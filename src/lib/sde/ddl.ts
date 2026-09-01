@@ -31,6 +31,8 @@ export const SDE_TABLES = [
   "sde_constellations",
   "sde_solar_systems",
   "sde_stations",
+  "sde_alpha_skills",
+  "sde_skill_plans",
 ] as const;
 
 export type SdeTableName = (typeof SDE_TABLES)[number];
@@ -179,6 +181,18 @@ const TABLE_BODIES: Record<SdeTableName, string> = {
     type_id        int,
     owner_id       int,
     operation_id   int`,
+  // Spec §3: the Alpha skill set, from cloneGrades grade 1. All four racial grades are identical.
+  sde_alpha_skills: `
+    skill_id  int PRIMARY KEY,
+    max_level int`,
+  // Spec §3: CCP's 40 certified career plans, offered as templates.
+  // skills/milestones are [{ "skillId": int, "level": int }, …] in the SDE's own order.
+  sde_skill_plans: `
+    id          int PRIMARY KEY,
+    name        text,
+    description text,
+    skills      jsonb,
+    milestones  jsonb`,
 };
 
 const INDEXES: { name: string; table: SdeTableName; expr: string }[] = [

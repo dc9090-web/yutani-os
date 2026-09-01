@@ -13,6 +13,7 @@ describe("sde-mini.zip", () => {
       "dogmaAttributeCategories.jsonl", "dogmaAttributes.jsonl", "marketGroups.jsonl", "mapRegions.jsonl",
       "types.jsonl", "typeDogma.jsonl", "typeBonus.jsonl", "dogmaEffects.jsonl",
       "mapConstellations.jsonl", "mapSolarSystems.jsonl", "npcStations.jsonl",
+      "cloneGrades.jsonl", "skillPlans.jsonl",
     ];
     const counts: Record<string, number> = {};
     for (const m of members) counts[m] = await fixtureCount(m);
@@ -33,6 +34,8 @@ describe("sde-mini.zip", () => {
       "mapConstellations.jsonl": 1,
       "mapSolarSystems.jsonl": 7,
       "npcStations.jsonl": 18,
+      "cloneGrades.jsonl": 4,
+      "skillPlans.jsonl": 40,
     });
   }, 30_000);
 
@@ -51,5 +54,18 @@ describe("sde-mini.zip", () => {
     const station = await fixtureRecord("npcStations.jsonl", 60003760);
     expect(station.solarSystemID).toBe(30000142);
     expect(station.typeID).toBe(52678);
+  }, 30_000);
+
+  it("carries the Alpha clone grades and CCP's career plans", async () => {
+    const alpha = await fixtureRecord("cloneGrades.jsonl", 1);
+    expect(alpha.name).toBe("Alpha Caldari");
+    expect((alpha.skills as unknown[]).length).toBe(175);
+    const plan = await fixtureRecord("skillPlans.jsonl", 4);
+    expect((plan.name as Record<string, string>).en).toBe("Minmatar Militia Fighter");
+    expect((plan.skillRequirements as unknown[])[0]).toEqual({ level: 1, typeID: 3327 });
+    expect(plan.milestones).toEqual([
+      { level: 3, typeID: 3329 }, { level: 2, typeID: 3356 }, { level: 3, typeID: 3302 },
+      { level: 3, typeID: 3315 }, { level: 3, typeID: 3310 },
+    ]);
   }, 30_000);
 });

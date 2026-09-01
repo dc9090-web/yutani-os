@@ -1,6 +1,6 @@
 import type { SdeTableName } from "./ddl.js";
 
-export type SdePgType = "int" | "text" | "bool" | "float8";
+export type SdePgType = "int" | "text" | "bool" | "float8" | "jsonb";
 export interface SdeColumn { name: string; type: SdePgType }
 
 export interface SdeTable {
@@ -42,6 +42,14 @@ export function bool(value: unknown): boolean | null {
 }
 export function str(value: unknown): string | null {
   return typeof value === "string" ? value : null;
+}
+
+/**
+ * A jsonb column's value. `pg` serialises a `text[]`/`jsonb[]` parameter by escaping each element,
+ * so handing it JSON strings is safe for any content — quotes, commas and backslashes included.
+ */
+export function json(value: unknown): string {
+  return JSON.stringify(value);
 }
 
 function list(value: unknown): Rec[] {
@@ -228,6 +236,24 @@ export const SDE_TABLE_DEFS: readonly SdeTable[] = [
     columns: cols({ id: "int", solar_system_id: "int", type_id: "int", owner_id: "int", operation_id: "int" }),
     // npcStations carry no name — station names come from ESI in phase 3.
     map: (r) => [int(r._key), int(r.solarSystemID), int(r.typeID), int(r.ownerID), int(r.operationID)],
+  },
+  {
+    table: "sde_alpha_skills",
+    member: "cloneGrades",
+    columns: cols({ skill_id: "int", max_level: "int" }),
+    // Four racial grades, byte-identical after sorting; keep grade 1 and let the rest map to nothing.
+    map: (r) => (int(r._key) === 1 ? list(r.skills).map((s) => [int(s.typeID), int(s.level)]) : []),
+  },
+  {
+    table: "sde_skill_plans",
+    member: "skillPlans",
+    columns: cols({ id: "int", name: "text", description: "text", skills: "jsonb", milestones: "jsonb" }),
+    // The SDE field is `skillRequirements`; the column keeps the spec's name `skills`.
+    map: (r) => [
+      int(r._key), en(r.name), en(r.description),
+      json(list(r.skillRequirements).map((s) => ({ skillId: int(s.typeID), level: int(s.level) }))),
+      json(list(r.milestones).map((s) => ({ skillId: int(s.typeID), level: int(s.level) }))),
+    ],
   },
 ];
 

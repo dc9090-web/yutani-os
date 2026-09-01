@@ -240,3 +240,90 @@ export async function getTypesByNames(names: string[]): Promise<Map<string, numb
     `SELECT lower(name) AS key, id FROM sde_types WHERE lower(name) = ANY($1::text[])`, [wanted]);
   return new Map(rows.map((r) => [r.key, r.id]));
 }
+
+export interface SdeCareerPlan {
+  id: number; name: string | null; description: string | null;
+  skills: { skillId: number; level: number }[];
+  milestones: { skillId: number; level: number }[];
+}
+export interface SdePlanSkill {
+  id: number; name: string | null; groupId: number | null; groupName: string | null;
+  rank: number; primaryAttr: number; secondaryAttr: number;
+  prereqs: { skillId: number; level: number }[];
+}
+
+const CAREER_PLAN_COLS = "id, name, description, skills, milestones";
+
+/** skillId → the highest level an Alpha clone may train (spec §3). */
+export async function getAlphaSkills(): Promise<Map<number, number>> {
+  const { rows } = await getPool().query<{ skillId: number; maxLevel: number | null }>(
+    `SELECT skill_id AS "skillId", max_level AS "maxLevel" FROM sde_alpha_skills`);
+  const out = new Map<number, number>();
+  for (const r of rows) if (r.maxLevel !== null) out.set(r.skillId, r.maxLevel);
+  return out;
+}
+
+/** `pg` parses a jsonb column into plain objects, so the arrays come back ready to use. */
+export async function listCareerPlans(): Promise<SdeCareerPlan[]> {
+  const { rows } = await getPool().query<SdeCareerPlan>(
+    `SELECT ${CAREER_PLAN_COLS} FROM sde_skill_plans ORDER BY name, id`);
+  return rows.map(careerPlan);
+}
+
+export async function getCareerPlan(id: number): Promise<SdeCareerPlan | null> {
+  const { rows } = await getPool().query<SdeCareerPlan>(
+    `SELECT ${CAREER_PLAN_COLS} FROM sde_skill_plans WHERE id = $1`, [id]);
+  return rows[0] ? careerPlan(rows[0]) : null;
+}
+
+/** A NULL jsonb column (an SDE record with no such list) reads as an empty array, never null. */
+function careerPlan(r: SdeCareerPlan): SdeCareerPlan {
+  return { ...r, skills: r.skills ?? [], milestones: r.milestones ?? [] };
+}
+
+/**
+ * Every published skill in a published skill group (category 16), with the rank, the primary and
+ * secondary attribute ids and the six prerequisite pairs pivoted out of `sde_type_attributes` in
+ * one query. Group 505 "Fake Skills" is unpublished, so `g.published` excludes it without a
+ * hard-coded id. Values are SDE floats — rounded here, as `getSkillRequirements` already does.
+ */
+export async function listPlanSkills(): Promise<SdePlanSkill[]> {
+  const pairs = SKILL_ATTRIBUTE_PAIRS.flatMap(([skillAttr, levelAttr], i) =>
+    [`max(a.value) FILTER (WHERE a.attribute_id = ${skillAttr}) AS "req${i}"`,
+     `max(a.value) FILTER (WHERE a.attribute_id = ${levelAttr}) AS "req${i}Level"`]).join(",\n            ");
+  type Row = {
+    id: number; name: string | null; groupId: number | null; groupName: string | null;
+    rank: number | null; primaryAttr: number | null; secondaryAttr: number | null;
+  } & Record<string, number | null | string>;
+  const { rows } = await getPool().query<Row>(
+    `SELECT t.id, t.name, t.group_id AS "groupId", g.name AS "groupName",
+            max(a.value) FILTER (WHERE a.attribute_id = 275) AS "rank",
+            max(a.value) FILTER (WHERE a.attribute_id = 180) AS "primaryAttr",
+            max(a.value) FILTER (WHERE a.attribute_id = 181) AS "secondaryAttr",
+            ${pairs}
+     FROM sde_types t
+     JOIN sde_groups g ON g.id = t.group_id
+     LEFT JOIN sde_type_attributes a ON a.type_id = t.id
+     WHERE t.published AND g.published AND g.category_id = 16
+     GROUP BY t.id, t.name, t.group_id, g.name
+     ORDER BY t.name, t.id`);
+  return rows.map((r) => {
+    const prereqs: { skillId: number; level: number }[] = [];
+    for (let i = 0; i < SKILL_ATTRIBUTE_PAIRS.length; i++) {
+      const skill = r[`req${i}`];
+      const level = r[`req${i}Level`];
+      if (typeof skill !== "number" || typeof level !== "number") continue;
+      const skillId = Math.round(skill);
+      if (skillId <= 0) continue;
+      prereqs.push({ skillId, level: Math.round(level) });
+    }
+    return {
+      id: r.id, name: r.name, groupId: r.groupId, groupName: r.groupName,
+      // A skill with no rank cannot be trained; rank 1 keeps the arithmetic finite and the row visible.
+      rank: r.rank === null ? 1 : Math.round(r.rank),
+      primaryAttr: r.primaryAttr === null ? 0 : Math.round(r.primaryAttr),
+      secondaryAttr: r.secondaryAttr === null ? 0 : Math.round(r.secondaryAttr),
+      prereqs,
+    };
+  });
+}

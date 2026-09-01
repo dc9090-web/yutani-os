@@ -12,10 +12,11 @@ import { mkdir, stat } from "node:fs/promises";
 import { readJsonlMember } from "../src/lib/sde/jsonl.js";
 import { writeZip, type ZipMember } from "./lib/zip.js";
 
-/** Copied whole: together these are ~4.1 MB of JSON that deflates to well under the budget. */
+/** Copied whole: together these are ~4.5 MB of JSON that deflates to well under the budget. */
 const FULL_MEMBERS = [
   "_sde", "categories", "groups", "metaGroups", "dogmaUnits",
   "dogmaAttributeCategories", "dogmaAttributes", "marketGroups", "mapRegions",
+  "cloneGrades", "skillPlans",
 ];
 
 /** Rifter, Gyrostabilizer II, Gunnery, Small Hybrid Turret, Small Projectile Turret,

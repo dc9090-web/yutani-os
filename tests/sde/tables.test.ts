@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { tableDef, en, int, num, bool, str, SDE_TABLE_DEFS } from "../../src/lib/sde/tables.js";
+import { tableDef, en, int, num, bool, str, json, SDE_TABLE_DEFS } from "../../src/lib/sde/tables.js";
 import { fixtureRecord } from "./fixture.js";
 
 /** Maps a fixture record with the named table's mapper and returns the single row. */
@@ -34,12 +34,12 @@ describe("field helpers", () => {
 });
 
 describe("every table def", () => {
-  it("covers 17 tables and declares a type for every column", () => {
-    expect(SDE_TABLE_DEFS.length).toBe(17);
-    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(17);
+  it("covers 19 tables and declares a type for every column", () => {
+    expect(SDE_TABLE_DEFS.length).toBe(19);
+    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(19);
     for (const def of SDE_TABLE_DEFS) {
       expect(def.columns.length).toBeGreaterThan(0);
-      for (const c of def.columns) expect(["int", "text", "bool", "float8"]).toContain(c.type);
+      for (const c of def.columns) expect(["int", "text", "bool", "float8", "jsonb"]).toContain(c.type);
     }
   });
 });
@@ -178,5 +178,32 @@ describe("sde_type_bonuses fan-out order", () => {
     expect(tableDef("sde_type_bonuses").map(record)).toEqual([
       [54838, 0, "misc", null, 1, null, "Cynosural Field Generation Blocked", null],
     ]);
+  });
+});
+
+describe("phase 6 static data", () => {
+  it("keeps only Alpha grade 1 and fans its 175 skills out", async () => {
+    const alpha = await rows("sde_alpha_skills", "cloneGrades.jsonl", 1);
+    expect(alpha).toHaveLength(175);
+    expect(alpha[0]).toEqual([3300, 5]);                   // Gunnery, capped at V for Alphas
+    expect(await rows("sde_alpha_skills", "cloneGrades.jsonl", 2)).toEqual([]);
+    expect(await rows("sde_alpha_skills", "cloneGrades.jsonl", 8)).toEqual([]);
+  }, 30_000);
+
+  it("maps a career plan, reading skillRequirements into the skills column", async () => {
+    const plan = await row("sde_skill_plans", "skillPlans.jsonl", 4);
+    expect(plan[0]).toBe(4);
+    expect(plan[1]).toBe("Minmatar Militia Fighter");
+    expect(String(plan[2])).toContain("Minmatar Soldiers of Fortune");
+    expect(JSON.parse(String(plan[3]))[0]).toEqual({ skillId: 3327, level: 1 });
+    expect(JSON.parse(String(plan[4]))).toEqual([
+      { skillId: 3329, level: 3 }, { skillId: 3356, level: 2 }, { skillId: 3302, level: 3 },
+      { skillId: 3315, level: 3 }, { skillId: 3310, level: 3 },
+    ]);
+  }, 30_000);
+
+  it("json stringifies without touching a string", () => {
+    expect(json([{ skillId: 1, level: 2 }])).toBe('[{"skillId":1,"level":2}]');
+    expect(json([])).toBe("[]");
   });
 });
