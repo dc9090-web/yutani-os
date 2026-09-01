@@ -26,6 +26,7 @@ describe("schema", () => {
       "sde_market_groups", "sde_meta", "sde_meta_groups", "sde_regions", "sde_skill_plans",
       "sde_solar_systems", "sde_stations", "sde_type_attributes", "sde_type_bonuses",
       "sde_type_effects", "sde_types",
+      "skill_plan_entries", "skill_plans",
       "structures", "sync_runs", "universe_names",
     ]);
   });
@@ -40,12 +41,16 @@ describe("schema", () => {
     await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (42, 'Cascade', 'enc') ON CONFLICT (id) DO NOTHING");
     await pool.query("INSERT INTO character_skills (character_id, skill_id, trained_level, active_level, skillpoints) VALUES (42, 3300, 5, 5, 256000)");
     await pool.query("INSERT INTO character_assets (character_id, item_id, type_id, quantity, location_id, location_type, location_flag) VALUES (42, 1, 34, 5, 60003760, 'station', 'Hangar')");
+    await pool.query("INSERT INTO skill_plans (id, character_id, name) VALUES (900, 42, 'Cascade plan')");
+    await pool.query("INSERT INTO skill_plan_entries (plan_id, position, skill_id, level) VALUES (900, 0, 3300, 5)");
     await pool.query("INSERT INTO character_wallet (character_id, balance) VALUES (42, 1.00)");
     await pool.query("DELETE FROM characters WHERE id = 42");
     for (const t of ["character_skills", "character_assets", "character_wallet"]) {
       const { rows } = await pool.query(`SELECT count(*)::int AS n FROM ${t} WHERE character_id = 42`);
       expect(rows[0].n).toBe(0);
     }
+    expect((await pool.query("SELECT count(*) FROM skill_plans WHERE character_id = 42")).rows[0].count).toBe("0");
+    expect((await pool.query("SELECT count(*) FROM skill_plan_entries WHERE plan_id = 900")).rows[0].count).toBe("0");
   });
   it("accepts an ESI enum value nobody has seen before", async () => {
     await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (43, 'Enum', 'enc') ON CONFLICT (id) DO NOTHING");
@@ -55,5 +60,11 @@ describe("schema", () => {
       `INSERT INTO character_assets (character_id, item_id, type_id, quantity, location_id, location_type, location_flag)
        VALUES (43, 2, 34, 1, 60003760, 'station', 'BrandNewHold')`);
     await pool.query("DELETE FROM characters WHERE id = 43");
+  });
+  it("rejects a plan entry outside levels 1..5", async () => {
+    await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (43, 'Levels', 'enc') ON CONFLICT (id) DO NOTHING");
+    await pool.query("INSERT INTO skill_plans (id, character_id, name) VALUES (901, 43, 'Levels')");
+    await expect(pool.query("INSERT INTO skill_plan_entries (plan_id, position, skill_id, level) VALUES (901, 0, 3300, 6)"))
+      .rejects.toThrow(/check/i);
   });
 });

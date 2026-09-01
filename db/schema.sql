@@ -267,3 +267,27 @@ CREATE TABLE IF NOT EXISTS fit_items (
   PRIMARY KEY (fit_id, idx)
 );
 CREATE INDEX IF NOT EXISTS fits_updated_idx ON fits (updated_at DESC);
+
+-- ── Phase 6: the skill planner ──────────────────────────────────────────────
+-- EVEMon-style plans. A plan belongs to exactly one character and dies with it: without a pilot
+-- there are no attributes, no implants and no queue, so there is nothing left to compute.
+-- remap is NULL, or the five BASE attribute values the plan assumes (each 17..27, summing to 99).
+CREATE TABLE IF NOT EXISTS skill_plans (
+  id            serial PRIMARY KEY,
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  name          text NOT NULL,
+  remap         jsonb,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS skill_plans_character_idx ON skill_plans (character_id, updated_at DESC);
+
+-- position is the training order, dense from 0; a PUT replaces the whole list.
+CREATE TABLE IF NOT EXISTS skill_plan_entries (
+  plan_id   int NOT NULL REFERENCES skill_plans(id) ON DELETE CASCADE,
+  position  int NOT NULL,
+  skill_id  int NOT NULL,
+  level     int NOT NULL CHECK (level BETWEEN 1 AND 5),
+  note      text,
+  PRIMARY KEY (plan_id, position)
+);
