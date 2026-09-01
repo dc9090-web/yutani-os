@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Status:** Approved by delegation (project overview §2; rulings recorded inline)
 **Depends on:** Phase 3 (`resolveNames`, sync jobs), Phase 4 (`market_prices`, fit builders), Phase 5 (local fits)
-**Research:** `.superpowers/research/esi-endpoints.md` §6 (ESI killmails, zKillboard API)
+**Research:** `docs/research/esi-endpoints.md` §6 (ESI killmails, zKillboard API)
 
 ## 1. Goal
 

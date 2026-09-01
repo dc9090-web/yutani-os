@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Status:** Approved by delegation (project overview §2; rulings recorded inline)
 **Depends on:** Phase 1 (Foundation), Phase 2 (SDE) — `sde_*` tables and `src/lib/sde/repo.ts`
-**Research:** `.superpowers/research/esi-endpoints.md` (ESI schemas, scopes, cache timers, rate-limit buckets)
+**Research:** `docs/research/esi-endpoints.md` (ESI schemas, scopes, cache timers, rate-limit buckets)
 
 ## 1. Goal
 

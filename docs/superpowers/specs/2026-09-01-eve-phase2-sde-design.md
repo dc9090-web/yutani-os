@@ -13,7 +13,7 @@ small typed lookup library. Phases 3–7 never parse SDE files; they query these
 
 ## 2. Source format (verified against build 3484357, 2026-08-28)
 
-Research: `.superpowers/research/sde-format.md`.
+Research: `docs/research/sde-format.md`.
 
 - **Version pointer:** `GET https://developers.eveonline.com/static-data/tranquility/latest.jsonl`
   → one line `{"_key":"sde","buildNumber":3484357,"releaseDate":"2026-08-28T11:07:12Z"}`. Supports
@@ -186,7 +186,7 @@ Ansible's existing `eve` role redeploys; acceptance runs after deploy.
   referenced by those types plus effects 754, 290, 146, 92, 89, 5928; constellation 20000020
   (Kimotoro) and its solar systems; stations in system 30000142 (Jita). The allow-list lives in the
   script; the fixture is regenerated only deliberately. The full archive used for generation is
-  `.superpowers/research/sde-3484357.zip` (git-ignored).
+  `docs/research/sde-3484357.zip` (git-ignored).
 - **Unit (vitest):** `readJsonlMember` streams the fixture; each `SdeTable.map` on verbatim records
   (English pick, absent → null, effect modifiers incl. `EffectStopper`, `typeBonus` fan-out order);
   `fetchLatestBuild` with a mocked fetch; `sde-update` job skip/import/error paths with fakes;

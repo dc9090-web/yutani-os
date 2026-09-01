@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Status:** Approved by delegation (project overview §2; rulings recorded inline)
 **Depends on:** Phase 2 (`sde_*`), Phase 3 (`character_skills`, `character_skill_queue`, `character_attributes`, `character_implants`)
-**Research:** `.superpowers/research/skill-planner.md` (formulas verified against the SDE; EVEMon behaviour; formats)
+**Research:** `docs/research/skill-planner.md` (formulas verified against the SDE; EVEMon behaviour; formats)
 
 ## 1. Goal
 

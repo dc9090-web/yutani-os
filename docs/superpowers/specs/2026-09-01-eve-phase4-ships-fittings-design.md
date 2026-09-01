@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Status:** Approved by delegation (project overview §2; rulings recorded inline)
 **Depends on:** Phase 2 (`sde_*`), Phase 3 (`character_assets`, `character_fittings*`, `character_skills`, `character_implants`)
-**Research:** `.superpowers/research/dogma-engine.md` (EOS/Pyfa/EVEShipFit comparison; verified IDs, formulas, fixtures)
+**Research:** `docs/research/dogma-engine.md` (EOS/Pyfa/EVEShipFit comparison; verified IDs, formulas, fixtures)
 
 ## 1. Goal
 
