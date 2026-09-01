@@ -1,4 +1,4 @@
-import type { EsiClient } from "../lib/esi/client.js";
+import { EsiClient, EsiError } from "../lib/esi/client.js";
 import { NeedsReauthError } from "../lib/esi/tokens.js";
 import type { startRun, finishRun } from "../lib/db/sync-runs.js";
 
@@ -7,6 +7,7 @@ export interface SyncJob { name: string; intervalMs: number; run(ctx: JobContext
 export interface SchedulerDeps {
   jobs: SyncJob[]; esi: EsiClient; listCharacters: () => Promise<{ id: number; tokenStatus: string }[]>;
   startRun: typeof startRun; finishRun: typeof finishRun; now?: () => number; staggerMs?: number; log?: (msg: string) => void;
+  markNeedsReauth?: (characterId: number) => Promise<void>;
 }
 
 export class Scheduler {
@@ -45,7 +46,15 @@ export class Scheduler {
       await this.deps.finishRun(id, { status: "ok", rows });
       this.log(`${job.name} character=${characterId} ok rows=${rows}`);
     } catch (e) {
-      const error = e instanceof NeedsReauthError ? e.message : (e as Error).message ?? String(e);
+      let error: string;
+      if (e instanceof NeedsReauthError) {
+        error = e.message;
+      } else if (e instanceof EsiError && e.status === 401) {
+        await this.deps.markNeedsReauth?.(characterId);
+        error = "ESI 401 — token rejected; character needs re-authorisation";
+      } else {
+        error = (e as Error).message ?? String(e);
+      }
       await this.deps.finishRun(id, { status: "error", error });
       this.log(`${job.name} character=${characterId} error: ${error}`);
     }

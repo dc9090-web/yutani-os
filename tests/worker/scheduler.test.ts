@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { Scheduler, type SyncJob } from "../../src/worker/scheduler.js";
 import { NeedsReauthError } from "../../src/lib/esi/tokens.js";
+import { EsiError } from "../../src/lib/esi/client.js";
 
-function make(jobs: SyncJob[], chars = [{ id: 1, tokenStatus: "ok" }, { id: 2, tokenStatus: "ok" }]) {
+function make(jobs: SyncJob[], chars = [{ id: 1, tokenStatus: "ok" }, { id: 2, tokenStatus: "ok" }], markNeedsReauth?: (id: number) => Promise<void>) {
   let t = 0;
   const runs: { job: string; cid: number | null }[] = [];
   const finished: { id: number; status: string; error?: string; rows?: number }[] = [];
@@ -10,7 +11,7 @@ function make(jobs: SyncJob[], chars = [{ id: 1, tokenStatus: "ok" }, { id: 2, t
     jobs, esi: {} as never, listCharacters: async () => chars,
     startRun: async (job, cid) => { runs.push({ job, cid }); return runs.length; },
     finishRun: async (id, r) => { finished.push({ id, ...r }); },
-    now: () => t, staggerMs: 5000, log: () => {},
+    now: () => t, staggerMs: 5000, log: () => {}, markNeedsReauth,
   });
   return { s, runs, finished, advance: (ms: number) => { t += ms; } };
 }
@@ -36,5 +37,21 @@ describe("Scheduler", () => {
     const { s, finished } = make([{ name: "j", intervalMs: 60_000, run }], [{ id: 1, tokenStatus: "ok" }]);
     await s.tick();
     expect(finished[0].status).toBe("error"); expect(finished[0].error).toMatch(/re-authorisation/);
+  });
+  it("marks needs_reauth on a 401 EsiError", async () => {
+    const run = vi.fn(async () => { throw new EsiError(401, "/x", "nope"); });
+    const markNeedsReauth = vi.fn(async () => {});
+    const { s, finished } = make([{ name: "j", intervalMs: 60_000, run }], [{ id: 1, tokenStatus: "ok" }], markNeedsReauth);
+    await s.tick();
+    expect(markNeedsReauth).toHaveBeenCalledWith(1);
+    expect(finished[0].status).toBe("error"); expect(finished[0].error).toMatch(/401/);
+  });
+  it("leaves a 403 EsiError as a plain error, no reauth flag", async () => {
+    const run = vi.fn(async () => { throw new EsiError(403, "/x", "forbidden"); });
+    const markNeedsReauth = vi.fn(async () => {});
+    const { s, finished } = make([{ name: "j", intervalMs: 60_000, run }], [{ id: 1, tokenStatus: "ok" }], markNeedsReauth);
+    await s.tick();
+    expect(markNeedsReauth).not.toHaveBeenCalled();
+    expect(finished[0].status).toBe("error"); expect(finished[0].error).toBe("forbidden");
   });
 });
