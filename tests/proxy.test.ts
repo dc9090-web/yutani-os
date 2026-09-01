@@ -10,6 +10,10 @@ describe("isPublicPath", () => {
   it("guards everything else", () => {
     for (const p of ["/", "/settings", "/api/accounts", "/ships/1", "/login-history", "/api/healthz"]) expect(isPublicPath(p)).toBe(false);
   });
+
+  it("guards the wallet JSON route like every other API route", () => {
+    expect(isPublicPath("/api/characters/669539978/wallet?kind=journal&offset=100")).toBe(false);
+  });
 });
 
 describe("proxy", () => {
