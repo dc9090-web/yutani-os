@@ -54,4 +54,7 @@ describe("ESI fixtures", () => {
     expect(esiFixture<Record<string, unknown>[]>("wallet-transactions")).toHaveLength(2);
     expect(esiFixture<number[]>("implants")).toHaveLength(5);
   });
+  it("throws for a fixture name with no matching file", () => {
+    expect(() => esiFixture("does-not-exist")).toThrow();
+  });
 });

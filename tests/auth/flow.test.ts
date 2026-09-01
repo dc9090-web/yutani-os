@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { startLogin, completeLogin, AuthError, safeNextPath, type FlowDeps } from "../../src/lib/auth/flow.js";
+import { decryptSecret } from "../../src/lib/auth/crypto.js";
 import { signPayload, verifyPayload, OAUTH_MAX_AGE, type OauthPayload } from "../../src/lib/auth/session.js";
 import { loadConfig } from "../../src/lib/config.js";
 import type { SsoMetadata } from "../../src/lib/auth/sso.js";
@@ -41,7 +42,8 @@ describe("completeLogin", () => {
     expect(out).toEqual({ characterId: 669539978, name: "TrilliumONE" });
     const arg = (d.upsert as ReturnType<typeof vi.fn>).mock.calls[0][0];
     expect(arg.refreshTokenEnc).toMatch(/^v1\./);
-    expect(arg.refreshTokenEnc).not.toContain("rt");
+    expect(arg.refreshTokenEnc).not.toBe("rt");
+    expect(decryptSecret(arg.refreshTokenEnc, config.sessionSecret)).toBe("rt");
     expect(arg.scopes).toEqual(["a"]);
   });
   it("rejects state mismatch / missing cookie", async () => {

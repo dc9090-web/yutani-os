@@ -13,7 +13,9 @@ describe("crypto", () => {
     const t = encryptSecret("x", key);
     expect(() => decryptSecret(t, "other-key-other-key-other-key-000")).toThrow();
     const parts = t.split(".");
-    parts[3] = parts[3].slice(0, -2) + "AA";
+    const ct = Buffer.from(parts[3], "base64url");
+    ct[0] ^= 0xff;
+    parts[3] = ct.toString("base64url");
     expect(() => decryptSecret(parts.join("."), key)).toThrow();
   });
 });

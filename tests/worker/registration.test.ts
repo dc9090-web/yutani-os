@@ -15,7 +15,6 @@ describe("worker job registration", () => {
     expect(new Set(ALL_JOBS.map((j) => j.name)).size).toBe(ALL_JOBS.length);
     for (const job of ALL_JOBS) {
       expect(job.intervalMs).toBeGreaterThan(0);
-      if (job.name === "sde-update") continue;                 // phase-2 job, no retryMs
       expect(job.retryMs).toBeGreaterThan(0);
       expect(job.retryMs!).toBeLessThan(job.intervalMs);
     }
