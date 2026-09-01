@@ -5,9 +5,10 @@
  * of any value import from src/lib/db, so the engine remains isomorphic.
  */
 import type { AssetRow } from "../db/character-assets.js";
+import type { FittingItemRow, FittingRow } from "../db/character-fittings.js";
 import type { DogmaData, TypeId } from "./data.js";
 import {
-  SLOT_KINDS, addModule, attachCharge, createFit, makeItem, makeSkill,
+  SLOT_KINDS, addModule, attachCharge, createFit, makeItem, makeSkill, slotOfType,
   type Fit, type Item, type SlotKind,
 } from "./fit.js";
 import { clearMemo } from "./calc.js";
@@ -74,14 +75,69 @@ export function fitFromAssets(shipAsset: AssetRow, childAssets: AssetRow[], ctx:
 
   for (const flag of orderedFlags(slotted.keys())) {
     const group = slotted.get(flag) ?? [];
-    // The singleton is the module; anything non-singleton sharing its flag is a charge.
-    const module = group.find((g) => g.isSingleton) ?? group[0];
+    // The singleton is the module; anything non-singleton sharing its flag is a charge. With no
+    // singleton at all there is no module to hang a charge under, so the whole group is cargo — a
+    // charge is never promoted into the slot on its own (review tightening #1).
+    const candidates = group.filter((g) => g.isSingleton);
+    if (candidates.length === 0) { built.cargo.push(...group.map((g) => g.entry)); continue; }
+    const [module, ...extra] = candidates;
+    // A second singleton sharing the flag is not a charge either — it's an unfittable extra module
+    // (review tightening #2).
+    built.unfittable.push(...extra.map((g) => g.entry));
     const { slot, index } = slotFromFlag(flag)!;
-    fitOneModule(built, ctx, module.entry, slot, index, group.filter((g) => g !== module).map((g) => g.entry));
+    const charges = group.filter((g) => !g.isSingleton).map((g) => g.entry);
+    fitOneModule(built, ctx, module.entry, slot, index, charges);
   }
 
   clearMemo(built.fit);
   return built;
+}
+
+/**
+ * A saved ESI fitting has no `is_singleton`, so the module in a slot is the entry whose *type* carries
+ * that slot's marker effect; anything else sharing the flag is its charge.
+ */
+export function fitFromFitting(fitting: FittingRow, items: FittingItemRow[], ctx: FitContext): BuiltFit {
+  const built = startFit(ctx, fitting.shipTypeId);
+  const slotted = new Map<string, FitEntry[]>();
+
+  for (const row of items) {
+    const entry: FitEntry = { typeId: row.typeId, quantity: row.quantity, flag: row.flag, name: null };
+    if (row.flag === INVALID_FLAG) { built.unfittable.push(entry); continue; }
+    if (slotFromFlag(row.flag)) { pushInto(slotted, row.flag, entry); continue; }
+    if (row.flag === DRONE_BAY_FLAG) { addDrone(built, ctx, entry); continue; }
+    built.cargo.push(entry);
+  }
+
+  for (const flag of orderedFlags(slotted.keys())) {
+    const group = slotted.get(flag) ?? [];
+    // The module is the entry whose type carries the slot's marker effect. A type this SDE build
+    // doesn't know can't be ruled out either way, so it stays a candidate (and any build failure lands
+    // it in `unknown`, same as fitFromAssets). With no candidate at all the whole group is cargo — a
+    // charge is never promoted into the slot on its own (review tightening #1).
+    const candidates = group.filter((entry) => isModuleCandidate(ctx.data, entry.typeId));
+    if (candidates.length === 0) { built.cargo.push(...group); continue; }
+    const [module, ...extra] = candidates;
+    // A second marker-carrying (or unresolvable) entry sharing the flag is not a charge either — it's
+    // an unfittable extra module (review tightening #2).
+    built.unfittable.push(...extra);
+    const { slot, index } = slotFromFlag(flag)!;
+    const charges = group.filter((entry) => !isModuleCandidate(ctx.data, entry.typeId));
+    fitOneModule(built, ctx, module, slot, index, charges);
+  }
+
+  clearMemo(built.fit);
+  return built;
+}
+
+function carriesSlotMarker(data: DogmaData, typeId: TypeId): boolean {
+  const type = data.types.get(typeId);
+  return type !== undefined && slotOfType(type) !== null;
+}
+
+/** A type this build doesn't know can't be confirmed as a charge, so it isn't excluded as a candidate. */
+function isModuleCandidate(data: DogmaData, typeId: TypeId): boolean {
+  return !data.types.has(typeId) || carriesSlotMarker(data, typeId);
 }
 
 function startFit(ctx: FitContext, shipTypeId: TypeId): BuiltFit {

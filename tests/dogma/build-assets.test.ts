@@ -118,4 +118,30 @@ describe("fitFromAssets", () => {
     ], ctx);
     expect(built.cargo).toEqual([{ typeId: 12608, quantity: 3, flag: "Cargo", name: "spare ammo" }]);
   });
+
+  it("sends every item in a slot flag to cargo when nothing in it is a singleton", () => {
+    // Two non-singleton stacks share MedSlot1 with no module to hang them off — neither is promoted
+    // into the slot as a stand-in module (review tightening #1).
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 5001, typeId: 12608, locationFlag: "MedSlot1", quantity: 50, isSingleton: false }),
+      asset({ itemId: 5002, typeId: 12608, locationFlag: "MedSlot1", quantity: 25, isSingleton: false }),
+    ], ctx);
+    expect(built.fit.modules.some((m) => m.slot === "mid" && m.index === 1)).toBe(false);
+    expect(built.cargo).toEqual([
+      { typeId: 12608, quantity: 50, flag: "MedSlot1", name: null },
+      { typeId: 12608, quantity: 25, flag: "MedSlot1", name: null },
+    ]);
+  });
+
+  it("sends a second singleton sharing a flag to unfittable instead of treating it as a charge", () => {
+    // Two singleton guns both claim HiSlot2 — the second can't be a charge of the first (review
+    // tightening #2).
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 5003, typeId: 2889, locationFlag: "HiSlot2" }),
+      asset({ itemId: 5004, typeId: 2889, locationFlag: "HiSlot2" }),
+    ], ctx);
+    expect(built.fit.modules.filter((m) => m.slot === "high" && m.index === 2)).toHaveLength(1);
+    expect(built.fit.modules.find((m) => m.slot === "high" && m.index === 2)?.item.charge).toBeUndefined();
+    expect(built.unfittable).toEqual([{ typeId: 2889, quantity: 1, flag: "HiSlot2", name: null }]);
+  });
 });
