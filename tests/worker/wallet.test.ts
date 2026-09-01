@@ -4,20 +4,24 @@ import {
   MAX_TRANSACTION_BATCHES, type EsiTransaction, type WalletJobDeps,
 } from "../../src/worker/jobs/wallet.js";
 import type { WalletWrite } from "../../src/lib/db/character-wallet.js";
-import { EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { EsiError, EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { NeedsReauthError } from "../../src/lib/esi/tokens.js";
 import { esiFixture } from "../fixtures/esi.js";
 
 const CID = 669539978;
 const WALLET_SCOPE = "esi-wallet.read_character_wallet.v1";
 
-function harness(scopes: string[] = [WALLET_SCOPE]) {
+function harness(scopes: string[] = [WALLET_SCOPE], over: Partial<WalletJobDeps> = {}) {
   const writes: WalletWrite[] = [];
   const resolved: number[][] = [];
+  const resolvedPlaces: { ids: number[]; characterId: number }[] = [];
   const calls: { path: string; query?: Record<string, string | number> }[] = [];
   const deps: WalletJobDeps = {
     getCharacter: async () => ({ scopes }),
     saveWallet: async (_id, w) => { writes.push(w); return 7; },
     resolveNames: async (ids) => { resolved.push(ids); return new Map(); },
+    resolveLocations: async (ids: number[], characterId: number) => { resolvedPlaces.push({ ids, characterId }); return new Map(); },
+    ...over,
   };
   const esi = {
     get: vi.fn(async (path: string, opts?: { query?: Record<string, string | number> }) => {
@@ -30,7 +34,7 @@ function harness(scopes: string[] = [WALLET_SCOPE]) {
     }),
     getAll: vi.fn(async (path: string) => { calls.push({ path }); return esiFixture("wallet-journal"); }),
   };
-  return { job: createWalletJob(deps), esi, writes, resolved, calls };
+  return { job: createWalletJob(deps), esi, writes, resolved, resolvedPlaces, calls };
 }
 
 describe("wallet job", () => {
@@ -94,6 +98,32 @@ describe("wallet job", () => {
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
     expect(h.writes).toEqual([]);
     expect(h.resolved).toEqual([]);
+  });
+  it("resolves every transaction location so the wallet page can label it", async () => {
+    const h = harness();
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    expect(h.resolvedPlaces).toHaveLength(1);
+    expect(h.resolvedPlaces[0].characterId).toBe(CID);
+    expect(h.resolvedPlaces[0].ids).toContain(60003760);
+  });
+  it("does not fail the run when resolveLocations throws a non-outage error", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const h = harness([WALLET_SCOPE], { resolveLocations: async () => { throw new Error("boom"); } });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).resolves.toBe(7);
+    expect(warn).toHaveBeenCalledWith(`[wallet] location resolution failed for ${CID}: boom`);
+    warn.mockRestore();
+  });
+  it("still rejects when resolveLocations throws an EsiUnavailableError", async () => {
+    const h = harness([WALLET_SCOPE], { resolveLocations: async () => { throw new EsiUnavailableError("/universe/structures/1", Date.now() + 60_000); } });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
+  });
+  it("still rejects when resolveLocations throws a NeedsReauthError", async () => {
+    const h = harness([WALLET_SCOPE], { resolveLocations: async () => { throw new NeedsReauthError(CID); } });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(NeedsReauthError);
+  });
+  it("still rejects when resolveLocations throws an EsiError(401)", async () => {
+    const h = harness([WALLET_SCOPE], { resolveLocations: async () => { throw new EsiError(401, "/universe/structures/1", "token rejected"); } });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toMatchObject({ status: 401 });
   });
 });
 

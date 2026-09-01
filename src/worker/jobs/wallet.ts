@@ -2,7 +2,8 @@ import type { CharacterSyncJob } from "../scheduler.js";
 import { hasScope } from "../../lib/auth/sso.js";
 import { getCharacter } from "../../lib/db/characters.js";
 import { saveWallet, type JournalRow, type TransactionRow, type WalletWrite } from "../../lib/db/character-wallet.js";
-import { resolveNames } from "../../lib/names/index.js";
+import { resolveLocations, resolveNames } from "../../lib/names/index.js";
+import { isAuthOrOutage } from "./resolve-guard.js";
 
 export const WALLET_INTERVAL_MS = 60 * 60 * 1000;
 export const WALLET_RETRY_MS = 10 * 60 * 1000;
@@ -29,6 +30,7 @@ export interface WalletJobDeps {
   getCharacter: (id: number) => Promise<{ scopes: string[] } | null>;
   saveWallet: (characterId: number, w: WalletWrite) => Promise<number>;
   resolveNames: (ids: number[]) => Promise<unknown>;
+  resolveLocations: (locationIds: number[], characterId: number) => Promise<unknown>;
 }
 
 const nullable = (v: number | undefined): number | null => (v === undefined ? null : v);
@@ -103,9 +105,22 @@ export function createWalletJob(deps: WalletJobDeps): CharacterSyncJob {
       }
       for (const t of transactions) if (t.client_id > 0) parties.add(t.client_id);
       await deps.resolveNames([...parties]);
+
+      // Transactions show where they happened, and the wallet page cannot call ESI for the name.
+      const places = new Set<number>();
+      for (const t of transactions) if (t.location_id > 0) places.add(t.location_id);
+      if (places.size > 0) {
+        try {
+          await deps.resolveLocations([...places], characterId);
+        } catch (e) {
+          if (isAuthOrOutage(e)) throw e;
+          // The wallet was already written; the next run's resolveLocations retries this.
+          console.warn(`[wallet] location resolution failed for ${characterId}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+      }
       return written;
     },
   };
 }
 
-export const walletJob: CharacterSyncJob = createWalletJob({ getCharacter, saveWallet, resolveNames });
+export const walletJob: CharacterSyncJob = createWalletJob({ getCharacter, saveWallet, resolveNames, resolveLocations });

@@ -2,6 +2,8 @@ import type { CharacterSyncJob } from "../scheduler.js";
 import { hasScope } from "../../lib/auth/sso.js";
 import { getCharacter } from "../../lib/db/characters.js";
 import { replaceClones, type ClonesWrite, type JumpCloneRow } from "../../lib/db/character-clones.js";
+import { resolveLocations } from "../../lib/names/index.js";
+import { isAuthOrOutage } from "./resolve-guard.js";
 
 export const CLONES_INTERVAL_MS = 6 * 60 * 60 * 1000;
 export const CLONES_RETRY_MS = 15 * 60 * 1000;
@@ -19,6 +21,7 @@ interface EsiClones {
 export interface ClonesJobDeps {
   getCharacter: (id: number) => Promise<{ scopes: string[] } | null>;
   replaceClones: (characterId: number, w: ClonesWrite) => Promise<number>;
+  resolveLocations: (locationIds: number[], characterId: number) => Promise<unknown>;
 }
 
 const date = (v: string | undefined): Date | null => (v === undefined ? null : new Date(v));
@@ -58,9 +61,27 @@ export function createClonesJob(deps: ClonesJobDeps): CharacterSyncJob {
         ? (await esi.get<number[]>(`/characters/${characterId}/implants`, { characterId })).data
         : null;
 
-      return deps.replaceClones(characterId, { clones, implants });
+      const written = await deps.replaceClones(characterId, { clones, implants });
+
+      // The Skills page labels the home station and every jump clone's location, and pages never
+      // call ESI — so those names have to be in Postgres before the page renders.
+      if (clones !== null) {
+        const places = new Set<number>();
+        if (clones.homeLocationId !== null) places.add(clones.homeLocationId);
+        for (const c of clones.jumpClones) if (c.locationId !== null) places.add(c.locationId);
+        if (places.size > 0) {
+          try {
+            await deps.resolveLocations([...places], characterId);
+          } catch (e) {
+            if (isAuthOrOutage(e)) throw e;
+            // Clones were already written; the next run's resolveLocations retries this.
+            console.warn(`[clones] location resolution failed for ${characterId}: ${e instanceof Error ? e.message : String(e)}`);
+          }
+        }
+      }
+      return written;
     },
   };
 }
 
-export const clonesJob: CharacterSyncJob = createClonesJob({ getCharacter, replaceClones });
+export const clonesJob: CharacterSyncJob = createClonesJob({ getCharacter, replaceClones, resolveLocations });
