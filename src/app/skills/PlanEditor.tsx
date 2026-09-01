@@ -58,6 +58,7 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
   const [saveState, setSaveState] = useState<keyof typeof SAVE_LABELS>("idle");
   const [exportFormat, setExportFormat] = useState<PlanTextFormat>("evemon");
   const [exportText, setExportText] = useState<string | null>(null);
+  const [exportFailed, setExportFailed] = useState(false);
 
   // Captured once: a `new Date()` in the render would shift every completion time per keystroke.
   const [mountedAt] = useState(() => (now === undefined ? new Date() : new Date(now)));
@@ -161,6 +162,10 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
   }, [plan.id, router.refresh]);
 
   useEffect(() => {
+    // An empty name would 400 on PUT; skip scheduling so a mid-rename clear doesn't wedge autosave
+    // in a retry loop. The plan stays dirty — the next keystroke that restores a name re-runs this
+    // effect and schedules normally.
+    if (payload.name.trim() === "") return;
     if (JSON.stringify(payload) === savedRef.current) return;
     timerRef.current = setTimeout(() => { timerRef.current = null; void save(payload); }, AUTOSAVE_MS);
     return () => { if (timerRef.current !== null) { clearTimeout(timerRef.current); timerRef.current = null; } };
@@ -197,6 +202,7 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
   const openExport = useCallback(async (format: PlanTextFormat) => {
     setExportFormat(format);
     setExportText("");
+    setExportFailed(false);
     try {
       await flush();
       const res = await fetch(`/api/skill-plans/${plan.id}/export?format=${format}`);
@@ -205,6 +211,7 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
     } catch (e) {
       console.error("[planner] could not export the plan", e);
       setExportText("");
+      setExportFailed(true);
     }
   }, [flush, plan.id]);
 
@@ -212,7 +219,7 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
     <div className="plan-editor">
       <div className="plan-editor-main">
         <div className="plan-toolbar">
-          <input className="fit-name-input" aria-label="Plan name" value={name}
+          <input className="fit-name-input" aria-label="Plan name" value={name} maxLength={60}
                  onChange={(e) => setName(e.target.value)} />
           <span className="muted">{characterName}</span>
           <button type="button" className="fit-btn" onClick={() => void flush()}>
@@ -305,7 +312,9 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
                       onClick={() => void navigator.clipboard?.writeText(exportText)}>Copy</button>
               <button type="button" className="fit-btn" onClick={() => setExportText(null)}>Close</button>
             </div>
-            <textarea className="eft-text" aria-label="Plan text" readOnly value={exportText} />
+            {exportFailed
+              ? <p className="warn-text">Could not export — try again.</p>
+              : <textarea className="eft-text" aria-label="Plan text" readOnly value={exportText} />}
           </div>
         </div>
       )}

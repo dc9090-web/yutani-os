@@ -98,6 +98,32 @@ describe("PlanEditor", () => {
     expect(screen.getByText("Saved")).toBeInTheDocument();
   });
 
+  it("skips autosave while the name is empty, then saves once it is valid again", async () => {
+    editor();
+    fireEvent.change(screen.getByLabelText("Plan name"), { target: { value: "" } });
+    await vi.advanceTimersByTimeAsync(AUTOSAVE_MS + 50);
+    expect(puts).toHaveLength(0);
+    fireEvent.change(screen.getByLabelText("Plan name"), { target: { value: "Gunnery Plan" } });
+    await vi.advanceTimersByTimeAsync(AUTOSAVE_MS + 50);
+    await waitFor(() => expect(puts).toHaveLength(1));
+    expect(puts[0]).toMatchObject({ url: "/api/skill-plans/7", body: { name: "Gunnery Plan" } });
+  });
+
+  it("shows an error line in the export modal when the export fetch fails", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/export")) return { ok: false, status: 500 } as Response;
+      puts.push({ url, body: JSON.parse(String(init?.body)) });
+      return { ok: true, status: 200, json: async () => ({ plan: PLAN }) } as Response;
+    }) as typeof fetch;
+    editor();
+    fireEvent.click(screen.getByRole("button", { name: "Export" }));
+    expect(await screen.findByText("Could not export — try again.")).toBeInTheDocument();
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it("shifts the timeline to the end of the queue", async () => {
     editor();
     expect(screen.getAllByText("2026-09-01 04:10").length).toBeGreaterThan(0);

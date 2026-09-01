@@ -55,7 +55,8 @@ export function effectiveAttributes(
 /**
  * Omega rate (spec §2 ruling — every character on this install is Omega). `primaryAttrId` and
  * `secondaryAttrId` are the VALUES of dogma attributes 180/181, which are themselves ids in
- * 164-168. An id we do not recognise yields 0, which the timeline renders as an untrainable entry.
+ * 164-168. An id we do not recognise yields 0, which the timeline renders as 0 ms of training
+ * time — the row still appears, its time/cumulative/done-at cells just read "—".
  */
 export function spPerMinute(attrs: AttributeSet, primaryAttrId: number, secondaryAttrId: number): number {
   const primary = ATTRIBUTE_KEY_BY_ATTR.get(primaryAttrId);

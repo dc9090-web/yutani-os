@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildCatalogue, catalogueFrom, type CatalogueRow } from "../../src/lib/skills/catalogue.js";
 import {
-  PLAN_TEXT_FORMATS, exportPlanText, isPlanTextFormat, levelFromToken, planTextNames,
+  PLAN_TEXT_FORMATS, exportPlanText, isPlanTextFormat, levelFromToken,
   resolvePlanLines, tokenisePlanText,
 } from "../../src/lib/skills/text.js";
 
@@ -58,11 +58,6 @@ describe("tokenisePlanText", () => {
   it("handles CRLF and surrounding whitespace", () => {
     expect(tokenisePlanText("  Gunnery  II  \r\nGunnery III\r\n").map((l) => [l.name, l.level]))
       .toEqual([["Gunnery", 2], ["Gunnery", 3]]);
-  });
-
-  it("lists the lower-cased names to resolve, once each", () => {
-    expect(planTextNames("Gunnery I\nGUNNERY II\nAdvanced Weapon Upgrades 1\n"))
-      .toEqual(["gunnery", "advanced weapon upgrades"]);
   });
 });
 

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { PlansCard, type PlanListRow } from "../../src/app/skills/PlansCard.js";
+import { MAX_PLAN_NAME } from "../../src/lib/skills/parse.js";
 
 const push = vi.fn();
 const refresh = vi.fn();
@@ -9,7 +10,11 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 const PLANS: PlanListRow[] = [{
   id: 7, name: "Gunnery", entries: 3, remaining: "4 h 10 m", doneAt: "2026-09-01 04:10",
 }];
-const TEMPLATES = [{ id: 4, name: "Minmatar Militia Fighter" }, { id: 14, name: "Manufacturer" }];
+const LONG_TEMPLATE_NAME = "x".repeat(MAX_PLAN_NAME + 5);
+const TEMPLATES = [
+  { id: 4, name: "Minmatar Militia Fighter" }, { id: 14, name: "Manufacturer" },
+  { id: 21, name: LONG_TEMPLATE_NAME },
+];
 
 let posts: { url: string; body: unknown }[] = [];
 let deletes: string[] = [];
@@ -62,6 +67,17 @@ describe("PlansCard", () => {
       url: "/api/skill-plans",
       body: { characterId: 669539978, name: "Minmatar Militia Fighter", templateId: 4 },
     });
+  });
+
+  it("clamps an over-long template name before creating the plan", async () => {
+    card();
+    fireEvent.click(screen.getByRole("button", { name: "From template" }));
+    fireEvent.change(screen.getByLabelText("Template"), { target: { value: "21" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create from template" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/skills/plans/9"));
+    const body = posts[0].body as { name: string };
+    expect(body.name).toHaveLength(MAX_PLAN_NAME);
+    expect(body.name).toBe(LONG_TEMPLATE_NAME.slice(0, MAX_PLAN_NAME));
   });
 
   it("imports text and reports the lines that did not resolve", async () => {

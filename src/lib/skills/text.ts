@@ -49,13 +49,6 @@ export function tokenisePlanText(text: string): PlanTextLine[] {
   return out;
 }
 
-/** The lower-cased names an import must resolve, deduplicated, in first-appearance order. */
-export function planTextNames(text: string): string[] {
-  const seen = new Set<string>();
-  for (const line of tokenisePlanText(text)) seen.add(line.name.toLowerCase());
-  return [...seen];
-}
-
 export interface ParsedPlanText { entries: { skillId: number; level: number }[]; unresolved: string[] }
 
 /** `byName` is a lower-cased skill name → id map, from the catalogue (spec §5: exact, case-insensitive). */

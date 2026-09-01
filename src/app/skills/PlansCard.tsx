@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconFileImport, IconPlus, IconTemplate, IconTrash } from "@tabler/icons-react";
+import { clampPlanName } from "../../lib/skills/parse.js";
 
 export interface PlanListRow {
   id: number; name: string; entries: number; remaining: string; doneAt: string;
@@ -86,7 +87,7 @@ export function PlansCard({ characterId, plans, templates }: PlansCardProps) {
             </select>
           ) : (
             <input className="filter-input" aria-label="Plan name" value={name} placeholder="Plan name"
-                   onChange={(e) => setName(e.target.value)} />
+                   maxLength={60} onChange={(e) => setName(e.target.value)} />
           )}
           {panel === "import" ? (
             <textarea className="eft-text" aria-label="Plan text" value={text} placeholder="Gunnery V"
@@ -101,7 +102,8 @@ export function PlansCard({ characterId, plans, templates }: PlansCardProps) {
           {panel === "template" ? (
             <button type="button" className="fit-btn" disabled={busy}
                     onClick={() => void create("/api/skill-plans", {
-                      characterId, name: templates.find((t) => t.id === templateId)?.name ?? "Career plan",
+                      characterId,
+                      name: clampPlanName(templates.find((t) => t.id === templateId)?.name ?? "Career plan"),
                       templateId,
                     })}>
               Create from template
@@ -116,7 +118,11 @@ export function PlansCard({ characterId, plans, templates }: PlansCardProps) {
           {unresolved.length === 0 ? null : (
             <>
               <p className="warn-text">These lines did not resolve to a skill:</p>
-              <ul className="problem-list">{unresolved.map((line) => <li key={line}>{line}</li>)}</ul>
+              {/* Keyed by index+line: a duplicate bad line (e.g. the same typo pasted twice) would
+                  otherwise collide on `key={line}`. */}
+              <ul className="problem-list">
+                {unresolved.map((line, i) => <li key={`${i}-${line}`}>{line}</li>)}
+              </ul>
               {created === null ? null : (
                 <button type="button" className="fit-btn"
                         onClick={() => router.push(`/skills/plans/${created}`)}>
