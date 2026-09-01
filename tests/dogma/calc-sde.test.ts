@@ -72,6 +72,44 @@ describe("Weapon Upgrades and Advanced Weapon Upgrades", () => {
   });
 });
 
+describe("Minmatar Frigate hull bonus (effect 7248, a LocationRequiredSkillModifier on the hull)", () => {
+  it("cuts a 200mm AutoCannon II's rate of fire (attr 51) end to end at Minmatar Frigate V", () => {
+    // The Rifter carries effect 7248: postPercent(51 ← 460) on every item that itself requires
+    // Small Projectile Turret (3302). Attr 460 (shipBonusMF) is the Rifter's own base -7.5, scaled by
+    // effect 453 (carried by the Minmatar Frigate skill) to -7.5 × 5 = -37.5 at level 5, so the gun's
+    // speed drops by 37.5 %: 3750 × 0.625 = 2343.75. Isolated to just this skill — no Gunnery trained —
+    // so no other rate-of-fire modifier is in play.
+    const fit = buildFit(data, 587, { modules: [[2889, "high", 0]], skills: skills([[3329, 5]]) });
+    expect(getAttr(fit, fit.modules[0].item, 51)).toBe(2343.75);
+    const applied = explain(fit, fit.modules[0].item, 51);
+    expect(applied).toHaveLength(1);
+    expect(applied[0]).toMatchObject({
+      carrierTypeId: 587, carrierName: "Rifter", effectId: 7248, modifyingAttrId: 460,
+      rawValue: -37.5, value: -0.375, penalised: false,
+    });
+  });
+});
+
+describe("a loaded charge modifying its module through the `other` domain", () => {
+  it("Hail S's effect 599 cuts the gun's falloff (attr 158) by its fallofMultiplier", () => {
+    // Effect 599, carried by Hail S (12608, category 8 — penalty-immune), is an ItemModifier with
+    // domain "other": postMul(158 falloff ← 517 fallofMultiplier), reaching from the loaded charge to
+    // its container module. Hail S's fallofMultiplier is 0.75, a flat −25 % (no skills trained, so the
+    // gun's base falloff 5160 only also carries the Rifter's own baked-in +10 % from effect 5779):
+    // 5160 × 1.1 × 0.75 = 4257.
+    const fit = buildFit(data, 587, {
+      modules: [[2889, "high", 0]], charges: new Map([[0, 12608]]), skills: new Map(),
+    });
+    expect(getAttr(fit, fit.modules[0].item, 158)).toBe(4257);
+    const applied = explain(fit, fit.modules[0].item, 158);
+    const fromCharge = applied.find((a) => a.carrierTypeId === 12608);
+    expect(fromCharge).toMatchObject({
+      carrierName: "Hail S", effectId: 599, modifyingAttrId: 517, rawValue: 0.75, value: -0.25, penalised: false,
+    });
+    expect(fromCharge!.carrier).toBe(fit.modules[0].item.charge);
+  });
+});
+
 describe("group and drawback modifiers", () => {
   it("applies a rig's drawback to the powergrid of every projectile weapon on the ship", () => {
     // Rig 31686 carries effect 2708: postPercent power ← drawback (10) on group 55.
