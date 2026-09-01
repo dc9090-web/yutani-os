@@ -8,9 +8,9 @@ export interface AssetNode {
 
 /**
  * A root location. `locationType` is the raw ESI `location_type` of the rows sitting directly in it
- * — "station" | "solar_system" | "item" | "other". The page must only call locationLabel/locationLabels
- * for a root whose type is NOT "item": item ids are >= 1e12, which classifyLocation() would happily
- * (and wrongly) call a player structure.
+ * — "station" | "solar_system" | "item" | "other". A "item"-typed root is an orphan: ESI reports a
+ * structure-docked hangar this way, with `locationId` = the structure's item id, which classifyLocation()
+ * happily (and correctly, here) treats as a player structure — see `locationDisplayLabel`.
  */
 export interface AssetLocation { locationId: number; locationType: string; itemCount: number; nodes: AssetNode[] }
 
@@ -98,6 +98,18 @@ export function sumVolume(nodes: AssetViewNode[]): number {
   let total = 0;
   for (const node of nodes) total += node.volume + sumVolume(node.children);
   return total;
+}
+
+/**
+ * Picks a root location's display label. `locationLabels` is asked about every root, including
+ * `locationType: "item"` ones — a structure-docked hangar reports `location_id` = the structure's
+ * item id, which is by definition not one of the character's own items (an orphan root), so it is a
+ * place, not an item. When the id resolves to a real place, its name is used regardless of
+ * `locationType`; only an unresolved id (kind "unknown", or nothing came back at all) falls back to
+ * "Container <id>".
+ */
+export function locationDisplayLabel(locationId: number, resolved: { name: string; kind: string } | undefined): string {
+  return resolved !== undefined && resolved.kind !== "unknown" ? resolved.name : `Container ${locationId}`;
 }
 
 /**

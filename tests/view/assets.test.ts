@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
 import {
-  buildAssetTree, toViewNodes, sumVolume, filterAssetTree,
+  buildAssetTree, toViewNodes, sumVolume, filterAssetTree, locationDisplayLabel,
   type AssetViewNode, type TypeInfo,
 } from "../../src/lib/view/assets.js";
 
@@ -65,6 +65,22 @@ describe("buildAssetTree", () => {
 
   it("returns nothing for a character with no assets", () => {
     expect(buildAssetTree([])).toEqual([]);
+  });
+});
+
+describe("locationDisplayLabel", () => {
+  it("uses the resolved place name, whatever its kind", () => {
+    expect(locationDisplayLabel(60003760, { name: "Jita IV - Moon 4 - CNAP", kind: "station" })).toBe("Jita IV - Moon 4 - CNAP");
+    // A structure-docked hangar's orphan root: location_type "item", but a real, named structure.
+    expect(locationDisplayLabel(1035466617946, { name: "Player Citadel", kind: "structure" })).toBe("Player Citadel");
+  });
+
+  it("falls back to Container <id> when the id could not be classified as a place", () => {
+    expect(locationDisplayLabel(1099999999999, { name: "Unknown location (1099999999999)", kind: "unknown" })).toBe("Container 1099999999999");
+  });
+
+  it("falls back to Container <id> when nothing was resolved at all", () => {
+    expect(locationDisplayLabel(1099999999999, undefined)).toBe("Container 1099999999999");
   });
 });
 

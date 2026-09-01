@@ -4,7 +4,7 @@ import { listAssets } from "../../lib/db/character-assets.js";
 import { getTypes } from "../../lib/sde/repo.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { buildAssetTree, sumVolume, toViewNodes, type AssetViewLocation } from "../../lib/view/assets.js";
+import { buildAssetTree, locationDisplayLabel, sumVolume, toViewNodes, type AssetViewLocation } from "../../lib/view/assets.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { AssetsBrowser } from "./AssetsBrowser.js";
 
@@ -19,18 +19,16 @@ export default async function AssetsPage() {
   const tree = buildAssetTree(rows);
   const [types, places] = await Promise.all([
     getTypes([...new Set(rows.map((r) => r.typeId))]),
-    // Only real places: an item-rooted location id is an item_id, and item ids share
-    // classifyLocation's >= 1e12 player-structure range.
-    locationLabels(tree.filter((l) => l.locationType !== "item").map((l) => l.locationId)),
+    // Every root, including "item"-typed ones: those are orphans (a structure-docked hangar), so
+    // they are places too — see locationDisplayLabel and AssetLocation's doc comment.
+    locationLabels(tree.map((l) => l.locationId)),
   ]);
 
   const locations: AssetViewLocation[] = tree.map((location) => {
     const nodes = toViewNodes(location.nodes, types);
     return {
       locationId: location.locationId,
-      label: location.locationType === "item"
-        ? `Container ${location.locationId}`
-        : places.get(location.locationId)?.name ?? `Location ${location.locationId}`,
+      label: locationDisplayLabel(location.locationId, places.get(location.locationId)),
       itemCount: location.itemCount,
       volume: sumVolume(nodes),
       nodes,

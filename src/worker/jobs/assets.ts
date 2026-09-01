@@ -64,8 +64,14 @@ export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
       });
       const written = await deps.replaceAssets(characterId, rows);
 
-      // Roots are the assets that are not nested inside another item: stations, systems, citadels.
-      const roots = [...new Set(raw.filter((a) => a.location_type !== "item").map((a) => a.location_id))];
+      // Roots are the assets that are not nested inside another item: stations, systems, citadels,
+      // and structure-docked hangars. ESI reports the latter as location_type "item" too, with
+      // location_id = the structure's own item id — which is by definition not one of this
+      // character's item ids, so it stays a root rather than nesting under a (nonexistent) parent row.
+      const itemIds = new Set(rows.map((r) => r.itemId));
+      const roots = [...new Set(
+        raw.filter((a) => a.location_type !== "item" || !itemIds.has(a.location_id)).map((a) => a.location_id),
+      )];
       try {
         await deps.resolveLocations(roots, characterId);
       } catch (e) {

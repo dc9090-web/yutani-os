@@ -70,6 +70,19 @@ describe("assets job", () => {
     expect(h.resolved[0].characterId).toBe(CID);
     expect([...h.resolved[0].ids].sort((a, b) => a - b)).toEqual([30000142, 60003760, 1035466617946]);
   });
+  it("resolves an item-typed orphan root (structure-docked hangar) but not a genuinely nested item's parent", async () => {
+    const STRUCTURE = 1035466617946;               // not an item_id in this fixture: an orphan root
+    const assets: RawAsset[] = [
+      { item_id: 1023456789012, type_id: 587, quantity: 1, location_id: STRUCTURE, location_type: "item", location_flag: "Hangar", is_singleton: false },
+      { item_id: 1023456789014, type_id: 2048, quantity: 1, location_id: 1023456789012, location_type: "item", location_flag: "LoSlot0", is_singleton: false },
+    ];
+    const h = harness(["esi-assets.read_assets.v1"], assets);
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    expect(h.resolved).toHaveLength(1);
+    const ids = h.resolved[0].ids;
+    expect(ids).toContain(STRUCTURE);
+    expect(ids).not.toContain(1023456789012);      // a real item id: its child stays nested, not a root
+  });
   it("chunks the names POST to 1000 unique ids", async () => {
     const many: RawAsset[] = Array.from({ length: 2500 }, (_, i) => ({
       item_id: 2_000_000_000_000 + i, type_id: 587, quantity: 1, location_id: 60003760,
