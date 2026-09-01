@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FitSheet } from "../../src/app/ships/FitSheet.js";
+import { CouldNotCompute } from "../../src/app/ships/CouldNotCompute.js";
 import type { FitSheetView } from "../../src/lib/view/fit-sheet.js";
 
 const view: FitSheetView = {
@@ -109,5 +110,14 @@ describe("FitSheet", () => {
     expect(screen.getByText("No problems — this fit is legal.")).toBeInTheDocument();
     expect(screen.getByText("Every skill for this fit is trained.")).toBeInTheDocument();
     expect(screen.getByText("Nothing in the cargo hold or drone bay.")).toBeInTheDocument();
+  });
+});
+
+describe("CouldNotCompute", () => {
+  it("names the fit and offers a way back", () => {
+    render(<CouldNotCompute title="Scarlet Dart" />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Scarlet Dart");
+    expect(screen.getByText(/Could not compute/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Ships/ })).toHaveAttribute("href", "/ships");
   });
 });
