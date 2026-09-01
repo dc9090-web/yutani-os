@@ -1,0 +1,3842 @@
+{
+ "attributes": [
+  {
+   "id": 3,
+   "name": "damage",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 4,
+   "name": "mass",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 6,
+   "name": "capacitorNeed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 9,
+   "name": "hp",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 11,
+   "name": "powerOutput",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 12,
+   "name": "lowSlots",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 13,
+   "name": "medSlots",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 14,
+   "name": "hiSlots",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 15,
+   "name": "powerLoad",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 19,
+   "name": "powerToSpeed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 21,
+   "name": "warpFactor",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 30,
+   "name": "power",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 37,
+   "name": "maxVelocity",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true,
+   "maxAttributeId": 2033
+  },
+  {
+   "id": 38,
+   "name": "capacity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 48,
+   "name": "cpuOutput",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 49,
+   "name": "cpuLoad",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 50,
+   "name": "cpu",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 51,
+   "name": "speed",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 55,
+   "name": "rechargeRate",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 70,
+   "name": "agility",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 76,
+   "name": "maxTargetRange",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true,
+   "maxAttributeId": 797
+  },
+  {
+   "id": 79,
+   "name": "scanSpeed",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 101,
+   "name": "launcherSlotsLeft",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 102,
+   "name": "turretSlotsLeft",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 109,
+   "name": "kineticDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 2770
+  },
+  {
+   "id": 110,
+   "name": "thermalDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 2769
+  },
+  {
+   "id": 111,
+   "name": "explosiveDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 2771
+  },
+  {
+   "id": 113,
+   "name": "emDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 2768
+  },
+  {
+   "id": 117,
+   "name": "kineticDamage",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 124,
+   "name": "mainColor",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 129,
+   "name": "maxPassengers",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 136,
+   "name": "uniformity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 151,
+   "name": "agilityBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 153,
+   "name": "warpCapacitorNeed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 161,
+   "name": "volume",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 162,
+   "name": "radius",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 180,
+   "name": "primaryAttribute",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 181,
+   "name": "secondaryAttribute",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 182,
+   "name": "requiredSkill1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 183,
+   "name": "requiredSkill2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 184,
+   "name": "requiredSkill3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 188,
+   "name": "cargoScanResistance",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 192,
+   "name": "maxLockedTargets",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 193,
+   "name": "maxAttackTargets",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 208,
+   "name": "scanRadarStrength",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 209,
+   "name": "scanLadarStrength",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 210,
+   "name": "scanMagnetometricStrength",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 211,
+   "name": "scanGravimetricStrength",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 217,
+   "name": "propulsionGraphicID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 246,
+   "name": "gfxBoosterID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 263,
+   "name": "shieldCapacity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 265,
+   "name": "armorHP",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 267,
+   "name": "armorEmDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1527
+  },
+  {
+   "id": 268,
+   "name": "armorExplosiveDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1527
+  },
+  {
+   "id": 269,
+   "name": "armorKineticDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1527
+  },
+  {
+   "id": 270,
+   "name": "armorThermalDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1527
+  },
+  {
+   "id": 271,
+   "name": "shieldEmDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1528
+  },
+  {
+   "id": 272,
+   "name": "shieldExplosiveDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1528
+  },
+  {
+   "id": 273,
+   "name": "shieldKineticDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1528
+  },
+  {
+   "id": 274,
+   "name": "shieldThermalDamageResonance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false,
+   "maxAttributeId": 1528
+  },
+  {
+   "id": 275,
+   "name": "skillTimeConstant",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 276,
+   "name": "skillPoints",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 277,
+   "name": "requiredSkill1Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 278,
+   "name": "requiredSkill2Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 279,
+   "name": "requiredSkill3Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 280,
+   "name": "skillLevel",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 283,
+   "name": "droneCapacity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 293,
+   "name": "rofBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 313,
+   "name": "powerEngineeringOutputBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 315,
+   "name": "velocityBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 327,
+   "name": "hullHpBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 338,
+   "name": "rechargeratebonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 422,
+   "name": "techLevel",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 424,
+   "name": "cpuOutputBonus2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 441,
+   "name": "turretSpeeBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 463,
+   "name": "shipBonusCF",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 479,
+   "name": "shieldRechargeRate",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 482,
+   "name": "capacitorCapacity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 484,
+   "name": "shieldUniformity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 487,
+   "name": "shipBonusCC",
+   "defaultValue": 5,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 524,
+   "name": "armorUniformity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 525,
+   "name": "structureUniformity",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 552,
+   "name": "signatureRadius",
+   "defaultValue": 100,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 564,
+   "name": "scanResolution",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 588,
+   "name": "shipBonusCF2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 600,
+   "name": "warpSpeedMultiplier",
+   "defaultValue": 3,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 633,
+   "name": "metaLevelOld",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 657,
+   "name": "shipBonusCC2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 661,
+   "name": "maxDirectionalVelocity",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 662,
+   "name": "minTargetVelDmgMultiplier",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 734,
+   "name": "shipBonusCD1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 735,
+   "name": "shipBonusCD2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 797,
+   "name": "maximumRangeCap",
+   "defaultValue": 300000,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 974,
+   "name": "hullEmDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false,
+   "maxAttributeId": 1529
+  },
+  {
+   "id": 975,
+   "name": "hullExplosiveDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false,
+   "maxAttributeId": 1529
+  },
+  {
+   "id": 976,
+   "name": "hullKineticDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false,
+   "maxAttributeId": 1529
+  },
+  {
+   "id": 977,
+   "name": "hullThermalDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false,
+   "maxAttributeId": 1529
+  },
+  {
+   "id": 1047,
+   "name": "canNotBeTrainedOnTrial",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1132,
+   "name": "upgradeCapacity",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1137,
+   "name": "rigSlots",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1138,
+   "name": "drawback",
+   "defaultValue": 10,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1153,
+   "name": "upgradeCost",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1154,
+   "name": "upgradeSlotsLeft",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1178,
+   "name": "heatCapacityHi",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1179,
+   "name": "heatDissipationRateHi",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1196,
+   "name": "heatDissipationRateMed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1198,
+   "name": "heatDissipationRateLow",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1199,
+   "name": "heatCapacityMed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1200,
+   "name": "heatCapacityLow",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1211,
+   "name": "heatDamage",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 1224,
+   "name": "heatGenerationMultiplier",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1259,
+   "name": "heatAttenuationHi",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1261,
+   "name": "heatAttenuationMed",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1262,
+   "name": "heatAttenuationLow",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1267,
+   "name": "moduleRepairRate",
+   "defaultValue": 10,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1271,
+   "name": "droneBandwidth",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1281,
+   "name": "baseWarpSpeed",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1285,
+   "name": "requiredSkill4",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1286,
+   "name": "requiredSkill4Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1287,
+   "name": "requiredSkill5Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1288,
+   "name": "requiredSkill6Level",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1289,
+   "name": "requiredSkill5",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1290,
+   "name": "requiredSkill6",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1298,
+   "name": "canFitShipGroup01",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1299,
+   "name": "canFitShipGroup02",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1300,
+   "name": "canFitShipGroup03",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1301,
+   "name": "canFitShipGroup04",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1302,
+   "name": "canFitShipType1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1303,
+   "name": "canFitShipType2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1304,
+   "name": "canFitShipType3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1305,
+   "name": "canFitShipType4",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1366,
+   "name": "subSystemSlot",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1367,
+   "name": "maxSubSystems",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1368,
+   "name": "turretHardPointModifier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1369,
+   "name": "launcherHardPointModifier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1374,
+   "name": "hiSlotModifier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1375,
+   "name": "medSlotModifier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1376,
+   "name": "lowSlotModifier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1380,
+   "name": "fitsToShipType",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1441,
+   "name": "subsystemBonusCaldariCore",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1443,
+   "name": "subsystemBonusCaldariDefensive",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1444,
+   "name": "subsystemBonusCaldariOffensive",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1445,
+   "name": "subsystemBonusCaldariPropulsion",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1504,
+   "name": "shipBonusStrategicCruiserCaldari1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1510,
+   "name": "subsystemBonusCaldariOffensive2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1513,
+   "name": "subsystemBonusCaldariPropulsion2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1515,
+   "name": "subsystemBonusCaldariCore2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1516,
+   "name": "subsystemBonusCaldariDefensive2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1527,
+   "name": "armorMaxDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1528,
+   "name": "shieldMaxDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1529,
+   "name": "hullMaxDamageResonance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1533,
+   "name": "subsystemBonusCaldariOffensive3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1535,
+   "name": "shipBonusCC3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1544,
+   "name": "maxGroupFitted",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1547,
+   "name": "rigSize",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1555,
+   "name": "fwLpKill",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1624,
+   "name": "shipBonus3CF",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1768,
+   "name": "typeColorScheme",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 1872,
+   "name": "canFitShipGroup05",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1879,
+   "name": "canFitShipGroup06",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1880,
+   "name": "canFitShipGroup07",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1881,
+   "name": "canFitShipGroup08",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1882,
+   "name": "warfareLinkCPUAdd",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1883,
+   "name": "warfareLinkCPUPenalty",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1944,
+   "name": "canFitShipType5",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1989,
+   "name": "roleBonusT3ProbeCPU",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2033,
+   "name": "speedLimit",
+   "defaultValue": 1000000,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2045,
+   "name": "energyWarfareResistance",
+   "defaultValue": 1,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 2065,
+   "name": "canFitShipGroup09",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2103,
+   "name": "canFitShipType6",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2112,
+   "name": "sensorDampenerResistance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 2113,
+   "name": "weaponDisruptionResistance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 2115,
+   "name": "stasisWebifierResistance",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 2396,
+   "name": "canFitShipGroup10",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2463,
+   "name": "canFitShipType7",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2476,
+   "name": "canFitShipGroup11",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2477,
+   "name": "canFitShipGroup12",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2478,
+   "name": "canFitShipGroup13",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2479,
+   "name": "canFitShipGroup14",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2480,
+   "name": "canFitShipGroup15",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2481,
+   "name": "canFitShipGroup16",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2482,
+   "name": "canFitShipGroup17",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2483,
+   "name": "canFitShipGroup18",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2484,
+   "name": "canFitShipGroup19",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2485,
+   "name": "canFitShipGroup20",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2486,
+   "name": "canFitShipType8",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2487,
+   "name": "canFitShipType9",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2488,
+   "name": "canFitShipType10",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2669,
+   "name": "subsystemMMissileFittingReduction",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": false
+  },
+  {
+   "id": 2675,
+   "name": "specialSubsystemHoldCapacity",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 2676,
+   "name": "shipBonusStrategicCruiserCaldari2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2682,
+   "name": "subsystemBonusCaldariDefensive3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2683,
+   "name": "subsystemBonusCaldariCore3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2758,
+   "name": "canFitShipType11",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2768,
+   "name": "emDamageResonanceMax",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2769,
+   "name": "thermalDamageResonanceMax",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2770,
+   "name": "kineticDamageResonanceMax",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2771,
+   "name": "explosiveDamageResonanceMax",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 5225,
+   "name": "shipBonusNavyDestroyerCaldari1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 5228,
+   "name": "shipBonusNavyDestroyerCaldari2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 5229,
+   "name": "shipBonusNavyDestroyerCaldari3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 5796,
+   "name": "maxDirectionalScanRange",
+   "defaultValue": 2147483648000,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 5948,
+   "name": "canFitShipType12",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 6088,
+   "name": "shipBonusCD3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  }
+ ],
+ "effects": [
+  {
+   "id": 132,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 280,
+     "modifyingAttrId": 276,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 163,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 293,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 218,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 313,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 222,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 315,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 232,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 151,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 251,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 327,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 283,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 338,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 368,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 424,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 392,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 9,
+     "modifyingAttrId": 327,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 394,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 37,
+     "modifyingAttrId": 315,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 395,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 70,
+     "modifyingAttrId": 151,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 397,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 48,
+     "modifyingAttrId": 424,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 413,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 441,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 414,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 51,
+     "modifyingAttrId": 441,
+     "operation": 9,
+     "skillTypeId": 3300
+    }
+   ]
+  },
+  {
+   "id": 460,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 463,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 486,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 479,
+     "modifyingAttrId": 338,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 490,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 11,
+     "modifyingAttrId": 313,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 520,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 487,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 761,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 588,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 927,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 657,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 1763,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 51,
+     "modifyingAttrId": 293,
+     "operation": 9,
+     "skillTypeId": 3319
+    }
+   ]
+  },
+  {
+   "id": 3772,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": []
+  },
+  {
+   "id": 3773,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 102,
+     "modifyingAttrId": 1368,
+     "operation": 4
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 101,
+     "modifyingAttrId": 1369,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3774,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 14,
+     "modifyingAttrId": 1374,
+     "operation": 4
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 13,
+     "modifyingAttrId": 1375,
+     "operation": 4
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 12,
+     "modifyingAttrId": 1376,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3782,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 11,
+     "modifyingAttrId": 11,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3783,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 48,
+     "modifyingAttrId": 48,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3797,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1271,
+     "modifyingAttrId": 1271,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3799,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 283,
+     "modifyingAttrId": 283,
+     "operation": 4
+    }
+   ]
+  },
+  {
+   "id": 3833,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1443,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 954
+    }
+   ]
+  },
+  {
+   "id": 3841,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1441,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 958
+    }
+   ]
+  },
+  {
+   "id": 3846,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1444,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 956
+    }
+   ]
+  },
+  {
+   "id": 3849,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1445,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 957
+    }
+   ]
+  },
+  {
+   "id": 4122,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 51,
+     "modifyingAttrId": 1444,
+     "operation": 9,
+     "groupId": 511
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 51,
+     "modifyingAttrId": 1444,
+     "operation": 9,
+     "groupId": 771
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 51,
+     "modifyingAttrId": 1444,
+     "operation": 9,
+     "groupId": 510
+    }
+   ]
+  },
+  {
+   "id": 4188,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1211,
+     "modifyingAttrId": 1504,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 4192,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1504,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 4196,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1516,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 954
+    }
+   ]
+  },
+  {
+   "id": 4204,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1515,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 958
+    }
+   ]
+  },
+  {
+   "id": 4209,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1510,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 956
+    }
+   ]
+  },
+  {
+   "id": 4212,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1513,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 957
+    }
+   ]
+  },
+  {
+   "id": 4248,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 117,
+     "modifyingAttrId": 1510,
+     "operation": 9,
+     "skillTypeId": 3321
+    },
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 117,
+     "modifyingAttrId": 1510,
+     "operation": 9,
+     "skillTypeId": 3324
+    },
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 117,
+     "modifyingAttrId": 1510,
+     "operation": 9,
+     "skillTypeId": 25719
+    }
+   ]
+  },
+  {
+   "id": 4331,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 37,
+     "modifyingAttrId": 1533,
+     "operation": 9,
+     "skillTypeId": 25719
+    },
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 37,
+     "modifyingAttrId": 1533,
+     "operation": 9,
+     "skillTypeId": 3324
+    }
+   ]
+  },
+  {
+   "id": 4339,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1533,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 956
+    }
+   ]
+  },
+  {
+   "id": 4357,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1535,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 4599,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1624,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 5265,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 1882,
+     "modifyingAttrId": 1883,
+     "operation": 4,
+     "skillTypeId": 3348
+    }
+   ]
+  },
+  {
+   "id": 5278,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 734,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 5279,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 735,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 6009,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 50,
+     "modifyingAttrId": 1989,
+     "operation": 9,
+     "skillTypeId": 3412
+    }
+   ]
+  },
+  {
+   "id": 6900,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 30,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 771
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 50,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 771
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 30,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 510
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 50,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 510
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 30,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 511
+    },
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 50,
+     "modifyingAttrId": 2669,
+     "operation": 9,
+     "groupId": 511
+    }
+   ]
+  },
+  {
+   "id": 6906,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 2676,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 6908,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "character",
+     "modifiedAttrId": 1267,
+     "modifyingAttrId": 2676,
+     "operation": 9
+    }
+   ]
+  },
+  {
+   "id": 6914,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 2683,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 958
+    }
+   ]
+  },
+  {
+   "id": 6915,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "ship",
+     "modifiedAttrId": 2682,
+     "modifyingAttrId": 280,
+     "operation": 2,
+     "groupId": 954
+    }
+   ]
+  },
+  {
+   "id": 11447,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 5225,
+     "modifyingAttrId": 280,
+     "operation": 2
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 5228,
+     "modifyingAttrId": 280,
+     "operation": 2
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 5229,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 12814,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 6088,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  }
+ ],
+ "types": [
+  {
+   "id": 3300,
+   "groupId": 255,
+   "categoryId": 16,
+   "name": "Gunnery",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     441,
+     -2
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     413,
+     false
+    ],
+    [
+     414,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3319,
+   "groupId": 256,
+   "categoryId": 16,
+   "name": "Missile Launcher Operation",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     293,
+     -2
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     163,
+     false
+    ],
+    [
+     1763,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3327,
+   "groupId": 257,
+   "categoryId": 16,
+   "name": "Spaceship Command",
+   "attrs": [
+    [
+     151,
+     -2
+    ],
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     193,
+     1
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     232,
+     false
+    ],
+    [
+     395,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3330,
+   "groupId": 257,
+   "categoryId": 16,
+   "name": "Caldari Frigate",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3327
+    ],
+    [
+     275,
+     2
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     280,
+     0
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     460,
+     false
+    ],
+    [
+     761,
+     false
+    ],
+    [
+     4599,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3334,
+   "groupId": 257,
+   "categoryId": 16,
+   "name": "Caldari Cruiser",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3327
+    ],
+    [
+     183,
+     33092
+    ],
+    [
+     275,
+     5
+    ],
+    [
+     277,
+     2
+    ],
+    [
+     278,
+     3
+    ],
+    [
+     280,
+     0
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     520,
+     false
+    ],
+    [
+     927,
+     false
+    ],
+    [
+     4357,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3392,
+   "groupId": 1210,
+   "categoryId": 16,
+   "name": "Mechanics",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     327,
+     5
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     251,
+     false
+    ],
+    [
+     392,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3413,
+   "groupId": 1216,
+   "categoryId": 16,
+   "name": "Power Grid Management",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     313,
+     5
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     218,
+     false
+    ],
+    [
+     490,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3416,
+   "groupId": 1209,
+   "categoryId": 16,
+   "name": "Shield Operation",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     182,
+     3413
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     338,
+     -5
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     283,
+     false
+    ],
+    [
+     486,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3426,
+   "groupId": 1216,
+   "categoryId": 16,
+   "name": "CPU Management",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     424,
+     5
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     368,
+     false
+    ],
+    [
+     397,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 3449,
+   "groupId": 275,
+   "categoryId": 16,
+   "name": "Navigation",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     167
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     315,
+     5
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     222,
+     false
+    ],
+    [
+     394,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 29984,
+   "groupId": 963,
+   "categoryId": 6,
+   "name": "Tengu",
+   "attrs": [
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     14400000
+    ],
+    [
+     9,
+     1700
+    ],
+    [
+     11,
+     420
+    ],
+    [
+     12,
+     0
+    ],
+    [
+     13,
+     0
+    ],
+    [
+     14,
+     0
+    ],
+    [
+     15,
+     0
+    ],
+    [
+     19,
+     1
+    ],
+    [
+     21,
+     0
+    ],
+    [
+     37,
+     170
+    ],
+    [
+     38,
+     460
+    ],
+    [
+     48,
+     310
+    ],
+    [
+     49,
+     0
+    ],
+    [
+     55,
+     350000
+    ],
+    [
+     70,
+     0.52
+    ],
+    [
+     76,
+     75000
+    ],
+    [
+     79,
+     0
+    ],
+    [
+     101,
+     0
+    ],
+    [
+     102,
+     0
+    ],
+    [
+     109,
+     0.67
+    ],
+    [
+     110,
+     0.67
+    ],
+    [
+     111,
+     0.67
+    ],
+    [
+     113,
+     0.67
+    ],
+    [
+     124,
+     16777215
+    ],
+    [
+     129,
+     510
+    ],
+    [
+     136,
+     1
+    ],
+    [
+     153,
+     8.13e-7
+    ],
+    [
+     161,
+     92000
+    ],
+    [
+     162,
+     221.05
+    ],
+    [
+     182,
+     30651
+    ],
+    [
+     183,
+     30544
+    ],
+    [
+     184,
+     30552
+    ],
+    [
+     188,
+     0
+    ],
+    [
+     192,
+     6
+    ],
+    [
+     208,
+     0
+    ],
+    [
+     209,
+     0
+    ],
+    [
+     210,
+     0
+    ],
+    [
+     211,
+     20
+    ],
+    [
+     217,
+     395
+    ],
+    [
+     246,
+     395
+    ],
+    [
+     263,
+     2600
+    ],
+    [
+     265,
+     2100
+    ],
+    [
+     267,
+     0.5
+    ],
+    [
+     268,
+     0.9
+    ],
+    [
+     269,
+     0.5625
+    ],
+    [
+     270,
+     0.275
+    ],
+    [
+     271,
+     1
+    ],
+    [
+     272,
+     0.5
+    ],
+    [
+     273,
+     0.45
+    ],
+    [
+     274,
+     0.4
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     278,
+     1
+    ],
+    [
+     279,
+     1
+    ],
+    [
+     283,
+     0
+    ],
+    [
+     422,
+     3
+    ],
+    [
+     479,
+     1400000
+    ],
+    [
+     482,
+     1400
+    ],
+    [
+     484,
+     0.75
+    ],
+    [
+     524,
+     0.75
+    ],
+    [
+     525,
+     1
+    ],
+    [
+     552,
+     180
+    ],
+    [
+     564,
+     210
+    ],
+    [
+     600,
+     4
+    ],
+    [
+     633,
+     5
+    ],
+    [
+     661,
+     2000
+    ],
+    [
+     662,
+     0.25
+    ],
+    [
+     974,
+     1
+    ],
+    [
+     975,
+     1
+    ],
+    [
+     976,
+     1
+    ],
+    [
+     977,
+     1
+    ],
+    [
+     1132,
+     400
+    ],
+    [
+     1137,
+     3
+    ],
+    [
+     1154,
+     3
+    ],
+    [
+     1178,
+     100
+    ],
+    [
+     1179,
+     0.01
+    ],
+    [
+     1196,
+     0.01
+    ],
+    [
+     1198,
+     0.01
+    ],
+    [
+     1199,
+     100
+    ],
+    [
+     1200,
+     100
+    ],
+    [
+     1224,
+     0.75
+    ],
+    [
+     1259,
+     0.79
+    ],
+    [
+     1261,
+     0.78
+    ],
+    [
+     1262,
+     0.55
+    ],
+    [
+     1271,
+     0
+    ],
+    [
+     1281,
+     1
+    ],
+    [
+     1285,
+     30548
+    ],
+    [
+     1286,
+     1
+    ],
+    [
+     1287,
+     1
+    ],
+    [
+     1289,
+     30549
+    ],
+    [
+     1367,
+     5
+    ],
+    [
+     1504,
+     -5
+    ],
+    [
+     1547,
+     2
+    ],
+    [
+     1555,
+     300
+    ],
+    [
+     1768,
+     11326
+    ],
+    [
+     1989,
+     -99
+    ],
+    [
+     2045,
+     1
+    ],
+    [
+     2112,
+     1
+    ],
+    [
+     2113,
+     1
+    ],
+    [
+     2115,
+     1
+    ],
+    [
+     2675,
+     120
+    ],
+    [
+     2676,
+     10
+    ],
+    [
+     5796,
+     2147483647000
+    ]
+   ],
+   "effects": [
+    [
+     4188,
+     false
+    ],
+    [
+     6009,
+     false
+    ],
+    [
+     6908,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 30544,
+   "groupId": 1240,
+   "categoryId": 16,
+   "name": "Caldari Defensive Systems",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     182,
+     3416
+    ],
+    [
+     183,
+     3392
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     277,
+     5
+    ],
+    [
+     278,
+     3
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     3833,
+     false
+    ],
+    [
+     4196,
+     false
+    ],
+    [
+     6915,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 30548,
+   "groupId": 1240,
+   "categoryId": 16,
+   "name": "Caldari Core Systems",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     165
+    ],
+    [
+     181,
+     166
+    ],
+    [
+     182,
+     3413
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     277,
+     5
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     3841,
+     false
+    ],
+    [
+     4204,
+     false
+    ],
+    [
+     6914,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 30549,
+   "groupId": 1240,
+   "categoryId": 16,
+   "name": "Caldari Offensive Systems",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3319
+    ],
+    [
+     183,
+     3300
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     277,
+     5
+    ],
+    [
+     278,
+     3
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     3846,
+     false
+    ],
+    [
+     4209,
+     false
+    ],
+    [
+     4339,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 30552,
+   "groupId": 1240,
+   "categoryId": 16,
+   "name": "Caldari Propulsion Systems",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3449
+    ],
+    [
+     275,
+     1
+    ],
+    [
+     277,
+     5
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     3849,
+     false
+    ],
+    [
+     4212,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 30651,
+   "groupId": 257,
+   "categoryId": 16,
+   "name": "Caldari Strategic Cruiser",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3334
+    ],
+    [
+     275,
+     5
+    ],
+    [
+     277,
+     5
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     4192,
+     false
+    ],
+    [
+     6906,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 33092,
+   "groupId": 257,
+   "categoryId": 16,
+   "name": "Caldari Destroyer",
+   "attrs": [
+    [
+     161,
+     0.01
+    ],
+    [
+     180,
+     167
+    ],
+    [
+     181,
+     168
+    ],
+    [
+     182,
+     3330
+    ],
+    [
+     275,
+     2
+    ],
+    [
+     277,
+     3
+    ],
+    [
+     280,
+     0
+    ],
+    [
+     1047,
+     0
+    ]
+   ],
+   "effects": [
+    [
+     132,
+     true
+    ],
+    [
+     5278,
+     false
+    ],
+    [
+     5279,
+     false
+    ],
+    [
+     11447,
+     false
+    ],
+    [
+     12814,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 45601,
+   "groupId": 956,
+   "categoryId": 32,
+   "name": "Tengu Offensive - Accelerated Ejection Bay",
+   "attrs": [
+    [
+     4,
+     800000
+    ],
+    [
+     9,
+     40
+    ],
+    [
+     11,
+     190
+    ],
+    [
+     48,
+     160
+    ],
+    [
+     161,
+     40
+    ],
+    [
+     162,
+     500
+    ],
+    [
+     182,
+     30549
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     283,
+     0
+    ],
+    [
+     422,
+     3
+    ],
+    [
+     633,
+     1
+    ],
+    [
+     1271,
+     0
+    ],
+    [
+     1366,
+     127
+    ],
+    [
+     1368,
+     0
+    ],
+    [
+     1369,
+     6
+    ],
+    [
+     1374,
+     7
+    ],
+    [
+     1375,
+     0
+    ],
+    [
+     1376,
+     0
+    ],
+    [
+     1380,
+     29984
+    ],
+    [
+     1444,
+     -7.5
+    ],
+    [
+     1510,
+     5
+    ],
+    [
+     1533,
+     10
+    ],
+    [
+     1883,
+     10000
+    ],
+    [
+     2669,
+     -25
+    ]
+   ],
+   "effects": [
+    [
+     3772,
+     false
+    ],
+    [
+     3773,
+     false
+    ],
+    [
+     3774,
+     false
+    ],
+    [
+     3782,
+     false
+    ],
+    [
+     3783,
+     false
+    ],
+    [
+     3797,
+     false
+    ],
+    [
+     3799,
+     false
+    ],
+    [
+     4122,
+     false
+    ],
+    [
+     4248,
+     false
+    ],
+    [
+     4331,
+     false
+    ],
+    [
+     5265,
+     false
+    ],
+    [
+     6900,
+     false
+    ]
+   ]
+  }
+ ],
+ "groups": [
+  {
+   "id": 255,
+   "name": "Gunnery",
+   "categoryId": 16
+  },
+  {
+   "id": 256,
+   "name": "Missiles",
+   "categoryId": 16
+  },
+  {
+   "id": 257,
+   "name": "Spaceship Command",
+   "categoryId": 16
+  },
+  {
+   "id": 275,
+   "name": "Navigation",
+   "categoryId": 16
+  },
+  {
+   "id": 956,
+   "name": "Offensive Subsystem",
+   "categoryId": 32
+  },
+  {
+   "id": 963,
+   "name": "Strategic Cruiser",
+   "categoryId": 6
+  },
+  {
+   "id": 1209,
+   "name": "Shields",
+   "categoryId": 16
+  },
+  {
+   "id": 1210,
+   "name": "Armor",
+   "categoryId": 16
+  },
+  {
+   "id": 1216,
+   "name": "Engineering",
+   "categoryId": 16
+  },
+  {
+   "id": 1240,
+   "name": "Subsystems",
+   "categoryId": 16
+  }
+ ]
+}
