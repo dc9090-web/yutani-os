@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createSdeUpdateJob, sdeUpdateJob, SDE_UPDATE_INTERVAL_MS, type SdeUpdateDeps } from "../../src/worker/jobs/sde-update.js";
+import { createSdeUpdateJob, sdeUpdateJob, SDE_UPDATE_INTERVAL_MS, SDE_UPDATE_RETRY_MS, type SdeUpdateDeps } from "../../src/worker/jobs/sde-update.js";
 import type { ImportResult } from "../../src/lib/sde/import.js";
 
 const LATEST = { buildNumber: 3484357, releaseDate: new Date("2026-08-28T11:07:12Z") };
@@ -29,6 +29,7 @@ describe("sde-update job", () => {
     expect(sdeUpdateJob.scope).toBe("global");
     expect(sdeUpdateJob.intervalMs).toBe(SDE_UPDATE_INTERVAL_MS);
     expect(SDE_UPDATE_INTERVAL_MS).toBe(6 * 60 * 60 * 1000);
+    expect(sdeUpdateJob.retryMs).toBe(SDE_UPDATE_RETRY_MS);
   });
 
   it("imports on an empty database and returns the sde_types row count", async () => {

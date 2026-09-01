@@ -86,4 +86,27 @@ describe("Scheduler", () => {
     expect(finished).toEqual([{ id: 1, status: "error", error: "sde boom" }]);
     expect(markNeedsReauth).not.toHaveBeenCalled();
   });
+
+  it("rebooks a failed global job at now + retryMs instead of now + intervalMs", async () => {
+    const run = vi.fn(async () => { throw new Error("boom"); });
+    const { s, runs, advance } = make(
+      [{ name: "g", scope: "global", intervalMs: 60_000, retryMs: 10_000, run }],
+      [],
+    );
+    expect(await s.tick()).toBe(1);
+    advance(9_000); expect(await s.tick()).toBe(0);   // not due yet — still within retryMs
+    advance(1_000); expect(await s.tick()).toBe(1);   // retryMs elapsed
+    expect(runs).toEqual([{ job: "g", cid: null }, { job: "g", cid: null }]);
+  });
+
+  it("keeps the old full-interval rebooking when a global job has no retryMs", async () => {
+    const run = vi.fn(async () => { throw new Error("boom"); });
+    const { s, advance } = make(
+      [{ name: "g", scope: "global", intervalMs: 60_000, run }],
+      [],
+    );
+    expect(await s.tick()).toBe(1);
+    advance(59_000); expect(await s.tick()).toBe(0);  // not due yet
+    advance(1_000); expect(await s.tick()).toBe(1);   // full interval elapsed
+  });
 });

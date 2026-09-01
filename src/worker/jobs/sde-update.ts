@@ -9,6 +9,7 @@ import { getSdeMeta } from "../../lib/sde/repo.js";
 import { getPool } from "../../lib/db/client.js";
 
 export const SDE_UPDATE_INTERVAL_MS = 6 * 60 * 60 * 1000;
+export const SDE_UPDATE_RETRY_MS = 10 * 60 * 1000;
 
 /** Every side effect is injected so the job is unit-tested with fakes. */
 export interface SdeUpdateDeps {
@@ -32,6 +33,7 @@ export function createSdeUpdateJob(deps: SdeUpdateDeps): GlobalSyncJob {
     name: "sde-update",
     scope: "global",
     intervalMs: SDE_UPDATE_INTERVAL_MS,
+    retryMs: SDE_UPDATE_RETRY_MS,
     async run() {
       const latest = await deps.fetchLatestBuild();
       const meta = await deps.getSdeMeta();

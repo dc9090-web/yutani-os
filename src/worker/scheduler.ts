@@ -10,6 +10,8 @@ export interface CharacterSyncJob {
   name: string;
   scope?: "character";
   intervalMs: number;
+  /** When set, a failed run is rebooked at now + retryMs instead of now + intervalMs. */
+  retryMs?: number;
   run(ctx: JobContext): Promise<number>;
 }
 
@@ -18,6 +20,8 @@ export interface GlobalSyncJob {
   name: string;
   scope: "global";
   intervalMs: number;
+  /** When set, a failed run is rebooked at now + retryMs instead of now + intervalMs. */
+  retryMs?: number;
   run(ctx: GlobalJobContext): Promise<number>;
 }
 
@@ -63,29 +67,32 @@ export class Scheduler {
     for (const job of globalJobs) {
       const key = `${job.name}:global`;
       if (this.due.get(key)! > this.now()) continue;
-      await this.record(job.name, null, () => job.run({ esi: this.deps.esi }));
-      this.due.set(key, this.now() + job.intervalMs);
+      const outcome = await this.record(job.name, null, () => job.run({ esi: this.deps.esi }));
+      const delay = outcome === "error" && job.retryMs !== undefined ? job.retryMs : job.intervalMs;
+      this.due.set(key, this.now() + delay);
       ran++;
     }
     for (const job of characterJobs) {
       for (const c of chars) {
         const key = `${job.name}:${c.id}`;
         if (this.due.get(key)! > this.now()) continue;
-        await this.record(job.name, c.id, () => job.run({ characterId: c.id, esi: this.deps.esi }));
-        this.due.set(key, this.now() + job.intervalMs);
+        const outcome = await this.record(job.name, c.id, () => job.run({ characterId: c.id, esi: this.deps.esi }));
+        const delay = outcome === "error" && job.retryMs !== undefined ? job.retryMs : job.intervalMs;
+        this.due.set(key, this.now() + delay);
         ran++;
       }
     }
     return ran;
   }
 
-  private async record(name: string, characterId: number | null, exec: () => Promise<number>): Promise<void> {
+  private async record(name: string, characterId: number | null, exec: () => Promise<number>): Promise<"ok" | "error"> {
     const who = characterId === null ? "global" : `character=${characterId}`;
     const id = await this.deps.startRun(name, characterId);
     try {
       const rows = await exec();
       await this.deps.finishRun(id, { status: "ok", rows });
       this.log(`${name} ${who} ok rows=${rows}`);
+      return "ok";
     } catch (e) {
       let error: string;
       if (e instanceof NeedsReauthError) {
@@ -98,6 +105,7 @@ export class Scheduler {
       }
       await this.deps.finishRun(id, { status: "error", error });
       this.log(`${name} ${who} error: ${error}`);
+      return "error";
     }
   }
 }
