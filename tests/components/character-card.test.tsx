@@ -1,0 +1,60 @@
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import { CharacterCard, type OverviewCard } from "../../src/app/components/CharacterCard.js";
+
+const full: OverviewCard = {
+  id: 669539978,
+  name: "TrilliumONE",
+  corp: "Caldari Navy · Northern Coalition",
+  needsReauth: false,
+  balance: "1,234,567.89 ISK",
+  system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
+  dockedAt: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+  ship: "Rifter — Scarlet Dart",
+  online: true,
+  training: "Caldari Frigate V · finishes in 3 h 12 m",
+  totalSp: "47.4M SP",
+  lastSync: "2 m ago",
+};
+
+describe("CharacterCard", () => {
+  it("shows the balance, location, ship, training, SP and last sync", () => {
+    render(<CharacterCard card={full} />);
+    expect(screen.getByRole("heading", { name: /TrilliumONE/ })).toBeInTheDocument();
+    expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
+    expect(screen.getByText("1,234,567.89 ISK")).toBeInTheDocument();
+    expect(screen.getByText("Jita")).toBeInTheDocument();
+    expect(screen.getByText("0.9")).toHaveClass("sec-high");
+    expect(screen.getByText(/Caldari Navy Assembly Plant/)).toBeInTheDocument();
+    expect(screen.getByText("Rifter — Scarlet Dart")).toBeInTheDocument();
+    expect(screen.getByText("Caldari Frigate V · finishes in 3 h 12 m")).toBeInTheDocument();
+    expect(screen.getByText("47.4M SP")).toBeInTheDocument();
+    expect(screen.getByText("2 m ago")).toBeInTheDocument();
+  });
+
+  it("shows the online dot only when the online scope produced a value", () => {
+    const { rerender, container } = render(<CharacterCard card={full} />);
+    expect(container.querySelector(".online-dot.on")).not.toBeNull();
+    rerender(<CharacterCard card={{ ...full, online: false }} />);
+    expect(container.querySelector(".online-dot")).not.toBeNull();
+    expect(container.querySelector(".online-dot.on")).toBeNull();
+    rerender(<CharacterCard card={{ ...full, online: null }} />);
+    expect(container.querySelector(".online-dot")).toBeNull();
+  });
+
+  it("shows the re-authorise badge for a broken token", () => {
+    render(<CharacterCard card={{ ...full, needsReauth: true }} />);
+    expect(screen.getByText("re-authorise")).toHaveClass("needs_reauth");
+  });
+
+  it("degrades to placeholders before the first sync", () => {
+    render(<CharacterCard card={{
+      ...full, balance: null, system: null, dockedAt: null, ship: null, online: null,
+      training: "Not synced", totalSp: null, lastSync: "never",
+    }} />);
+    expect(screen.getAllByText("Not synced yet")).toHaveLength(2);   // wallet and location
+    expect(screen.getAllByText("—")).toHaveLength(2);                // ship and total SP
+    expect(screen.getByText("Not synced")).toBeInTheDocument();
+    expect(screen.getByText("never")).toBeInTheDocument();
+  });
+});

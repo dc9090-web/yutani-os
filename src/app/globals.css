@@ -16,6 +16,7 @@
   --accent-2: #5eb0ff;
   --pos: #34d399;
   --neg: #f76d7a;
+  --warn: #f2b03d;
   --aurora: linear-gradient(90deg, #a5b4fc, #4d8dff, #22d3ee, #5eead4, #4d8dff, #a5b4fc);
   --col: 1123px;
 }
@@ -161,3 +162,24 @@ body {
 .badge.running { background: rgba(77,141,255,.14); color: var(--accent); }
 .sso-btn { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; }
 .sso-btn:hover { background: var(--accent-2); }
+
+/* ---------- Overview cards (phase 3) ---------- */
+.card-grid.overview { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.ov-card { display: flex; flex-direction: column; gap: 14px; }
+.ov-head { display: flex; gap: 14px; align-items: center; }
+.ov-portrait { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
+.ov-name { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
+.ov-corp { margin: 2px 0 6px; font-size: 13px; color: var(--muted); }
+.ov-rows { margin: 0; display: grid; gap: 6px; }
+.ov-row { display: grid; grid-template-columns: 86px 1fr; gap: 10px; align-items: baseline; }
+.ov-row dt { font-size: 12px; color: var(--faint); }
+.ov-row dd { margin: 0; font-size: 13px; color: var(--text); }
+
+/* Shared by every phase-3 page. */
+.online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }
+.online-dot.on { background: var(--pos); box-shadow: 0 0 6px rgba(52, 211, 153, 0.6); }
+.sec-high { color: var(--pos); }
+.sec-low { color: var(--warn); }
+.sec-null { color: var(--neg); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.card-stack { display: grid; gap: 20px; }
