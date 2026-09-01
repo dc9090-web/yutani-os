@@ -2,16 +2,19 @@ import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { getAttributes, getSkillSummary, listSkillQueue, listSkills } from "../../lib/db/character-skills.js";
 import { getClones, listImplants } from "../../lib/db/character-clones.js";
-import { getGroups, getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
+import { listPlans } from "../../lib/db/skill-plans.js";
+import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../lib/sde/repo.js";
+import { summarisePlans } from "../../lib/skills/load.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { relativeTime, roman, sp, stamp } from "../../lib/view/format.js";
+import { duration, relativeTime, roman, sp, stamp } from "../../lib/view/format.js";
 import { attributeViews, groupSkills, implantBonusLabel, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
 import { QueueTable, type QueueEntryView } from "./QueueTable.js";
 import { SkillGroups, type SkillGroupProps } from "./SkillGroups.js";
 import { ClonesCard, type ImplantView, type JumpCloneView } from "./ClonesCard.js";
+import { PlansCard, type PlanListRow } from "./PlansCard.js";
 
 export default async function SkillsPage() {
   const [session, characters] = await Promise.all([readSession(), listCharacters()]);
@@ -19,13 +22,15 @@ export default async function SkillsPage() {
   if (character === null) return <NoCharacter title="Skills" />;
 
   const now = new Date();
-  const [summary, attributes, queue, skills, implantIds, clones] = await Promise.all([
+  const [summary, attributes, queue, skills, implantIds, clones, storedPlans, templates] = await Promise.all([
     getSkillSummary(character.id),
     getAttributes(character.id),
     listSkillQueue(character.id),
     listSkills(character.id),
     listImplants(character.id),
     getClones(character.id),
+    listPlans(character.id),
+    listCareerPlans(),
   ]);
 
   // One types query for every id on the page: sheet skills, queue skills, active implants and every
@@ -65,6 +70,14 @@ export default async function SkillsPage() {
     })),
   }));
 
+  const planRows: PlanListRow[] = (await summarisePlans(storedPlans)).map((plan) => ({
+    id: plan.id,
+    name: plan.name,
+    entries: plan.entryCount,
+    remaining: duration(plan.totalMs),
+    doneAt: stamp(plan.doneAt),
+  }));
+
   const implants: ImplantView[] = implantIds.map((typeId, index) => ({
     typeId,
     name: types.get(typeId)?.name ?? `Type ${typeId}`,
@@ -94,6 +107,11 @@ export default async function SkillsPage() {
         <h2 className="card-title">Training queue</h2>
         <QueueTable entries={entries} />
       </div>
+      <PlansCard
+        characterId={character.id}
+        plans={planRows}
+        templates={templates.map((t) => ({ id: t.id, name: t.name ?? `Plan ${t.id}` }))}
+      />
       <div className="card">
         <h2 className="card-title">Skills</h2>
         <SkillGroups groups={groupProps} />
