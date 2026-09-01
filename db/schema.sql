@@ -240,3 +240,30 @@ CREATE TABLE IF NOT EXISTS market_prices (
   jita_buy_max    numeric,
   updated_at      timestamptz NOT NULL DEFAULT now()
 );
+
+-- ── Phase 5: the fitting designer ───────────────────────────────────────────
+-- Our own fits. They are never pushed to ESI (spec §2 ruling); export is by EFT text.
+-- character_id chooses WHOSE SKILLS the numbers use; NULL means the "All skills V" pilot, which is
+-- also what a deleted character degrades to.
+CREATE TABLE IF NOT EXISTS fits (
+  id            serial PRIMARY KEY,
+  name          text NOT NULL,
+  ship_type_id  int NOT NULL,
+  description   text NOT NULL DEFAULT '',
+  character_id  bigint REFERENCES characters(id) ON DELETE SET NULL,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- idx is the position in the document, so the editor's order survives a round trip.
+CREATE TABLE IF NOT EXISTS fit_items (
+  fit_id          int NOT NULL REFERENCES fits(id) ON DELETE CASCADE,
+  idx             int NOT NULL,
+  type_id         int NOT NULL,
+  quantity        int NOT NULL DEFAULT 1,
+  flag            text NOT NULL,
+  charge_type_id  int,
+  state           text NOT NULL DEFAULT 'active' CHECK (state IN ('offline','online','active','overload')),
+  PRIMARY KEY (fit_id, idx)
+);
+CREATE INDEX IF NOT EXISTS fits_updated_idx ON fits (updated_at DESC);

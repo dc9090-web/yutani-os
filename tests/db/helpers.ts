@@ -13,7 +13,7 @@ export async function resetDb(): Promise<Pool> {
   await applySchema(pool);
   // CASCADE clears every character_* table via their characters(id) foreign key; universe_names,
   // structures and market_prices have no FK, so they are listed explicitly.
-  await pool.query("TRUNCATE sync_runs, esi_cache, characters, accounts, universe_names, structures, market_prices RESTART IDENTITY CASCADE");
+  await pool.query("TRUNCATE sync_runs, esi_cache, characters, accounts, universe_names, structures, market_prices, fits RESTART IDENTITY CASCADE");
   return pool;
 }
 
