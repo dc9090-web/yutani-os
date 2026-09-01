@@ -90,6 +90,24 @@ The worker polls CCP's Static Data Export on a schedule; there is nothing to pro
   ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
   ```
 
+## Market prices
+
+The worker's `market-prices` job runs hourly and fills the `market_prices` table from two sources:
+
+- `GET /markets/prices` (ESI, public, one request, ~1.1 MB) → `adjusted_price` / `average_price` for
+  every market type in the game. These are CCP's reference values, not tradeable prices.
+- `https://market.fuzzwork.co.uk/aggregates/?region=10000002` (Jita's region) in batches of 500 type
+  ids, for the *types of interest* only — everything the characters own, everything in a saved fit and
+  everything traded in the last 30 days → `jita_sell_min` / `jita_buy_max`.
+
+Fuzzwork is one person's server with no SLA. If it fails, the run still finishes `ok` and `/settings`
+shows the message in amber behind a `warn:` prefix; the ESI reference prices stay in place and the
+Ships pages fall back to them (`priceOf = sell ?? adjusted`). An ESI failure is a real error and the
+job retries after 10 minutes.
+
+Prices are empty until the first run, so `/ships` shows `0 ISK` and "n items unpriced" on a fresh
+deploy for up to an hour.
+
 ## Logs and troubleshooting
 
 ```
