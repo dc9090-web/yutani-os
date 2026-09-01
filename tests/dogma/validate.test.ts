@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { ATTR } from "../../src/lib/dogma/data.js";
-import { validateFit, type Problem } from "../../src/lib/dogma/validate.js";
+import { ATTR, State } from "../../src/lib/dogma/data.js";
+import { clearMemo } from "../../src/lib/dogma/calc.js";
+import { missingSkills, validateFit, type Problem } from "../../src/lib/dogma/validate.js";
 import { fixtureData } from "./fixture.js";
 import { allSkills, buildFit } from "./build-fit.js";
 import type { Fit, SlotKind } from "../../src/lib/dogma/fit.js";
@@ -117,5 +118,146 @@ describe("rig size", () => {
     const fit = buildFit(data, 587, { modules: [[2048, "low", 0]] });
     fit.modules[0].item.attrs.set(ATTR.rigSize, 3);
     expect(nonSkill(fit)).toEqual([]);
+  });
+});
+
+describe("ship restriction", () => {
+  it("accepts a bomb launcher on a stealth bomber", () => {
+    // Bomb Launcher II carries canFitShipGroup01 = 834; the Hound is group 834.
+    const fit = buildFit(data, 12034, { modules: [[4256, "high", 0]], skills: allSkills(data, 5) });
+    expect(validateFit(fit)).toEqual([]);
+  });
+
+  it("rejects it on a Rifter", () => {
+    const fit = buildFit(data, 587, { modules: [[4256, "high", 0]], skills: allSkills(data, 5) });
+    const problems = nonSkill(fit);
+    expect(problems).toHaveLength(1);
+    expect(problems[0].item).toBe(fit.modules[0].item);
+    expect(problems[0].detail).toBe("Bomb Launcher II cannot be fitted to Rifter");
+  });
+
+  it("accepts a module that names the hull's type id", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0]] });
+    fit.modules[0].item.attrs.set(1302, 587);
+    expect(nonSkill(fit)).toEqual([]);
+  });
+
+  it("rejects a module that names a different type id", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0]] });
+    fit.modules[0].item.attrs.set(1302, 626);
+    expect(nonSkill(fit).map((p) => p.kind)).toEqual(["shipRestriction"]);
+  });
+
+  it("folds fitsToShipType into the type set", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0]] });
+    fit.modules[0].item.attrs.set(ATTR.fitsToShipType, 587);
+    expect(nonSkill(fit)).toEqual([]);
+  });
+
+  it("exempts rigs and subsystems", () => {
+    const fit = buildFit(data, 587, { modules: [[31686, "rig", 0]] });
+    fit.modules[0].item.attrs.set(1302, 626);
+    expect(nonSkill(fit)).toEqual([]);
+  });
+});
+
+describe("maxGroupFitted", () => {
+  it("accepts one Damage Control II", () => {
+    expect(nonSkill(buildFit(data, 587, { modules: [[2048, "low", 0]] }))).toEqual([]);
+  });
+
+  it("rejects two, flagging both", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0], [2048, "low", 1]] });
+    const problems = validateFit(fit).filter((p) => p.kind === "maxGroupFitted");
+    expect(problems).toHaveLength(2);
+    expect(problems[0].item).toBe(fit.modules[0].item);
+    expect(problems[1].item).toBe(fit.modules[1].item);
+    expect(problems[0].detail).toBe("Damage Control II: only 1 of this group can be fitted (2 fitted)");
+  });
+
+  it("counts duplicates regardless of state", () => {
+    const fit = buildFit(data, 587, { modules: [[33076, "low", 0], [33076, "low", 1]] });
+    fit.modules[1].item.state = State.Offline;
+    clearMemo(fit);
+    expect(validateFit(fit).filter((p) => p.kind === "maxGroupFitted")).toHaveLength(2);
+  });
+
+  it("uses the raw value, not the modified one", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0], [2048, "low", 1]] });
+    // Pyfa's ruling: a modified maxGroupFitted is deliberately ignored.
+    expect(fit.modules[0].item.attrs.get(ATTR.maxGroupFitted)).toBe(1);
+    expect(validateFit(fit).filter((p) => p.kind === "maxGroupFitted")).toHaveLength(2);
+  });
+
+  it("says nothing about modules of a different group", () => {
+    const fit = buildFit(data, 587, { modules: [[2048, "low", 0], [519, "low", 1]] });
+    expect(validateFit(fit).filter((p) => p.kind === "maxGroupFitted")).toEqual([]);
+  });
+});
+
+describe("skills", () => {
+  it("reports nothing when everything is trained to V", () => {
+    const fit = buildFit(data, 587, {
+      modules: [[2889, "high", 0]], charges: new Map([[0, 12608]]), drones: [2456],
+      skills: allSkills(data, 5),
+    });
+    expect(missingSkills(fit)).toEqual([]);
+    expect(validateFit(fit)).toEqual([]);
+  });
+
+  it("expands the hull's and the turret's prerequisites recursively at skill 0", () => {
+    const fit = buildFit(data, 587, { modules: [[2889, "high", 0]] });
+    expect(missingSkills(fit)).toEqual([
+      { skillTypeId: 3300, required: 2, have: 0 },    // Gunnery, raised from 1 by the turret's own requirement
+      { skillTypeId: 3302, required: 5, have: 0 },    // Small Projectile Turret
+      { skillTypeId: 3312, required: 3, have: 0 },    // Motion Prediction, via Small Autocannon Specialization
+      { skillTypeId: 3327, required: 1, have: 0 },    // Spaceship Command, via Minmatar Frigate
+      { skillTypeId: 3329, required: 1, have: 0 },    // Minmatar Frigate, from the hull
+      { skillTypeId: 11084, required: 1, have: 0 },   // Small Autocannon Specialization
+    ]);
+  });
+
+  it("stops recursing into a skill that is already trained deeply enough", () => {
+    const fit = buildFit(data, 587, { modules: [[2889, "high", 0]], skills: allSkills(data, 1) });
+    expect(missingSkills(fit)).toEqual([
+      { skillTypeId: 3300, required: 2, have: 1 },
+      { skillTypeId: 3302, required: 5, have: 1 },
+    ]);
+  });
+
+  it("checks a charge's own requirements", () => {
+    // 125mm Gatling AutoCannon I needs only 3302/3300; Hail S needs Small Autocannon Specialization I.
+    const fit = buildFit(data, 587, {
+      modules: [[484, "high", 0]], charges: new Map([[0, 12608]]), skills: allSkills(data, 5),
+    });
+    fit.skills.get(11084)!.attrs.set(ATTR.skillLevel, 0);
+    // 11084's own prerequisites (3312 III, 3302 V) are trained, so the recursion stops there.
+    expect(missingSkills(fit)).toEqual([{ skillTypeId: 11084, required: 1, have: 0 }]);
+  });
+
+  it("checks drones", () => {
+    const fit = buildFit(data, 587, { drones: [2456], skills: allSkills(data, 5) });
+    fit.skills.get(24241)!.attrs.set(ATTR.skillLevel, 2);   // Light Drone Operation V required
+    expect(missingSkills(fit)).toEqual([{ skillTypeId: 24241, required: 5, have: 2 }]);
+  });
+
+  it("exempts rigs", () => {
+    const fit = buildFit(data, 587, { modules: [[31686, "rig", 0]], skills: allSkills(data, 5) });
+    fit.modules[0].item.attrs.set(182, 3300);
+    fit.modules[0].item.attrs.set(277, 5);
+    fit.skills.get(3300)!.attrs.set(ATTR.skillLevel, 0);
+    expect(missingSkills(fit)).toEqual([]);
+  });
+
+  it("surfaces each missing skill as its own Problem", () => {
+    const fit = buildFit(data, 587, { modules: [[2889, "high", 0]], skills: allSkills(data, 1) });
+    const problems = validateFit(fit).filter((p) => p.kind === "skill");
+    expect(problems.map((p) => p.skill)).toEqual([
+      { skillTypeId: 3300, required: 2, have: 1 },
+      { skillTypeId: 3302, required: 5, have: 1 },
+    ]);
+    expect(problems[0].detail).toBe("Gunnery level 2 required (trained 1)");
+    expect(problems[1].detail).toBe("Small Projectile Turret level 5 required (trained 1)");
+    expect(problems[0].item).toBeUndefined();
   });
 });
