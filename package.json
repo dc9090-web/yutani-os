@@ -14,6 +14,7 @@
     "sde:import": "tsx scripts/sde-import.ts",
     "sde:fixture": "tsx scripts/sde-fixture.ts",
     "dogma:fixture": "tsx scripts/dogma-fixture.ts",
+    "skills:fixture": "tsx scripts/skills-fixture.ts",
     "esi:types": "tsx scripts/esi-types.ts",
     "worker": "tsx src/worker/index.ts"
   },
