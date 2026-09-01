@@ -7,7 +7,7 @@ import { FIXTURE_ZIP } from "../sde/fixture.js";
 import {
   getSdeMeta, getType, getTypes, searchTypes, getTypeAttributes, getTypeEffects,
   getSkillRequirements, getSolarSystem, getRegion, getStation,
-  getGroups, listGroups, getSolarSystems, getStations,
+  getGroups, listGroups, getSolarSystems, getStations, getTypeBonuses,
 } from "../../src/lib/sde/repo.js";
 
 let pool: Pool;
@@ -160,5 +160,25 @@ describe("batched map lookups", () => {
     expect(stations.get(60003760)!.solarSystemId).toBe(30000142);
     expect(stations.get(60000361)!.solarSystemId).toBe(30000142);
     expect(await getStations([])).toEqual(new Map());
+  });
+});
+
+describe("type bonuses", () => {
+  it("reads the Rifter's two skill bonuses in file order", async () => {
+    expect(await getTypeBonuses(587)).toEqual([
+      {
+        idx: 0, kind: "skill", skillTypeId: 3329, importance: 1, bonus: 7.5, unitId: 105,
+        bonusText: "bonus to <a href=showinfo:3302>Small Projectile Turret</a> rate of fire",
+      },
+      {
+        idx: 1, kind: "skill", skillTypeId: 3329, importance: 2, bonus: 10, unitId: 105,
+        bonusText: "bonus to <a href=showinfo:3302>Small Projectile Turret</a> falloff",
+      },
+    ]);
+  });
+
+  it("returns an empty list for a type with no bonuses", async () => {
+    expect(await getTypeBonuses(519)).toEqual([]);
+    expect(await getTypeBonuses(999999)).toEqual([]);
   });
 });

@@ -20,6 +20,10 @@ export interface SdeStation {
 }
 export interface SdeTypeEffect { effectId: number; isDefault: boolean | null }
 export interface SdeSkillRequirement { skillTypeId: number; level: number }
+export interface SdeTypeBonus {
+  idx: number; kind: "skill" | "role" | "misc" | null; skillTypeId: number | null;
+  importance: number | null; bonus: number | null; bonusText: string | null; unitId: number | null;
+}
 
 const TYPE_COLS = `id, group_id AS "groupId", name, description, published,
   market_group_id AS "marketGroupId", meta_group_id AS "metaGroupId", meta_level AS "metaLevel",
@@ -171,4 +175,17 @@ export async function getStations(ids: number[]): Promise<Map<number, SdeStation
             owner_id AS "ownerId", operation_id AS "operationId"
      FROM sde_stations WHERE id = ANY($1::int[])`, [ids]);
   return new Map(rows.map((r) => [r.id, r]));
+}
+
+/**
+ * A hull's traits (spec §4): the per-skill bonuses first, in the SDE's own order, then role and misc
+ * bonuses. `bonus_text` is CCP's English string and still carries `showinfo` anchors — see
+ * `bonusLabel` in `src/lib/view/ships.ts` for the display side.
+ */
+export async function getTypeBonuses(typeId: number): Promise<SdeTypeBonus[]> {
+  const { rows } = await getPool().query<SdeTypeBonus>(
+    `SELECT idx, kind, skill_type_id AS "skillTypeId", importance, bonus,
+            bonus_text AS "bonusText", unit_id AS "unitId"
+     FROM sde_type_bonuses WHERE type_id = $1 ORDER BY idx`, [typeId]);
+  return rows;
 }
