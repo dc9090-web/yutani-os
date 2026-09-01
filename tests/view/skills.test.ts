@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { attributeViews, queueProgress, ATTRIBUTE_BONUS_ATTR, SKILL_CATEGORY_ID } from "../../src/lib/view/skills.js";
+import { attributeViews, queueProgress, remapAvailability, ATTRIBUTE_BONUS_ATTR, SKILL_CATEGORY_ID } from "../../src/lib/view/skills.js";
+
+const NOW = new Date("2026-09-01T12:00:00Z");
 
 describe("attributeViews", () => {
   const base = { charisma: 20, intelligence: 24, memory: 21, perception: 20, willpower: 21 };
@@ -101,5 +103,22 @@ describe("implantBonusLabel", () => {
   it("returns null for an implant that boosts none of the five", () => {
     expect(implantBonusLabel(new Map([[9, 100]]))).toBeNull();
     expect(implantBonusLabel(new Map())).toBeNull();
+  });
+});
+
+describe("remapAvailability", () => {
+  it("says available now once the cooldown has elapsed", () => {
+    expect(remapAvailability({ bonusRemaps: 0, accruedRemapCooldownDate: new Date("2026-08-30T12:00:00Z") }, NOW)).toBe("available now");
+    expect(remapAvailability({ bonusRemaps: 0, accruedRemapCooldownDate: NOW }, NOW)).toBe("available now");   // exactly now counts
+  });
+  it("gives the relative time while the cooldown is still running", () => {
+    expect(remapAvailability({ bonusRemaps: 0, accruedRemapCooldownDate: new Date("2026-09-03T12:00:00Z") }, NOW)).toBe("in 2 days");
+  });
+  it("says available now with no cooldown on record but a bonus remap banked", () => {
+    expect(remapAvailability({ bonusRemaps: 1, accruedRemapCooldownDate: null }, NOW)).toBe("available now");
+  });
+  it("returns null when there is neither a cooldown nor a bonus remap", () => {
+    expect(remapAvailability({ bonusRemaps: 0, accruedRemapCooldownDate: null }, NOW)).toBeNull();
+    expect(remapAvailability({ bonusRemaps: null, accruedRemapCooldownDate: null }, NOW)).toBeNull();
   });
 });

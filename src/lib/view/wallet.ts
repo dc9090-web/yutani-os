@@ -2,7 +2,9 @@ import { listJournal, listTransactions, type JournalRow, type TransactionRow } f
 import { displayNames, locationLabels } from "../names/label.js";
 import { getTypes } from "../sde/repo.js";
 import { refTypeLabel } from "./enums.js";
-import { grouped, isk } from "./format.js";
+import { grouped, isk, stamp } from "./format.js";
+
+export { stamp } from "./format.js";
 
 /** Spec §8: the page and the "show more" route both hand out 100 rows at a time. */
 export const WALLET_PAGE_SIZE = 100;
@@ -29,11 +31,6 @@ export interface TransactionView {
   unitPrice: string;
   total: string;
   location: string;
-}
-
-/** "2026-08-31 18:30" — matches the settings tables, and survives JSON as a plain string. */
-export function stamp(date: Date): string {
-  return date.toISOString().replace("T", " ").slice(0, 16);
 }
 
 function party(id: number | null, names: ReadonlyMap<number, string>): string | null {

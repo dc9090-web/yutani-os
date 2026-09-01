@@ -5,18 +5,13 @@ import { getClones, listImplants } from "../../lib/db/character-clones.js";
 import { getGroups, getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { relativeTime, roman, sp } from "../../lib/view/format.js";
-import { attributeViews, groupSkills, implantBonusLabel, queueProgress } from "../../lib/view/skills.js";
+import { relativeTime, roman, sp, stamp } from "../../lib/view/format.js";
+import { attributeViews, groupSkills, implantBonusLabel, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
 import { QueueTable, type QueueEntryView } from "./QueueTable.js";
 import { SkillGroups, type SkillGroupProps } from "./SkillGroups.js";
 import { ClonesCard, type ImplantView, type JumpCloneView } from "./ClonesCard.js";
-
-/** "2026-08-31 18:30" — the timestamp format the settings tables already use. */
-function stamp(date: Date | null): string {
-  return date === null ? "—" : date.toISOString().replace("T", " ").slice(0, 16);
-}
 
 export default async function SkillsPage() {
   const [session, characters] = await Promise.all([readSession(), listCharacters()]);
@@ -93,7 +88,7 @@ export default async function SkillsPage() {
         attributes={attributes === null ? [] : attributeViews(attributes, implantAttributes)}
         bonusRemaps={attributes?.bonusRemaps ?? null}
         lastRemap={attributes?.lastRemapDate == null ? null : relativeTime(attributes.lastRemapDate, now)}
-        remapAvailable={attributes?.accruedRemapCooldownDate == null ? null : relativeTime(attributes.accruedRemapCooldownDate, now)}
+        remapAvailable={attributes === null ? null : remapAvailability(attributes, now)}
       />
       <div className="card">
         <h2 className="card-title">Training queue</h2>

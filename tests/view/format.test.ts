@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { grouped, isk, sp, roman, relativeTime, secClass, secText, trainingLabel } from "../../src/lib/view/format.js";
+import { grouped, isk, sp, roman, relativeTime, secClass, secText, stamp, trainingLabel } from "../../src/lib/view/format.js";
 
 const NOW = new Date("2026-09-01T12:00:00Z");
 
@@ -67,18 +67,32 @@ describe("relativeTime", () => {
   });
 });
 
+describe("stamp", () => {
+  it("renders YYYY-MM-DD HH:MM in UTC", () => {
+    expect(stamp(new Date("2026-08-31T18:30:12Z"))).toBe("2026-08-31 18:30");
+  });
+  it("renders an em dash for a null date", () => {
+    expect(stamp(null)).toBe("—");
+  });
+});
+
 describe("security", () => {
   it("classifies the way the client rounds — to one decimal", () => {
     expect(secClass(0.9459)).toBe("sec-high");
     expect(secClass(0.5)).toBe("sec-high");
     expect(secClass(0.45)).toBe("sec-high");    // rounds to 0.5
     expect(secClass(0.44)).toBe("sec-low");
-    expect(secClass(0.04)).toBe("sec-null");    // rounds to 0.0
+    expect(secClass(0.04)).toBe("sec-low");     // the game rounds a nonzero sub-0.05 band up to 0.1
+    expect(secClass(0.01)).toBe("sec-low");
+    expect(secClass(0.0)).toBe("sec-null");     // a true 0.0 is unaffected
     expect(secClass(-0.19)).toBe("sec-null");
     expect(secClass(null)).toBe("sec-null");
   });
   it("renders the number to one decimal", () => {
     expect(secText(0.9459)).toBe("0.9");
+    expect(secText(0.04)).toBe("0.1");
+    expect(secText(0.01)).toBe("0.1");
+    expect(secText(0.0)).toBe("0.0");
     expect(secText(-0.19)).toBe("-0.2");
     expect(secText(null)).toBe("—");
   });
@@ -94,5 +108,11 @@ describe("trainingLabel", () => {
   });
   it("says the queue is empty", () => {
     expect(trainingLabel(null, NOW)).toBe("Queue empty");
+  });
+  it("says finishing, not a past-tense relative time, when the head's finishDate has already passed", () => {
+    expect(trainingLabel({ skillName: "Caldari Frigate", finishedLevel: 5, finishDate: new Date("2026-09-01T08:48:00Z") }, NOW))
+      .toBe("Caldari Frigate V · finishing");
+    // Exactly now counts as stale too, not "in 0 m".
+    expect(trainingLabel({ skillName: "Gunnery", finishedLevel: 3, finishDate: NOW }, NOW)).toBe("Gunnery III · finishing");
   });
 });

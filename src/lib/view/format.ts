@@ -63,8 +63,14 @@ export function relativeTime(date: Date | null, now: Date = new Date()): string 
 
 export type SecClass = "sec-high" | "sec-low" | "sec-null";
 
-/** The client rounds security to one decimal before colouring it, and so do we: 0.45 is high-sec. */
+/**
+ * The client rounds security to one decimal before colouring it, and so do we: 0.45 is high-sec.
+ * A genuinely nonzero status below 0.05 is the one exception — the game still rounds that band up
+ * to 0.1 rather than letting plain rounding drop it to 0.0, so 0.01 reads "0.1"/sec-low, not
+ * "0.0"/sec-null. A true 0.0 (or negative) status is unaffected.
+ */
 function rounded(status: number): number {
+  if (status > 0 && status < 0.05) return 0.1;
   return Math.round(status * 10) / 10;
 }
 
@@ -79,13 +85,23 @@ export function secText(status: number | null): string {
   return status === null ? "—" : rounded(status).toFixed(1);
 }
 
+/** "2026-08-31 18:30" — the timestamp format the settings tables use across the app. */
+export function stamp(date: Date | null): string {
+  return date === null ? "—" : date.toISOString().replace("T", " ").slice(0, 16);
+}
+
 export interface QueueHeadLabel { skillName: string; finishedLevel: number; finishDate: Date | null }
 
-/** "Caldari Frigate V · finishes in 3 h 12 m" — the Overview's training line. */
+/**
+ * "Caldari Frigate V · finishes in 3 h 12 m" — the Overview's training line. A stale head — its
+ * finishDate already passed — means the sync just hasn't caught up with ESI yet, not that the
+ * skill is still finishing "3 h ago"; render it as still-in-progress instead of a confusing past tense.
+ */
 export function trainingLabel(head: QueueHeadLabel | null, now: Date = new Date()): string {
   if (head === null) return "Queue empty";
   const skill = `${head.skillName} ${roman(head.finishedLevel)}`;
   // A paused queue comes back from ESI with no dates at all (phase 3a stores them as NULL).
   if (head.finishDate === null) return `${skill} · paused`;
+  if (head.finishDate.getTime() <= now.getTime()) return `${skill} · finishing`;
   return `${skill} · finishes ${relativeTime(head.finishDate, now)}`;
 }

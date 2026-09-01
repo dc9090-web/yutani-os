@@ -1,4 +1,5 @@
 import type { SkillRow } from "../db/character-skills.js";
+import { relativeTime } from "./format.js";
 
 /** sde_categories.id for Skills — the Skills page shows nothing outside it (spec §7). */
 export const SKILL_CATEGORY_ID = 16;
@@ -82,6 +83,21 @@ export function groupSkills(
   for (const group of out) group.skills.sort((a, b) => a.name.localeCompare(b.name));
   out.sort((a, b) => a.name.localeCompare(b.name));
   return out;
+}
+
+export interface RemapAttributes { bonusRemaps: number | null; accruedRemapCooldownDate: Date | null }
+
+/**
+ * "available now" when a remap can be done immediately: the cooldown already elapsed, or there is
+ * no cooldown on record at all but a bonus remap is banked (a character who has never remapped, or
+ * whose last remap used a bonus, carries no cooldown date yet still has remaps to spend). Otherwise
+ * the relative time until the cooldown clears; null when there is nothing to report.
+ */
+export function remapAvailability(attrs: RemapAttributes, now: Date): string | null {
+  if (attrs.accruedRemapCooldownDate === null) {
+    return (attrs.bonusRemaps ?? 0) > 0 ? "available now" : null;
+  }
+  return attrs.accruedRemapCooldownDate.getTime() <= now.getTime() ? "available now" : relativeTime(attrs.accruedRemapCooldownDate, now);
 }
 
 /** "+5 Intelligence" for an attribute implant, null for anything else (a hardwiring, a booster). */
