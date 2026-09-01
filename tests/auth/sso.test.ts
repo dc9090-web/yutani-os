@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { SignJWT, generateKeyPair, exportJWK, createLocalJWKSet } from "jose";
-import { SCOPES, generatePkce, buildAuthorizeUrl, exchangeCode, refreshAccessToken, verifyEveJwt, SsoError, type SsoMetadata } from "../../src/lib/auth/sso.js";
+import { SCOPES, generatePkce, buildAuthorizeUrl, exchangeCode, refreshAccessToken, verifyEveJwt, getSsoMetadata, resetSsoMetadataCache, SsoError, type SsoMetadata } from "../../src/lib/auth/sso.js";
 import { createHash } from "node:crypto";
 
 const metadata: SsoMetadata = {
@@ -22,6 +22,19 @@ async function signedJwt(claims: Record<string, unknown>, opts: { aud?: string[]
 
 describe("sso", () => {
   it("exports the ten scopes", () => { expect(SCOPES.length).toBe(10); expect(SCOPES).toContain("esi-fittings.read_fittings.v1"); });
+
+  it("does not memoise a rejected metadata fetch forever", async () => {
+    resetSsoMetadataCache();
+    let calls = 0;
+    const fetchImpl = (async () => {
+      calls++;
+      if (calls === 1) throw new Error("network down");
+      return new Response(JSON.stringify(metadata), { status: 200 });
+    }) as unknown as typeof fetch;
+    await expect(getSsoMetadata(fetchImpl)).rejects.toThrow("network down");
+    await expect(getSsoMetadata(fetchImpl)).resolves.toEqual(metadata);
+    expect(calls).toBe(2);
+  });
 
   it("PKCE challenge is S256 of the verifier", () => {
     const { verifier, challenge } = generatePkce();

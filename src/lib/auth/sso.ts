@@ -19,12 +19,17 @@ export class SsoError extends Error {
 
 let metadataPromise: Promise<SsoMetadata> | undefined;
 export function getSsoMetadata(fetchImpl: typeof fetch = fetch): Promise<SsoMetadata> {
-  metadataPromise ??= fetchImpl(SSO_METADATA_URL).then(async (r) => {
-    if (!r.ok) { metadataPromise = undefined; throw new SsoError("token_http", `SSO metadata HTTP ${r.status}`); }
-    return (await r.json()) as SsoMetadata;
-  });
+  metadataPromise ??= fetchImpl(SSO_METADATA_URL)
+    .then(async (r) => {
+      if (!r.ok) throw new SsoError("token_http", `SSO metadata HTTP ${r.status}`);
+      return (await r.json()) as SsoMetadata;
+    })
+    .catch((e) => { metadataPromise = undefined; throw e; });
   return metadataPromise;
 }
+
+/** Test-only: clears the module-level metadata memoisation so tests can start from a fresh state. */
+export function resetSsoMetadataCache(): void { metadataPromise = undefined; }
 
 export function generatePkce(): { verifier: string; challenge: string } {
   const verifier = randomBytes(32).toString("base64url");
@@ -49,7 +54,6 @@ async function tokenRequest(metadata: SsoMetadata, clientId: string, clientSecre
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       Authorization: "Basic " + Buffer.from(`${clientId}:${clientSecret}`).toString("base64"),
-      Host: "login.eveonline.com",
     },
     body: new URLSearchParams(form).toString(),
   });
