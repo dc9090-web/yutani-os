@@ -3,8 +3,8 @@
  * Isomorphic — this file runs in the browser.
  */
 import {
-  ATTR, DRONE_BAY_FLAG, EFFECT, SLOT_KINDS, State, defaultStateOfType, getAttr,
-  kindOfType, slotFromFlag, slotOfType,
+  ATTR, CAN_FIT_SHIP_GROUP_ATTRS, CAN_FIT_SHIP_TYPE_ATTRS, DRONE_BAY_FLAG, EFFECT, SLOT_KINDS, State,
+  defaultStateOfType, getAttr, kindOfType, slotFromFlag, slotOfType,
   type AttrId, type DogmaData, type DogmaType, type Fit, type SlotKind,
 } from "../dogma/index.js";
 import {
@@ -135,6 +135,46 @@ export function chargeFits(moduleType: DogmaType, chargeType: DogmaType): boolea
   const size = chargeType.attrs.get(CHARGE_SIZE_ATTR);
   if (max === undefined || size === undefined) return true; // CCP only sets it where it bites
   return size <= max;
+}
+
+/**
+ * Spec §4's "Fits this hull" filter. Advisory only — `validateFit` remains the authority and still
+ * raises `shipRestriction` / `rigSize` if the filter is cleared and the module fitted anyway. It
+ * reads exactly what the engine's validator reads: `canFitShipType1..12` plus `fitsToShipType`
+ * (1380), `canFitShipGroup01..20`, and `rigSize` (1547) compared with strict equality — and it
+ * repeats the validator's exemption of rigs and subsystems from the hull restriction.
+ */
+export function canFitShip(shipType: DogmaType, moduleType: DogmaType): boolean {
+  const slot = slotOfType(moduleType);
+
+  // `validateFit`'s `allowedOnHull`, attribute for attribute — including `fitsToShipType` (1380)
+  // beside `canFitShipType1..12`, and its exemption for rigs and subsystems.
+  if (slot !== "rig" && slot !== "subsystem") {
+    const allowedTypes = new Set<number>();
+    const allowedGroups = new Set<number>();
+    for (const attrId of [...CAN_FIT_SHIP_TYPE_ATTRS, ATTR.fitsToShipType]) {
+      const value = moduleType.attrs.get(attrId);
+      if (value !== undefined && value > 0) allowedTypes.add(Math.round(value));
+    }
+    for (const attrId of CAN_FIT_SHIP_GROUP_ATTRS) {
+      const value = moduleType.attrs.get(attrId);
+      if (value !== undefined && value > 0) allowedGroups.add(Math.round(value));
+    }
+    if ((allowedTypes.size > 0 || allowedGroups.size > 0)
+        && !allowedTypes.has(shipType.id) && !allowedGroups.has(shipType.groupId)) {
+      return false;
+    }
+  }
+
+  // `validateFit`'s rigSize rule: rigs only, raw attributes, strict equality, skipped when either
+  // side lacks the attribute.
+  if (slot === "rig") {
+    const rigSize = moduleType.attrs.get(ATTR.rigSize);
+    const hullRigSize = shipType.attrs.get(ATTR.rigSize);
+    if (rigSize === undefined || hullRigSize === undefined) return true;
+    return Math.round(rigSize) === Math.round(hullRigSize);
+  }
+  return true;
 }
 
 /** The states this type can actually be put in — a single-entry list means "render no toggle". */

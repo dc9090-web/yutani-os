@@ -3,7 +3,7 @@ import { fixtureData } from "../dogma/fixture.js";
 import { createFit, makeItem } from "../../src/lib/dogma/index.js";
 import { CARGO_FLAG, type FitDoc, type FitItem } from "../../src/lib/fits/doc.js";
 import {
-  allowedStates, chargeFits, firstFreeIndex, fitTypeInto, removeSlot, setEntryQuantity,
+  allowedStates, canFitShip, chargeFits, firstFreeIndex, fitTypeInto, removeSlot, setEntryQuantity,
   setSlotCharge, setSlotState, slotGrid, slotTotals,
 } from "../../src/lib/fits/slots.js";
 
@@ -149,5 +149,24 @@ describe("allowedStates", () => {
     expect(allowedStates(data, data.types.get(2889)!)).toEqual(["offline", "online", "active", "overload"]);
     expect(allowedStates(data, data.types.get(2048)!)).toEqual(["offline", "online"]);
     expect(allowedStates(data, data.types.get(31686)!)).toEqual(["offline", "online"]);
+  });
+});
+
+describe("canFitShip", () => {
+  const rifter = data.types.get(587)!;
+  const gun = data.types.get(2889)!;                 // no restriction at all
+  const smallRig = data.types.get(31686)!;           // Small rig, rigSize 1
+  const mediumRig = data.types.get(31682)!;          // Medium rig, rigSize 2
+  const bombLauncher = data.types.get(4256)!;        // canFitShipGroup01 = 834 (Stealth Bomber)
+
+  it("accepts anything with no restriction", () => {
+    expect(canFitShip(rifter, gun)).toBe(true);
+  });
+  it("rejects a rig whose size the hull does not take", () => {
+    expect(canFitShip(rifter, smallRig)).toBe(true);        // both are rigSize 1
+    expect(canFitShip(rifter, mediumRig)).toBe(false);      // rigSize 2 on a rigSize 1 hull
+  });
+  it("rejects a module restricted to other hull groups", () => {
+    expect(canFitShip(rifter, bombLauncher)).toBe(false);   // the Rifter's group is 25, not 834
   });
 });

@@ -4,7 +4,7 @@
  * touches Postgres.
  */
 export {
-  ATTR, CATEGORY, EFFECT, Operator, State,
+  ATTR, CAN_FIT_SHIP_GROUP_ATTRS, CAN_FIT_SHIP_TYPE_ATTRS, CATEGORY, EFFECT, Operator, State,
   type AttrId, type DogmaAttribute, type DogmaData, type DogmaDataJson, type DogmaEffect,
   type DogmaGroup, type DogmaType, type EffectId, type GroupId, type Modifier, type ModifierDomain, type ModifierFunc, type TypeId,
   deserialiseDogmaData, serialiseDogmaData,
