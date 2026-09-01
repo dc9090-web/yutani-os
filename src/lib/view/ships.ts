@@ -18,3 +18,27 @@ export function bonusLabel(b: { bonus: number | null; bonusText: string | null; 
   const value = `${b.bonus}${b.unitId !== null && PERCENT_UNIT_IDS.has(b.unitId) ? "%" : ""}`;
   return text === "" ? value : `${value} ${text}`;
 }
+
+/** A resource bar: CPU, powergrid or calibration. `over` drives the `.over` CSS class (spec §4). */
+export interface GaugeView {
+  label: string; unit: string; used: number; output: number;
+  text: string; percent: number; over: boolean;
+}
+
+/**
+ * `percent` is clamped to 100 so the bar never overflows its track; `over` is the honest
+ * `used > output` test — the same one `validateFit` makes, with no epsilon, because the engine
+ * already rounded CPU and powergrid to two decimals. A blank `unit` (calibration) would otherwise
+ * leave a trailing space in `text`; trim it so the two forms both read cleanly.
+ */
+export function gauge(
+  label: string, unit: string, pool: { used: number; output: number }, digits = 2,
+): GaugeView {
+  const raw = pool.output > 0 ? (pool.used / pool.output) * 100 : pool.used > 0 ? 100 : 0;
+  return {
+    label, unit, used: pool.used, output: pool.output,
+    text: `${pool.used.toFixed(digits)} / ${pool.output.toFixed(digits)} ${unit}`.trimEnd(),
+    percent: Math.round(Math.min(100, raw) * 10) / 10,
+    over: pool.used > pool.output,
+  };
+}
