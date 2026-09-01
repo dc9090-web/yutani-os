@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { groupByAccount, portraitUrl, toCharacterView } from "../../src/lib/view/characters.js";
+import { groupByAccount, portraitUrl, toCharacterView, pickActive } from "../../src/lib/view/characters.js";
 
 const c = (id: number, accountId: number | null) => ({ id, name: `c${id}`, accountId, corporationName: null, allianceName: null, tokenStatus: "ok" as const });
 
@@ -37,5 +37,21 @@ describe("toCharacterView", () => {
     });
     expect(view).not.toHaveProperty("refreshTokenEnc");
     expect(view).not.toHaveProperty("scopes");
+  });
+});
+
+describe("pickActive", () => {
+  const characters = [{ id: 1 }, { id: 2 }, { id: 3 }];
+  it("returns the session's active character", () => {
+    expect(pickActive(characters, 2)).toEqual({ id: 2 });
+  });
+  it("falls back to the first character when the session names none", () => {
+    expect(pickActive(characters, null)).toEqual({ id: 1 });
+  });
+  it("falls back to the first character when the session names one that is gone", () => {
+    expect(pickActive(characters, 99)).toEqual({ id: 1 });
+  });
+  it("returns null when there are no characters at all", () => {
+    expect(pickActive([], 2)).toBeNull();
   });
 });

@@ -20,3 +20,12 @@ export function portraitUrl(id: number, size: 64 | 128 | 256 = 64): string {
 export function toCharacterView(c: { id: number; name: string; accountId: number | null; corporationName: string | null; allianceName: string | null; tokenStatus: "ok" | "needs_reauth" }): CharacterView {
   return { id: c.id, name: c.name, accountId: c.accountId, corporationName: c.corporationName, allianceName: c.allianceName, tokenStatus: c.tokenStatus };
 }
+
+/**
+ * "Active character" per spec §7: the session's `activeCharacterId`, falling back to the first
+ * character. Returns null only when no character is authorised at all.
+ */
+export function pickActive<T extends { id: number }>(characters: T[], activeId: number | null): T | null {
+  if (characters.length === 0) return null;
+  return characters.find((c) => c.id === activeId) ?? characters[0];
+}
