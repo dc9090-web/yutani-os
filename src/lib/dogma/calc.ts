@@ -90,7 +90,12 @@ export function getAttr(fit: Fit, item: Item, attrId: AttrId): number {
   }
 }
 
-/** The modifiers that were applied to `(item, attrId)`, for the "affected by" panel. */
+/**
+ * Every modifier `calculate` *gathered* for `(item, attrId)` — the gather-and-normalise step of the
+ * pipeline below — not just the ones that ultimately shaped the result: a penalised bucket's losers
+ * (every entry beyond the one `penalizeValues` collapses to) and each pre-collapse penalised value
+ * are included alongside the plain, unpenalised entries. For the "affected by" panel.
+ */
 export function explain(fit: Fit, item: Item, attrId: AttrId): AppliedModifier[] {
   const trace: AppliedModifier[] = [];
   calculate(fit, item, attrId, trace);
