@@ -7,9 +7,11 @@ import { getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
 import { isk, relativeTime, secClass, secText, sp, trainingLabel } from "../lib/view/format.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
+import { NoCharacter } from "./components/NoCharacter.js";
 
 export default async function Overview() {
   const [characters, runs] = await Promise.all([listCharacters(), latestRuns()]);
+  if (characters.length === 0) return <NoCharacter title="Overview" />;
   const now = new Date();
 
   // Four repo reads per character, all in flight at once; the id -> name lookups below are then
@@ -78,8 +80,5 @@ export default async function Overview() {
     <div className="card-grid overview">
       {cards.map((card) => <CharacterCard key={card.id} card={card} />)}
     </div>
-    {cards.length === 0
-      ? <div className="card coming-soon">No characters yet — use the menu top-right to add one.</div>
-      : null}
   </>);
 }
