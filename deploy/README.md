@@ -43,6 +43,29 @@ in `script` to give it a pseudo-tty:
 script -qc "ansible-playbook site.yml --tags eve" /dev/null
 ```
 
+## ESI application scopes (manual, one-off)
+
+The app now requests twelve scopes (`SCOPES` in `src/lib/auth/sso.ts`). The developer-portal
+application at <https://developers.eveonline.com> already has all twelve enabled — no portal
+change is needed. Two of them were added in phase 3:
+
+- `esi-universe.read_structures.v1` — names of player structures (citadels) the character can dock at
+- `esi-location.read_online.v1` — whether the character is currently online
+
+Tokens issued before this deploy were granted under the old ten-scope set, and scope grants are
+immutable per refresh token. So **every character must log in once more after the deploy** (menu →
+Add character, or the "Log in with EVE Online" button, then `/auth/start`) to pick up the new
+scopes. Until a character does that, those two features degrade gracefully rather than failing:
+structures show `Unknown structure (id)` and online status is blank, while everything else
+(skills, assets, fittings, clones, wallet, location) keeps syncing normally.
+
+## ESI compatibility date
+
+`ESI_COMPATIBILITY_DATE` must be a date from `GET https://esi.evetech.net/meta/compatibility-dates`
+— ESI silently rounds an unlisted date down to the newest published date below it. It is pinned to
+`2026-08-18` in `deploy/ansible/group_vars/eve.yml`, `.env`, `.env.example`, `deploy/.env.example`
+and `scripts/esi-types.ts`. Bump all five together and re-run `npm run esi:types`, never one alone.
+
 ## Where things live on the VM
 
 - `/opt/eve/traefik` — Traefik config, dynamic routes, ACME certificate storage.
