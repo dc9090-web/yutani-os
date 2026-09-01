@@ -5,6 +5,6 @@ describe("isPublicPath", () => {
     for (const p of ["/login", "/auth/start", "/auth/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/eve-mark.svg"]) expect(isPublicPath(p)).toBe(true);
   });
   it("guards everything else", () => {
-    for (const p of ["/", "/settings", "/api/accounts", "/ships/1"]) expect(isPublicPath(p)).toBe(false);
+    for (const p of ["/", "/settings", "/api/accounts", "/ships/1", "/login-history", "/api/healthz"]) expect(isPublicPath(p)).toBe(false);
   });
 });

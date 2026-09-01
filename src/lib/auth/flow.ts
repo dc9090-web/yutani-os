@@ -46,3 +46,11 @@ export async function completeLogin(
   await deps.upsert({ id: verified.characterId, name: verified.name, refreshTokenEnc: encryptSecret(tokens.refresh_token, config.sessionSecret), scopes: verified.scopes });
   return { characterId: verified.characterId, name: verified.name };
 }
+
+export function safeNextPath(next: unknown, origin: string): string {
+  if (typeof next !== "string") return "/";
+  let url: URL;
+  try { url = new URL(next, origin); } catch { return "/"; }
+  if (url.origin !== origin) return "/";
+  return url.pathname + url.search;
+}

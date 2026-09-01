@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { startLogin, completeLogin, AuthError, type FlowDeps } from "../../src/lib/auth/flow.js";
+import { startLogin, completeLogin, AuthError, safeNextPath, type FlowDeps } from "../../src/lib/auth/flow.js";
 import { signPayload, verifyPayload, OAUTH_MAX_AGE, type OauthPayload } from "../../src/lib/auth/session.js";
 import { loadConfig } from "../../src/lib/config.js";
 import type { SsoMetadata } from "../../src/lib/auth/sso.js";
@@ -58,5 +58,19 @@ describe("completeLogin", () => {
     await expect(completeLogin({ code: "c", state: "st", oauthCookie: cookie }, config, d1)).rejects.toBeInstanceOf(AuthError);
     const d2 = deps({ verify: vi.fn(async () => { throw new Error("bad sig"); }) });
     await expect(completeLogin({ code: "c", state: "st", oauthCookie: cookie }, config, d2)).rejects.toMatchObject({ code: "jwt" });
+  });
+});
+
+describe("safeNextPath", () => {
+  const origin = "https://eve.plasma66.com";
+  it.each([
+    ["/ships", "/ships"],
+    ["//evil.com/x", "/"],
+    ["/\\evil.com", "/"],
+    ["https://evil.com", "/"],
+    [undefined, "/"],
+    ["/a?b=1", "/a?b=1"],
+  ])("safeNextPath(%j) -> %j", (input, expected) => {
+    expect(safeNextPath(input, origin)).toBe(expected);
   });
 });
