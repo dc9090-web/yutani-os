@@ -6,3 +6,4 @@ node_modules/
 deploy/ansible/vars/secrets.yml
 *.log
 .DS_Store
+.superpowers/
