@@ -25,6 +25,6 @@ export function resolveLocations(locationIds: number[], characterId: number): Pr
   return nameResolver().resolveLocations(locationIds, characterId);
 }
 
-export { locationLabel, type LocationLabel } from "./label.js";
+export { locationLabel, locationLabels, displayNames, type LocationLabel } from "./label.js";
 export { classifyLocation, unknownStructureLabel, type LocationKind } from "./ranges.js";
 export type { NameResolver, ResolvedName, ResolvedLocation } from "./resolve.js";
