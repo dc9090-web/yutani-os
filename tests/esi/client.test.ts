@@ -88,4 +88,35 @@ describe("EsiClient", () => {
     expect(await client.getAll<number>("/characters/1/assets", { characterId: 1 })).toEqual([1, 2, 3, 4]);
     expect(calls.map((c) => new URL(c.url).searchParams.get("page"))).toEqual(["1", "2", "3"]);
   });
+  it("post sends a JSON body with the bearer, compat date and UA, and returns the parsed response", async () => {
+    const { client, calls, store } = make([{ status: 200, body: [{ item_id: 7, name: "Fast Tackle" }] }]);
+    const out = await client.post<{ item_id: number; name: string }[]>("/characters/1/assets/names", [7], { characterId: 1 });
+    expect(out).toEqual([{ item_id: 7, name: "Fast Tackle" }]);
+    expect(calls[0].init.method).toBe("POST");
+    expect(calls[0].init.body).toBe("[7]");
+    const h = calls[0].init.headers as Record<string, string>;
+    expect(h["Content-Type"]).toBe("application/json");
+    expect(h.Authorization).toBe("Bearer tok-1");
+    expect(h["X-Compatibility-Date"]).toBe("2026-08-18");
+    expect(h["User-Agent"]).toBe("ua");
+    expect(store.size).toBe(0);                       // POST responses carry no cache headers
+  });
+  it("post throws EsiError on a 4xx and sends no bearer for a public route", async () => {
+    const { client, calls } = make([{ status: 200, body: [] }, { status: 400, body: { error: "too many ids" } }]);
+    await client.post("/universe/names", [1, 2]);
+    expect((calls[0].init.headers as Record<string, string>).Authorization).toBeUndefined();
+    await expect(client.post("/universe/names", [1, 2])).rejects.toMatchObject({ status: 400, path: "/universe/names" });
+  });
+  it("keys rate-limit buckets on (group, characterId) so one character never delays another", async () => {
+    const low = { "X-Ratelimit-Group": "char-wallet", "X-Ratelimit-Limit": "150/15m", "X-Ratelimit-Remaining": "5" };
+    const high = { "X-Ratelimit-Group": "char-wallet", "X-Ratelimit-Limit": "150/15m", "X-Ratelimit-Remaining": "140" };
+    const { client, sleeps } = make([
+      { status: 200, body: {}, headers: low }, { status: 200, body: {}, headers: high }, { status: 200, body: {}, headers: high },
+    ]);
+    await client.get("/characters/1/wallet", { characterId: 1 });   // bucket char-wallet:1 now throttled
+    await client.get("/characters/2/wallet", { characterId: 2 });   // same route template, different bucket
+    expect(sleeps).toEqual([]);
+    await client.get("/characters/1/wallet", { characterId: 1 });   // same template: bucket char-wallet:1 is known and throttled
+    expect(sleeps.length).toBe(1);                                  // bucket char-wallet:1 waited
+  });
 });
