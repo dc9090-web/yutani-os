@@ -102,7 +102,7 @@ characters   id bigint (EVE character_id) PK, name, account_id → accounts (nul
              corporation_id, corporation_name, alliance_id, alliance_name,
              refresh_token_enc, scopes text[], token_status ('ok'|'needs_reauth'),
              created_at, updated_at, last_login_at
-esi_cache    character_id (nullable for public routes), path, etag, expires_at, body jsonb,
+esi_cache    character_id (0 for public routes — part of the PK, so not nullable), path, etag, expires_at, pages, body jsonb,
              PK (character_id, path)
 sync_runs    id, job text, character_id, started_at, finished_at, status ('ok'|'error'|'running'),
              rows int, error text
@@ -126,7 +126,8 @@ its row. Nobody else can ever get in.
   `esi_cache`; never re-fetches before `Expires`; sends `If-None-Match`; on 304 returns the
   cached body.
 - **Rate limiting:** reads `X-Ratelimit-Limit/Remaining`; when remaining < 20 % of the limit,
-  waits until the window clears before the next call in that group; honours `Retry-After` on
+  waits before the next call in that group — ESI's bucket refills continuously, so the wait is
+  10 % of the window capped at 60 s rather than a full window (amended 2026-09-01); honours `Retry-After` on
   429; on 420 (legacy error limit) halts all ESI calls for 60 s.
 - **Pagination:** `X-Pages` handled inside the wrapper (`esiFetchAll`).
 - **Token refresh failure (invalid_grant):** sets `characters.token_status = 'needs_reauth'`;
@@ -142,8 +143,9 @@ its row. Nobody else can ever get in.
   every run in `sync_runs`; a failing job logs its error and retries next interval — it never
   crashes the process.
 - Phase 1 ships one job, `character-info` (every 6 h): refreshes name, corporation,
-  alliance via `/characters/{id}` (+ `/corporations/{id}`, `/alliances/{id}` for names). Its
-  purpose is to prove token refresh, the ESI wrapper, and `sync_runs` end-to-end.
+  alliance via `/characters/{id}` — called **with** the character's bearer token even though the
+  route is public — (+ `/corporations/{id}`, `/alliances/{id}` for names). Its purpose is to
+  prove token refresh, the ESI wrapper, and `sync_runs` end-to-end.
 
 ### 3.5 UI shell & pages
 
@@ -177,7 +179,8 @@ its row. Nobody else can ever get in.
 ### 3.7 Error handling
 
 - ESI errors are recorded per job run in `sync_runs`; the worker retries on the next interval.
-- 401/403 or `invalid_grant` on a character → `needs_reauth`; the UI flags it; the worker
+- `invalid_grant` on refresh, or a 401 on an authenticated ESI call, → `needs_reauth` (a 403
+  means a missing role, not a bad token, and stays a plain error — amended 2026-09-01); the UI flags it; the worker
   skips that character until re-authorised.
 - SSO failures (bad state, JWT invalid, not allow-listed) → `/login?error=…`; nothing persisted.
 - Pages never call ESI inline, so a CCP outage shows stale data, not errors.
