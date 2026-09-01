@@ -42,7 +42,7 @@
     cmd: docker compose exec -T app npm run migrate
     chdir: "{{ base_dir }}/src/deploy"
   register: migrate
-  changed_when: "'schema applied' in migrate.stdout"
+  changed_when: "migrate.stdout is defined and 'schema applied' in migrate.stdout"
 
 - name: Restart worker so it sees the schema
   community.docker.docker_compose_v2:

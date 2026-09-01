@@ -4,7 +4,7 @@ global:
   sendAnonymousUsage: false
 
 api:
-  dashboard: true            # exposed via the router defined in docker-compose labels
+  dashboard: true            # no router binds api@internal — the dashboard is unreachable by design
 
 entryPoints:
   web:
