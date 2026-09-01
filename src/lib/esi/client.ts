@@ -171,8 +171,10 @@ export class EsiClient {
     let res = await this.fetchImpl(url, makeInit());
     this.noteLimits(url.pathname, characterId, res);
     if (res.status === 429) {
-      const retry = Number(res.headers.get("Retry-After"));
-      await this.sleep((Number.isFinite(retry) && retry >= 0 ? retry : 5) * 1000);
+      const raw = res.headers.get("Retry-After");
+      const n = raw === null ? 5 : Number(raw);
+      const retry = Number.isFinite(n) && n >= 0 ? n : 5;
+      await this.sleep(retry * 1000);
       res = await this.fetchImpl(url, makeInit());
       this.noteLimits(url.pathname, characterId, res);
     }

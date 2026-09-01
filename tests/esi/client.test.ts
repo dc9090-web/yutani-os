@@ -80,6 +80,15 @@ describe("EsiClient", () => {
     expect(sleeps).toContain(5000);
     expect(r.data.ok).toBe(1);
   });
+  it("falls back to a 5s sleep when Retry-After is absent on a 429", async () => {
+    const { client, sleeps } = make([
+      { status: 429 },
+      { status: 200, body: { ok: 1 } },
+    ]);
+    const r = await client.get<{ ok: number }>("/a");
+    expect(sleeps).toContain(5000);
+    expect(r.data.ok).toBe(1);
+  });
   it("halts all calls for 60s after a 420", async () => {
     const { client, sleeps } = make([{ status: 420 }, { status: 200, body: {} }, { status: 200, body: {} }]);
     await expect(client.get("/a")).rejects.toBeInstanceOf(EsiError);
