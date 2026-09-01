@@ -1,0 +1,20 @@
+{
+  "home_location": { "location_id": 60003760, "location_type": "station" },
+  "jump_clones": [
+    {
+      "jump_clone_id": 1001,
+      "location_id": 60008494,
+      "location_type": "station",
+      "name": "Amarr medical",
+      "implants": [9899, 9941, 9942]
+    },
+    {
+      "jump_clone_id": 1002,
+      "location_id": 1035466617946,
+      "location_type": "structure",
+      "implants": []
+    }
+  ],
+  "last_clone_jump_date": "2026-08-20T21:04:11Z",
+  "last_station_change_date": "2026-08-28T07:45:02Z"
+}

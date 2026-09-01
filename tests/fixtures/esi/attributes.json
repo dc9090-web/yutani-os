@@ -1,0 +1,10 @@
+{
+  "charisma": 20,
+  "intelligence": 24,
+  "memory": 21,
+  "perception": 20,
+  "willpower": 21,
+  "bonus_remaps": 2,
+  "last_remap_date": "2025-11-14T09:12:33Z",
+  "accrued_remap_cooldown_date": "2026-11-14T09:12:33Z"
+}

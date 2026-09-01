@@ -1,0 +1,57 @@
+[
+  {
+    "item_id": 1023456789012,
+    "type_id": 587,
+    "quantity": 1,
+    "location_id": 60003760,
+    "location_type": "station",
+    "location_flag": "Hangar",
+    "is_singleton": true
+  },
+  {
+    "item_id": 1023456789013,
+    "type_id": 34,
+    "quantity": 129837,
+    "location_id": 60003760,
+    "location_type": "station",
+    "location_flag": "Hangar",
+    "is_singleton": false
+  },
+  {
+    "item_id": 1023456789014,
+    "type_id": 2048,
+    "quantity": 1,
+    "location_id": 1023456789012,
+    "location_type": "item",
+    "location_flag": "LoSlot0",
+    "is_singleton": true
+  },
+  {
+    "item_id": 1023456789015,
+    "type_id": 484,
+    "quantity": 1,
+    "location_id": 1023456789012,
+    "location_type": "item",
+    "location_flag": "HiSlot3",
+    "is_singleton": true
+  },
+  {
+    "item_id": 1023456789016,
+    "type_id": 785,
+    "quantity": 1,
+    "location_id": 1035466617946,
+    "location_type": "other",
+    "location_flag": "Hangar",
+    "is_singleton": true,
+    "is_blueprint_copy": true
+  },
+  {
+    "item_id": 1023456789017,
+    "type_id": 626,
+    "quantity": 1,
+    "location_id": 30000142,
+    "location_type": "solar_system",
+    "location_flag": "AutoFit",
+    "is_singleton": true
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "fitting_id": 4021,
+    "name": "Rifter — cheap tackle",
+    "description": "",
+    "ship_type_id": 587,
+    "items": [
+      { "type_id": 484, "quantity": 1, "flag": "HiSlot0" },
+      { "type_id": 484, "quantity": 1, "flag": "HiSlot1" },
+      { "type_id": 5443, "quantity": 1, "flag": "MedSlot0" },
+      { "type_id": 2048, "quantity": 1, "flag": "LoSlot0" },
+      { "type_id": 31724, "quantity": 1, "flag": "RigSlot0" },
+      { "type_id": 12608, "quantity": 400, "flag": "Cargo" },
+      { "type_id": 27339, "quantity": 1, "flag": "Invalid" }
+    ]
+  },
+  {
+    "fitting_id": 4022,
+    "name": "Vexor — ratting",
+    "description": "Drone boat for anomalies.",
+    "ship_type_id": 626,
+    "items": [
+      { "type_id": 2456, "quantity": 5, "flag": "DroneBay" }
+    ]
+  }
+]

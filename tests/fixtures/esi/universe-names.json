@@ -1,0 +1,8 @@
+[
+  { "id": 669539978, "name": "TrilliumONE", "category": "character" },
+  { "id": 2112625428, "name": "Broker Bob", "category": "character" },
+  { "id": 1000035, "name": "Caldari Navy", "category": "corporation" },
+  { "id": 60003760, "name": "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "category": "station" },
+  { "id": 30000142, "name": "Jita", "category": "solar_system" },
+  { "id": 34, "name": "Tritanium", "category": "inventory_type" }
+]

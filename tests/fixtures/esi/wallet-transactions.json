@@ -1,0 +1,26 @@
+[
+  {
+    "transaction_id": 6100000001,
+    "date": "2026-09-01T10:14:07Z",
+    "type_id": 34,
+    "quantity": 100000,
+    "unit_price": 4.18,
+    "client_id": 2112625428,
+    "location_id": 60003760,
+    "is_buy": true,
+    "is_personal": true,
+    "journal_ref_id": 24000000001
+  },
+  {
+    "transaction_id": 6100000000,
+    "date": "2026-08-31T16:41:22Z",
+    "type_id": 1230,
+    "quantity": 25000,
+    "unit_price": 12.5,
+    "client_id": 1000035,
+    "location_id": 1035466617946,
+    "is_buy": false,
+    "is_personal": true,
+    "journal_ref_id": 24000000000
+  }
+]

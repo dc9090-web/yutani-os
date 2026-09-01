@@ -1,0 +1,45 @@
+[
+  {
+    "id": 24000000001,
+    "date": "2026-09-01T10:14:07Z",
+    "ref_type": "market_transaction",
+    "description": "Market: TrilliumONE bought Tritanium",
+    "amount": -418293.5,
+    "balance": 1234567.89,
+    "context_id": 6100000001,
+    "context_id_type": "market_transaction_id",
+    "first_party_id": 669539978,
+    "second_party_id": 2112625428
+  },
+  {
+    "id": 24000000002,
+    "date": "2026-09-01T09:58:44Z",
+    "ref_type": "brokers_fee",
+    "description": "Broker fee",
+    "amount": -12448.8,
+    "balance": 1652861.39,
+    "context_id": 60003760,
+    "context_id_type": "station_id",
+    "first_party_id": 669539978,
+    "second_party_id": 1000035,
+    "tax": 0,
+    "tax_receiver_id": 1000035
+  },
+  {
+    "id": 24000000003,
+    "date": "2026-08-31T22:03:12Z",
+    "ref_type": "player_donation",
+    "description": "TrilliumONE transferred cash to Sasha-9999",
+    "reason": "for the doctrine",
+    "amount": -5000000,
+    "balance": 1665310.19,
+    "first_party_id": 669539978,
+    "second_party_id": 2124678472
+  },
+  {
+    "id": 24000000004,
+    "date": "2026-08-31T18:22:51Z",
+    "ref_type": "corporate_reward_payout",
+    "description": "Corporation reward payout"
+  }
+]
