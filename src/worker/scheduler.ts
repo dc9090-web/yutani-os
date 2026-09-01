@@ -1,9 +1,18 @@
 import { EsiClient, EsiError } from "../lib/esi/client.js";
 import { NeedsReauthError } from "../lib/esi/tokens.js";
 import type { startRun, finishRun } from "../lib/db/sync-runs.js";
+import { WARN_PREFIX } from "../lib/view/format.js";
 
 export interface JobContext { characterId: number; esi: EsiClient }
 export interface GlobalJobContext { esi: EsiClient }
+
+/**
+ * What a job's `run` may return. A bare number is "everything worked, this many rows"; the object
+ * form adds a non-fatal warning — the run still counts as `ok` and still waits the full interval,
+ * but the message is written to `sync_runs.error` behind `WARN_PREFIX` so `/settings` can show it
+ * (spec §3: a Fuzzwork outage degrades prices, it does not fail the run).
+ */
+export interface JobOutcome { rows: number; warn?: string }
 
 /** A job run once per character. `scope` may be omitted — that is what a character job looks like. */
 export interface CharacterSyncJob {
@@ -12,7 +21,7 @@ export interface CharacterSyncJob {
   intervalMs: number;
   /** When set, a failed run is rebooked at now + retryMs instead of now + intervalMs. */
   retryMs?: number;
-  run(ctx: JobContext): Promise<number>;
+  run(ctx: JobContext): Promise<number | JobOutcome>;
 }
 
 /** A job run once per interval regardless of characters; its sync_runs rows have character_id NULL. */
@@ -22,7 +31,7 @@ export interface GlobalSyncJob {
   intervalMs: number;
   /** When set, a failed run is rebooked at now + retryMs instead of now + intervalMs. */
   retryMs?: number;
-  run(ctx: GlobalJobContext): Promise<number>;
+  run(ctx: GlobalJobContext): Promise<number | JobOutcome>;
 }
 
 export type SyncJob = CharacterSyncJob | GlobalSyncJob;
@@ -85,13 +94,15 @@ export class Scheduler {
     return ran;
   }
 
-  private async record(name: string, characterId: number | null, exec: () => Promise<number>): Promise<"ok" | "error"> {
+  private async record(name: string, characterId: number | null, exec: () => Promise<number | JobOutcome>): Promise<"ok" | "error"> {
     const who = characterId === null ? "global" : `character=${characterId}`;
     const id = await this.deps.startRun(name, characterId);
     try {
-      const rows = await exec();
-      await this.deps.finishRun(id, { status: "ok", rows });
-      this.log(`${name} ${who} ok rows=${rows}`);
+      const outcome = await exec();
+      const { rows, warn } = typeof outcome === "number" ? { rows: outcome, warn: undefined } : outcome;
+      const error = warn === undefined ? undefined : `${WARN_PREFIX}${warn}`;
+      await this.deps.finishRun(id, { status: "ok", rows, error });
+      this.log(`${name} ${who} ok rows=${rows}${error === undefined ? "" : ` (${error})`}`);
       return "ok";
     } catch (e) {
       let error: string;

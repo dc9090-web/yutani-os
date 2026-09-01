@@ -1,4 +1,5 @@
 import type { SyncRunSummary } from "../../lib/db/sync-runs.js";
+import { isWarning } from "../../lib/view/format.js";
 export function SyncStatus({ runs, names }: { runs: SyncRunSummary[]; names: Record<number, string> }) {
   if (runs.length === 0) return <p className="faint">No sync runs yet — the worker runs its first jobs within a minute of starting.</p>;
   return (
@@ -12,7 +13,7 @@ export function SyncStatus({ runs, names }: { runs: SyncRunSummary[]; names: Rec
             <td className="muted">{r.startedAt.toISOString().replace("T", " ").slice(0, 16)}</td>
             <td><span className={`badge ${r.status}`}>{r.status}</span></td>
             <td>{r.rows ?? "—"}</td>
-            <td className="neg">{r.error ?? ""}</td>
+            <td className={isWarning(r.error) ? "warn-text" : "neg"}>{r.error ?? ""}</td>
           </tr>
         ))}
       </tbody>

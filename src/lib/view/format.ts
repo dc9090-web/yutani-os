@@ -105,3 +105,14 @@ export function trainingLabel(head: QueueHeadLabel | null, now: Date = new Date(
   if (head.finishDate.getTime() <= now.getTime()) return `${skill} · finishing`;
   return `${skill} · finishes ${relativeTime(head.finishDate, now)}`;
 }
+
+/**
+ * A job that partly succeeded records `ok` and puts its message in `sync_runs.error` behind this
+ * prefix (spec §3). The worker's scheduler writes it and the settings page reads it, so the literal
+ * lives here — in the one module with no imports at all — rather than in either of them.
+ */
+export const WARN_PREFIX = "warn: ";
+
+export function isWarning(error: string | null): boolean {
+  return error !== null && error.startsWith(WARN_PREFIX);
+}

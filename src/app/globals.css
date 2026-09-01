@@ -220,3 +220,6 @@ body {
 .show-more { margin-top: 12px; padding: 8px 16px; background: var(--raised); border: 1px solid var(--border-hi); border-radius: 8px; color: var(--text); font: inherit; cursor: pointer; }
 .show-more:hover { border-color: var(--accent); color: var(--accent); }
 .show-more[disabled] { opacity: 0.6; cursor: default; }
+
+/* ---------- Ships & market (phase 4) ---------- */
+.warn-text { color: var(--warn); }

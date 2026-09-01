@@ -25,4 +25,15 @@ describe("SyncStatus", () => {
     expect(screen.getByText("—")).toBeInTheDocument();          // the global sde-update row
     expect(screen.getAllByText("TrilliumONE")).toHaveLength(7);
   });
+  it("shows a warning row in amber and a real error in red", () => {
+    const { container } = render(<SyncStatus
+      runs={[
+        { job: "market-prices", characterId: null, startedAt: new Date(), finishedAt: new Date(), status: "ok", rows: 12, error: "warn: fuzzwork 503" },
+        { job: "skills", characterId: 1, startedAt: new Date(), finishedAt: new Date(), status: "error", rows: null, error: "boom" },
+      ]}
+      names={{ 1: "TrilliumONE" }} />);
+    expect(screen.getByText("warn: fuzzwork 503")).toHaveClass("warn-text");
+    expect(screen.getByText("boom")).toHaveClass("neg");
+    expect(container.querySelectorAll("tbody tr")).toHaveLength(2);
+  });
 });

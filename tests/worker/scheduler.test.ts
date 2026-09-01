@@ -109,4 +109,17 @@ describe("Scheduler", () => {
     advance(59_000); expect(await s.tick()).toBe(0);  // not due yet
     advance(1_000); expect(await s.tick()).toBe(1);   // full interval elapsed
   });
+  it("records a warning outcome as ok, prefixing the error column", async () => {
+    const run = vi.fn(async () => ({ rows: 5, warn: "fuzzwork 503 for 900 types" }));
+    const { s, finished } = make([{ name: "g", scope: "global", intervalMs: 60_000, retryMs: 10_000, run }], []);
+    expect(await s.tick()).toBe(1);
+    expect(finished).toEqual([{ id: 1, status: "ok", rows: 5, error: "warn: fuzzwork 503 for 900 types" }]);
+  });
+  it("reboots a warned run on the full interval, not the retry interval", async () => {
+    const run = vi.fn(async () => ({ rows: 1, warn: "partial" }));
+    const { s, advance } = make([{ name: "g", scope: "global", intervalMs: 60_000, retryMs: 10_000, run }], []);
+    await s.tick();
+    advance(10_001); expect(await s.tick()).toBe(0);      // retryMs would have fired here
+    advance(50_000); expect(await s.tick()).toBe(1);      // intervalMs did
+  });
 });

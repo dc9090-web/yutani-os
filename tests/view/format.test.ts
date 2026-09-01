@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { grouped, isk, sp, roman, relativeTime, secClass, secText, stamp, trainingLabel } from "../../src/lib/view/format.js";
+import { WARN_PREFIX, grouped, isWarning, isk, sp, roman, relativeTime, secClass, secText, stamp, trainingLabel } from "../../src/lib/view/format.js";
 
 const NOW = new Date("2026-09-01T12:00:00Z");
 
@@ -114,5 +114,16 @@ describe("trainingLabel", () => {
       .toBe("Caldari Frigate V · finishing");
     // Exactly now counts as stale too, not "in 0 m".
     expect(trainingLabel({ skillName: "Gunnery", finishedLevel: 3, finishDate: NOW }, NOW)).toBe("Gunnery III · finishing");
+  });
+});
+
+describe("isWarning", () => {
+  it("recognises the scheduler's warning prefix", () => {
+    expect(WARN_PREFIX).toBe("warn: ");
+    expect(isWarning("warn: fuzzwork 503")).toBe(true);
+  });
+  it("treats a real error and a missing message as not-a-warning", () => {
+    expect(isWarning("ESI 500 for /markets/prices")).toBe(false);
+    expect(isWarning(null)).toBe(false);
   });
 });
