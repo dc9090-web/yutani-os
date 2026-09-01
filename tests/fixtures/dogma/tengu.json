@@ -442,13 +442,6 @@
    "highIsGood": true
   },
   {
-   "id": 276,
-   "name": "skillPoints",
-   "defaultValue": 0,
-   "stackable": true,
-   "highIsGood": true
-  },
-  {
    "id": 277,
    "name": "requiredSkill1Level",
    "defaultValue": 0,
@@ -1449,20 +1442,6 @@
  ],
  "effects": [
   {
-   "id": 132,
-   "categoryId": 0,
-   "state": 1,
-   "modifiers": [
-    {
-     "func": "ItemModifier",
-     "domain": "self",
-     "modifiedAttrId": 280,
-     "modifyingAttrId": 276,
-     "operation": 4
-    }
-   ]
-  },
-  {
    "id": 163,
    "categoryId": 0,
    "state": 1,
@@ -2375,10 +2354,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      413,
      false
     ],
@@ -2420,10 +2395,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      163,
      false
@@ -2471,10 +2442,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      232,
      false
     ],
@@ -2520,10 +2487,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      460,
      false
@@ -2583,10 +2546,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      520,
      false
     ],
@@ -2633,10 +2592,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      251,
      false
     ],
@@ -2678,10 +2633,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      218,
      false
@@ -2733,10 +2684,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      283,
      false
     ],
@@ -2779,10 +2726,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      368,
      false
     ],
@@ -2824,10 +2767,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      222,
      false
@@ -3321,10 +3260,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      3833,
      false
     ],
@@ -3378,10 +3313,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      3841,
      false
@@ -3445,10 +3376,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      3846,
      false
     ],
@@ -3503,10 +3430,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      3849,
      false
     ],
@@ -3557,10 +3480,6 @@
    ],
    "effects": [
     [
-     132,
-     true
-    ],
-    [
      4192,
      false
     ],
@@ -3610,10 +3529,6 @@
     ]
    ],
    "effects": [
-    [
-     132,
-     true
-    ],
     [
      5278,
      false

@@ -41,6 +41,17 @@ const MODIFIER_FUNCS: ReadonlySet<string> = new Set<ModifierFunc>([
   "LocationRequiredSkillModifier", "OwnerRequiredSkillModifier",
 ]);
 
+/**
+ * skillEffect, carried by every skill type. One of its two modifier rows (skill points → skill level,
+ * operation 9) is already dropped as unsupported by `operatorFromSde` (research §2.3). The other row —
+ * ItemModifier(280 skillLevel ← 276 skillPoints, ModAdd) — survives that filter, but `skillPoints` is
+ * never populated in typeDogma (it defaults to 0), so it always adds zero: a real no-op, just one the
+ * engine would otherwise still gather and report on every skill's `explain()`/`activeModifiers()`.
+ * Dropped entirely — from `data.effects` and from every type's effects map — rather than left in as
+ * dead weight.
+ */
+const SKILL_EFFECT_ID = 132;
+
 let basePromise: Promise<BaseData> | null = null;
 const typeCache = new Map<TypeId, DogmaType>();
 const missingTypes = new Set<TypeId>();
@@ -93,6 +104,7 @@ async function readBase(): Promise<BaseData> {
     "SELECT id, effect_category_id, fitting_usage_chance_attribute_id FROM sde_dogma_effects");
   const effects = new Map<EffectId, DogmaEffect>();
   for (const r of effectRows) {
+    if (r.id === SKILL_EFFECT_ID) continue;     // dropped entirely — see SKILL_EFFECT_ID
     // The SDE files `online` as effectCategoryID 1 (active); the client treats it as online.
     const categoryId = r.id === EFFECT.online ? ONLINE_EFFECT_CATEGORY_ID : r.effect_category_id;
     const state = stateForEffectCategory(categoryId);
@@ -214,6 +226,7 @@ async function readTypes(ids: TypeId[]): Promise<void> {
     }
   }
   for (const r of effectRows) {
+    if (r.effect_id === SKILL_EFFECT_ID) continue;     // dropped entirely — see SKILL_EFFECT_ID
     const type = built.get(r.type_id);
     if (type) type.effects.set(r.effect_id, r.is_default ?? false);
   }

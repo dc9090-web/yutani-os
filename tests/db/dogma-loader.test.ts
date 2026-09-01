@@ -41,7 +41,7 @@ describe("attributes", () => {
 
 describe("effects", () => {
   it("loads every effect in the build", () => {
-    expect(data.effects.size).toBe(23);
+    expect(data.effects.size).toBe(22);
   });
 
   it("patches the online effect into the online category", () => {
@@ -71,10 +71,8 @@ describe("effects", () => {
     ]);
   });
 
-  it("drops operation 9 but keeps the rest of effect 132", () => {
-    expect(data.effects.get(132)!.modifiers).toEqual([
-      { func: "ItemModifier", domain: "self", modifiedAttrId: 280, modifyingAttrId: 276, operation: Operator.ModAdd },
-    ]);
+  it("drops effect 132 (skillEffect) entirely, not just its unsupported operation-9 row", () => {
+    expect(data.effects.has(132)).toBe(false);
   });
 
   it("drops targetID/target domains and EffectStopper rows, keeping the effect itself", () => {
@@ -141,7 +139,8 @@ describe("types", () => {
 
   it("carries the type→effect map with isDefault", () => {
     expect([...data.types.get(587)!.effects.entries()]).toEqual([[5779, false], [7248, false]]);
-    expect([...data.types.get(3426)!.effects.entries()].sort((a, b) => a[0] - b[0])).toEqual([[132, true], [368, false], [397, false]]);
+    // 132 (skillEffect) would otherwise be here too — it's dropped from every type's effects map.
+    expect([...data.types.get(3426)!.effects.entries()].sort((a, b) => a[0] - b[0])).toEqual([[368, false], [397, false]]);
     expect([...data.types.get(519)!.effects.keys()].sort((a, b) => a - b)).toEqual([11, 16, 89, 92]);
   });
 });

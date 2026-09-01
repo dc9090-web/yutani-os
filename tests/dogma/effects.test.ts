@@ -120,12 +120,13 @@ describe("activeModifiers", () => {
     const fit = createFit(data, makeItem(data, 587));
     fit.skills.set(3426, makeSkill(data, 3426, 5));
     const collected = activeModifiers(fit);
-    // CPU Management carries 132 (1 surviving modifier), 368 and 397; the Rifter carries 5779 and 7248.
+    // CPU Management carries 368 and 397; the Rifter carries 5779 and 7248. 132 (skillEffect) is
+    // dropped at load time, so it never shows up here even though CPU Management carries it.
     const byEffect = new Map(collected.map((c) => [c.effect.id, c]));
     expect(byEffect.get(368)!.carrier).toBe(fit.skills.get(3426));
     expect(byEffect.get(397)!.modifier.modifiedAttrId).toBe(48);
     expect(byEffect.get(7248)!.carrier).toBe(fit.ship);
-    expect(collected.filter((c) => c.effect.id === 132)).toHaveLength(1);
+    expect(collected.filter((c) => c.effect.id === 132)).toHaveLength(0);
   });
 
   it("drops the modifiers of an effect that has stopped running", () => {

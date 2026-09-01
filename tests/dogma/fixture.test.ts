@@ -86,7 +86,9 @@ describe("rifter.json", () => {
   });
 
   it("keeps every attribute the pruned effects read", () => {
-    for (const id of [276, 280, 310, 313, 323, 424, 64, ATTR.cpu, ATTR.power, ATTR.cpuOutput, ATTR.powerOutput]) {
+    // 276 (skillPoints) is not in this list: it was only reachable through effect 132 (skillEffect),
+    // which is dropped entirely at load time (never even reaches the fixture-pruning step).
+    for (const id of [280, 310, 313, 323, 424, 64, ATTR.cpu, ATTR.power, ATTR.cpuOutput, ATTR.powerOutput]) {
       expect(data.attributes.has(id)).toBe(true);
     }
     expect(data.attributes.get(ATTR.cpu)!.stackable).toBe(true);
