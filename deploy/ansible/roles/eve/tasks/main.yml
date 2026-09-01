@@ -1,0 +1,51 @@
+---
+- name: Create app directories
+  ansible.builtin.file:
+    path: "{{ base_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0755"
+  loop: ["", "src"]
+
+- name: Sync repository to the VM (excluding secrets, deps, build output)
+  ansible.posix.synchronize:
+    src: "{{ playbook_dir }}/../../"
+    dest: "{{ base_dir }}/src/"
+    delete: true
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=node_modules"
+      - "--exclude=.next"
+      - "--exclude=.env"
+      - "--exclude=.env.*"
+      - "--exclude=deploy/ansible/vars/secrets.yml"
+      - "--exclude=.superpowers"
+  become: false
+
+- name: Template the stack .env
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ base_dir }}/src/deploy/.env"
+    owner: "{{ ansible_user }}"
+    mode: "0600"
+
+- name: Build and start the stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ base_dir }}/src/deploy"
+    build: always
+    state: present
+    remove_orphans: true
+
+- name: Apply database schema
+  ansible.builtin.command:
+    cmd: docker compose exec -T app npm run migrate
+    chdir: "{{ base_dir }}/src/deploy"
+  register: migrate
+  changed_when: "'schema applied' in migrate.stdout"
+
+- name: Restart worker so it sees the schema
+  community.docker.docker_compose_v2:
+    project_src: "{{ base_dir }}/src/deploy"
+    services: [worker]
+    state: restarted

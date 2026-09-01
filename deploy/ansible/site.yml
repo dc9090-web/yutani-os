@@ -1,0 +1,20 @@
+---
+- name: Configure the EVE VM
+  hosts: eve
+  become: true
+  gather_facts: true
+  vars_files: [vars/secrets.yml]
+  pre_tasks:
+    - name: Fail early on placeholder secrets
+      ansible.builtin.assert:
+        that:
+          - cloudflare_dns_api_token != "CHANGEME"
+          - eve_client_secret != "CHANGEME"
+          - session_secret != "CHANGEME"
+          - postgres_password != "CHANGEME"
+        quiet: true
+  roles:
+    - { role: common,  tags: [common] }
+    - { role: docker,  tags: [docker] }
+    - { role: traefik, tags: [traefik] }
+    - { role: eve,     tags: [eve, app] }

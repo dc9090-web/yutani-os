@@ -1,0 +1,17 @@
+# Managed by Ansible — Traefik v3 dynamic config.
+http:
+  middlewares:
+    # Default deny: only LAN + Tailscale source IPs may reach LAN-bound services.
+    lan-only:
+      ipAllowList:
+        sourceRange:
+{% for cidr in lan_allowed_cidrs %}
+          - "{{ cidr }}"
+{% endfor %}
+    secure-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true

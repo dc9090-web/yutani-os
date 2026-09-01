@@ -1,0 +1,43 @@
+---
+- name: Set system timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+  ignore_errors: true   # community.general may be absent; non-fatal
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - python3
+      - python3-pip
+      - rsync
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure base_dir exists
+  ansible.builtin.file:
+    path: "{{ base_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create swapfile (build headroom on a 3.3 GB VM)
+  ansible.builtin.command:
+    cmd: "fallocate -l {{ swap_size_mb }}M /swapfile"
+    creates: /swapfile
+- name: Secure and format swapfile
+  ansible.builtin.shell: "chmod 600 /swapfile && mkswap /swapfile"
+  args: { creates: /swapfile.formatted }
+  register: mkswap
+- name: Mark swapfile formatted
+  ansible.builtin.file: { path: /swapfile.formatted, state: touch, mode: "0600" }
+  when: mkswap.changed
+- name: Enable swap in fstab
+  ansible.posix.mount: { src: /swapfile, path: none, fstype: swap, opts: sw, state: present }
+- name: Activate swap now
+  ansible.builtin.command: swapon -a
+  changed_when: false

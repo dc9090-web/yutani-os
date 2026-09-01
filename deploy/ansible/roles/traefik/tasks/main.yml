@@ -1,0 +1,51 @@
+---
+- name: Create Traefik directories
+  ansible.builtin.file:
+    path: "{{ base_dir }}/traefik/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - ""
+    - letsencrypt
+
+- name: Secure the ACME storage file
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ base_dir }}/traefik/letsencrypt/acme.json"
+    force: false
+    mode: "0600"
+
+- name: Template Traefik static config
+  ansible.builtin.template:
+    src: traefik.yml.j2
+    dest: "{{ base_dir }}/traefik/traefik.yml"
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Template Traefik dynamic config (middlewares + cross-VM routes)
+  ansible.builtin.template:
+    src: dynamic.yml.j2
+    dest: "{{ base_dir }}/traefik/dynamic.yml"
+    mode: "0644"
+  # Traefik hot-reloads this file for routing changes, but a NEW router needs a
+  # restart to trigger ACME cert acquisition — so restart on any change.
+  notify: Restart traefik
+
+- name: Template Traefik .env
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ base_dir }}/traefik/.env"
+    mode: "0600"
+  notify: Restart traefik
+
+- name: Template Traefik docker-compose
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ base_dir }}/traefik/docker-compose.yml"
+    mode: "0644"
+  notify: Restart traefik
+
+- name: Deploy Traefik
+  community.docker.docker_compose_v2:
+    project_src: "{{ base_dir }}/traefik"
+    state: present
