@@ -50,3 +50,56 @@ describe("queueProgress", () => {
     expect(queueProgress({ startDate: start, finishDate: start }, new Date())).toBe(1);
   });
 });
+
+import { groupSkills, implantBonusLabel } from "../../src/lib/view/skills.js";
+import type { SkillRow } from "../../src/lib/db/character-skills.js";
+
+describe("groupSkills", () => {
+  const skills: SkillRow[] = [
+    { skillId: 3300, trainedLevel: 5, activeLevel: 5, skillpoints: 256000 },   // Gunnery, group 255
+    { skillId: 3301, trainedLevel: 4, activeLevel: 3, skillpoints: 45255 },    // Small Hybrid Turret, group 255
+    { skillId: 3426, trainedLevel: 5, activeLevel: 5, skillpoints: 256000 },   // CPU Management, group 1216
+    { skillId: 587, trainedLevel: 1, activeLevel: 1, skillpoints: 10 },        // Rifter — a ship, not a skill
+    { skillId: 999999, trainedLevel: 1, activeLevel: 1, skillpoints: 10 },     // not in the SDE at all
+  ];
+  const types = new Map([
+    [3300, { name: "Gunnery", groupId: 255 }],
+    [3301, { name: "Small Hybrid Turret", groupId: 255 }],
+    [3426, { name: "CPU Management", groupId: 1216 }],
+    [587, { name: "Rifter", groupId: 25 }],
+  ]);
+  const groups = new Map([
+    [255, { name: "Gunnery", categoryId: 16 }],
+    [1216, { name: "Engineering", categoryId: 16 }],
+    [25, { name: "Frigate", categoryId: 6 }],
+  ]);
+
+  it("groups by sde_groups, sums group SP and sorts by name", () => {
+    const grouped = groupSkills(skills, types, groups);
+    expect(grouped.map((g) => g.name)).toEqual(["Engineering", "Gunnery"]);
+    expect(grouped[1].groupSp).toBe(301255);
+    expect(grouped[1].skills.map((s) => s.name)).toEqual(["Gunnery", "Small Hybrid Turret"]);
+    expect(grouped[1].skills[1]).toEqual({ skillId: 3301, name: "Small Hybrid Turret", trainedLevel: 4, activeLevel: 3, skillpoints: 45255 });
+  });
+
+  it("drops anything outside category 16 and anything the SDE has never heard of", () => {
+    const grouped = groupSkills(skills, types, groups);
+    expect(grouped.flatMap((g) => g.skills).map((s) => s.skillId)).not.toContain(587);
+    expect(grouped.flatMap((g) => g.skills).map((s) => s.skillId)).not.toContain(999999);
+  });
+
+  it("returns nothing for an unsynced sheet", () => {
+    expect(groupSkills([], types, groups)).toEqual([]);
+  });
+});
+
+describe("implantBonusLabel", () => {
+  it("names the attribute an implant boosts", () => {
+    expect(implantBonusLabel(new Map([[176, 5]]))).toBe("+5 Intelligence");
+    expect(implantBonusLabel(new Map([[179, 3], [9, 100]]))).toBe("+3 Willpower");
+  });
+  it("returns null for an implant that boosts none of the five", () => {
+    expect(implantBonusLabel(new Map([[9, 100]]))).toBeNull();
+    expect(implantBonusLabel(new Map())).toBeNull();
+  });
+});

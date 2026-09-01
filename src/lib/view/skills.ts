@@ -1,3 +1,5 @@
+import type { SkillRow } from "../db/character-skills.js";
+
 /** sde_categories.id for Skills — the Skills page shows nothing outside it (spec §7). */
 export const SKILL_CATEGORY_ID = 16;
 
@@ -43,4 +45,50 @@ export function queueProgress(entry: { startDate: Date | null; finishDate: Date 
   if (window <= 0) return 1;
   const done = (now.getTime() - entry.startDate.getTime()) / window;
   return Math.min(1, Math.max(0, done));
+}
+
+export interface SkillView { skillId: number; name: string; trainedLevel: number; activeLevel: number; skillpoints: number }
+export interface SkillGroupView { groupId: number; name: string; groupSp: number; skills: SkillView[] }
+
+/**
+ * Groups the skill sheet by sde_groups, keeping only category 16 (Skills) — a character row can
+ * carry a type the SDE has since dropped, and injected skills occasionally arrive with a group that
+ * is not a skill group. Groups and their skills are sorted by name so the page order is stable.
+ */
+export function groupSkills(
+  skills: SkillRow[],
+  types: ReadonlyMap<number, { name: string | null; groupId: number | null }>,
+  groups: ReadonlyMap<number, { name: string | null; categoryId: number | null }>,
+): SkillGroupView[] {
+  const byGroup = new Map<number, SkillGroupView>();
+  for (const skill of skills) {
+    const type = types.get(skill.skillId);
+    const groupId = type?.groupId ?? null;
+    if (groupId === null) continue;
+    const group = groups.get(groupId);
+    if (group === undefined || group.categoryId !== SKILL_CATEGORY_ID) continue;
+    let view = byGroup.get(groupId);
+    if (view === undefined) {
+      view = { groupId, name: group.name ?? `Group ${groupId}`, groupSp: 0, skills: [] };
+      byGroup.set(groupId, view);
+    }
+    view.groupSp += skill.skillpoints;
+    view.skills.push({
+      skillId: skill.skillId, name: type?.name ?? `Skill ${skill.skillId}`,
+      trainedLevel: skill.trainedLevel, activeLevel: skill.activeLevel, skillpoints: skill.skillpoints,
+    });
+  }
+  const out = [...byGroup.values()];
+  for (const group of out) group.skills.sort((a, b) => a.name.localeCompare(b.name));
+  out.sort((a, b) => a.name.localeCompare(b.name));
+  return out;
+}
+
+/** "+5 Intelligence" for an attribute implant, null for anything else (a hardwiring, a booster). */
+export function implantBonusLabel(attributes: ReadonlyMap<number, number>): string | null {
+  for (const key of ORDER) {
+    const value = attributes.get(ATTRIBUTE_BONUS_ATTR[key]);
+    if (value !== undefined && value !== 0) return `+${value} ${ATTRIBUTE_LABEL[key]}`;
+  }
+  return null;
 }

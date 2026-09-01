@@ -195,3 +195,14 @@ body {
 .attr-bonus { margin-left: 6px; font-size: 12px; color: var(--accent); }
 .progress { height: 6px; min-width: 80px; border-radius: 99px; background: var(--raised); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); }
+.skill-group { border-top: 1px solid var(--hairline); }
+.skill-group:first-child { border-top: 0; }
+.group-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 0; background: none; border: 0; color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.group-toggle:hover { color: var(--accent); }
+.group-sp { margin-left: auto; font-size: 12px; color: var(--faint); }
+.level-boxes { display: inline-flex; gap: 3px; }
+.level-box { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--border-hi); }
+.level-box.trained { background: rgba(77, 141, 255, 0.32); border-color: var(--accent); }
+.level-box.active { background: var(--accent); border-color: var(--accent); }
+.clone-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.clone-list li { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; }

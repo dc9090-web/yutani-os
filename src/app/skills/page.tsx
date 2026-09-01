@@ -1,14 +1,17 @@
 import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
-import { getAttributes, getSkillSummary, listSkillQueue } from "../../lib/db/character-skills.js";
-import { listImplants } from "../../lib/db/character-clones.js";
-import { getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
+import { getAttributes, getSkillSummary, listSkillQueue, listSkills } from "../../lib/db/character-skills.js";
+import { getClones, listImplants } from "../../lib/db/character-clones.js";
+import { getGroups, getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
+import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
 import { relativeTime, roman, sp } from "../../lib/view/format.js";
-import { attributeViews, queueProgress } from "../../lib/view/skills.js";
+import { attributeViews, groupSkills, implantBonusLabel, queueProgress } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
 import { QueueTable, type QueueEntryView } from "./QueueTable.js";
+import { SkillGroups, type SkillGroupProps } from "./SkillGroups.js";
+import { ClonesCard, type ImplantView, type JumpCloneView } from "./ClonesCard.js";
 
 /** "2026-08-31 18:30" — the timestamp format the settings tables already use. */
 function stamp(date: Date | null): string {
@@ -21,17 +24,32 @@ export default async function SkillsPage() {
   if (character === null) return <NoCharacter title="Skills" />;
 
   const now = new Date();
-  const [summary, attributes, queue, implantIds] = await Promise.all([
+  const [summary, attributes, queue, skills, implantIds, clones] = await Promise.all([
     getSkillSummary(character.id),
     getAttributes(character.id),
     listSkillQueue(character.id),
+    listSkills(character.id),
     listImplants(character.id),
+    getClones(character.id),
   ]);
 
-  // One types query for the queue's skills and the implants; one dogma query per implant (a clone
-  // holds at most ten), never one per row.
-  const types = await getTypes([...new Set([...queue.map((q) => q.skillId), ...implantIds])]);
-  const implantAttributes = await Promise.all(implantIds.map((id) => getTypeAttributes(id)));
+  // One types query for every id on the page: sheet skills, queue skills, active implants and every
+  // jump clone's implants. Then one groups query, one dogma query per implant (at most ten) and one
+  // locationLabels pass for the home station plus every jump clone.
+  const jumpImplantIds = (clones?.jumpClones ?? []).flatMap((c) => c.implants);
+  const types = await getTypes([...new Set([
+    ...skills.map((s) => s.skillId), ...queue.map((q) => q.skillId), ...implantIds, ...jumpImplantIds,
+  ])]);
+  const groupIds = [...new Set([...types.values()].map((t) => t.groupId).filter((id): id is number => id !== null))];
+  const placeIds = [
+    ...(clones?.homeLocationId == null ? [] : [clones.homeLocationId]),
+    ...(clones?.jumpClones ?? []).map((c) => c.locationId).filter((id): id is number => id !== null),
+  ];
+  const [groups, implantAttributes, places] = await Promise.all([
+    getGroups(groupIds),
+    Promise.all(implantIds.map((id) => getTypeAttributes(id))),
+    locationLabels(placeIds),
+  ]);
 
   const entries: QueueEntryView[] = queue.map((q, index) => ({
     position: q.queuePosition + 1,
@@ -40,6 +58,29 @@ export default async function SkillsPage() {
     start: stamp(q.startDate),
     finish: stamp(q.finishDate),
     progress: index === 0 ? queueProgress(q, now) : null,
+  }));
+
+  const groupProps: SkillGroupProps[] = groupSkills(skills, types, groups).map((group) => ({
+    groupId: group.groupId,
+    name: group.name,
+    groupSp: sp(group.groupSp),
+    skills: group.skills.map((skill) => ({
+      skillId: skill.skillId, name: skill.name,
+      trainedLevel: skill.trainedLevel, activeLevel: skill.activeLevel, sp: sp(skill.skillpoints),
+    })),
+  }));
+
+  const implants: ImplantView[] = implantIds.map((typeId, index) => ({
+    typeId,
+    name: types.get(typeId)?.name ?? `Type ${typeId}`,
+    bonus: implantBonusLabel(implantAttributes[index]),
+  }));
+
+  const jumpClones: JumpCloneView[] = (clones?.jumpClones ?? []).map((clone) => ({
+    jumpCloneId: clone.jumpCloneId,
+    label: clone.locationId === null ? "Unknown location" : places.get(clone.locationId)?.name ?? "Unknown location",
+    name: clone.name,
+    implants: clone.implants.map((typeId) => types.get(typeId)?.name ?? `Type ${typeId}`),
   }));
 
   return (<>
@@ -58,6 +99,15 @@ export default async function SkillsPage() {
         <h2 className="card-title">Training queue</h2>
         <QueueTable entries={entries} />
       </div>
+      <div className="card">
+        <h2 className="card-title">Skills</h2>
+        <SkillGroups groups={groupProps} />
+      </div>
+      <ClonesCard
+        home={clones?.homeLocationId == null ? null : places.get(clones.homeLocationId)?.name ?? null}
+        implants={implants}
+        jumpClones={jumpClones}
+      />
     </div>
   </>);
 }
