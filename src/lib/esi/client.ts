@@ -111,6 +111,7 @@ export class EsiClient {
     for (let attempt = 0; attempt < 2; attempt++) {
       const rows = await this.walk<T>(path, { ...opts, fresh: attempt > 0 });
       if (rows) return rows;
+      console.warn(`[esi] paginated resource changed mid-walk, restarting: ${path}`);
     }
     throw new EsiError(409, this.buildUrl(path, opts.query).pathname, "paginated resource changed mid-walk");
   }
@@ -170,8 +171,8 @@ export class EsiClient {
     let res = await this.fetchImpl(url, makeInit());
     this.noteLimits(url.pathname, characterId, res);
     if (res.status === 429) {
-      const retry = Number(res.headers.get("Retry-After") ?? "5");
-      await this.sleep(retry * 1000);
+      const retry = Number(res.headers.get("Retry-After"));
+      await this.sleep((Number.isFinite(retry) && retry >= 0 ? retry : 5) * 1000);
       res = await this.fetchImpl(url, makeInit());
       this.noteLimits(url.pathname, characterId, res);
     }

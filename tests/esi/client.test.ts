@@ -71,6 +71,15 @@ describe("EsiClient", () => {
     const r = await client.get<{ ok: number }>("/c");
     expect(sleeps).toContain(7000); expect(r.data.ok).toBe(1);
   });
+  it("falls back to a 5s sleep when Retry-After is an HTTP-date rather than a delta-seconds count", async () => {
+    const { client, sleeps } = make([
+      { status: 429, headers: { "Retry-After": "Wed, 21 Oct 2026 07:28:00 GMT" } },
+      { status: 200, body: { ok: 1 } },
+    ]);
+    const r = await client.get<{ ok: number }>("/a");
+    expect(sleeps).toContain(5000);
+    expect(r.data.ok).toBe(1);
+  });
   it("halts all calls for 60s after a 420", async () => {
     const { client, sleeps } = make([{ status: 420 }, { status: 200, body: {} }, { status: 200, body: {} }]);
     await expect(client.get("/a")).rejects.toBeInstanceOf(EsiError);
@@ -170,8 +179,11 @@ describe("EsiClient", () => {
       { status: 200, body: [1, 9], headers: { "X-Pages": "2", "Last-Modified": b } },
       { status: 200, body: [2], headers: { "Last-Modified": b } },     // consistent on the retry
     ]);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(await client.getAll<number>("/characters/1/assets", { characterId: 1 })).toEqual([1, 9, 2]);
     expect(calls.length).toBe(4);
+    expect(warn).toHaveBeenCalledWith("[esi] paginated resource changed mid-walk, restarting: /characters/1/assets");
+    warn.mockRestore();
   });
   it("throws 409 when the walk is still torn after the restart", async () => {
     const h = (lm: string, pages?: string): Record<string, string> => (pages ? { "X-Pages": pages, "Last-Modified": lm } : { "Last-Modified": lm });

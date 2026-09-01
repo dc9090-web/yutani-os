@@ -61,7 +61,7 @@ export function applyQueueOverlay(skills: SkillRow[], queue: SkillQueueRow[], no
     const current = bySkill.get(q.skillId) ?? { skillId: q.skillId, trainedLevel: 0, activeLevel: 0, skillpoints: 0 };
     bySkill.set(q.skillId, {
       skillId: q.skillId,
-      trainedLevel: q.finishedLevel,
+      trainedLevel: Math.max(current.trainedLevel, q.finishedLevel),
       activeLevel: Math.max(current.activeLevel, q.finishedLevel),
       skillpoints: q.levelEndSp ?? current.skillpoints,
     });
