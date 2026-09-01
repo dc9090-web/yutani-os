@@ -127,3 +127,23 @@ export async function getAttributes(characterId: number): Promise<AttributesRow 
      FROM character_attributes WHERE character_id = $1`, [characterId]);
   return rows[0] ? { ...rows[0], characterId: Number(rows[0].characterId) } : null;
 }
+
+export interface AccountQueueEnd { characterId: number; name: string; endsAt: Date }
+
+/**
+ * When each of this character's account-mates stops training (spec §5's one-trainer-per-account
+ * rule). `characters.account_id` is nullable and SQL's NULL never equals NULL, so an unassigned
+ * character simply has no mates and gets an empty list — which is the right answer, not a bug.
+ * A paused queue has no finish_date and contributes nothing.
+ */
+export async function accountQueueEnds(characterId: number): Promise<AccountQueueEnd[]> {
+  const { rows } = await getPool().query<{ characterId: string; name: string; endsAt: Date }>(
+    `SELECT other.id AS "characterId", other.name, max(q.finish_date) AS "endsAt"
+     FROM characters me
+     JOIN characters other ON other.account_id = me.account_id AND other.id <> me.id
+     JOIN character_skill_queue q ON q.character_id = other.id
+     WHERE me.id = $1 AND me.account_id IS NOT NULL AND q.finish_date IS NOT NULL
+     GROUP BY other.id, other.name
+     ORDER BY max(q.finish_date) DESC`, [characterId]);
+  return rows.map((r) => ({ characterId: Number(r.characterId), name: r.name, endsAt: r.endsAt }));
+}
