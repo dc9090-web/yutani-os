@@ -206,3 +206,16 @@ body {
 .level-box.active { background: var(--accent); border-color: var(--accent); }
 .clone-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
 .clone-list li { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+
+/* ---------- Assets (phase 3) ---------- */
+.filter-input { display: block; width: 100%; max-width: 320px; margin: 6px 0 16px; padding: 8px 10px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font: inherit; }
+.filter-input:focus { outline: none; border-color: var(--accent); }
+.loc-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 0; background: none; border: 0; border-top: 1px solid var(--hairline); color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.loc-toggle:hover { color: var(--accent); }
+.loc-meta { margin-left: auto; font-size: 12px; color: var(--faint); }
+.tree { list-style: none; margin: 0 0 12px; padding: 0; }
+.tree-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; font-size: 13px; }
+.tree-toggle { width: 14px; padding: 0; background: none; border: 0; color: var(--faint); font: inherit; cursor: pointer; }
+.tree-toggle:hover { color: var(--accent); }
+.tree-flag { margin-left: auto; font-size: 12px; color: var(--faint); }
+.badge.bpc { background: rgba(94, 176, 255, 0.14); color: var(--accent-2); }
