@@ -27,3 +27,7 @@ export {
   DRONE_BAY_FLAG, INVALID_FLAG, fitFromAssets, fitFromFitting, slotFromFlag,
   type BuiltFit, type FitContext, type FitEntry,
 } from "./build.js";
+export {
+  deserialiseMeta, deserialiseTypes, dogmaDataFrom, serialiseMeta, serialiseTypes,
+  type DogmaMeta, type DogmaMetaJson, type DogmaTypesJson,
+} from "./serialize.js";
