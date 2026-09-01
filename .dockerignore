@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+deploy
+docs
+tests
+compose.dev.yml
+.env
+.env.*
+tsconfig.tsbuildinfo

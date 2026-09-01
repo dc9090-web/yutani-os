@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: eve-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: eve
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: eve
+    volumes:
+      - eve_pg:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eve -d eve"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: ..
+    image: eve:latest
+    container_name: eve-app
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [proxy, internal]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.services.eve.loadbalancer.server.port=3000"
+      - "traefik.http.routers.eve.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.eve.entrypoints=websecure"
+      - "traefik.http.routers.eve.tls.certresolver=cloudflare"
+      - "traefik.http.routers.eve.middlewares=lan-only@file,secure-headers@file"
+
+  worker:
+    image: eve:latest
+    container_name: eve-worker
+    restart: unless-stopped
+    env_file: .env
+    command: ["npm", "run", "worker"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      app: { condition: service_started }   # app is built first; worker reuses the image
+    networks: [internal]
+
+volumes:
+  eve_pg:
+
+networks:
+  proxy:
+    external: true
+  internal:
