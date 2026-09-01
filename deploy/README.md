@@ -49,6 +49,24 @@ script -qc "ansible-playbook site.yml --tags eve" /dev/null
 - `/opt/eve/src` — the synced repository; `/opt/eve/src/deploy` is the Compose project directory
   (`docker-compose.yml`, the templated `.env`) that `docker compose` commands run from.
 
+## Static data (SDE)
+
+The worker polls CCP's Static Data Export on a schedule; there is nothing to provision for it.
+
+- On an empty database, the worker's first tick downloads the current SDE (~95 MB) and imports it
+  — a few minutes, mostly the download. `/settings` shows "Not imported yet" until that completes.
+- Once imported, the `sde-update` job re-checks the published build every 6 hours and only
+  downloads/re-imports when it changed. A failed check (network blip, CCP endpoint down) retries
+  after 10 minutes rather than waiting for the next 6-hour slot.
+- The `/settings` page's "Static data" card shows the imported build number, release date, import
+  timestamp and a few table counts (types, dogma attributes, dogma effects, solar systems) once an
+  import has completed.
+- To force a re-import without waiting for the schedule:
+
+  ```
+  ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
+  ```
+
 ## Logs and troubleshooting
 
 ```

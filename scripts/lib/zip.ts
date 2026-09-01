@@ -23,6 +23,8 @@ function crc32(buf: Buffer): number {
  * Writes a minimal PKZIP archive (one deflated entry per member, no zip64, no data descriptors).
  * yauzl reads it. We hand-roll it because yauzl is read-only and no zip *writer* dependency is
  * allowed; `deflateRawSync` produces exactly the raw deflate stream compression method 8 wants.
+ * Every member is buffered in memory (content, deflated bytes and both headers) before anything is
+ * written — fine for small test fixtures, not for anything approaching real SDE archive sizes.
  */
 export async function writeZip(destPath: string, members: ZipMember[]): Promise<void> {
   const local: Buffer[] = [];
