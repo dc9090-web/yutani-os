@@ -7,7 +7,7 @@ export interface EsiDeps {
   config: Pick<AppConfig, "esiBaseUrl" | "esiCompatibilityDate" | "esiUserAgent">;
   now?: () => number; sleep?: (ms: number) => Promise<void>; timeoutMs?: number;
 }
-export interface EsiResult<T> { data: T; status: number; pages: number; fromCache: boolean }
+export interface EsiResult<T> { data: T; status: number; pages: number; fromCache: boolean; lastModified: string | null }
 export class EsiError extends Error {
   constructor(public status: number, public path: string, message: string) { super(message); this.name = "EsiError"; }
 }
@@ -23,7 +23,7 @@ export class EsiUnavailableError extends EsiError {
     this.name = "EsiUnavailableError";
   }
 }
-interface GetOpts { characterId?: number; query?: Record<string, string | number>; page?: number }
+interface GetOpts { characterId?: number; query?: Record<string, string | number>; page?: number; fresh?: boolean }
 interface PostOpts { characterId?: number; query?: Record<string, string | number> }
 
 const HALT_MS = 60_000;
@@ -69,8 +69,8 @@ export class EsiClient {
     const key = url.pathname + url.search;
 
     const cached = await this.deps.cache.get(cid, key);
-    if (cached?.expiresAt && cached.expiresAt.getTime() > this.now()) {
-      return { data: cached.body as T, status: 200, pages: cached.pages, fromCache: true };
+    if (!opts.fresh && cached?.expiresAt && cached.expiresAt.getTime() > this.now()) {
+      return { data: cached.body as T, status: 200, pages: cached.pages, fromCache: true, lastModified: null };
     }
 
     const headers = await this.headers(opts.characterId);
@@ -82,7 +82,7 @@ export class EsiClient {
 
     if (res.status === 304 && cached) {
       await this.deps.cache.put(cid, key, { ...cached, expiresAt: expiresAt ?? cached.expiresAt, pages });
-      return { data: cached.body as T, status: 304, pages, fromCache: true };
+      return { data: cached.body as T, status: 304, pages, fromCache: true, lastModified: res.headers.get("Last-Modified") };
     }
     if (!res.ok) {
       const text = await res.text().catch(() => "");
@@ -90,13 +90,32 @@ export class EsiClient {
     }
     const data = (await res.json()) as T;
     await this.deps.cache.put(cid, key, { etag: res.headers.get("ETag"), expiresAt, pages, body: data });
-    return { data, status: res.status, pages, fromCache: false };
+    return { data, status: res.status, pages, fromCache: false, lastModified: res.headers.get("Last-Modified") };
   }
 
-  async getAll<T>(path: string, opts: Omit<GetOpts, "page"> = {}): Promise<T[]> {
+  /**
+   * ESI's docs: every page of one paginated resource carries the same `Last-Modified`. A page that
+   * disagrees means the data refreshed mid-walk and the assembled set is torn — discard it and walk
+   * again, this time ignoring any still-valid cached page (a cache hit has no Last-Modified to
+   * compare, so a cached page 1 would hide a second tear). Still torn → the caller gets a 409.
+   */
+  async getAll<T>(path: string, opts: Omit<GetOpts, "page" | "fresh"> = {}): Promise<T[]> {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const rows = await this.walk<T>(path, { ...opts, fresh: attempt > 0 });
+      if (rows) return rows;
+    }
+    throw new EsiError(409, this.buildUrl(path, opts.query).pathname, "paginated resource changed mid-walk");
+  }
+
+  /** One pass over the pages; `null` when a page's Last-Modified disagrees with page 1's. */
+  private async walk<T>(path: string, opts: Omit<GetOpts, "page">): Promise<T[] | null> {
     const first = await this.get<T[]>(path, { ...opts, page: 1 });
     const out = [...first.data];
-    for (let p = 2; p <= first.pages; p++) out.push(...(await this.get<T[]>(path, { ...opts, page: p })).data);
+    for (let p = 2; p <= first.pages; p++) {
+      const next = await this.get<T[]>(path, { ...opts, page: p });
+      if (first.lastModified && next.lastModified && next.lastModified !== first.lastModified) return null;
+      out.push(...next.data);
+    }
     return out;
   }
 

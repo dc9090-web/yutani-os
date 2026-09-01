@@ -161,4 +161,49 @@ describe("EsiClient", () => {
     const { client } = make([{ status: 503 }]);
     await expect(client.get("/a")).rejects.toBeInstanceOf(EsiError);
   });
+  it("restarts the paginated walk once when a page's Last-Modified disagrees with page 1", async () => {
+    const a = "Mon, 01 Sep 2026 10:00:00 GMT";
+    const b = "Mon, 01 Sep 2026 10:30:00 GMT";
+    const { client, calls } = make([
+      { status: 200, body: [1], headers: { "X-Pages": "2", "Last-Modified": a } },
+      { status: 200, body: [2], headers: { "Last-Modified": b } },     // torn
+      { status: 200, body: [1, 9], headers: { "X-Pages": "2", "Last-Modified": b } },
+      { status: 200, body: [2], headers: { "Last-Modified": b } },     // consistent on the retry
+    ]);
+    expect(await client.getAll<number>("/characters/1/assets", { characterId: 1 })).toEqual([1, 9, 2]);
+    expect(calls.length).toBe(4);
+  });
+  it("throws 409 when the walk is still torn after the restart", async () => {
+    const h = (lm: string, pages?: string): Record<string, string> => (pages ? { "X-Pages": pages, "Last-Modified": lm } : { "Last-Modified": lm });
+    const { client } = make([
+      { status: 200, body: [1], headers: h("Mon, 01 Sep 2026 10:00:00 GMT", "2") },
+      { status: 200, body: [2], headers: h("Mon, 01 Sep 2026 10:30:00 GMT") },
+      { status: 200, body: [1], headers: h("Mon, 01 Sep 2026 11:00:00 GMT", "2") },
+      { status: 200, body: [2], headers: h("Mon, 01 Sep 2026 11:30:00 GMT") },
+    ]);
+    await expect(client.getAll("/characters/1/assets", { characterId: 1 }))
+      .rejects.toMatchObject({ status: 409, path: "/characters/1/assets" });
+  });
+  it("accepts a walk whose pages agree, and one where ESI sent no Last-Modified at all", async () => {
+    const lm = "Mon, 01 Sep 2026 10:00:00 GMT";
+    const same = make([
+      { status: 200, body: [1], headers: { "X-Pages": "2", "Last-Modified": lm } },
+      { status: 200, body: [2], headers: { "Last-Modified": lm } },
+    ]);
+    expect(await same.client.getAll<number>("/x", { characterId: 1 })).toEqual([1, 2]);
+    const none = make([{ status: 200, body: [1], headers: { "X-Pages": "2" } }, { status: 200, body: [2] }]);
+    expect(await none.client.getAll<number>("/y", { characterId: 1 })).toEqual([1, 2]);
+  });
+  it("the restart bypasses a still-valid cached page 1", async () => {
+    const a = "Mon, 01 Sep 2026 10:00:00 GMT";
+    const b = "Mon, 01 Sep 2026 10:30:00 GMT";
+    const { client, calls } = make([
+      { status: 200, body: [1], headers: { "X-Pages": "2", "Last-Modified": a, Expires: future(1_700_000_000_000, 3600) } },
+      { status: 200, body: [2], headers: { "Last-Modified": b } },
+      { status: 200, body: [1], headers: { "X-Pages": "2", "Last-Modified": b } },
+      { status: 200, body: [2], headers: { "Last-Modified": b } },
+    ]);
+    expect(await client.getAll<number>("/z", { characterId: 1 })).toEqual([1, 2]);
+    expect(calls.length).toBe(4);                    // page 1 was re-requested despite the fresh cache
+  });
 });
