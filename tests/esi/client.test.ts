@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { EsiClient, EsiError } from "../../src/lib/esi/client.js";
+import { EsiClient, EsiError, EsiUnavailableError } from "../../src/lib/esi/client.js";
 import type { CacheEntry } from "../../src/lib/db/esi-cache.js";
 
 type Resp = { status: number; body?: unknown; headers?: Record<string, string> };
@@ -118,5 +118,47 @@ describe("EsiClient", () => {
     expect(sleeps).toEqual([]);
     await client.get("/characters/1/wallet", { characterId: 1 });   // same template: bucket char-wallet:1 is known and throttled
     expect(sleeps.length).toBe(1);                                  // bucket char-wallet:1 waited
+  });
+  it("waits for the error-limit reset when fewer than 20 errors remain in the window", async () => {
+    const { client, sleeps } = make([
+      { status: 404, headers: { "X-ESI-Error-Limit-Remain": "12", "X-ESI-Error-Limit-Reset": "37" } },
+      { status: 200, body: { ok: 1 } },
+    ]);
+    await expect(client.get("/a")).rejects.toMatchObject({ status: 404 });
+    await client.get("/b");
+    expect(sleeps).toContain(37_000);
+  });
+  it("does not wait while the error limit is healthy or the headers are absent", async () => {
+    const { client, sleeps } = make([
+      { status: 200, body: {}, headers: { "X-ESI-Error-Limit-Remain": "98", "X-ESI-Error-Limit-Reset": "40" } },
+      { status: 200, body: {} },
+      { status: 200, body: {} },
+    ]);
+    await client.get("/a"); await client.get("/b"); await client.get("/c");
+    expect(sleeps).toEqual([]);
+  });
+  it("opens a 60s breaker on 503 and fails fast without touching ESI", async () => {
+    const { client, calls, advance } = make([
+      { status: 503, body: { error: "Timeout contacting tranquility" } },
+      { status: 200, body: { ok: 1 } },
+    ]);
+    await expect(client.get("/status")).rejects.toBeInstanceOf(EsiUnavailableError);
+    await expect(client.get("/characters/1", { characterId: 1 })).rejects.toMatchObject({ status: 503, name: "EsiUnavailableError" });
+    expect(calls.length).toBe(1);                     // second call never left the process
+    advance(60_001);
+    expect((await client.get<{ ok: number }>("/characters/1", { characterId: 1 })).data.ok).toBe(1);
+    expect(calls.length).toBe(2);
+  });
+  it("opens the breaker on 502 and 504 too, and post fails fast as well", async () => {
+    const { client, calls } = make([{ status: 502 }]);
+    await expect(client.get("/a")).rejects.toBeInstanceOf(EsiUnavailableError);
+    await expect(client.post("/universe/names", [1])).rejects.toBeInstanceOf(EsiUnavailableError);
+    expect(calls.length).toBe(1);
+    const gateway = make([{ status: 504, body: { error: "Timeout contacting tranquility", timeout: 10 } }]);
+    await expect(gateway.client.get("/a")).rejects.toBeInstanceOf(EsiUnavailableError);
+  });
+  it("EsiUnavailableError is an EsiError so existing catch sites keep working", async () => {
+    const { client } = make([{ status: 503 }]);
+    await expect(client.get("/a")).rejects.toBeInstanceOf(EsiError);
   });
 });

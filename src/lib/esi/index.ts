@@ -18,5 +18,5 @@ export function createEsiClient(): EsiClient {
   }
   return client;
 }
-export { EsiClient, EsiError } from "./client.js";
+export { EsiClient, EsiError, EsiUnavailableError } from "./client.js";
 export { NeedsReauthError } from "./tokens.js";
