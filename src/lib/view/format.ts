@@ -52,6 +52,25 @@ function span(ms: number): string {
   return days === 1 ? "1 day" : `${days} days`;
 }
 
+/**
+ * "5 d 13 h 20 m" — a training span, as the planner shows it. Distinct from `relativeTime`'s
+ * private `span`, which collapses anything over a day to whole days: right for "synced 2 days ago",
+ * useless for a plan whose length is the whole point.
+ */
+export function duration(ms: number): string {
+  if (ms <= 0) return "0 m";
+  const minutes = Math.round(ms / MINUTE);
+  if (minutes === 0) return "< 1 m";
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const rest = minutes % 60;
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days} d`);
+  if (hours > 0) parts.push(`${hours} h`);
+  if (rest > 0 || parts.length === 0) parts.push(`${rest} m`);
+  return parts.join(" ");
+}
+
 /** "in 3 h 12 m" / "2 days ago" / "just now" / "never" — spec §7. */
 export function relativeTime(date: Date | null, now: Date = new Date()): string {
   if (date === null) return "never";
