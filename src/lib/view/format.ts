@@ -13,9 +13,14 @@ export function grouped(value: string | number): string {
   return `${negative ? "-" : ""}${separated}${fraction === undefined ? "" : `.${fraction}`}`;
 }
 
-/** "1,234,567.89 ISK" — spec §7. Always two decimals, even for a whole number. */
+/**
+ * "1,234,567.89 ISK" — spec §7. Always two decimals, even for a whole number.
+ * `toFixed` rounds tiny negatives (e.g. -0.001) to "-0.00"; normalise that to "0.00" so the sign
+ * never appears without a nonzero magnitude behind it.
+ */
 export function isk(value: number): string {
-  return `${grouped(value.toFixed(2))} ISK`;
+  const fixed = value.toFixed(2);
+  return `${grouped(fixed === "-0.00" ? "0.00" : fixed)} ISK`;
 }
 
 /** "12.3M SP" / "850k SP" / "512 SP". The k branch floors so 999,999 never reads "1000k SP". */

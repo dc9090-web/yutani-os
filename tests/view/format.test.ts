@@ -21,6 +21,11 @@ describe("isk", () => {
     expect(isk(-4500)).toBe("-4,500.00 ISK");
     expect(isk(4.187)).toBe("4.19 ISK");
   });
+  it("never renders -0.00 for a tiny negative amount", () => {
+    expect(isk(-0.001)).toBe("0.00 ISK");
+    expect(isk(-0.005)).toBe("-0.01 ISK"); // (-0.005).toFixed(2) === "-0.01" (binary repr rounds away from zero here)
+    expect(isk(-4500)).toBe("-4,500.00 ISK");
+  });
 });
 
 describe("sp", () => {
