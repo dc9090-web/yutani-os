@@ -4,6 +4,8 @@ import { chunk } from "../../lib/chunk.js";
 import { getCharacter } from "../../lib/db/characters.js";
 import { replaceAssets, type AssetRow } from "../../lib/db/character-assets.js";
 import { resolveLocations } from "../../lib/names/index.js";
+import { getTypes } from "../../lib/sde/repo.js";
+import { EsiUnavailableError } from "../../lib/esi/client.js";
 
 export const ASSETS_INTERVAL_MS = 60 * 60 * 1000;
 export const ASSETS_RETRY_MS = 10 * 60 * 1000;
@@ -20,6 +22,7 @@ export interface AssetsJobDeps {
   getCharacter: (id: number) => Promise<{ scopes: string[] } | null>;
   replaceAssets: (characterId: number, assets: AssetRow[]) => Promise<number>;
   resolveLocations: (locationIds: number[], characterId: number) => Promise<unknown>;
+  getTypes: (ids: number[]) => Promise<Map<number, { name: string | null }>>;
 }
 
 export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
@@ -42,21 +45,37 @@ export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
         for (const n of named) names.set(n.item_id, n.name);
       }
 
-      const rows: AssetRow[] = raw.map((a) => ({
-        itemId: a.item_id, typeId: a.type_id, quantity: a.quantity, locationId: a.location_id,
-        locationType: a.location_type, locationFlag: a.location_flag, isSingleton: a.is_singleton,
-        // ESI only ever sends `true`; absent means "not a blueprint copy". Never compare with false.
-        isBlueprintCopy: a.is_blueprint_copy === true,
-        name: names.get(a.item_id) ?? null,
-      }));
+      // ESI also echoes the type name back for an unrenamed singleton (no distinct blank state).
+      // Look the singleton types up once and null out any ESI name that just repeats the type name,
+      // so a stored name means "this item was actually given a custom name".
+      const singletonTypeIds = [...new Set(raw.filter((a) => a.is_singleton).map((a) => a.type_id))];
+      const types = singletonTypeIds.length > 0 ? await deps.getTypes(singletonTypeIds) : new Map<number, { name: string | null }>();
+
+      const rows: AssetRow[] = raw.map((a) => {
+        const esiName = names.get(a.item_id) ?? null;
+        const typeName = a.is_singleton ? types.get(a.type_id)?.name ?? null : null;
+        return {
+          itemId: a.item_id, typeId: a.type_id, quantity: a.quantity, locationId: a.location_id,
+          locationType: a.location_type, locationFlag: a.location_flag, isSingleton: a.is_singleton,
+          // ESI only ever sends `true`; absent means "not a blueprint copy". Never compare with false.
+          isBlueprintCopy: a.is_blueprint_copy === true,
+          name: esiName !== null && esiName === typeName ? null : esiName,
+        };
+      });
       const written = await deps.replaceAssets(characterId, rows);
 
       // Roots are the assets that are not nested inside another item: stations, systems, citadels.
       const roots = [...new Set(raw.filter((a) => a.location_type !== "item").map((a) => a.location_id))];
-      await deps.resolveLocations(roots, characterId);
+      try {
+        await deps.resolveLocations(roots, characterId);
+      } catch (e) {
+        if (e instanceof EsiUnavailableError) throw e;
+        // The assets themselves were already written; the next run's resolveLocations retries this.
+        console.warn(`[assets] location resolution failed for ${characterId}: ${e instanceof Error ? e.message : String(e)}`);
+      }
       return written;
     },
   };
 }
 
-export const assetsJob: CharacterSyncJob = createAssetsJob({ getCharacter, replaceAssets, resolveLocations });
+export const assetsJob: CharacterSyncJob = createAssetsJob({ getCharacter, replaceAssets, resolveLocations, getTypes });

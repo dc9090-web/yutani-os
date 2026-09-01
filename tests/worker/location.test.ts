@@ -7,7 +7,7 @@ import { esiFixture } from "../fixtures/esi.js";
 const CID = 669539978;
 const ALL = ["esi-location.read_location.v1", "esi-location.read_ship_type.v1", "esi-location.read_online.v1"];
 
-function harness(scopes: string[] = ALL, location: unknown = esiFixture("location")) {
+function harness(scopes: string[] = ALL, location: unknown = esiFixture("location"), over: Partial<LocationJobDeps> = {}) {
   const writes: LocationInput[] = [];
   const resolved: { ids: number[]; characterId: number }[] = [];
   const paths: string[] = [];
@@ -15,6 +15,7 @@ function harness(scopes: string[] = ALL, location: unknown = esiFixture("locatio
     getCharacter: async () => ({ scopes }),
     upsertLocation: async (_id, loc) => { writes.push(loc); return 1; },
     resolveLocations: async (ids, characterId) => { resolved.push({ ids, characterId }); return new Map(); },
+    ...over,
   };
   const esi = {
     get: vi.fn(async (path: string) => {
@@ -82,5 +83,20 @@ describe("location job", () => {
     h.esi.get = vi.fn(async () => { throw new EsiUnavailableError("/characters/1/location", Date.now() + 60_000); });
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
     expect(h.writes).toEqual([]);
+  });
+  it("does not fail the run when resolveLocations throws a non-outage error", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const h = harness(ALL, { solar_system_id: 30000144, structure_id: 1035466617946 }, {
+      resolveLocations: async () => { throw new Error("boom"); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).resolves.toBe(1);
+    expect(warn).toHaveBeenCalledWith(`[location] location resolution failed for ${CID}: boom`);
+    warn.mockRestore();
+  });
+  it("still rejects when resolveLocations throws an EsiUnavailableError", async () => {
+    const h = harness(ALL, { solar_system_id: 30000144, structure_id: 1035466617946 }, {
+      resolveLocations: async () => { throw new EsiUnavailableError("/universe/structures/1", Date.now() + 60_000); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
   });
 });

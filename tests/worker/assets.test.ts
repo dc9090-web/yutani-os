@@ -7,15 +7,18 @@ import { esiFixture } from "../fixtures/esi.js";
 const CID = 669539978;
 type RawAsset = { item_id: number; type_id: number; quantity: number; location_id: number; location_type: string; location_flag: string; is_singleton: boolean; is_blueprint_copy?: boolean };
 
-function harness(scopes: string[] = ["esi-assets.read_assets.v1"], assets = esiFixture<RawAsset[]>("assets")) {
+function harness(scopes: string[] = ["esi-assets.read_assets.v1"], assets = esiFixture<RawAsset[]>("assets"), over: Partial<AssetsJobDeps> = {}) {
   const writes: AssetRow[][] = [];
   const resolved: { ids: number[]; characterId: number }[] = [];
   const posts: { path: string; body: number[] }[] = [];
   const getAllPaths: string[] = [];
+  const getTypesCalls: number[][] = [];
   const deps: AssetsJobDeps = {
     getCharacter: async () => ({ scopes }),
     replaceAssets: async (_id, rows) => { writes.push(rows); return rows.length; },
     resolveLocations: async (ids, characterId) => { resolved.push({ ids, characterId }); return new Map(); },
+    getTypes: async (ids) => { getTypesCalls.push(ids); return new Map(); },
+    ...over,
   };
   const esi = {
     getAll: vi.fn(async (path: string) => { getAllPaths.push(path); return assets; }),
@@ -25,7 +28,7 @@ function harness(scopes: string[] = ["esi-assets.read_assets.v1"], assets = esiF
       return names.filter((n) => (body as number[]).includes(n.item_id));
     }),
   };
-  return { job: createAssetsJob(deps), esi, writes, resolved, posts, getAllPaths };
+  return { job: createAssetsJob(deps), esi, writes, resolved, posts, getAllPaths, getTypesCalls };
 }
 
 describe("assets job", () => {
@@ -97,5 +100,43 @@ describe("assets job", () => {
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
     expect(h.writes).toEqual([]);
     expect(h.resolved).toEqual([]);
+  });
+  it("nulls a singleton's name when it just echoes the type name back", async () => {
+    // Fixture: item 1023456789012 (type 587) is named "Fast Tackle" by /assets/names.
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      getTypes: async () => new Map([[587, { name: "Fast Tackle" }]]),
+    });
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    expect(h.writes[0].find((r) => r.itemId === 1023456789012)!.name).toBeNull();
+  });
+  it("keeps a singleton's name when it differs from the type name", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      getTypes: async () => new Map([[587, { name: "Rifter" }]]),
+    });
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    expect(h.writes[0].find((r) => r.itemId === 1023456789012)!.name).toBe("Fast Tackle");
+  });
+  it("does not call getTypes when nothing is a singleton", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], [{
+      item_id: 1, type_id: 34, quantity: 5, location_id: 60003760,
+      location_type: "station", location_flag: "Hangar", is_singleton: false,
+    }]);
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    expect(h.getTypesCalls).toEqual([]);
+  });
+  it("does not fail the run when resolveLocations throws a non-outage error", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      resolveLocations: async () => { throw new Error("boom"); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).resolves.toBe(6);
+    expect(warn).toHaveBeenCalledWith(`[assets] location resolution failed for ${CID}: boom`);
+    warn.mockRestore();
+  });
+  it("still rejects when resolveLocations throws an EsiUnavailableError", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      resolveLocations: async () => { throw new EsiUnavailableError("/universe/structures/1", Date.now() + 60_000); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
   });
 });

@@ -3,7 +3,9 @@ import { chunk } from "../chunk.js";
 
 export interface AssetRow {
   itemId: number; typeId: number; quantity: number; locationId: number;
-  locationType: string; locationFlag: string; isSingleton: boolean; isBlueprintCopy: boolean; name: string | null;
+  locationType: string; locationFlag: string; isSingleton: boolean; isBlueprintCopy: boolean;
+  /** The item's custom name only; null when it was never renamed (ESI echoing the type name back is normalised away). */
+  name: string | null;
 }
 
 const INSERT_BATCH = 2000;
