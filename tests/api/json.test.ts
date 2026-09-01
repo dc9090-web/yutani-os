@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseName, parseAccountId, parseId } from "../../src/lib/api/json.js";
+import { parseName, parseAccountId, parseId, parseIdList } from "../../src/lib/api/json.js";
 describe("api parsing", () => {
   it("parseName trims and bounds", () => {
     expect(parseName({ name: "  Main " })).toBe("Main");
@@ -19,5 +19,19 @@ describe("api parsing", () => {
     expect(parseId("0")).toBeNull();
     expect(parseId("-3")).toBeNull();
     expect(parseId("1.5")).toBeNull();
+  });
+});
+
+describe("parseIdList", () => {
+  it("parses, dedupes and keeps order", () => {
+    expect(parseIdList("3, 1 ,3", 10)).toEqual([3, 1]);
+  });
+  it("rejects nothing, rubbish, non-positives and over-long lists", () => {
+    expect(parseIdList(null, 10)).toBeNull();
+    expect(parseIdList("", 10)).toBeNull();
+    expect(parseIdList("1,x", 10)).toBeNull();
+    expect(parseIdList("1,-2", 10)).toBeNull();
+    expect(parseIdList("1.5", 10)).toBeNull();
+    expect(parseIdList("1,2,3", 2)).toBeNull();
   });
 });
