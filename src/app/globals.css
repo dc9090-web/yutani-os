@@ -219,3 +219,8 @@ body {
 .tree-toggle:hover { color: var(--accent); }
 .tree-flag { margin-left: auto; font-size: 12px; color: var(--faint); }
 .badge.bpc { background: rgba(94, 176, 255, 0.14); color: var(--accent-2); }
+
+/* ---------- Wallet (phase 3) ---------- */
+.show-more { margin-top: 12px; padding: 8px 16px; background: var(--raised); border: 1px solid var(--border-hi); border-radius: 8px; color: var(--text); font: inherit; cursor: pointer; }
+.show-more:hover { border-color: var(--accent); color: var(--accent); }
+.show-more[disabled] { opacity: 0.6; cursor: default; }
