@@ -59,15 +59,16 @@ export function createMarketPricesJob(deps: MarketPricesDeps): GlobalSyncJob {
         log("market-prices: nothing of interest yet, skipping Fuzzwork");
         return rows;
       }
+      let jita: JitaPriceRow[];
       try {
-        const jita = await deps.fetchAggregates(typeIds);
-        rows += await deps.upsertJitaPrices(jita);
-        log(`market-prices: ${jita.length} Jita aggregates for ${typeIds.length} types of interest`);
+        jita = await deps.fetchAggregates(typeIds);
       } catch (e) {
         const message = (e as Error).message ?? String(e);
         log(`market-prices: Fuzzwork failed, keeping ESI prices: ${message}`);
         return { rows, warn: `Fuzzwork aggregates failed for ${typeIds.length} types: ${message}` };
       }
+      rows += await deps.upsertJitaPrices(jita);
+      log(`market-prices: ${jita.length} Jita aggregates for ${typeIds.length} types of interest`);
       return rows;
     },
   };

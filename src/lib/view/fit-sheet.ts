@@ -1,5 +1,5 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, itemLabel,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, itemLabel, round2,
   type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats,
   type Hardpoint, type Item, type ModuleStat, type Problem, type ProblemKind, type SlotKind,
 } from "../dogma/index.js";
@@ -117,8 +117,10 @@ function moduleRow(fit: Fit, stat: ModuleStat): ModuleRowView {
     name: itemLabel(stat.item),
     typeId: stat.item.typeId,
     charge: stat.item.charge === undefined ? null : itemLabel(stat.item.charge),
-    cpu: stat.cpu.toFixed(2),
-    power: stat.power.toFixed(2),
+    // Half-even round to 2dp first — same convention as the pool totals in `fitStats` — so a row's
+    // own cpu/power always matches what the gauge above it is summing.
+    cpu: round2(stat.cpu).toFixed(2),
+    power: round2(stat.power).toFixed(2),
     state: stateLabel(stat.state),
     cpuExplain: safeExplain(fit, stat.item, ATTR.cpu),
     powerExplain: safeExplain(fit, stat.item, ATTR.power),

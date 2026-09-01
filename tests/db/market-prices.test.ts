@@ -37,4 +37,18 @@ describe("market_prices repo", () => {
     expect(await upsertJitaPrices([])).toBe(0);
     expect(await getPrices([])).toEqual(new Map());
   });
+
+  it("dedupes a repeated type_id within one batch instead of letting ON CONFLICT abort", async () => {
+    await expect(upsertEsiPrices([
+      { typeId: 44992, adjustedPrice: 1, averagePrice: 1 },
+      { typeId: 44992, adjustedPrice: 2, averagePrice: 2 },
+    ])).resolves.toBe(1);
+    expect((await getPrices([44992])).get(44992)).toEqual({ sell: null, buy: null, adjusted: 2 });
+
+    await expect(upsertJitaPrices([
+      { typeId: 44992, sellMin: 10, buyMax: 9 },
+      { typeId: 44992, sellMin: 20, buyMax: 19 },
+    ])).resolves.toBe(1);
+    expect((await getPrices([44992])).get(44992)).toEqual({ sell: 20, buy: 19, adjusted: 2 });
+  });
 });

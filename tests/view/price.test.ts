@@ -50,4 +50,9 @@ describe("iskShort", () => {
     expect(iskShort(850)).toBe("850 ISK");
     expect(iskShort(0)).toBe("0 ISK");
   });
+
+  it("rolls a tier over instead of showing a mantissa of 1000", () => {
+    expect(iskShort(999_999)).toBe("1.0M ISK");
+    expect(iskShort(999_950_000)).toBe("1.0B ISK");
+  });
 });

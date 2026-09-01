@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import type { Pool } from "pg";
 import { resetDb, resetSde } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
@@ -71,5 +71,18 @@ describe("fittingSheet", () => {
 
   it("404s for an unknown fitting", async () => {
     expect(await fittingSheet(1, 4242)).toEqual({ kind: "notFound" });
+  });
+
+  it("returns an error sheet, and logs, when the engine throws building the fit", async () => {
+    // ship_type_id 99999999 exists in no SDE build, mini fixture included — `fitFromFitting`'s
+    // `startFit` calls `makeItem` on it and throws `UnknownTypeError` (src/lib/dogma/fit.ts), which
+    // `computeFit` (src/lib/view/ships.ts) catches and logs before returning null.
+    await pool.query(
+      "INSERT INTO character_fittings (character_id, fitting_id, name, description, ship_type_id) VALUES (1, 8, 'Ghost Fit', '', 99999999)");
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const result = await fittingSheet(1, 8);
+    expect(result).toEqual({ kind: "error", title: "Ghost Fit" });
+    expect(spy).toHaveBeenCalled();
+    spy.mockRestore();
   });
 });

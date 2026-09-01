@@ -42,10 +42,21 @@ export function unpricedNote(unpriced: number): string | null {
 /**
  * Compact ISK for cards and slot rows ("2.45B ISK"). The sheet's value panel uses `isk()` from
  * `format.ts` so the exact figure is always available somewhere on the page.
+ *
+ * Each tier's rounding can itself reach the next tier's floor (999,999 rounds to "1000k", 999,950,000
+ * rounds to "1000.0M") — checked and promoted a tier up so the display never shows a mantissa of 1000.
  */
 export function iskShort(value: number): string {
   if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(2)}B ISK`;
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M ISK`;
-  if (value >= 1_000) return `${Math.round(value / 1_000)}k ISK`;
+  if (value >= 1_000_000) {
+    const millions = (value / 1_000_000).toFixed(1);
+    if (millions === "1000.0") return "1.0B ISK";
+    return `${millions}M ISK`;
+  }
+  if (value >= 1_000) {
+    const thousands = Math.round(value / 1_000);
+    if (thousands === 1000) return "1.0M ISK";
+    return `${thousands}k ISK`;
+  }
   return `${Math.round(value)} ISK`;
 }

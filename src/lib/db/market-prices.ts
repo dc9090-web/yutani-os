@@ -13,12 +13,22 @@ const INSERT_BATCH = 2000;
 const num = (v: string | null): number | null => (v === null ? null : Number(v));
 
 /**
+ * `ON CONFLICT` aborts an entire statement if the same conflict target (here, `type_id`) appears
+ * twice in one INSERT's VALUES — "ON CONFLICT DO UPDATE command cannot affect row a second time".
+ * ESI and Fuzzwork responses are not contractually unique, so de-dupe defensively before chunking;
+ * last row for a given type wins, matching what a second INSERT of the same id would have done anyway.
+ */
+function dedupeByTypeId<T extends { typeId: number }>(rows: T[]): T[] {
+  return [...new Map(rows.map((r) => [r.typeId, r])).values()];
+}
+
+/**
  * Upserts only the two ESI columns, so a Fuzzwork run's values survive untouched (spec §3: a
  * Fuzzwork failure degrades prices to ESI's, never to nothing).
  */
 export async function upsertEsiPrices(rows: EsiPriceRow[]): Promise<number> {
   let written = 0;
-  for (const batch of chunk(rows, INSERT_BATCH)) {
+  for (const batch of chunk(dedupeByTypeId(rows), INSERT_BATCH)) {
     const res = await getPool().query(
       `INSERT INTO market_prices (type_id, adjusted_price, average_price, updated_at)
        SELECT *, now() FROM unnest($1::int[], $2::numeric[], $3::numeric[])
@@ -33,7 +43,7 @@ export async function upsertEsiPrices(rows: EsiPriceRow[]): Promise<number> {
 /** The mirror image: only the two Jita columns, so the ESI reference values survive. */
 export async function upsertJitaPrices(rows: JitaPriceRow[]): Promise<number> {
   let written = 0;
-  for (const batch of chunk(rows, INSERT_BATCH)) {
+  for (const batch of chunk(dedupeByTypeId(rows), INSERT_BATCH)) {
     const res = await getPool().query(
       `INSERT INTO market_prices (type_id, jita_sell_min, jita_buy_max, updated_at)
        SELECT *, now() FROM unnest($1::int[], $2::numeric[], $3::numeric[])

@@ -66,6 +66,13 @@ describe("market-prices job", () => {
     expect(d.upsertJitaPrices).not.toHaveBeenCalled();
   });
 
+  it("propagates an upsertJitaPrices failure as a real error, not a warning", async () => {
+    const d = deps({ upsertJitaPrices: vi.fn(async () => { throw new Error("pool exhausted"); }) });
+    await expect(createMarketPricesJob(d).run({ esi })).rejects.toThrow(/pool exhausted/);
+    expect(d.fetchAggregates).toHaveBeenCalledTimes(1);
+    expect(d.upsertJitaPrices).toHaveBeenCalledTimes(1);
+  });
+
   it("propagates an ESI failure as a real error and writes nothing", async () => {
     const d = deps({ fetchEsiPrices: vi.fn(async () => { throw new Error("ESI 500 for /markets/prices"); }) });
     await expect(createMarketPricesJob(d).run({ esi })).rejects.toThrow(/ESI 500/);
