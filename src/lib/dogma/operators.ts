@@ -71,7 +71,20 @@ export function penalizeValues(modValues: number[]): number {
   return value - 1;
 }
 
-/** The 2-dp rounding EOS applies to cpu/power/cpuOutput/powerOutput — it *is* the fit tolerance. */
+/**
+ * The 2-dp rounding EOS applies to cpu/power/cpuOutput/powerOutput — it *is* the fit tolerance.
+ * On an exact `.5` tie this rounds to the even neighbour (banker's rounding), matching Python's
+ * `round()` — which EOS and Pyfa both run on — rather than JavaScript's round-half-away-from-zero.
+ * This branch only fires when the underlying float arithmetic lands exactly on `.5`
+ * (e.g. 6.755 × 100 === 675.5); anything nudged off by float noise (e.g. 164.1275 × 100 ===
+ * 16412.75) falls through to ordinary rounding.
+ */
 export function round2(v: number): number {
-  return Math.round(v * 100) / 100;
+  const x = v * 100;
+  const truncated = Math.trunc(x);
+  if (Math.abs(x - truncated) === 0.5) {
+    const evenNeighbour = truncated % 2 === 0 ? truncated : truncated + Math.sign(x);
+    return evenNeighbour / 100;
+  }
+  return Math.round(x) / 100;
 }

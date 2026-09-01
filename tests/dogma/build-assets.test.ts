@@ -86,7 +86,9 @@ describe("fitFromAssets", () => {
 
   it("produces a fit the rest of the engine can measure", () => {
     const stats = fitStats(fitFromAssets(SHIP, children, ctx).fit);
-    expect(stats.cpu.output).toBe(164.13);       // 130 × 1.25 (CPU Management V) × 1.01 (EE-601)
+    // 130 × 1.25 (CPU Management V) × 1.01 (EE-601) = 164.125 exactly, an exact-tie 2dp round that
+    // banker's rounding takes to the even neighbour, 164.12 (Python's round(), which EOS/Pyfa use).
+    expect(stats.cpu.output).toBe(164.12);
     expect(stats.cpu.used).toBe(43.5);           // 2 × 6.75 + 30
     expect(stats.calibration.used).toBe(300);
     expect(stats.hardpoints.turret).toEqual({ used: 2, total: 3 });

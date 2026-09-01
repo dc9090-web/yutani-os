@@ -109,4 +109,15 @@ describe("round2", () => {
     expect(round2(6.755)).toBe(6.76);
     expect(round2(-1.005)).toBe(-1);
   });
+
+  it("rounds an exact tie to the even neighbour (banker's rounding, matching Python's round())", () => {
+    expect(round2(28.125)).toBe(28.12);   // 2812.5 → 2812 (even)
+    expect(round2(28.135)).toBe(28.14);   // 2813.5 → 2814 (even)
+    expect(round2(0.125)).toBe(0.12);     // 12.5 → 12 (even)
+    expect(round2(-28.125)).toBe(-28.12); // -2812.5 → -2812 (even)
+  });
+
+  it("leaves a non-tie value alone even when its 2dp neighbour is even", () => {
+    expect(round2(164.1275)).toBe(164.13);   // 16412.75 is not a tie, ordinary rounding applies
+  });
 });

@@ -32,7 +32,8 @@ describe("Rifter CPU and powergrid output", () => {
     const alone = buildFit(data, 587, { implants: [27143] });
     expect(getAttr(alone, alone.ship, ATTR.cpuOutput)).toBe(131.3);           // 130 × 1.01
     const both = buildFit(data, 587, { implants: [27143], skills: skills([[3426, 5]]) });
-    expect(getAttr(both, both.ship, ATTR.cpuOutput)).toBe(164.13);            // 130 × 1.25 × 1.01, rounded
+    // 130 × 1.25 × 1.01 = 164.125 exactly: an exact 2dp tie, rounded to the even neighbour 164.12.
+    expect(getAttr(both, both.ship, ATTR.cpuOutput)).toBe(164.12);
   });
 
   it("stacks the skill and the implant unpenalised, because cpuOutput is stackable", () => {
