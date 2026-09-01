@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { loadConfig, parseAllowedCharacterIds } from "../src/lib/config.js";
 
-const full = {
+const full: NodeJS.ProcessEnv = {
+  NODE_ENV: "test",
   EVE_CLIENT_ID: "id", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://x/auth/callback",
   ALLOWED_CHARACTER_IDS: "1, 2,3", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",

@@ -17,7 +17,7 @@ export function parseAllowedCharacterIds(raw: string | undefined): Set<number> {
   return out;
 }
 
-export function loadConfig(env: Record<string, string | undefined> = process.env): AppConfig {
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const missing = REQUIRED.filter((k) => !env[k]);
   if (missing.length) throw new Error(`Missing env: ${missing.join(", ")}`);
   return {
