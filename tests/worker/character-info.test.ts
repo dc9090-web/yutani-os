@@ -16,6 +16,7 @@ describe("character-info job", () => {
     expect(rows).toBe(1);
     expect(updateCharacterInfo).toHaveBeenCalledWith(1, { name: "T", corporationId: 98, corporationName: "Corp", allianceId: 99, allianceName: "Ally" });
     expect(characterInfoJob.intervalMs).toBe(6 * 60 * 60 * 1000);
+    expect(get.mock.calls[0]).toEqual(["/characters/1", { characterId: 1 }]);
   });
   it("handles no alliance", async () => {
     const get = vi.fn(async (path: string) => path === "/characters/1" ? { data: { name: "T", corporation_id: 98 } } : { data: { name: "Corp" } });
