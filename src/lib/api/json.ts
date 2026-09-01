@@ -10,3 +10,7 @@ export function parseAccountId(body: unknown): number | null | undefined {
   if (v === null) return null;
   return typeof v === "number" && Number.isInteger(v) && v > 0 ? v : undefined;
 }
+export function parseId(raw: string): number | null {
+  const id = Number(raw);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}

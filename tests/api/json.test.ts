@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseName, parseAccountId } from "../../src/lib/api/json.js";
+import { parseName, parseAccountId, parseId } from "../../src/lib/api/json.js";
 describe("api parsing", () => {
   it("parseName trims and bounds", () => {
     expect(parseName({ name: "  Main " })).toBe("Main");
@@ -12,5 +12,12 @@ describe("api parsing", () => {
     expect(parseAccountId({ accountId: 3 })).toBe(3);
     expect(parseAccountId({ accountId: "3" })).toBeUndefined();
     expect(parseAccountId({})).toBeUndefined();
+  });
+  it("parseId accepts positive integer strings; rejects others", () => {
+    expect(parseId("12")).toBe(12);
+    expect(parseId("abc")).toBeNull();
+    expect(parseId("0")).toBeNull();
+    expect(parseId("-3")).toBeNull();
+    expect(parseId("1.5")).toBeNull();
   });
 });
