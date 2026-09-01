@@ -148,10 +148,6 @@ body {
 .card-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 16px; color: var(--text); margin: 0 0 14px; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
 .muted { color: var(--muted); } .faint { color: var(--faint); } .pos { color: var(--pos); } .neg { color: var(--neg); }
-.char-card { display: flex; gap: 16px; align-items: center; }
-.char-card img { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
-.char-card h3 { margin: 0; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
-.char-card p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
 .coming-soon { text-align: center; padding: 64px 24px; color: var(--faint); }
 .table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .table th { text-align: left; font-weight: 500; color: var(--faint); padding: 8px 10px; border-bottom: 1px solid var(--border); }
