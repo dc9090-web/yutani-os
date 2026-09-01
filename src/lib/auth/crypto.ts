@@ -1,6 +1,6 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, hkdfSync, randomBytes } from "node:crypto";
 
-const key = (secret: string) => createHash("sha256").update(secret).digest();
+const key = (secret: string) => Buffer.from(hkdfSync("sha256", secret, "", "eve:refresh-token-aes-256-gcm", 32));
 const b64 = (b: Buffer) => b.toString("base64url");
 
 export function encryptSecret(plain: string, secret: string): string {
