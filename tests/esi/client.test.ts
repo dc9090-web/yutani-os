@@ -16,7 +16,7 @@ function make(responses: Resp[]) {
   const client = new EsiClient({
     fetchImpl, getAccessToken: async (cid) => `tok-${cid}`,
     cache: { get: async (cid, p) => store.get(`${cid}${p}`) ?? null, put: async (cid, p, e) => { store.set(`${cid}${p}`, e); } },
-    config: { esiBaseUrl: "https://esi.test", esiCompatibilityDate: "2026-08-28", esiUserAgent: "ua" },
+    config: { esiBaseUrl: "https://esi.test", esiCompatibilityDate: "2026-08-18", esiUserAgent: "ua" },
     now: () => t, sleep: async (ms) => { sleeps.push(ms); t += ms; },
   });
   return { client, calls, store, sleeps, advance: (ms: number) => { t += ms; } };
@@ -29,7 +29,7 @@ describe("EsiClient", () => {
     const r = await client.get<{ name: string }>("/characters/1", { characterId: 1 });
     expect(r.data.name).toBe("T"); expect(r.fromCache).toBe(false);
     const h = calls[0].init.headers as Record<string, string>;
-    expect(h["X-Compatibility-Date"]).toBe("2026-08-28"); expect(h["User-Agent"]).toBe("ua"); expect(h.Authorization).toBe("Bearer tok-1");
+    expect(h["X-Compatibility-Date"]).toBe("2026-08-18"); expect(h["User-Agent"]).toBe("ua"); expect(h.Authorization).toBe("Bearer tok-1");
     expect(calls[0].url).toBe("https://esi.test/characters/1");
     expect(store.get("1/characters/1")?.etag).toBe('"e1"');
   });

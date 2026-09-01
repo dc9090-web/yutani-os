@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { SignJWT, generateKeyPair, exportJWK, createLocalJWKSet } from "jose";
-import { SCOPES, generatePkce, buildAuthorizeUrl, exchangeCode, refreshAccessToken, verifyEveJwt, getSsoMetadata, resetSsoMetadataCache, SsoError, type SsoMetadata } from "../../src/lib/auth/sso.js";
+import { SCOPES, hasScope, generatePkce, buildAuthorizeUrl, exchangeCode, refreshAccessToken, verifyEveJwt, getSsoMetadata, resetSsoMetadataCache, SsoError, type SsoMetadata } from "../../src/lib/auth/sso.js";
 import { createHash } from "node:crypto";
 
 const metadata: SsoMetadata = {
@@ -21,7 +21,19 @@ async function signedJwt(claims: Record<string, unknown>, opts: { aud?: string[]
 }
 
 describe("sso", () => {
-  it("exports the ten scopes", () => { expect(SCOPES.length).toBe(10); expect(SCOPES).toContain("esi-fittings.read_fittings.v1"); });
+  it("exports the twelve scopes the project needs", () => {
+    expect(SCOPES.length).toBe(12);
+    expect(SCOPES).toContain("esi-fittings.read_fittings.v1");
+    expect(SCOPES).toContain("esi-universe.read_structures.v1");
+    expect(SCOPES).toContain("esi-location.read_online.v1");
+    expect(new Set(SCOPES).size).toBe(SCOPES.length);
+  });
+  it("hasScope reads the character's granted scopes and tolerates a missing character", () => {
+    expect(hasScope({ scopes: ["esi-location.read_online.v1"] }, "esi-location.read_online.v1")).toBe(true);
+    expect(hasScope({ scopes: [] }, "esi-location.read_online.v1")).toBe(false);
+    expect(hasScope(null, "esi-location.read_online.v1")).toBe(false);
+    expect(hasScope(undefined, "esi-location.read_online.v1")).toBe(false);
+  });
 
   it("does not memoise a rejected metadata fetch forever", async () => {
     resetSsoMetadataCache();

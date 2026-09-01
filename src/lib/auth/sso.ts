@@ -6,7 +6,20 @@ export const SCOPES = [
   "esi-fittings.read_fittings.v1", "esi-clones.read_clones.v1", "esi-clones.read_implants.v1",
   "esi-wallet.read_character_wallet.v1", "esi-killmails.read_killmails.v1",
   "esi-location.read_location.v1", "esi-location.read_ship_type.v1",
+  // Phase 3: /characters/{id}/online and /universe/structures/{id}. SSO grants are immutable per
+  // refresh token, so these are added before onboarding rather than after.
+  "esi-location.read_online.v1", "esi-universe.read_structures.v1",
 ];
+
+/**
+ * True when the token stored for this character was granted `scope`. Jobs skip (never fail)
+ * endpoints whose scope is missing, so a character authorised under the phase-1 scope set keeps
+ * syncing everything except structure names and online status until they log in again.
+ */
+export function hasScope(character: { scopes: string[] } | null | undefined, scope: string): boolean {
+  return character !== null && character !== undefined && character.scopes.includes(scope);
+}
+
 export const SSO_METADATA_URL = "https://login.eveonline.com/.well-known/oauth-authorization-server";
 
 export interface SsoMetadata { issuer: string; authorization_endpoint: string; token_endpoint: string; jwks_uri: string }

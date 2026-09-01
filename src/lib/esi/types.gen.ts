@@ -1,4 +1,4 @@
-// Generated from https://esi.evetech.net/meta/openapi.json by scripts/esi-types.ts — do not edit.
+// Generated from https://esi.evetech.net/meta/openapi.json (X-Compatibility-Date: 2026-08-18) by scripts/esi-types.ts — do not edit.
 export interface paths {
     "/alliances": {
         parameters: {
@@ -153,7 +153,47 @@ export interface paths {
          * Get character's public information
          * @description Public information about a character
          */
-        get: operations["GetCharactersCharacterId"];
+        get: operations["GetCharactersDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/access-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Access Lists
+         * @description Lists all Access Lists the character is Manager or Admin of.
+         */
+        get: operations["GetCharactersAccessListsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/access-lists/{access_list_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Access List details
+         * @description Get the details of an Access List.
+         */
+        get: operations["GetCharactersAccessListsDetail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -498,6 +538,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/characters/{character_id}/cosmetics/skinr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a character's owned SKINR licenses
+         * @description Listing of all SKINR licenses you own
+         */
+        get: operations["GetCharactersCosmeticsSkinr"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/cosmetics/skinr/components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a character's owned SKINR component licenses
+         * @description Listing of all SKINR component licenses you own
+         */
+        get: operations["GetCharactersCosmeticsSkinrComponents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/characters/{character_id}/cspa": {
         parameters: {
             query?: never;
@@ -594,6 +674,46 @@ export interface paths {
          * @description Return the fleet ID the character is in, if any.
          */
         get: operations["GetCharactersCharacterIdFleet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/freelance-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List character freelance jobs
+         * @description Listing of all freelance jobs you are actively participating in.
+         */
+        get: operations["GetCharactersFreelanceJobsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/freelance-jobs/{job_id}/participation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get character freelance job participation
+         * @description Show your participation in a freelance job.
+         */
+        get: operations["GetCharactersFreelanceJobsParticipation"];
         put?: never;
         post?: never;
         delete?: never;
@@ -860,6 +980,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/characters/{character_id}/mercenary-tactical-operations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Mercenary Tactical Operations
+         * @description Listing of all Mercenary Tactical Operations for the character.
+         */
+        get: operations["GetCharactersMercenaryTacticalOperationsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/mercenary-tactical-operations/{operation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Mercenary Tactical Operation details
+         * @description Get the details of a Mercenary Tactical Operation.
+         */
+        get: operations["GetCharactersMercenaryTacticalOperationsDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/military-campaigns/objectives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List character participation in military campaigns
+         * @description Listing of the military campaign objectives the character has participated in.
+         */
+        get: operations["GetCharactersMilitaryCampaignsObjectivesListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/military-campaigns/objectives/{objective_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get character military campaign objective participation
+         * @description Show your participation in a military campaign objective.
+         */
+        get: operations["GetCharactersMilitaryCampaignsObjectivesParticipation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/characters/{character_id}/mining": {
         parameters: {
             query?: never;
@@ -972,6 +1172,26 @@ export interface paths {
          * @description List cancelled and expired market orders placed by a character up to 90 days in the past.
          */
         get: operations["GetCharactersCharacterIdOrdersHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/paragon-hub/skinr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a character's Paragon Hub SKINR listings
+         * @description List the SKINR listings a character has posted on the Paragon Hub.
+         */
+        get: operations["GetCharactersParagonHubSkinr"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1161,6 +1381,46 @@ export interface paths {
          * @description Return character standings from agents, NPC corporations, and factions
          */
         get: operations["GetCharactersCharacterIdStandings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/structures/mercenary-dens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Mercenary Dens
+         * @description Listing of all Mercenary Dens.
+         */
+        get: operations["GetCharactersStructuresMercenaryDensListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/characters/{character_id}/structures/mercenary-dens/{mercenary_den_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Mercenary Den details
+         * @description Get the details of a Mercenary Den.
+         */
+        get: operations["GetCharactersStructuresMercenaryDensDetail"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1691,6 +1951,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/corporations/{corporation_id}/freelance-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List corporation freelance jobs
+         * @description Listing of all freelance jobs for your corporation.
+         */
+        get: operations["GetCorporationsFreelanceJobsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/freelance-jobs/{job_id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List participants of a freelance job
+         * @description Listing of all participants of a freelance job.
+         */
+        get: operations["GetCorporationsFreelanceJobsParticipants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/corporations/{corporation_id}/fw/stats": {
         parameters: {
             query?: never;
@@ -1933,6 +2233,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/corporations/{corporation_id}/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List corporation projects
+         * @description Listing of all (active) corporation projects.
+         */
+        get: operations["GetCorporationsProjectsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project details
+         * @description Get the details of a corporation project.
+         */
+        get: operations["GetCorporationsProjectsDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/projects/{project_id}/contribution/{character_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your project contribution
+         * @description Show your contribution to a corporation project.
+         */
+        get: operations["GetCorporationsProjectsContribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/projects/{project_id}/contributors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List project contributors
+         * @description Listing of all contributors to a corporation project.
+         */
+        get: operations["GetCorporationsProjectsContributors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/corporations/{corporation_id}/roles": {
         parameters: {
             query?: never;
@@ -2073,6 +2453,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/corporations/{corporation_id}/structures/skyhooks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Skyhooks
+         * @description Listing of all Skyhooks.
+         */
+        get: operations["GetCorporationsStructuresSkyhooksListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/structures/skyhooks/{skyhook_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Skyhook details
+         * @description Get the details of a Skyhook.
+         */
+        get: operations["GetCorporationsStructuresSkyhooksDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/structures/sovereignty-hubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Sovereignty Hubs
+         * @description Listing of all Sovereignty Hubs.
+         */
+        get: operations["GetCorporationsStructuresSovereigntyHubsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/corporations/{corporation_id}/structures/sovereignty-hubs/{sovereignty_hub_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Sovereignty Hub details
+         * @description Get the details of a Sovereignty Hub.
+         */
+        get: operations["GetCorporationsStructuresSovereigntyHubsDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/corporations/{corporation_id}/titles": {
         parameters: {
             query?: never;
@@ -2145,6 +2605,26 @@ export interface paths {
          * @description Get wallet transactions of a corporation
          */
         get: operations["GetCorporationsCorporationIdWalletsDivisionTransactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/cosmetics/skinr/{skinr_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get SKINR attributes
+         * @description All attributes of a SKINR license
+         */
+        get: operations["GetCosmeticsSkinr"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2421,6 +2901,52 @@ export interface paths {
          * @description Create a new squad in a fleet
          */
         post: operations["PostFleetsFleetIdWingsWingIdSquads"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freelance-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List freelance jobs
+         * @description Listing of all public freelance jobs.
+         */
+        get: operations["GetFreelanceJobsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/freelance-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get freelance job details
+         * @description Get the details of a freelance job.
+         *
+         *     Jobs without an ACL (public jobs) does not require authentication.
+         *
+         *     Jobs with an ACL requires authentication, and requires that the character is:
+         *     - An active participant of the job, or
+         *     - A freelance job manager for the corporation that owns the job.
+         */
+        get: operations["GetFreelanceJobsDetail"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2865,7 +3391,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/route/{origin}/{destination}": {
+    "/meta/name": {
         parameters: {
             query?: never;
             header?: never;
@@ -2873,10 +3399,230 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get route
-         * @description Get the systems between origin and destination
+         * Get the name of ESI
+         * @description Get the name ESI is currently going by, plus the full and glorious history of every name it has ever had. The three letters have never once meant the same thing twice.
          */
-        get: operations["GetRouteOriginDestination"];
+        get: operations["GetMetaName"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/meta/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get health status
+         * @description Get the health status of each API route.
+         */
+        get: operations["GetMetaStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/military-campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List military campaigns
+         * @description Listing of all active military campaigns.
+         */
+        get: operations["GetMilitaryCampaignsListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/military-campaigns/{campaign_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get military campaign details
+         * @description Get the details of a military campaign.
+         */
+        get: operations["GetMilitaryCampaignsDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/military-campaigns/{campaign_id}/objectives": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List military campaign objectives
+         * @description Listing of all active, completed or expired objectives of a military campaign.
+         */
+        get: operations["GetMilitaryCampaignsObjectivesListing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/military-campaigns/{campaign_id}/objectives/{objective_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get military campaign objective details
+         * @description Get the details of an objective of a military campaign.
+         */
+        get: operations["GetMilitaryCampaignsObjectivesDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paragon-hub/skinr": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List public Paragon Hub SKINR listings
+         * @description Browse the SKINR listings publicly available on the Paragon Hub.
+         */
+        get: operations["GetParagonHubSkinr"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paragon-hub/skinr/alliances/{alliance_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Paragon Hub SKINR listings targeted at an alliance
+         * @description Browse the SKINR listings on the Paragon Hub that are visible to the given alliance.
+         */
+        get: operations["GetParagonHubSkinrAlliances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paragon-hub/skinr/characters/{character_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Paragon Hub SKINR listings targeted at a character
+         * @description Browse the SKINR listings on the Paragon Hub that are visible to the given character.
+         */
+        get: operations["GetParagonHubSkinrCharacters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/paragon-hub/skinr/corporations/{corporation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Paragon Hub SKINR listings targeted at a corporation
+         * @description Browse the SKINR listings on the Paragon Hub that are visible to the given corporation.
+         */
+        get: operations["GetParagonHubSkinrCorporations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/route/{origin_system_id}/{destination_system_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Get route between two systems
+         * @description Calculate the systems between the given origin and destination.
+         */
+        post: operations["PostRoute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/skyhooks/raidable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List (upcoming) raidable Skyhooks
+         * @description Listing of all Skyhooks that currently or will shortly be raidable.
+         */
+        get: operations["GetSkyhooksRaidable"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2905,7 +3651,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sovereignty/map": {
+    "/sovereignty/systems": {
         parameters: {
             query?: never;
             header?: never;
@@ -2913,30 +3659,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List sovereignty of systems
-         * @description Shows sovereignty information for solar systems
+         * List sovereignty details for K-space systems
+         * @description Listing of sovereignty details for all K-space systems in New Eden.
          */
-        get: operations["GetSovereigntyMap"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sovereignty/structures": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List sovereignty structures
-         * @description Shows sovereignty data for structures.
-         */
-        get: operations["GetSovereigntyStructures"];
+        get: operations["GetSovereigntySystems"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3869,6 +4595,61 @@ export interface components {
          * @example 90000001
          */
         CharacterID: number;
+        CharactersAccessListsDetail: {
+            /** @description The Access List's description */
+            description: string;
+            /** @description The Access List's ID */
+            id: components["schemas"]["AccessListID"];
+            /** @description The Access List's membership */
+            membership: components["schemas"]["CharactersAccessListsDetailMembership"];
+            /** @description The Access List's name */
+            name: string;
+        };
+        CharactersAccessListsDetailAllianceentry: {
+            /**
+             * @description Alliance's access
+             * @enum {string}
+             */
+            access: "Unspecified" | "Allowed" | "Blocked" | "Manager" | "Admin";
+            /** @description Alliance's ID */
+            alliance_id: components["schemas"]["AllianceID"];
+        };
+        CharactersAccessListsDetailCharacterentry: {
+            /**
+             * @description Character's access
+             * @enum {string}
+             */
+            access: "Unspecified" | "Allowed" | "Blocked" | "Manager" | "Admin";
+            /** @description Character's ID */
+            character_id: components["schemas"]["CharacterID"];
+        };
+        CharactersAccessListsDetailCorporationentry: {
+            /**
+             * @description Corporation's access
+             * @enum {string}
+             */
+            access: "Unspecified" | "Allowed" | "Blocked" | "Manager" | "Admin";
+            /** @description Corporation's ID */
+            corporation_id: components["schemas"]["CorporationID"];
+        };
+        CharactersAccessListsDetailMembership: {
+            /** @description Alliances in the Access List */
+            alliances: components["schemas"]["CharactersAccessListsDetailAllianceentry"][];
+            /** @description Whether everyone is allowed unless blocked */
+            allow_everyone: boolean;
+            /** @description Characters in the Access List */
+            characters: components["schemas"]["CharactersAccessListsDetailCharacterentry"][];
+            /** @description Corporations in the Access List */
+            corporations: components["schemas"]["CharactersAccessListsDetailCorporationentry"][];
+        };
+        CharactersAccessListsListing: {
+            /** @description List of Access Lists */
+            access_lists: components["schemas"]["CharactersAccessListsListingAccesslist"][];
+        };
+        CharactersAccessListsListingAccesslist: {
+            /** @description Access List's ID */
+            id: components["schemas"]["AccessListID"];
+        };
         CharactersAffiliationPost: {
             /**
              * Format: int64
@@ -5007,7 +5788,57 @@ export interface components {
              */
             unit_price: number;
         }[];
+        CharactersCosmeticsSkinr: {
+            /** @description SKINR licenses the character owns */
+            licenses: components["schemas"]["CharactersCosmeticsSkinrItem"][];
+        };
+        CharactersCosmeticsSkinrComponents: {
+            /** @description SKINR component licenses the character owns */
+            licenses: components["schemas"]["CharactersCosmeticsSkinrComponentsItem"][];
+        };
+        CharactersCosmeticsSkinrComponentsItem: {
+            /**
+             * Format: int64
+             * @description ID of the component (see SDE for details)
+             * @example 67890
+             */
+            component_id: number;
+            /** @description Remaining uses of this license */
+            runs: {
+                /**
+                 * Format: int64
+                 * @description Runs remaining on license
+                 */
+                remaining?: number;
+            } | {
+                /** @description Whether the license has unlimited uses */
+                unlimited?: boolean;
+            };
+            /**
+             * @description Kind of component
+             * @enum {string}
+             */
+            type: "nanocoating" | "pattern";
+        };
+        CharactersCosmeticsSkinrItem: {
+            /** @description Whether this SKINR is activated */
+            activated: boolean;
+            /** @description SKINR identifier */
+            skinr_id: string;
+            /**
+             * Format: int64
+             * @description Number of unactivated copies of this SKINR
+             * @example 3
+             */
+            unactivated: number;
+        };
         CharactersDetail: {
+            /**
+             * Format: int64
+             * @description Character's achievement score
+             * @example 1234
+             */
+            achievement_score: number;
             /** @description Character's alliance ID */
             alliance_id?: components["schemas"]["AllianceID"];
             /**
@@ -5017,8 +5848,12 @@ export interface components {
             birthday: string;
             /** @description Character's bloodline ID */
             bloodline_id: components["schemas"]["BloodlineID"];
+            /** @description Character's equipped cosmetic title ID */
+            character_title_id?: components["schemas"]["UUID"];
             /** @description Character's corporation ID */
             corporation_id: components["schemas"]["CorporationID"];
+            /** @description Character's corporation title */
+            corporation_title?: string;
             /** @description Character's description (biography) */
             description?: string;
             /** @description Character's faction ID */
@@ -5038,8 +5873,30 @@ export interface components {
              * @example 5
              */
             security_status?: number;
-            /** @description Character's corporation title */
-            title?: string;
+        };
+        CharactersFreelanceJobsListing: {
+            /** @description List of freelance jobs */
+            freelance_jobs: components["schemas"]["FreelanceJobsDetailFreelancejob"][];
+        };
+        CharactersFreelanceJobsParticipation: {
+            /**
+             * Format: int64
+             * @description Your contribution
+             * @example 100
+             */
+            contributed: number;
+            /**
+             * Format: date-time
+             * @description Moment this information was last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+            /**
+             * @description Your participation status
+             * @example Committed
+             * @enum {string}
+             */
+            state: "Unspecified" | "Committed" | "Kicked" | "Resigned";
         };
         CharactersLocation: {
             /** @description Solar system the character is in */
@@ -5048,6 +5905,86 @@ export interface components {
             station_id?: components["schemas"]["StationID"];
             /** @description Structure the character is docked in */
             structure_id?: components["schemas"]["ItemID"];
+        };
+        CharactersMercenaryTacticalOperationsDetail: {
+            /** @description Operation's dungeon type ID */
+            dungeon_type_id: components["schemas"]["DungeonID"];
+            /**
+             * Format: date-time
+             * @description Moment the operation will expire
+             * @example 2026-02-23T12:00:00Z
+             */
+            expires: string;
+            /** @description Operation's ID */
+            id: components["schemas"]["UUID"];
+            /** @description ID of Mercenary Den offering this operation */
+            mercenary_den_id: components["schemas"]["ItemID"];
+            /**
+             * @description Operation's state
+             * @enum {string}
+             */
+            state: "Unspecified" | "Available" | "Started" | "Completed" | "Expired" | "Removed";
+        };
+        CharactersMercenaryTacticalOperationsListing: {
+            /** @description List of available operations */
+            operations: components["schemas"]["CharactersMercenaryTacticalOperationsListingOperation"][];
+        };
+        CharactersMercenaryTacticalOperationsListingOperation: {
+            /** @description Operation's ID */
+            id: components["schemas"]["UUID"];
+            /** @description ID of Mercenary Den offering this operation */
+            mercenary_den_id: components["schemas"]["ItemID"];
+        };
+        CharactersMilitaryCampaignsObjectivesListing: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of military campaign objectives */
+            objectives: components["schemas"]["CharactersMilitaryCampaignsObjectivesParticipationCharacterobjective"][];
+        };
+        CharactersMilitaryCampaignsObjectivesParticipation: {
+            /** @description Campaign's ID */
+            campaign_id: components["schemas"]["UUID"];
+            /**
+             * Format: int64
+             * @description The character's cumulative contribution
+             * @example 10
+             */
+            contributed: number;
+            /** @description Objective's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * @description Whether the character is currently committed to the objective
+             * @example true
+             */
+            is_committed: boolean;
+            /**
+             * Format: date-time
+             * @description Moment this information was last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+        };
+        CharactersMilitaryCampaignsObjectivesParticipationCharacterobjective: {
+            /** @description Campaign's ID */
+            campaign_id: components["schemas"]["UUID"];
+            /**
+             * Format: int64
+             * @description The character's cumulative contribution
+             * @example 10
+             */
+            contributed: number;
+            /** @description Objective's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * @description Whether the character is currently committed to the objective
+             * @example true
+             */
+            is_committed: boolean;
+            /**
+             * Format: date-time
+             * @description Moment this information was last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
         };
         CharactersOnline: {
             /**
@@ -5070,6 +6007,73 @@ export interface components {
             logins?: number;
             /** @description Whether the character is online */
             online: boolean;
+        };
+        CharactersParagonHubSkinr: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description Page of SKINR listings the character has posted */
+            listings: components["schemas"]["CharactersParagonHubSkinrItem"][];
+        };
+        CharactersParagonHubSkinrItem: {
+            /**
+             * Format: date-time
+             * @description When the listing was created
+             */
+            created: string;
+            /**
+             * Format: date-time
+             * @description When the listing expires
+             */
+            expires: string;
+            /** @description Unique identifier of the listing */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description When this listing was last retrieved from the game
+             */
+            last_modified: string;
+            /** @description Asking price of the listing */
+            price: {
+                /**
+                 * Format: double
+                 * @description Price in ISK
+                 */
+                isk?: number;
+            } | {
+                /**
+                 * Format: int64
+                 * @description Price in PLEX
+                 */
+                plex?: number;
+            };
+            /**
+             * Format: int64
+             * @description How many licenses remain in this listing
+             * @example 3
+             */
+            quantity: number;
+            /** @description Character that posted the listing */
+            seller_id: components["schemas"]["CharacterID"];
+            /** @description SKINR license identifier */
+            skinr_id: string;
+            /**
+             * @description Lifecycle state of the listing
+             * @enum {string}
+             */
+            state: "listed" | "sold_out" | "expired" | "removed";
+            /** @description Who the listing is visible to */
+            target: {
+                /** @description Character the listing is visible to */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation the listing is visible to */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance the listing is visible to */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Whether the listing is visible to everyone */
+                public?: boolean;
+            };
         };
         CharactersShip: {
             /** @description Unique identifier for this ship */
@@ -5153,6 +6157,90 @@ export interface components {
              * @description The trained skill level
              */
             trained_skill_level: number;
+        };
+        CharactersStructuresMercenaryDensDetail: {
+            /** @description Mercenary Den's evolution */
+            evolution: components["schemas"]["CharactersStructuresMercenaryDensDetailEvolution"];
+            /** @description Mercenary Den's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description Mercenary Den's infomorphs */
+            infomorphs: components["schemas"]["CharactersStructuresMercenaryDensDetailInfomorphs"];
+            /** @description Mercenary Den's reinforcement timer (if the structure is reinforced) */
+            reinforcement_timer?: components["schemas"]["CharactersStructuresMercenaryDensDetailReinforcementtimer"];
+            /** @description Skyhook the Mercenary Den is attached to */
+            skyhook: components["schemas"]["CharactersStructuresMercenaryDensDetailSkyhook"];
+            /**
+             * @description Mercenary Den's state
+             * @enum {string}
+             */
+            state: "Unspecified" | "Running" | "Paused" | "Disabled";
+            /** @description Mercenary Den's type ID */
+            type_id: components["schemas"]["TypeID"];
+        };
+        CharactersStructuresMercenaryDensDetailEvolution: {
+            /** @description Mercenary Den's anarchy */
+            anarchy: components["schemas"]["CharactersStructuresMercenaryDensDetailEvolutionanarchy"];
+            /** @description Mercenary Den's development */
+            development: components["schemas"]["CharactersStructuresMercenaryDensDetailEvolutiondevelopment"];
+        };
+        CharactersStructuresMercenaryDensDetailEvolutionanarchy: {
+            /**
+             * Format: int64
+             * @description Anarchy's cumulative amount (0-100)
+             * @example 0
+             */
+            amount: number;
+            /**
+             * @description Anarchy's level
+             * @enum {string}
+             */
+            level: "Unspecified" | "Level0" | "Level1" | "Level2" | "Level3" | "Level4";
+        };
+        CharactersStructuresMercenaryDensDetailEvolutiondevelopment: {
+            /**
+             * Format: int64
+             * @description Development's cumulative amount (0-100)
+             * @example 50
+             */
+            amount: number;
+            /**
+             * @description Development's level
+             * @enum {string}
+             */
+            level: "Unspecified" | "Level0" | "Level1" | "Level2" | "Level3" | "Level4";
+        };
+        CharactersStructuresMercenaryDensDetailInfomorphs: {
+            /**
+             * Format: int64
+             * @description Amount of infomorphs
+             * @example 100
+             */
+            amount: number;
+        };
+        CharactersStructuresMercenaryDensDetailReinforcementtimer: {
+            /**
+             * Format: date-time
+             * @description The time when the reinforcement timer will end
+             */
+            end: string;
+        };
+        CharactersStructuresMercenaryDensDetailSkyhook: {
+            /** @description Corporation that owns the Skyhook */
+            corporation_id: components["schemas"]["CorporationID"];
+            /** @description Skyhook's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description ID of the planet the Skyhook is anchored on */
+            planet_id: components["schemas"]["PlanetID"];
+        };
+        CharactersStructuresMercenaryDensListing: {
+            /** @description List of Mercenary Dens */
+            mercenary_dens: components["schemas"]["CharactersStructuresMercenaryDensListingMercenaryden"][];
+        };
+        CharactersStructuresMercenaryDensListingMercenaryden: {
+            /** @description Mercenary Den's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description ID of the planet the Skyhook (to which the Mercenary Den is attached) is anchored on */
+            planet_id: components["schemas"]["PlanetID"];
         };
         /**
          * Format: date
@@ -6433,23 +7521,28 @@ export interface components {
             division: number;
         }[];
         CorporationsDetail: {
-            /** @description Corporation's alliance ID */
+            /** @description Alliance the corporation is a member of (Player-owned corporation only) */
             alliance_id?: components["schemas"]["AllianceID"];
             /** @description Corporation's CEO ID */
-            ceo_id: components["schemas"]["CharacterID"];
+            ceo_id?: components["schemas"]["CharacterID"];
             /** @description Corporation's creator ID */
-            creator_id: components["schemas"]["CharacterID"];
+            creator_id?: components["schemas"]["CharacterID"];
             /**
              * Format: date-time
              * @description Corporation's founding date
              */
             date_founded?: string;
             /** @description Corporation's description */
-            description?: string;
-            /** @description Corporation's faction ID */
-            faction_id?: components["schemas"]["FactionID"];
+            description: string;
+            /** @description Faction the corporation is enlisted in (Player-owned corporation only) */
+            enlisted_faction_id?: components["schemas"]["FactionID"];
+            /**
+             * @description Corporation's friendly fire status
+             * @enum {string}
+             */
+            friendly_fire: "legal" | "illegal";
             /** @description Corporation's home station ID */
-            home_station_id?: components["schemas"]["StationID"];
+            home_station_id: components["schemas"]["StationID"];
             /**
              * Format: int64
              * @description Corporation's member count
@@ -6458,26 +7551,1122 @@ export interface components {
             member_count: number;
             /** @description Corporation's name */
             name: string;
+            /** @description Corporation's palette colors (Player-owned corporation only) */
+            palette?: components["schemas"]["CorporationsDetailPalette"];
             /**
              * Format: int64
              * @description Corporation's shares
              * @example 1000
              */
-            shares?: number;
+            shares: number;
             /**
-             * Format: double
-             * @description Corporation's tax rate (between 0.000 and 1.000)
-             * @example 0.123
+             * @description Corporation's state
+             * @enum {string}
              */
-            tax_rate: number;
+            state: "active" | "closed";
+            /** @description Corporation's tax rates */
+            tax_rates: components["schemas"]["CorporationsDetailTaxrates"];
             /** @description Corporation's short name */
             ticker: string;
+            /**
+             * @description Corporation's type
+             * @enum {string}
+             */
+            type: "player_owned" | "npc_owned";
             /** @description Corporation's URL */
             url?: string;
             /** @description Corporation's war eligible */
-            war_eligible?: boolean;
+            war_eligible: boolean;
+        };
+        CorporationsDetailPalette: {
+            /** @description Main palette color (#rrggbb) */
+            main_color: string;
+            /** @description Secondary palette color (#rrggbb) */
+            secondary_color?: string;
+            /** @description Tertiary palette color (#rrggbb) */
+            tertiary_color?: string;
+        };
+        CorporationsDetailTaxrates: {
+            /**
+             * Format: double
+             * @description ISK tax rate (0.0% - 100.0%)
+             * @example 10
+             */
+            isk: number;
+            /**
+             * Format: double
+             * @description Loyalty point tax rate (0.0% - 100.0%)
+             * @example 5.6
+             */
+            loyalty_point: number;
+        };
+        CorporationsFreelanceJobsListing: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of freelance jobs */
+            freelance_jobs: components["schemas"]["FreelanceJobsDetailFreelancejob"][];
+        };
+        CorporationsFreelanceJobsParticipants: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of participants */
+            participants: components["schemas"]["CorporationsFreelanceJobsParticipantsParticipant"][];
+        };
+        CorporationsFreelanceJobsParticipantsParticipant: {
+            /**
+             * Format: int64
+             * @description Participant's contributed progress
+             * @example 100
+             */
+            contributed: number;
+            /** @description Participant's character ID */
+            id: components["schemas"]["CharacterID"];
+            /**
+             * @description Participant's name
+             * @example Participant Name
+             */
+            name: string;
+            /**
+             * @description Participant's state
+             * @example Committed
+             * @enum {string}
+             */
+            state: "Unspecified" | "Committed" | "Kicked" | "Resigned";
         };
         CorporationsNpccorpsGet: number[];
+        CorporationsProjectsContribution: {
+            /**
+             * Format: int64
+             * @description Your contribution
+             * @example 10
+             */
+            contributed: number;
+            /**
+             * Format: date-time
+             * @description Moment this information was last modified
+             * @example 2025-08-26T00:00:00Z
+             */
+            last_modified?: string;
+        };
+        CorporationsProjectsContributors: {
+            /** @description List of contributors */
+            contributors: components["schemas"]["CorporationsProjectsContributorsContributor"][];
+            cursor?: components["schemas"]["Cursor"];
+        };
+        CorporationsProjectsContributorsContributor: {
+            /**
+             * Format: int64
+             * @description Contributor's contributed progress
+             * @example 10
+             */
+            contributed: number;
+            /** @description Contributor's character ID */
+            id: components["schemas"]["CharacterID"];
+            /**
+             * @description Contributor's name
+             * @example Contributor Name
+             */
+            name: string;
+        };
+        CorporationsProjectsDetail: {
+            /** @description Project's configuration */
+            configuration: {
+                /** @description Capture factional warfare complex */
+                capture_fw_complex?: components["schemas"]["CorporationsProjectsDetailConfigurationcapturefwcomplex"];
+            } | {
+                /** @description Damage ship */
+                damage_ship?: components["schemas"]["CorporationsProjectsDetailConfigurationdamageship"];
+            } | {
+                /** @description Defend factional warfare complex */
+                defend_fw_complex?: components["schemas"]["CorporationsProjectsDetailConfigurationdefendfwcomplex"];
+            } | {
+                /** @description Deliver item */
+                deliver_item?: components["schemas"]["CorporationsProjectsDetailConfigurationdeliveritem"];
+            } | {
+                /** @description Destroy NPC */
+                destroy_npc?: components["schemas"]["CorporationsProjectsDetailConfigurationdestroynpc"];
+            } | {
+                /** @description Destroy ship */
+                destroy_ship?: components["schemas"]["CorporationsProjectsDetailConfigurationdestroyship"];
+            } | {
+                /** @description Earn loyalty point */
+                earn_loyalty_point?: components["schemas"]["CorporationsProjectsDetailConfigurationearnloyaltypoints"];
+            } | {
+                /** @description Lost ship */
+                lost_ship?: components["schemas"]["CorporationsProjectsDetailConfigurationlostship"];
+            } | {
+                /** @description Manual contribution */
+                manual?: components["schemas"]["CorporationsProjectsDetailConfigurationmanual"];
+            } | {
+                /** @description Manufacture item */
+                manufacture_item?: components["schemas"]["CorporationsProjectsDetailConfigurationmanufactureitem"];
+            } | {
+                /** @description Mine material */
+                mine_material?: components["schemas"]["CorporationsProjectsDetailConfigurationminematerial"];
+            } | {
+                /** @description Remote boost shield */
+                remote_boost_shield?: components["schemas"]["CorporationsProjectsDetailConfigurationremoteboostshield"];
+            } | {
+                /** @description Remote repair armor */
+                remote_repair_armor?: components["schemas"]["CorporationsProjectsDetailConfigurationremoterepairarmor"];
+            } | {
+                /** @description Salvage wreck */
+                salvage_wreck?: components["schemas"]["CorporationsProjectsDetailConfigurationsalvagewreck"];
+            } | {
+                /** @description Scan signature */
+                scan_signature?: components["schemas"]["CorporationsProjectsDetailConfigurationscansignature"];
+            } | {
+                /** @description Ship insurance */
+                ship_insurance?: components["schemas"]["CorporationsProjectsDetailConfigurationshipinsurance"];
+            } | {
+                /** @description Unknown */
+                unknown?: components["schemas"]["CorporationsProjectsDetailConfigurationunknown"];
+            };
+            /** @description Project's contribution settings */
+            contribution?: components["schemas"]["CorporationsProjectsDetailContribution"];
+            /** @description Project's creator */
+            creator: components["schemas"]["CorporationsProjectsDetailCreator"];
+            /** @description Project's details */
+            details: components["schemas"]["CorporationsProjectsDetailDetails"];
+            /** @description Project's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Moment this project was last modified. Project contributions also count as a modification
+             * @example 2025-06-01T00:00:00Z
+             */
+            last_modified: string;
+            /**
+             * @description Project's name
+             * @example Project Name
+             */
+            name: string;
+            /** @description Project's progress */
+            progress: components["schemas"]["CorporationsProjectsDetailProgress"];
+            /** @description Project's reward */
+            reward?: components["schemas"]["CorporationsProjectsDetailReward"];
+            /**
+             * @description Project's current state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Closed" | "Completed" | "Expired" | "Deleted";
+        };
+        CorporationsProjectsDetailConfigurationcapturefwcomplex: {
+            /** @description Archetype of complex */
+            archetypes?: components["schemas"]["CorporationsProjectsDetailConfigurationmatcherarchetype"][];
+            /** @description Faction to capture for */
+            factions?: components["schemas"]["CorporationsProjectsDetailConfigurationmatcherfaction"][];
+            /** @description Location of complex */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationdamageship: {
+            /** @description Identity of capsuleer */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of capsuleer's ship */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Ship-type of capsuleer's ship */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationdefendfwcomplex: {
+            /** @description Archetype of complex */
+            archetypes?: components["schemas"]["CorporationsProjectsDetailConfigurationmatcherarchetype"][];
+            /** @description Faction to defend for */
+            factions?: components["schemas"]["CorporationsProjectsDetailConfigurationmatcherfaction"][];
+            /** @description Location of complex */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationdeliveritem: {
+            /** @description Docking location to deliver to */
+            docking_locations?: ({
+                /** @description Structure's ID */
+                structure_id?: components["schemas"]["ItemID"];
+            } | {
+                /** @description Station's ID */
+                station_id?: components["schemas"]["StationID"];
+            })[];
+            /** @description Item to deliver */
+            items?: ({
+                /** @description Item's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Item's group ID */
+                group_id?: components["schemas"]["GroupID"];
+            })[];
+            /** @description Office to deliver to */
+            office_id?: components["schemas"]["ItemID"];
+        };
+        CorporationsProjectsDetailConfigurationdestroynpc: {
+            /** @description Location of non-capsuleer */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationdestroyship: {
+            /** @description Identity of capsuleer */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of capsuleer's ship */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Ship-type of capsuleer's ship */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationearnloyaltypoints: {
+            /** @description Corporation issuing loyalty points */
+            corporations?: components["schemas"]["CorporationsProjectsDetailConfigurationmatchercorporation"][];
+        };
+        CorporationsProjectsDetailConfigurationlostship: {
+            /** @description Identity of killer */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of lost ship */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Ship-type of lost ship */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationmanual: Record<string, never>;
+        CorporationsProjectsDetailConfigurationmanufactureitem: {
+            /** @description Station / structure to manufacture in */
+            docking_locations?: ({
+                /** @description Structure's ID */
+                structure_id?: components["schemas"]["ItemID"];
+            } | {
+                /** @description Station's ID */
+                station_id?: components["schemas"]["StationID"];
+            })[];
+            /** @description Item to manufacture */
+            items?: ({
+                /** @description Item's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Item's group ID */
+                group_id?: components["schemas"]["GroupID"];
+            })[];
+            /**
+             * @description Manufacture for
+             * @enum {string}
+             */
+            owner: "Any" | "Corporation" | "Character";
+        };
+        CorporationsProjectsDetailConfigurationmatcherarchetype: {
+            /** @description Archetype's ID */
+            archetype_id?: components["schemas"]["ArchetypeID"];
+        };
+        CorporationsProjectsDetailConfigurationmatchercorporation: {
+            /** @description Corporation's ID */
+            corporation_id?: components["schemas"]["CorporationID"];
+        };
+        CorporationsProjectsDetailConfigurationmatcherfaction: {
+            /** @description Faction's ID */
+            faction_id?: components["schemas"]["FactionID"];
+        };
+        CorporationsProjectsDetailConfigurationmatchersignature: {
+            /** @description Signature type's ID */
+            signature_type_id?: components["schemas"]["AttributeID"];
+        };
+        CorporationsProjectsDetailConfigurationminematerial: {
+            /** @description Location to mine */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Materials to mine */
+            materials?: ({
+                /** @description Ore's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ore's group ID */
+                group_id?: components["schemas"]["GroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationremoteboostshield: {
+            /** @description Identity of capsuleer to boost */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of capsuleer's ship to boost */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Ship-type of capsuleer's ship to boost */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationremoterepairarmor: {
+            /** @description Identity of capsuleer to repair */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of capsuleer's ship to repair */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Ship-type of capsuleer's ship to repair */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationsalvagewreck: {
+            /** @description Location of wreck */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationscansignature: {
+            /** @description Locations of signatures */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Signatures to scan */
+            signatures?: components["schemas"]["CorporationsProjectsDetailConfigurationmatchersignature"][];
+        };
+        CorporationsProjectsDetailConfigurationshipinsurance: {
+            /**
+             * @description Conflict type
+             * @enum {string}
+             */
+            conflict_type: "Any" | "Pvp" | "Pve";
+            /** @description Identity of killer */
+            identities?: ({
+                /** @description Character's ID */
+                character_id?: components["schemas"]["CharacterID"];
+            } | {
+                /** @description Corporation's ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            } | {
+                /** @description Alliance's ID */
+                alliance_id?: components["schemas"]["AllianceID"];
+            } | {
+                /** @description Faction's ID */
+                faction_id?: components["schemas"]["FactionID"];
+            })[];
+            /** @description Location of lost ship */
+            locations?: ({
+                /** @description Solar system's ID */
+                solar_system_id?: components["schemas"]["SolarSystemID"];
+            } | {
+                /** @description Constellation's ID */
+                constellation_id?: components["schemas"]["ConstellationID"];
+            } | {
+                /** @description Region's ID */
+                region_id?: components["schemas"]["RegionID"];
+            })[];
+            /** @description Reimburse implants */
+            reimburse_implants: boolean;
+            /** @description Ship-type of lost ship */
+            ships?: ({
+                /** @description Ship's type ID */
+                type_id?: components["schemas"]["TypeID"];
+            } | {
+                /** @description Ship's ship tree group ID */
+                group_id?: components["schemas"]["ShipTreeGroupID"];
+            })[];
+        };
+        CorporationsProjectsDetailConfigurationunknown: {
+            /**
+             * @description JSON-encoded configuration
+             * @example {}
+             */
+            data: unknown;
+            /**
+             * @description Configuration type
+             * @example projectType
+             */
+            type: string;
+        };
+        CorporationsProjectsDetailContribution: {
+            /**
+             * Format: int64
+             * @description Limit on the contribution of the individual participant
+             * @example 1000
+             */
+            participation_limit?: number;
+            /**
+             * Format: double
+             * @description ISK reward per contribution
+             * @example 123.5
+             */
+            reward_per_contribution?: number;
+            /**
+             * Format: int64
+             * @description Limit on amount of contribution per submission
+             * @example 100
+             */
+            submission_limit?: number;
+            /**
+             * Format: double
+             * @description Multiplier towards progress per contribution
+             * @example 1.5
+             */
+            submission_multiplier?: number;
+        };
+        CorporationsProjectsDetailCreator: {
+            /** @description Creator's character ID */
+            id: components["schemas"]["CharacterID"];
+            /**
+             * @description Creator's name
+             * @example Creator Name
+             */
+            name: string;
+        };
+        CorporationsProjectsDetailDetails: {
+            /**
+             * @description Assigned career path
+             * @example Explorer
+             * @enum {string}
+             */
+            career: "Unspecified" | "Explorer" | "Industrialist" | "Enforcer" | "Soldier of Fortune";
+            /**
+             * Format: date-time
+             * @description Moment this project was created
+             * @example 2025-06-01T00:00:00Z
+             */
+            created: string;
+            /**
+             * @description Description
+             * @example Project Description
+             */
+            description: string;
+            /**
+             * Format: date-time
+             * @description Moment this project expires
+             * @example 2025-06-01T00:01:00Z
+             */
+            expires?: string;
+            /**
+             * Format: date-time
+             * @description Moment this project transitioned to a non-active state.
+             * @example 2025-06-01T00:00:00Z
+             */
+            finished?: string;
+        };
+        CorporationsProjectsDetailProgress: {
+            /**
+             * Format: int64
+             * @description Current progress
+             * @example 50
+             */
+            current: number;
+            /**
+             * Format: int64
+             * @description Desired progress
+             * @example 100
+             */
+            desired: number;
+        };
+        CorporationsProjectsDetailProject: {
+            /** @description Project's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Moment this project was last modified. Project contributions also count as a modification
+             * @example 2025-06-01T00:00:00Z
+             */
+            last_modified: string;
+            /**
+             * @description Project's name
+             * @example Project Name
+             */
+            name: string;
+            /** @description Project's progress */
+            progress: components["schemas"]["CorporationsProjectsDetailProgress"];
+            /** @description Project's reward */
+            reward?: components["schemas"]["CorporationsProjectsDetailReward"];
+            /**
+             * @description Project's current state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Closed" | "Completed" | "Expired" | "Deleted";
+        };
+        CorporationsProjectsDetailReward: {
+            /**
+             * Format: double
+             * @description Original amount of ISK that was reserved for this project
+             * @example 12345.5
+             */
+            initial: number;
+            /**
+             * Format: double
+             * @description Remaining ISK to be awarded
+             * @example 5432.1
+             */
+            remaining: number;
+        };
+        CorporationsProjectsListing: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of projects */
+            projects: components["schemas"]["CorporationsProjectsDetailProject"][];
+        };
+        CorporationsStructuresSkyhooksDetail: {
+            /**
+             * Format: int64
+             * @description Skyhook's effective workforce; this can differ from the Skyhook's normal workforce due to the influence of an attached Mercenary Den
+             * @example 1000
+             */
+            effective_workforce?: number;
+            /** @description Skyhook's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description Whether the Skyhook is active and producing workforce/power/reagents */
+            is_active: boolean;
+            /** @description ID of the planet the Skyhook is anchored on */
+            planet_id: components["schemas"]["PlanetID"];
+            /** @description Skyhook's reagents */
+            reagents?: components["schemas"]["CorporationsStructuresSkyhooksDetailReagent"][];
+            /** @description Skyhook's reinforcement timer (if the structure is reinforced) */
+            reinforcement_timer?: components["schemas"]["CorporationsStructuresSkyhooksDetailReinforcementtimer"];
+            /**
+             * @description Skyhook's state
+             * @enum {string}
+             */
+            state: "Unspecified" | "ShieldVulnerable" | "ArmorReinforced" | "ArmorVulnerable" | "HullReinforced" | "HullVulnerable";
+            /** @description Skyhook's theft vulnerability */
+            theft_vulnerability?: components["schemas"]["CorporationsStructuresSkyhooksDetailTheftvulnerability"];
+        };
+        CorporationsStructuresSkyhooksDetailReagent: {
+            /**
+             * Format: date-time
+             * @description Moment the 'SecureStock'/'UnsecuredStock' value had its last cycle; use SDE to calculate the current values
+             * @example 2026-02-23T12:00:00Z
+             */
+            last_cycle: string;
+            /**
+             * Format: int64
+             * @description Secured stock of the reagent at the time of 'last_cycle'
+             * @example 1000
+             */
+            secured_stock: number;
+            /** @description Reagent's type ID */
+            type_id: components["schemas"]["TypeID"];
+            /**
+             * Format: int64
+             * @description Unsecured stock of the reagent at the time of 'last_cycle'
+             * @example 300
+             */
+            unsecured_stock: number;
+        };
+        CorporationsStructuresSkyhooksDetailReinforcementtimer: {
+            /**
+             * Format: date-time
+             * @description The time when the reinforcement timer will end
+             * @example 2026-02-23T16:00:00Z
+             */
+            end: string;
+        };
+        CorporationsStructuresSkyhooksDetailTheftvulnerability: {
+            /**
+             * Format: date-time
+             * @description End time of the theft vulnerability window
+             * @example 2026-02-23T16:00:00Z
+             */
+            end: string;
+            /**
+             * Format: date-time
+             * @description Start time of the theft vulnerability window
+             * @example 2026-02-23T12:00:00Z
+             */
+            start: string;
+        };
+        CorporationsStructuresSkyhooksListing: {
+            /** @description List of Skyhooks */
+            skyhooks: components["schemas"]["CorporationsStructuresSkyhooksListingSkyhook"][];
+        };
+        CorporationsStructuresSkyhooksListingSkyhook: {
+            /** @description Skyhook's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description ID of the planet the Skyhook is anchored on */
+            planet_id: components["schemas"]["PlanetID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetail: {
+            /** @description Access List with who can manage Sovereignty Hub's fuel */
+            fuel_access_list_id?: components["schemas"]["AccessListID"];
+            /** @description Sovereignty Hub's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description Sovereignty Hub's reagent bay */
+            reagent_bay: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailReagentbay"];
+            /** @description Sovereignty Hub's resources */
+            resources: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailResources"];
+            /** @description Sovereignty Hub's solar system ID */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+            /** @description Sovereignty Hub's installed upgrades */
+            upgrades: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailUpgrade"][];
+            /** @description Sovereignty Hub's vulnerability window; if omitted, this Sovereignty Hub is part of an active campaign */
+            vulnerability_window?: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailVulnerabilitywindow"];
+            /** @description Sovereignty Hub's workforce transport settings */
+            workforce_transport: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransport"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailReagent: {
+            /**
+             * Format: int64
+             * @description Amount of reagent in the bay at the time of 'last_updated'
+             * @example 1000
+             */
+            amount: number;
+            /**
+             * Format: int64
+             * @description Amount of reagent burning per hour
+             * @example 10
+             */
+            burning_per_hour: number;
+            /** @description Reagent's type ID */
+            type_id: components["schemas"]["TypeID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailReagentbay: {
+            /**
+             * Format: date-time
+             * @description Moment the 'amount' value was last updated; use 'burning_per_hour' to calculate the current value
+             * @example 2026-02-23T12:00:00Z
+             */
+            last_updated: string;
+            /** @description Sovereignty Hub's reagents */
+            reagents: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailReagent"][];
+        };
+        CorporationsStructuresSovereigntyHubsDetailResourcepower: {
+            /**
+             * Format: int64
+             * @description Allocated power
+             * @example 100
+             */
+            allocated: number;
+            /**
+             * Format: int64
+             * @description Available power
+             * @example 1000
+             */
+            available: number;
+        };
+        CorporationsStructuresSovereigntyHubsDetailResources: {
+            /** @description Sovereignty Hub's power */
+            power: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailResourcepower"];
+            /** @description Sovereignty Hub's workforce */
+            workforce: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailResourceworkforce"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailResourceworkforce: {
+            /**
+             * Format: int64
+             * @description Allocated workforce
+             * @example 100
+             */
+            allocated: number;
+            /**
+             * Format: int64
+             * @description Available workforce
+             * @example 1000
+             */
+            available: number;
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransport: {
+            /** @description Configured workforce transport */
+            configuration: {
+                /** @description Workforce is requested to be imported */
+                import?: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportconfigurationimport"];
+            } | {
+                /** @description Workforce is requested to be exported */
+                export?: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportconfigurationexport"];
+            } | {
+                /** @description Workforce is requested to be brought to transit */
+                transit?: boolean | null;
+            };
+            /** @description Current state of the workforce transport */
+            state: {
+                /** @description Workforce is being imported */
+                import?: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportstateimport"];
+            } | {
+                /** @description Workforce is being exported */
+                export?: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportstateexport"];
+            } | {
+                /** @description Workforce is being brought to transit */
+                transit?: boolean | null;
+            };
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportconfigurationexport: {
+            /**
+             * Format: int64
+             * @description Amount to be exported
+             * @example 1000
+             */
+            amount: number;
+            /** @description Destination's solar system ID */
+            solar_system_id?: components["schemas"]["SolarSystemID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportconfigurationimport: {
+            /** @description Sources */
+            sources: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportconfigurationsource"][];
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportconfigurationsource: {
+            /** @description Source's solar system ID */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportstateexport: {
+            /**
+             * Format: int64
+             * @description Amount exported
+             * @example 1000
+             */
+            amount?: number;
+            /** @description Destination's solar system ID */
+            solar_system_id?: components["schemas"]["SolarSystemID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportstateimport: {
+            /** @description Sources */
+            sources: components["schemas"]["CorporationsStructuresSovereigntyHubsDetailTransportstateimportsource"][];
+        };
+        CorporationsStructuresSovereigntyHubsDetailTransportstateimportsource: {
+            /**
+             * Format: int64
+             * @description Amount imported
+             * @example 1000
+             */
+            amount: number;
+            /** @description Source's solar system ID */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailUpgrade: {
+            /**
+             * @description Upgrade's power state
+             * @enum {string}
+             */
+            power_state: "Unspecified" | "Online" | "Offline" | "Low" | "Pending";
+            /** @description Upgrade's type ID */
+            type_id: components["schemas"]["TypeID"];
+        };
+        CorporationsStructuresSovereigntyHubsDetailVulnerabilitywindow: {
+            /**
+             * Format: date-time
+             * @description End time of the vulnerability window; if in the past, the Sovereignty Hub is in overtime
+             * @example 2026-02-23T16:00:00Z
+             */
+            end: string;
+            /**
+             * Format: date-time
+             * @description Start time of the vulnerability window; if in the past, the Sovereignty Hub is vulnerable right now
+             * @example 2026-02-23T12:00:00Z
+             */
+            start: string;
+        };
+        CorporationsStructuresSovereigntyHubsListing: {
+            /** @description List of Sovereignty Hubs */
+            sovereignty_hubs: components["schemas"]["CorporationsStructuresSovereigntyHubsListingSovereigntyhub"][];
+        };
+        CorporationsStructuresSovereigntyHubsListingSovereigntyhub: {
+            /** @description Sovereignty Hub's ID */
+            id: components["schemas"]["ItemID"];
+            /** @description Sovereignty Hub's location */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+        };
+        CosmeticsSkinr: {
+            /** @description SKINR creator character ID */
+            creator_id: components["schemas"]["CharacterID"];
+            /** @description SKINR ID */
+            id: string;
+            /** @description SKINR layout */
+            layout: components["schemas"]["CosmeticsSkinrLayout"];
+            /** @description SKINR line name */
+            line?: string;
+            /** @description SKINR name */
+            name: string;
+            /**
+             * @description ID of the ship hull
+             * @example 587
+             */
+            ship_type_id: components["schemas"]["TypeID"];
+            /** @description SKINR tier */
+            tier: components["schemas"]["CosmeticsSkinrTier"];
+        };
+        CosmeticsSkinrLayout: {
+            /**
+             * @description Blend mode to use when compositing patterns
+             * @enum {string}
+             */
+            pattern_blend_mode: "normal" | "subtract" | "exclusion" | "nested" | "nested_inverted";
+            /** @description Cosmetic slots in the layout */
+            slots: components["schemas"]["CosmeticsSkinrLayoutslot"][];
+        };
+        CosmeticsSkinrLayoutslot: {
+            /** @description Configuration of the cosmetic slot */
+            configuration: {
+                /** @description Nanocoating configuration */
+                nanocoating?: components["schemas"]["CosmeticsSkinrSlotnanocoating"];
+            } | {
+                /** @description Pattern configuration */
+                pattern?: components["schemas"]["CosmeticsSkinrSlotpattern"];
+            };
+            /**
+             * Format: int64
+             * @description ID of cosmetic slot (see SDE for details)
+             * @example 1
+             */
+            id: number;
+        };
+        CosmeticsSkinrPatternconfiguration: {
+            /** @description Whether to mirror the UV coordinates */
+            mirrored: boolean;
+            /** @description How the pattern is mapped onto the ship hull */
+            projection: components["schemas"]["CosmeticsSkinrPatternprojection"];
+            /** @description Transformation applied to the pattern */
+            transform: components["schemas"]["CosmeticsSkinrPatterntransform"];
+        };
+        CosmeticsSkinrPatternprojection: {
+            /** @description Whether the pattern is projected on cosmetic slot 1 */
+            slot1: boolean;
+            /** @description Whether the pattern is projected on cosmetic slot 2 */
+            slot2: boolean;
+            /** @description Whether the pattern is projected on cosmetic slot 3 */
+            slot3: boolean;
+            /** @description Whether the pattern is projected on cosmetic slot 4 */
+            slot4: boolean;
+        };
+        CosmeticsSkinrPatterntransform: {
+            /** @description Translation applied to the pattern */
+            position: components["schemas"]["CosmeticsSkinrVector3"];
+            /** @description Rotation applied to the pattern */
+            rotation: components["schemas"]["CosmeticsSkinrVector4"];
+            /** @description Scaling applied to the pattern */
+            scaling: components["schemas"]["CosmeticsSkinrVector3"];
+        };
+        CosmeticsSkinrSlotnanocoating: {
+            /**
+             * Format: int64
+             * @description ID of nanocoating component (see SDE for details)
+             * @example 67890
+             */
+            id: number;
+        };
+        CosmeticsSkinrSlotpattern: {
+            /** @description Pattern component configuration */
+            configuration: components["schemas"]["CosmeticsSkinrPatternconfiguration"];
+            /**
+             * Format: int64
+             * @description ID of pattern component (see SDE for details)
+             * @example 67890
+             */
+            id: number;
+        };
+        CosmeticsSkinrTier: {
+            /**
+             * Format: int64
+             * @description SKINR tier level
+             * @example 1
+             */
+            level: number;
+        };
+        CosmeticsSkinrVector3: {
+            /**
+             * Format: double
+             * @description X coordinate
+             * @example 0
+             */
+            x: number;
+            /**
+             * Format: double
+             * @description Y coordinate
+             * @example 0
+             */
+            y: number;
+            /**
+             * Format: double
+             * @description Z coordinate
+             * @example 0
+             */
+            z: number;
+        };
+        CosmeticsSkinrVector4: {
+            /**
+             * Format: double
+             * @description W coordinate
+             * @example 1
+             */
+            w: number;
+            /**
+             * Format: double
+             * @description X coordinate
+             * @example 1
+             */
+            x: number;
+            /**
+             * Format: double
+             * @description Y coordinate
+             * @example 0
+             */
+            y: number;
+            /**
+             * Format: double
+             * @description Z coordinate
+             * @example 0
+             */
+            z: number;
+        };
+        Cursor: {
+            /** @description Cursor to use as 'after' in your next request, to continue walking forwards in time. */
+            after?: string;
+            /** @description Cursor to use as 'before' in your next request, to continue walking backwards in time. */
+            before?: string;
+        };
         DogmaAttributesAttributeIdGet: {
             /** Format: int64 */
             attribute_id: number;
@@ -6669,6 +8858,290 @@ export interface components {
              * @description The squad_id of the newly created squad
              */
             squad_id: number;
+        };
+        FreelanceJobsDetail: {
+            /** @description Job's access and visibility */
+            access_and_visibility: components["schemas"]["FreelanceJobsDetailAccessandvisibility"];
+            /** @description Job's configuration */
+            configuration: components["schemas"]["FreelanceJobsDetailConfiguration"];
+            /** @description Job's contribution settings */
+            contribution?: components["schemas"]["FreelanceJobsDetailContribution"];
+            /** @description Job's details */
+            details: components["schemas"]["FreelanceJobsDetailDetails"];
+            /** @description Job's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Job's last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+            /**
+             * @description Job's name
+             * @example Freelance Job Name
+             */
+            name: string;
+            /** @description Job's progress */
+            progress: components["schemas"]["FreelanceJobsDetailProgress"];
+            /** @description Job's reward */
+            reward?: components["schemas"]["FreelanceJobsDetailReward"];
+            /**
+             * @description Job's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Closed" | "Completed" | "Expired" | "Deleted";
+        };
+        FreelanceJobsDetailAccessandvisibility: {
+            /**
+             * @description Whether the job is protected by an ACL
+             * @example false
+             */
+            acl_protected: boolean;
+            /** @description Solar systems where the job is broadcast */
+            broadcast_locations?: components["schemas"]["FreelanceJobsDetailBroadcastlocations"][];
+            /** @description Restrictions on who can participate */
+            restrictions?: components["schemas"]["FreelanceJobsDetailRestrictions"];
+        };
+        FreelanceJobsDetailBroadcastlocations: {
+            /** @description Solar system ID */
+            id: components["schemas"]["SolarSystemID"];
+            /**
+             * @description Solar system name
+             * @example Jita
+             */
+            name: string;
+        };
+        FreelanceJobsDetailConfiguration: {
+            /**
+             * @description Contribution method (see SDE for valid values)
+             * @example BoostShield
+             */
+            method: string;
+            /** @description Parameter values (see SDE for parameter definition) */
+            parameters: {
+                [key: string]: {
+                    /** @description Parameter that matches a type */
+                    matcher?: components["schemas"]["FreelanceJobsDetailParametermatcher"];
+                } | {
+                    /** @description Parameter that has one or more selected values */
+                    options?: components["schemas"]["FreelanceJobsDetailParameteroptions"];
+                } | {
+                    /** @description Parameter that can be toggled */
+                    boolean?: components["schemas"]["FreelanceJobsDetailParameterboolean"];
+                } | {
+                    /** @description Parameter for delivering items to a corporation */
+                    corporation_item_delivery?: components["schemas"]["FreelanceJobsDetailParametercorporationitemdelivery"];
+                };
+            };
+            /**
+             * Format: int64
+             * @description Version of parameter definition used
+             * @example 1
+             */
+            version: number;
+        };
+        FreelanceJobsDetailContribution: {
+            /**
+             * Format: int64
+             * @description Limit on the contribution of the individual participant
+             * @example 1000
+             */
+            contribution_per_participant_limit?: number;
+            /**
+             * Format: int64
+             * @description Maximum number of participants that can commit to this job
+             * @example 10000
+             */
+            max_committed_participants: number;
+            /**
+             * Format: double
+             * @description ISK reward per contribution
+             * @example 123.5
+             */
+            reward_per_contribution?: number;
+            /**
+             * Format: int64
+             * @description Limit on amount of contribution per submission
+             * @example 100
+             */
+            submission_limit?: number;
+            /**
+             * Format: double
+             * @description Multiplier towards progress per contribution
+             * @example 1.5
+             */
+            submission_multiplier?: number;
+        };
+        FreelanceJobsDetailCreator: {
+            /** @description Character that created the job */
+            character: components["schemas"]["FreelanceJobsDetailCreatorcharacter"];
+            /** @description Corporation that created the job */
+            corporation: components["schemas"]["FreelanceJobsDetailCreatorcorporation"];
+        };
+        FreelanceJobsDetailCreatorcharacter: {
+            /** @description Character ID */
+            id: components["schemas"]["CharacterID"];
+            /**
+             * @description Character name
+             * @example Creator Name
+             */
+            name: string;
+        };
+        FreelanceJobsDetailCreatorcorporation: {
+            /** @description Corporation ID */
+            id: components["schemas"]["CorporationID"];
+            /**
+             * @description Corporation name
+             * @example Creator Corporation
+             */
+            name: string;
+        };
+        FreelanceJobsDetailDetails: {
+            /**
+             * @description Assigned career path
+             * @example Explorer
+             * @enum {string}
+             */
+            career: "Unspecified" | "Explorer" | "Industrialist" | "Enforcer" | "Soldier of Fortune";
+            /**
+             * Format: date-time
+             * @description Moment this freelance job was created
+             * @example 2025-11-01T00:00:00Z
+             */
+            created: string;
+            /** @description Creator */
+            creator: components["schemas"]["FreelanceJobsDetailCreator"];
+            /**
+             * @description Description
+             * @example Freelance Job Description
+             */
+            description: string;
+            /**
+             * Format: date-time
+             * @description Moment this freelance job expires
+             * @example 2025-11-01T00:01:00Z
+             */
+            expires?: string;
+            /**
+             * Format: date-time
+             * @description Moment this freelance job transitioned to a non-active state
+             * @example 2025-11-01T00:00:00Z
+             */
+            finished?: string;
+        };
+        FreelanceJobsDetailFreelancejob: {
+            /** @description Job's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Job's last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+            /**
+             * @description Job's name
+             * @example Freelance Job Name
+             */
+            name: string;
+            /** @description Job's progress */
+            progress: components["schemas"]["FreelanceJobsDetailProgress"];
+            /** @description Job's reward */
+            reward?: components["schemas"]["FreelanceJobsDetailReward"];
+            /**
+             * @description Job's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Closed" | "Completed" | "Expired" | "Deleted";
+        };
+        FreelanceJobsDetailParameterboolean: {
+            /**
+             * @description Boolean value
+             * @example true
+             */
+            value: boolean;
+        };
+        FreelanceJobsDetailParametercorporationitemdelivery: {
+            /** @description Location for delivery */
+            corporation_office_location: components["schemas"]["FreelanceJobsDetailParametermatcher"];
+            /** @description Item(s) to be delivered */
+            item_type: components["schemas"]["FreelanceJobsDetailParametermatcher"];
+        };
+        FreelanceJobsDetailParametermatcher: {
+            /** @description Value type(s) and their value(s) */
+            values: components["schemas"]["FreelanceJobsDetailParametermatchervalue"][];
+        };
+        FreelanceJobsDetailParametermatchervalue: {
+            /**
+             * @description Type of the value(s)
+             * @example solarsystem
+             */
+            value_type: string;
+            /**
+             * @description Value(s) of this type
+             * @example [
+             *       "30001401"
+             *     ]
+             */
+            values: string[];
+        };
+        FreelanceJobsDetailParameteroptions: {
+            /**
+             * @description Selected value(s)
+             * @example [
+             *       "self",
+             *       "corporation"
+             *     ]
+             */
+            selected: string[];
+        };
+        FreelanceJobsDetailProgress: {
+            /**
+             * Format: int64
+             * @description Current progress
+             * @example 50
+             */
+            current: number;
+            /**
+             * Format: int64
+             * @description Desired progress
+             * @example 100
+             */
+            desired: number;
+        };
+        FreelanceJobsDetailRestrictions: {
+            /**
+             * Format: int64
+             * @description Maximum age of the participant, in days
+             * @example 100
+             */
+            maximum_age?: number;
+            /**
+             * Format: int64
+             * @description Minimum age of the participant, in days
+             * @example 10
+             */
+            minimum_age?: number;
+        };
+        FreelanceJobsDetailReward: {
+            /**
+             * Format: double
+             * @description Original amount of ISK that was reserved for this freelance job
+             * @example 12345.5
+             */
+            initial: number;
+            /**
+             * Format: double
+             * @description Remaining ISK to be awarded
+             * @example 5432.1
+             */
+            remaining: number;
+        };
+        FreelanceJobsListing: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of freelance jobs */
+            freelance_jobs: components["schemas"]["FreelanceJobsDetailFreelancejob"][];
         };
         FwLeaderboardsCharactersGet: {
             /** @description Top 100 rankings of pilots by number of kills from yesterday, last week and in total */
@@ -7295,11 +9768,6 @@ export interface components {
              */
             description: string;
             /**
-             * @description Whether this is a breaking change
-             * @example false
-             */
-            is_breaking: boolean;
-            /**
              * @description HTTP method of the route
              * @example GET
              * @enum {string}
@@ -7310,10 +9778,280 @@ export interface components {
              * @example /meta/changelog
              */
             path: string;
+            /**
+             * @description Type of the change
+             * @example breaking
+             * @enum {string}
+             */
+            type: "breaking" | "changed" | "new" | "removed";
         };
         MetaCompatibilityDates: {
             /** @description List of compatibility dates. */
             compatibility_dates: components["schemas"]["CompatibilityDate"][];
+        };
+        MetaName: {
+            /**
+             * @description The name ESI is going by today. It was almost certainly something else last time you looked.
+             * @example EVE Spring Inebriation (ESI)
+             */
+            current: string;
+            /** @description Every name ESI has ever gone by, newest first. It has never once been the same twice. */
+            history: components["schemas"]["MetaNameEntry"][];
+        };
+        MetaNameEntry: {
+            /**
+             * @description The date ESI started insisting on this name (UTC-11).
+             * @example 2026-04-01
+             */
+            date: string;
+            /**
+             * @description What those three letters allegedly stood for at the time.
+             * @example EVE Spring Inebriation (ESI)
+             */
+            name: string;
+        };
+        MetaStatus: {
+            /** @description List of all API routes and their health status */
+            routes: components["schemas"]["MetaStatusRoutestatus"][];
+        };
+        MetaStatusRoutestatus: {
+            /**
+             * @description Route's HTTP method
+             * @enum {string}
+             */
+            method: "GET" | "POST" | "PUT" | "DELETE";
+            /** @description Route's HTTP path */
+            path: string;
+            /**
+             * @description Route's health status
+             * @enum {string}
+             */
+            status: "Unknown" | "OK" | "Degraded" | "Down" | "Recovering";
+        };
+        MilitaryCampaignsDetail: {
+            /**
+             * Format: date-time
+             * @description Moment the campaign transitioned to a non-active state
+             * @example 2025-11-01T00:00:00Z
+             */
+            finished?: string;
+            /** @description Campaign's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: int64
+             * @description Campaign's progress
+             * @example 50
+             */
+            progress: number;
+            /**
+             * Format: date-time
+             * @description Moment the campaign started
+             * @example 2025-11-01T00:00:00Z
+             */
+            started?: string;
+            /**
+             * @description Campaign's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Completed" | "Expired";
+        };
+        MilitaryCampaignsDetailCampaign: {
+            /**
+             * Format: date-time
+             * @description Moment the campaign transitioned to a non-active state
+             * @example 2025-11-01T00:00:00Z
+             */
+            finished?: string;
+            /** @description Campaign's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: int64
+             * @description Campaign's progress
+             * @example 50
+             */
+            progress: number;
+            /**
+             * Format: date-time
+             * @description Moment the campaign started
+             * @example 2025-11-01T00:00:00Z
+             */
+            started?: string;
+            /**
+             * @description Campaign's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Completed" | "Expired";
+        };
+        MilitaryCampaignsListing: {
+            /** @description List of military campaigns */
+            campaigns: components["schemas"]["MilitaryCampaignsDetailCampaign"][];
+        };
+        MilitaryCampaignsObjectivesDetail: {
+            /**
+             * Format: date-time
+             * @description Moment the objective transitioned to a non-active state
+             * @example 2025-11-01T00:00:00Z
+             */
+            finished?: string;
+            /** @description Objective's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Objective's last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+            /** @description Objective's participants */
+            participants: components["schemas"]["MilitaryCampaignsObjectivesDetailParticipants"];
+            /**
+             * Format: int64
+             * @description Objective's progress
+             * @example 50
+             */
+            progress: number;
+            /**
+             * Format: date-time
+             * @description Moment the objective started
+             * @example 2025-11-01T00:00:00Z
+             */
+            started?: string;
+            /**
+             * @description Objective's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Completed" | "Expired";
+        };
+        MilitaryCampaignsObjectivesDetailObjective: {
+            /**
+             * Format: date-time
+             * @description Moment the objective transitioned to a non-active state
+             * @example 2025-11-01T00:00:00Z
+             */
+            finished?: string;
+            /** @description Objective's ID */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description Objective's last modified
+             * @example 2025-11-01T00:00:00Z
+             */
+            last_modified: string;
+            /** @description Objective's participants */
+            participants: components["schemas"]["MilitaryCampaignsObjectivesDetailParticipants"];
+            /**
+             * Format: int64
+             * @description Objective's progress
+             * @example 50
+             */
+            progress: number;
+            /**
+             * Format: date-time
+             * @description Moment the objective started
+             * @example 2025-11-01T00:00:00Z
+             */
+            started?: string;
+            /**
+             * @description Objective's state
+             * @example Active
+             * @enum {string}
+             */
+            state: "Unspecified" | "Active" | "Completed" | "Expired";
+        };
+        MilitaryCampaignsObjectivesDetailParticipants: {
+            /**
+             * Format: int64
+             * @description Number of currently committed participants
+             * @example 1
+             */
+            committed: number;
+            /**
+             * Format: int64
+             * @description Number of participants with at least one contribution
+             * @example 2
+             */
+            contributors: number;
+            /**
+             * Format: int64
+             * @description Number of participants (including those that resigned)
+             * @example 4
+             */
+            total: number;
+        };
+        MilitaryCampaignsObjectivesListing: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description List of military campaign objectives */
+            objectives: components["schemas"]["MilitaryCampaignsObjectivesDetailObjective"][];
+        };
+        ParagonHubSkinr: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description Page of public SKINR listings */
+            listings: components["schemas"]["ParagonHubSkinrInternalItem"][];
+        };
+        ParagonHubSkinrAlliances: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description Page of SKINR listings targeted at the alliance */
+            listings: components["schemas"]["ParagonHubSkinrInternalItem"][];
+        };
+        ParagonHubSkinrCharacters: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description Page of SKINR listings targeted at the character */
+            listings: components["schemas"]["ParagonHubSkinrInternalItem"][];
+        };
+        ParagonHubSkinrCorporations: {
+            cursor?: components["schemas"]["Cursor"];
+            /** @description Page of SKINR listings targeted at the corporation */
+            listings: components["schemas"]["ParagonHubSkinrInternalItem"][];
+        };
+        ParagonHubSkinrInternalItem: {
+            /**
+             * Format: date-time
+             * @description When the listing was created
+             */
+            created: string;
+            /**
+             * Format: date-time
+             * @description When the listing expires
+             */
+            expires: string;
+            /** @description Unique identifier of the listing */
+            id: components["schemas"]["UUID"];
+            /**
+             * Format: date-time
+             * @description When this listing was last retrieved from the game
+             */
+            last_modified: string;
+            /** @description Asking price of the listing */
+            price: {
+                /**
+                 * Format: double
+                 * @description Price in ISK
+                 */
+                isk?: number;
+            } | {
+                /**
+                 * Format: int64
+                 * @description Price in PLEX
+                 */
+                plex?: number;
+            };
+            /**
+             * Format: int64
+             * @description How many licenses remain in this listing
+             * @example 3
+             */
+            quantity: number;
+            /** @description Character that posted the listing */
+            seller_id: components["schemas"]["CharacterID"];
+            /** @description SKINR license identifier */
+            skinr_id: string;
+            /**
+             * @description Lifecycle state of the listing
+             * @enum {string}
+             */
+            state: "listed" | "sold_out" | "expired" | "removed";
         };
         /**
          * Format: int64
@@ -7330,14 +10068,66 @@ export interface components {
          * @example 10000001
          */
         RegionID: number;
-        /** @description Solar systems in route */
-        RouteOriginDestinationGet: number[];
+        Route: {
+            /** @description The route between the origin and destination systems */
+            route: components["schemas"]["SolarSystemID"][];
+        };
+        RouteConnection: {
+            /** @description From which system */
+            from: components["schemas"]["SolarSystemID"];
+            /** @description To which system */
+            to: components["schemas"]["SolarSystemID"];
+        };
+        RouteRequestBody: {
+            /** @description Systems to avoid */
+            avoid_systems?: components["schemas"]["SolarSystemID"][];
+            /** @description Additional one-way connections (like Jump Bridges) between systems */
+            connections?: components["schemas"]["RouteConnection"][];
+            /**
+             * @description Preference for the route
+             * @default Shorter
+             * @enum {string}
+             */
+            preference: "Shorter" | "Safer" | "LessSecure";
+            /**
+             * Format: int64
+             * @description Strictness of the path preference
+             * @default 50
+             */
+            security_penalty: number;
+        };
         /**
          * Format: int64
          * @description Ship tree group identifier.
          * @example 1559
          */
         ShipTreeGroupID: number;
+        SkyhooksRaidable: {
+            /** @description List of (upcoming) raidable Skyhooks */
+            skyhooks: components["schemas"]["SkyhooksRaidableVulnerableskyhook"][];
+        };
+        SkyhooksRaidableTheftvulnerability: {
+            /**
+             * Format: date-time
+             * @description End time of the theft vulnerability window
+             * @example 2026-02-23T16:00:00Z
+             */
+            end: string;
+            /**
+             * Format: date-time
+             * @description Start time of the theft vulnerability window
+             * @example 2026-02-23T12:00:00Z
+             */
+            start: string;
+        };
+        SkyhooksRaidableVulnerableskyhook: {
+            /** @description ID of the planet the Skyhook is anchored on */
+            planet_id: components["schemas"]["PlanetID"];
+            /** @description ID of the solar system the Skyhook is anchored on */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+            /** @description Skyhook's theft vulnerability */
+            theft_vulnerability: components["schemas"]["SkyhooksRaidableTheftvulnerability"];
+        };
         /**
          * Format: int64
          * @example 30000001
@@ -7397,53 +10187,96 @@ export interface components {
              */
             structure_id: number;
         }[];
-        SovereigntyMapGet: {
-            /** Format: int64 */
-            alliance_id?: number;
-            /** Format: int64 */
-            corporation_id?: number;
-            /** Format: int64 */
-            faction_id?: number;
-            /** Format: int64 */
-            system_id: number;
-        }[];
-        SovereigntyStructuresGet: {
+        SovereigntySystems: {
+            /** @description List of solar systems and their sovereignty owners */
+            solar_systems: components["schemas"]["SovereigntySystemsSolarsystem"][];
+        };
+        SovereigntySystemsAlliance: {
+            /** @description Alliance that claimed this solar system */
+            alliance_id: components["schemas"]["AllianceID"];
             /**
-             * Format: int64
-             * @description The alliance that owns the structure.
+             * Format: date-time
+             * @description Time the claim was made
+             * @example 2026-02-23T12:00:00Z
              */
-            alliance_id: number;
+            claimed_since: string;
+            /** @description Corporation that claimed this solar system */
+            corporation_id: components["schemas"]["CorporationID"];
+            /** @description Solar system's development */
+            development: components["schemas"]["SovereigntySystemsDevelopment"];
             /**
-             * Format: int64
-             * @description Solar system in which the structure is located.
+             * @description Whether the system is the capital system of the alliance
+             * @example false
              */
-            solar_system_id: number;
-            /**
-             * Format: int64
-             * @description Unique item ID for this structure.
-             */
-            structure_id: number;
-            /**
-             * Format: int64
-             * @description A reference to the type of structure this is.
-             */
-            structure_type_id: number;
+            is_capital_system: boolean;
+            /** @description Sovereignty Hub holding the claim */
+            sovereignty_hub: components["schemas"]["SovereigntySystemsSovereigntyhub"];
+        };
+        SovereigntySystemsDevelopment: {
             /**
              * Format: double
-             * @description The occupancy level for the next or current vulnerability window. This takes into account all development indexes and capital system bonuses. Also known as Activity Defense Multiplier from in the client. It increases the time that attackers must spend using their entosis links on the structure.
+             * @description Current Activity Defense Multiplier
+             * @example 1.2
              */
-            vulnerability_occupancy_level?: number;
+            activity_defense_multiplier: number;
+            /**
+             * Format: int64
+             * @description Industrial level (0-5) of this solar system
+             * @example 0
+             */
+            industrial_level: number;
+            /**
+             * Format: int64
+             * @description Military level (0-5) of this solar system
+             * @example 3
+             */
+            military_level: number;
+            /**
+             * Format: int64
+             * @description Strategic level (0-5) of this solar system
+             * @example 5
+             */
+            strategic_level: number;
+        };
+        SovereigntySystemsFaction: {
+            /** @description Faction that claimed this solar system */
+            faction_id: components["schemas"]["FactionID"];
+        };
+        SovereigntySystemsSolarsystem: {
+            /** @description Claim on this solar system */
+            claim: {
+                /** @description Solar system is claimed by a faction */
+                faction?: components["schemas"]["SovereigntySystemsFaction"];
+            } | {
+                /** @description Solar system is claimed by an alliance */
+                alliance?: components["schemas"]["SovereigntySystemsAlliance"];
+            } | {
+                /** @description Solar system is unclaimed */
+                unclaimed?: boolean;
+            };
+            /** @description ID of the solar system */
+            solar_system_id: components["schemas"]["SolarSystemID"];
+        };
+        SovereigntySystemsSovereigntyhub: {
+            /** @description ID of the Sovereignty Hub */
+            id: components["schemas"]["ItemID"];
+            /** @description Sovereignty Hub's vulnerability window; if omitted, this Sovereignty Hub is part of an active campaign */
+            vulnerability_window?: components["schemas"]["SovereigntySystemsVulnerabilitywindow"];
+        };
+        SovereigntySystemsVulnerabilitywindow: {
             /**
              * Format: date-time
-             * @description The time at which the next or current vulnerability window ends. At the end of a vulnerability window the next window is recalculated and locked in along with the vulnerabilityOccupancyLevel. If the structure is not in 100% entosis control of the defender, it will go in to 'overtime' and stay vulnerable for as long as that situation persists. Only once the defenders have 100% entosis control and has the vulnerableEndTime passed does the vulnerability interval expire and a new one is calculated.
+             * @description End time of the vulnerability window; if in the past, the Sovereignty Hub is in overtime
+             * @example 2026-02-23T16:00:00Z
              */
-            vulnerable_end_time?: string;
+            end: string;
             /**
              * Format: date-time
-             * @description The next time at which the structure will become vulnerable. Or the start time of the current window if current time is between this and vulnerableEndTime.
+             * @description Start time of the vulnerability window; if in the past, the Sovereignty Hub is vulnerable right now
+             * @example 2026-02-23T12:00:00Z
              */
-            vulnerable_start_time?: string;
-        }[];
+            start: string;
+        };
         /**
          * Format: int64
          * @example 60000001
@@ -8041,7 +10874,7 @@ export interface components {
         /** @description The language to use for the response. */
         AcceptLanguage: "en" | "de" | "fr" | "ja" | "ru" | "zh" | "ko" | "es";
         /** @description The compatibility date for the request. */
-        CompatibilityDate: "2020-01-01";
+        CompatibilityDate: "2026-08-18";
         /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
         IfModifiedSince: string;
         /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
@@ -8412,7 +11245,7 @@ export interface operations {
             };
         };
     };
-    GetCharactersCharacterId: {
+    GetCharactersDetail: {
         parameters: {
             query?: never;
             header: {
@@ -8448,6 +11281,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CharactersDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersAccessListsListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersAccessListsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersAccessListsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the Access List */
+                access_list_id: components["schemas"]["AccessListID"];
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersAccessListsDetail"];
                 };
             };
             /** @description Error */
@@ -9491,6 +12424,104 @@ export interface operations {
             };
         };
     };
+    GetCharactersCosmeticsSkinr: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character whose SKINR licenses to return */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersCosmeticsSkinr"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersCosmeticsSkinrComponents: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character whose SKINR component licenses to return */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersCosmeticsSkinrComponents"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     PostCharactersCharacterIdCspa: {
         parameters: {
             query?: never;
@@ -9795,6 +12826,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CharactersCharacterIdFleetGet"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersFreelanceJobsListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersFreelanceJobsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersFreelanceJobsParticipation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+                /** @description The ID of the freelance job */
+                job_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersFreelanceJobsParticipation"];
                 };
             };
             /** @description Error */
@@ -10638,6 +13769,213 @@ export interface operations {
             };
         };
     };
+    GetCharactersMercenaryTacticalOperationsListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersMercenaryTacticalOperationsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersMercenaryTacticalOperationsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the operation */
+                operation_id: components["schemas"]["UUID"];
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersMercenaryTacticalOperationsDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersMilitaryCampaignsObjectivesListing: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersMilitaryCampaignsObjectivesListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersMilitaryCampaignsObjectivesParticipation: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+                /** @description The ID of the objective */
+                objective_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersMilitaryCampaignsObjectivesParticipation"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     GetCharactersCharacterIdMining: {
         parameters: {
             query?: {
@@ -10927,6 +14265,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CharactersCharacterIdOrdersHistoryGet"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersParagonHubSkinr: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character whose listings to return */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersParagonHubSkinr"];
                 };
             };
             /** @description Error */
@@ -11374,6 +14768,106 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CharactersCharacterIdStandingsGet"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersStructuresMercenaryDensListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersStructuresMercenaryDensListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCharactersStructuresMercenaryDensDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the Mercenary Den */
+                mercenary_den_id: components["schemas"]["ItemID"];
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CharactersStructuresMercenaryDensDetail"];
                 };
             };
             /** @description Error */
@@ -12730,6 +16224,120 @@ export interface operations {
             };
         };
     };
+    GetCorporationsFreelanceJobsListing: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsFreelanceJobsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsFreelanceJobsParticipants: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+                /** @description The ID of the job */
+                job_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsFreelanceJobsParticipants"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     GetCorporationsCorporationIdFwStats: {
         parameters: {
             query?: never;
@@ -13343,6 +16951,226 @@ export interface operations {
             };
         };
     };
+    GetCorporationsProjectsListing: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+                /** @description Filter by state */
+                state?: "All" | "Active";
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsProjectsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsProjectsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+                /** @description The ID of the project */
+                project_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsProjectsDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsProjectsContribution: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+                /** @description The ID of the project */
+                project_id: components["schemas"]["UUID"];
+                /** @description The ID of the character */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsProjectsContribution"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsProjectsContributors: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+                /** @description The ID of the project */
+                project_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsProjectsContributors"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     GetCorporationsCorporationIdRoles: {
         parameters: {
             query?: never;
@@ -13710,6 +17538,206 @@ export interface operations {
             };
         };
     };
+    GetCorporationsStructuresSkyhooksListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsStructuresSkyhooksListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsStructuresSkyhooksDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the Skyhook */
+                skyhook_id: components["schemas"]["ItemID"];
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsStructuresSkyhooksDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsStructuresSovereigntyHubsListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsStructuresSovereigntyHubsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCorporationsStructuresSovereigntyHubsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the Sovereignty Hub */
+                sovereignty_hub_id: components["schemas"]["ItemID"];
+                /** @description The ID of the corporation */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorporationsStructuresSovereigntyHubsDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     GetCorporationsCorporationIdTitles: {
         parameters: {
             query?: never;
@@ -13901,6 +17929,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CorporationsCorporationIdWalletsDivisionTransactionsGet"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetCosmeticsSkinr: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description SKINR identifier */
+                skinr_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CosmeticsSkinr"];
                 };
             };
             /** @description Error */
@@ -14809,6 +18886,110 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FleetsFleetIdWingsWingIdSquadsPost"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetFreelanceJobsListing: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+                /** @description Filter on corporation ID */
+                corporation_id?: components["schemas"]["CorporationID"];
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreelanceJobsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetFreelanceJobsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the freelance job */
+                job_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FreelanceJobsDetail"];
                 };
             };
             /** @description Error */
@@ -15822,12 +20003,202 @@ export interface operations {
             };
         };
     };
-    GetRouteOriginDestination: {
+    GetMetaName: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetaName"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetMetaStatus: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetaStatus"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetMilitaryCampaignsListing: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilitaryCampaignsListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetMilitaryCampaignsDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the military campaign */
+                campaign_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilitaryCampaignsDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetMilitaryCampaignsObjectivesListing: {
         parameters: {
             query?: {
-                avoid?: number[];
-                connections?: number[][];
-                flag?: "shortest" | "secure" | "insecure";
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
             };
             header: {
                 /** @description The language to use for the response. */
@@ -15845,8 +20216,8 @@ export interface operations {
                 "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
             };
             path: {
-                destination: number;
-                origin: number;
+                /** @description The ID of the military campaign */
+                campaign_id: components["schemas"]["UUID"];
             };
             cookie?: never;
         };
@@ -15861,7 +20232,380 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["RouteOriginDestinationGet"];
+                    "application/json": components["schemas"]["MilitaryCampaignsObjectivesListing"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetMilitaryCampaignsObjectivesDetail: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the military campaign */
+                campaign_id: components["schemas"]["UUID"];
+                /** @description The ID of the objective */
+                objective_id: components["schemas"]["UUID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilitaryCampaignsObjectivesDetail"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetParagonHubSkinr: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParagonHubSkinr"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetParagonHubSkinrAlliances: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the alliance the listings are targeted at */
+                alliance_id: components["schemas"]["AllianceID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParagonHubSkinrAlliances"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetParagonHubSkinrCharacters: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the character the listings are targeted at */
+                character_id: components["schemas"]["CharacterID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParagonHubSkinrCharacters"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetParagonHubSkinrCorporations: {
+        parameters: {
+            query?: {
+                /** @description Return records from after this cursor (mutual exclusive with 'before'). '0' to start from the beginning. */
+                after?: string;
+                /** @description Return records from before this cursor (mutual exclusive with 'after'). '0' to start from the end. */
+                before?: string;
+                /** @description The amount of records to retrieve per request. */
+                limit?: number;
+            };
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description The ID of the corporation the listings are targeted at */
+                corporation_id: components["schemas"]["CorporationID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParagonHubSkinrCorporations"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    PostRoute: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path: {
+                /** @description Origin system */
+                origin_system_id: components["schemas"]["SolarSystemID"];
+                /** @description Destination system */
+                destination_system_id: components["schemas"]["SolarSystemID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteRequestBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Route"];
+                };
+            };
+            /** @description Error */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    GetSkyhooksRaidable: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description The language to use for the response. */
+                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
+                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
+                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
+                /** @description The compatibility date for the request. */
+                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
+                /**
+                 * @description The tenant ID for the request.
+                 * @example
+                 */
+                "X-Tenant"?: components["parameters"]["Tenant"];
+                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
+                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    "Cache-Control": components["headers"]["CacheControl"];
+                    ETag: components["headers"]["ETag"];
+                    "Last-Modified": components["headers"]["LastModified"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SkyhooksRaidable"];
                 };
             };
             /** @description Error */
@@ -15921,7 +20665,7 @@ export interface operations {
             };
         };
     };
-    GetSovereigntyMap: {
+    GetSovereigntySystems: {
         parameters: {
             query?: never;
             header: {
@@ -15953,53 +20697,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SovereigntyMapGet"];
-                };
-            };
-            /** @description Error */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    GetSovereigntyStructures: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description The language to use for the response. */
-                "Accept-Language"?: components["parameters"]["AcceptLanguage"];
-                /** @description The ETag of the previous request. A 304 will be returned if this matches the current ETag. */
-                "If-None-Match"?: components["parameters"]["IfNoneMatch"];
-                /** @description The compatibility date for the request. */
-                "X-Compatibility-Date": components["parameters"]["CompatibilityDate"];
-                /**
-                 * @description The tenant ID for the request.
-                 * @example
-                 */
-                "X-Tenant"?: components["parameters"]["Tenant"];
-                /** @description The date the resource was last modified. A 304 will be returned if the resource has not been modified since this date. */
-                "If-Modified-Since"?: components["parameters"]["IfModifiedSince"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    "Cache-Control": components["headers"]["CacheControl"];
-                    ETag: components["headers"]["ETag"];
-                    "Last-Modified": components["headers"]["LastModified"];
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SovereigntyStructuresGet"];
+                    "application/json": components["schemas"]["SovereigntySystems"];
                 };
             };
             /** @description Error */
