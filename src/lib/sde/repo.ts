@@ -9,6 +9,7 @@ export interface SdeType {
 }
 export interface SdeMetaCounts { types: number; dogmaAttributes: number; dogmaEffects: number; solarSystems: number }
 export interface SdeMeta { buildNumber: number; releaseDate: Date; importedAt: Date; counts: SdeMetaCounts }
+export interface SdeGroup { id: number; categoryId: number | null; name: string | null; published: boolean | null }
 export interface SdeSolarSystem {
   id: number; constellationId: number | null; regionId: number | null;
   name: string | null; securityStatus: number | null; securityClass: string | null;
@@ -26,6 +27,8 @@ const TYPE_COLS = `id, group_id AS "groupId", name, description, published,
   base_price AS "basePrice", icon_id AS "iconId", graphic_id AS "graphicId", race_id AS "raceId",
   faction_id AS "factionId", portion_size AS "portionSize",
   variation_parent_type_id AS "variationParentTypeId"`;
+
+const GROUP_COLS = `id, category_id AS "categoryId", name, published`;
 
 /** requiredSkill / requiredSkillLevel attribute pairs. */
 const SKILL_ATTRIBUTE_PAIRS: readonly [number, number][] = [
@@ -133,4 +136,39 @@ export async function getStation(id: number): Promise<SdeStation | null> {
             owner_id AS "ownerId", operation_id AS "operationId"
      FROM sde_stations WHERE id = $1`, [id]);
   return rows[0] ?? null;
+}
+
+/** Batch group lookup — the Skills page groups the sheet by sde_groups (spec §7). */
+export async function getGroups(ids: number[]): Promise<Map<number, SdeGroup>> {
+  if (ids.length === 0) return new Map();
+  const { rows } = await getPool().query<SdeGroup>(
+    `SELECT ${GROUP_COLS} FROM sde_groups WHERE id = ANY($1::int[])`, [ids]);
+  return new Map(rows.map((r) => [r.id, r]));
+}
+
+/** Every group in a category, name-ascending — category 16 is Skills. */
+export async function listGroups(categoryId: number): Promise<SdeGroup[]> {
+  const { rows } = await getPool().query<SdeGroup>(
+    `SELECT ${GROUP_COLS} FROM sde_groups WHERE category_id = $1 ORDER BY name`, [categoryId]);
+  return rows;
+}
+
+/** Batch solar-system lookup: pages resolve every system on the page in one query. */
+export async function getSolarSystems(ids: number[]): Promise<Map<number, SdeSolarSystem>> {
+  if (ids.length === 0) return new Map();
+  const { rows } = await getPool().query<SdeSolarSystem>(
+    `SELECT id, constellation_id AS "constellationId", region_id AS "regionId", name,
+            security_status AS "securityStatus", security_class AS "securityClass"
+     FROM sde_solar_systems WHERE id = ANY($1::int[])`, [ids]);
+  return new Map(rows.map((r) => [r.id, r]));
+}
+
+/** Batch NPC-station lookup. Station ids are 60000000–69999999, so int[] is safe. */
+export async function getStations(ids: number[]): Promise<Map<number, SdeStation>> {
+  if (ids.length === 0) return new Map();
+  const { rows } = await getPool().query<SdeStation>(
+    `SELECT id, solar_system_id AS "solarSystemId", type_id AS "typeId",
+            owner_id AS "ownerId", operation_id AS "operationId"
+     FROM sde_stations WHERE id = ANY($1::int[])`, [ids]);
+  return new Map(rows.map((r) => [r.id, r]));
 }

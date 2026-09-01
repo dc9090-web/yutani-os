@@ -7,6 +7,7 @@ import { FIXTURE_ZIP } from "../sde/fixture.js";
 import {
   getSdeMeta, getType, getTypes, searchTypes, getTypeAttributes, getTypeEffects,
   getSkillRequirements, getSolarSystem, getRegion, getStation,
+  getGroups, listGroups, getSolarSystems, getStations,
 } from "../../src/lib/sde/repo.js";
 
 let pool: Pool;
@@ -115,5 +116,49 @@ describe("map lookups", () => {
     expect(await getSolarSystem(1)).toBeNull();
     expect(await getRegion(1)).toBeNull();
     expect(await getStation(1)).toBeNull();
+  });
+});
+
+describe("groups", () => {
+  it("reads many groups at once, skipping unknown ids", async () => {
+    const groups = await getGroups([255, 1216, 25, 999999]);
+    expect(groups.size).toBe(3);
+    expect(groups.get(255)).toMatchObject({ id: 255, categoryId: 16, name: "Gunnery" });
+    expect(groups.get(1216)!.name).toBe("Engineering");
+    expect(groups.get(1216)!.categoryId).toBe(16);
+    expect(groups.get(25)!.categoryId).toBe(6);            // Frigate — a ship group, not a skill group
+    expect(await getGroups([])).toEqual(new Map());
+  });
+
+  it("lists a whole category name-ascending", async () => {
+    const skills = await listGroups(16);
+    expect(skills.length).toBeGreaterThan(20);
+    expect(skills.every((g) => g.categoryId === 16)).toBe(true);
+    const names = skills.map((g) => g.name);
+    expect(names).toContain("Gunnery");
+    expect(names).toContain("Spaceship Command");
+    // Name-ascending. Asserted as a relative order, not against JS's .sort(): Postgres' collation
+    // and UTF-16 code-point order disagree about spaces and hyphens.
+    expect(names.indexOf("Gunnery")).toBeLessThan(names.indexOf("Spaceship Command"));
+    expect(await listGroups(999999)).toEqual([]);
+  });
+});
+
+describe("batched map lookups", () => {
+  it("reads many solar systems at once", async () => {
+    const systems = await getSolarSystems([30000142, 30000144, 30009999]);
+    expect(systems.size).toBe(2);
+    expect(systems.get(30000142)!.name).toBe("Jita");
+    expect(systems.get(30000142)!.securityStatus).toBeCloseTo(0.9459, 4);
+    expect(systems.get(30000144)!.name).toBe("Perimeter");
+    expect(await getSolarSystems([])).toEqual(new Map());
+  });
+
+  it("reads many stations at once", async () => {
+    const stations = await getStations([60003760, 60000361, 60009999]);
+    expect(stations.size).toBe(2);
+    expect(stations.get(60003760)!.solarSystemId).toBe(30000142);
+    expect(stations.get(60000361)!.solarSystemId).toBe(30000142);
+    expect(await getStations([])).toEqual(new Map());
   });
 });
