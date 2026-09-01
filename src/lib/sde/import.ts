@@ -2,6 +2,7 @@ import type { Pool } from "pg";
 import { readJsonlMember } from "./jsonl.js";
 import { sdeDdl, SDE_TABLES } from "./ddl.js";
 import { SDE_TABLE_DEFS, type SdeTable } from "./tables.js";
+import { parseSdeBuild, type SdeBuild } from "./version.js";
 
 export const SDE_STAGING_SCHEMA = "sde_import";
 const BATCH_ROWS = 2000;
@@ -42,11 +43,24 @@ export async function importSde(zipPath: string, pool: Pool, log: (msg: string) 
     }
     for (const def of defs) counts[def.table] += await flush(pool, def, batches.get(def.table)!);
     log(`${member}.jsonl → ${defs.map((d) => `${d.table}=${counts[d.table]}`).join(", ")}`);
+    // Statistics for the planner: each table is fully loaded at this point (its final flush just
+    // ran), so ANALYZE here means the swapped-in table already has stats instead of starting cold.
+    for (const def of defs) {
+      await pool.query(`ANALYZE ${SDE_STAGING_SCHEMA}.${def.table}`);
+      log(`analyzed ${SDE_STAGING_SCHEMA}.${def.table}`);
+    }
   }
 
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    // Lock timeout: the swap only ever contends with readers holding brief AccessShareLocks, but
+    // if a stuck client is somehow holding one, fail fast rather than blocking every future query
+    // on these tables.
+    await client.query("SET LOCAL lock_timeout = '30s'");
+    // Contract: nothing may reference sde_* objects (no views, FKs or materialised views) — query
+    // them, never depend on them. The importer drops and replaces them wholesale on every run (see
+    // ddl.ts), so anything that depends on them would be silently dropped along with the old table.
     for (const table of SDE_TABLES) {
       await client.query(`DROP TABLE IF EXISTS public.${table}`);
       await client.query(`ALTER TABLE ${SDE_STAGING_SCHEMA}.${table} SET SCHEMA public`);
@@ -71,12 +85,9 @@ export async function importSde(zipPath: string, pool: Pool, log: (msg: string) 
   return { buildNumber: build.buildNumber, releaseDate: build.releaseDate, counts };
 }
 
-async function readBuild(zipPath: string): Promise<{ buildNumber: number; releaseDate: Date }> {
+async function readBuild(zipPath: string): Promise<SdeBuild> {
   for await (const record of readJsonlMember(zipPath, "_sde.jsonl")) {
-    if (typeof record.buildNumber !== "number" || typeof record.releaseDate !== "string") {
-      throw new Error(`_sde.jsonl has an unexpected record: ${JSON.stringify(record)}`);
-    }
-    return { buildNumber: record.buildNumber, releaseDate: new Date(record.releaseDate) };
+    return parseSdeBuild(record);
   }
   throw new Error("_sde.jsonl is empty");
 }

@@ -5,7 +5,7 @@ import path from "node:path";
 import type { Pool } from "pg";
 import { resetDb, resetSde } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { importSde } from "../../src/lib/sde/import.js";
+import { importSde, SDE_STAGING_SCHEMA } from "../../src/lib/sde/import.js";
 import { readJsonlMember } from "../../src/lib/sde/jsonl.js";
 import { writeZip, type ZipMember } from "../../scripts/lib/zip.js";
 import { FIXTURE_ZIP } from "../sde/fixture.js";
@@ -154,4 +154,60 @@ describe("importSde", () => {
     const { rows } = await pool.query<{ count: string }>("SELECT count(*) FROM sde_types");
     expect(Number(rows[0].count)).toBe(10);
   }, 60_000);
+
+  it("rejects an invalid releaseDate in _sde.jsonl before any staging work", async () => {
+    // Start from a known-clean slate: an earlier test may have left a failed-load's staging schema
+    // behind (it is only dropped at the start of the *next* importSde call), which would make a
+    // pre-existing schema look like this test's own staging work.
+    await pool.query("DROP SCHEMA IF EXISTS sde_import CASCADE");
+    const dest = path.join(tmp, "invalid-date.zip");
+    await writeZip(dest, [{ name: "_sde.jsonl", content: '{"_key":"sde","buildNumber":3484357,"releaseDate":"not-a-date"}\n' }]);
+    await expect(importSde(dest, pool)).rejects.toThrow(/invalid releaseDate/i);
+    const { rows: schemas } = await pool.query("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'sde_import'");
+    expect(schemas.length).toBe(0);
+    const { rows: types } = await pool.query<{ count: string }>("SELECT count(*) FROM sde_types");
+    expect(Number(types[0].count)).toBe(10);
+  }, 60_000);
+
+  it("leaves ANALYZE statistics on the swapped-in table", async () => {
+    await importSde(FIXTURE_ZIP, pool);
+    // pg_stat_user_tables can lag a beat behind the ANALYZE that produced it; pg_stats (which the
+    // planner reads from) is populated synchronously by the ANALYZE command itself, so assert there.
+    const { rows } = await pool.query<{ count: string }>(
+      "SELECT count(*) FROM pg_stats WHERE schemaname = 'public' AND tablename = 'sde_type_attributes'");
+    expect(Number(rows[0].count)).toBeGreaterThan(0);
+  }, 120_000);
+
+  it("keeps the previous SDE live when the load itself fails partway through", async () => {
+    const { rows: before } = await pool.query<{ count: string }>("SELECT count(*) FROM sde_types");
+    const { rows: metaBefore } = await pool.query<{ build_number: number; imported_at: Date }>(
+      "SELECT build_number, imported_at FROM sde_meta WHERE id = 1");
+
+    let failed = false;
+    const failingPool = {
+      query: (...args: unknown[]) => {
+        const sql = args[0];
+        if (!failed && typeof sql === "string" && sql.startsWith(`INSERT INTO ${SDE_STAGING_SCHEMA}.sde_types `)) {
+          failed = true;
+          return Promise.reject(new Error("simulated mid-load failure"));
+        }
+        return (pool.query as (...a: unknown[]) => Promise<unknown>)(...args);
+      },
+      connect: () => pool.connect(),
+    } as unknown as Pool;
+
+    await expect(importSde(FIXTURE_ZIP, failingPool)).rejects.toThrow(/simulated mid-load failure/);
+
+    const { rows: after } = await pool.query<{ count: string }>("SELECT count(*) FROM sde_types");
+    expect(Number(after[0].count)).toBe(Number(before[0].count));
+    const { rows: metaAfter } = await pool.query<{ build_number: number; imported_at: Date }>(
+      "SELECT build_number, imported_at FROM sde_meta WHERE id = 1");
+    expect(metaAfter[0]).toEqual(metaBefore[0]);
+
+    // a normal import afterwards succeeds — the leftover sde_import schema is dropped at the start
+    const result = await importSde(FIXTURE_ZIP, pool);
+    expect(result.buildNumber).toBe(3484357);
+    const { rows: types } = await pool.query<{ count: string }>("SELECT count(*) FROM sde_types");
+    expect(Number(types[0].count)).toBe(10);
+  }, 120_000);
 });

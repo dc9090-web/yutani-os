@@ -6,6 +6,11 @@
  * for `public` — the staging schema never holds provenance.
  *
  * There are deliberately no foreign keys: reference data is swapped wholesale on import.
+ *
+ * Contract: nothing may reference sde_* objects (no views, FKs or materialised views) — query
+ * them, never depend on them. import.ts drops and replaces every sde_* table wholesale on each
+ * run; anything defined on top of them (a view, an FK pointing at them) would be dropped with the
+ * old table before the new one takes its place.
  */
 
 export const SDE_TABLES = [

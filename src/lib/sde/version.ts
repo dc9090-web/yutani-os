@@ -8,6 +8,25 @@ export function sdeUserAgent(): string {
 }
 
 /**
+ * Validates and parses a build-pointer record ({buildNumber, releaseDate}). Shared by the version
+ * poll (`fetchLatestBuild`) and the importer's `_sde.jsonl` reader so both apply the same checks
+ * and a malformed build never gets past parsing.
+ */
+export function parseSdeBuild(record: { buildNumber?: unknown; releaseDate?: unknown }): SdeBuild {
+  if (typeof record.buildNumber !== "number" || typeof record.releaseDate !== "string") {
+    throw new Error(`SDE build record is an unexpected shape: ${JSON.stringify(record)}`);
+  }
+  if (!Number.isInteger(record.buildNumber) || record.buildNumber <= 0) {
+    throw new Error(`SDE build record has an invalid buildNumber: ${record.buildNumber}`);
+  }
+  const releaseDate = new Date(record.releaseDate);
+  if (Number.isNaN(releaseDate.getTime())) {
+    throw new Error(`SDE build record has an invalid releaseDate: ${record.releaseDate}`);
+  }
+  return { buildNumber: record.buildNumber, releaseDate };
+}
+
+/**
  * Reads the 80-byte build pointer:
  *   {"_key": "sde", "buildNumber": 3484357, "releaseDate": "2026-08-28T11:07:12Z"}
  * Cached 5 minutes server-side; a non-2xx is an error and must not trigger a download.
@@ -20,16 +39,5 @@ export async function fetchLatestBuild(fetchImpl: typeof fetch = fetch): Promise
   const body = await res.text();
   const line = body.split("\n").map((l) => l.trim()).find((l) => l.length > 0);
   if (!line) throw new Error("SDE version poll returned an empty body");
-  const record = JSON.parse(line) as { buildNumber?: unknown; releaseDate?: unknown };
-  if (typeof record.buildNumber !== "number" || typeof record.releaseDate !== "string") {
-    throw new Error(`SDE version poll returned an unexpected record: ${line}`);
-  }
-  if (!Number.isInteger(record.buildNumber) || record.buildNumber <= 0) {
-    throw new Error(`SDE version poll returned an invalid buildNumber: ${record.buildNumber}`);
-  }
-  const releaseDate = new Date(record.releaseDate);
-  if (Number.isNaN(releaseDate.getTime())) {
-    throw new Error(`SDE version poll returned an invalid releaseDate: ${record.releaseDate}`);
-  }
-  return { buildNumber: record.buildNumber, releaseDate };
+  return parseSdeBuild(JSON.parse(line) as { buildNumber?: unknown; releaseDate?: unknown });
 }
