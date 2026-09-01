@@ -1,6 +1,5 @@
 import { defineConfig } from "vitest/config";
-import path from "node:path";
 export default defineConfig({
   test: { environment: "happy-dom", setupFiles: ["./tests/setup.ts"], globals: true, fileParallelism: false },
-  resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+  resolve: { alias: { "@": new URL("./src", import.meta.url).pathname } },
 });
