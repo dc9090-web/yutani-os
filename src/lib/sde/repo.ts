@@ -189,3 +189,54 @@ export async function getTypeBonuses(typeId: number): Promise<SdeTypeBonus[]> {
      FROM sde_type_bonuses WHERE type_id = $1 ORDER BY idx`, [typeId]);
   return rows;
 }
+
+export interface SdeBrowseType {
+  id: number; name: string | null; groupId: number | null; categoryId: number | null;
+  marketGroupId: number | null; metaGroupId: number | null; metaLevel: number | null;
+}
+export interface BrowseOptions { q?: string; categoryIds?: number[]; marketGroupId?: number; limit?: number }
+export interface SdeMarketGroup { id: number; parentId: number | null; name: string | null; hasTypes: boolean | null }
+
+/**
+ * The fitting designer's item browser (spec §4). Distinct from `searchTypes`, which the Skills page
+ * uses and whose signature must not change. Published types only; name-ascending.
+ */
+export async function browseTypes(opts: BrowseOptions): Promise<SdeBrowseType[]> {
+  const { rows } = await getPool().query<SdeBrowseType>(
+    `SELECT t.id, t.name, t.group_id AS "groupId", g.category_id AS "categoryId",
+            t.market_group_id AS "marketGroupId", t.meta_group_id AS "metaGroupId",
+            t.meta_level AS "metaLevel"
+     FROM sde_types t LEFT JOIN sde_groups g ON g.id = t.group_id
+     WHERE t.published
+       AND ($1::text IS NULL OR strpos(lower(t.name), lower($1)) > 0)
+       AND ($2::int[] IS NULL OR g.category_id = ANY($2::int[]))
+       AND ($3::int IS NULL OR t.market_group_id = $3)
+     ORDER BY t.name, t.id
+     LIMIT $4`,
+    [opts.q ?? null, opts.categoryIds ?? null, opts.marketGroupId ?? null, opts.limit ?? 50]);
+  return rows;
+}
+
+/** The whole market-group tree — 2,106 rows the client assembles into parents and children. */
+export async function listMarketGroups(): Promise<SdeMarketGroup[]> {
+  const { rows } = await getPool().query<SdeMarketGroup>(
+    `SELECT id, parent_id AS "parentId", name, has_types AS "hasTypes"
+     FROM sde_market_groups ORDER BY id`);
+  return rows;
+}
+
+/** metaGroupId → "Tech II" etc., for the badge on a browser row. */
+export async function getMetaGroups(): Promise<Map<number, string>> {
+  const { rows } = await getPool().query<{ id: number; name: string | null }>(
+    "SELECT id, name FROM sde_meta_groups ORDER BY id");
+  return new Map(rows.filter((r) => r.name !== null).map((r) => [r.id, r.name as string]));
+}
+
+/** Lower-cased name → type id, for EFT import (spec §5: exact, case-insensitive). */
+export async function getTypesByNames(names: string[]): Promise<Map<string, number>> {
+  const wanted = [...new Set(names.map((n) => n.trim().toLowerCase()))].filter((n) => n !== "");
+  if (wanted.length === 0) return new Map();
+  const { rows } = await getPool().query<{ key: string; id: number }>(
+    `SELECT lower(name) AS key, id FROM sde_types WHERE lower(name) = ANY($1::text[])`, [wanted]);
+  return new Map(rows.map((r) => [r.key, r.id]));
+}
