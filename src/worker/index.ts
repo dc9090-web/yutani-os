@@ -3,17 +3,15 @@ import { createEsiClient } from "../lib/esi/index.js";
 import { listCharacters, setTokenStatus } from "../lib/db/characters.js";
 import { startRun, finishRun } from "../lib/db/sync-runs.js";
 import { Scheduler } from "./scheduler.js";
-import { characterInfoJob } from "./jobs/character-info.js";
-import { sdeUpdateJob } from "./jobs/sde-update.js";
+import { ALL_JOBS } from "./jobs/index.js";
 
 const TICK_MS = 30_000;
 getConfig();   // fail fast on missing env
 const scheduler = new Scheduler({
-  // sde-update first: on a fresh database the first tick imports the SDE.
-  jobs: [sdeUpdateJob, characterInfoJob], esi: createEsiClient(), listCharacters, startRun, finishRun,
+  jobs: ALL_JOBS, esi: createEsiClient(), listCharacters, startRun, finishRun,
   markNeedsReauth: (id) => setTokenStatus(id, "needs_reauth"),
 });
-console.log("[worker] started");
+console.log(`[worker] started with ${ALL_JOBS.length} jobs`);
 async function loop() {
   try { await scheduler.tick(); } catch (e) { console.error("[worker] tick failed:", e); }
   setTimeout(loop, TICK_MS);

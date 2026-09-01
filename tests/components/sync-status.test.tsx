@@ -13,4 +13,16 @@ describe("SyncStatus", () => {
     render(<SyncStatus runs={[]} names={{}} />);
     expect(screen.getByText(/no sync runs yet/i)).toBeInTheDocument();
   });
+  it("lists every phase-3 job, including the global one with no character", () => {
+    const names = ["sde-update", "character-info", "skills", "clones", "assets", "fittings", "wallet", "location"];
+    render(<SyncStatus
+      runs={names.map((job, i) => ({
+        job, characterId: job === "sde-update" ? null : 1, startedAt: new Date("2026-09-01T12:00:00Z"),
+        finishedAt: new Date("2026-09-01T12:00:05Z"), status: "ok" as const, rows: i, error: null,
+      }))}
+      names={{ 1: "TrilliumONE" }} />);
+    for (const job of names) expect(screen.getByText(job)).toBeInTheDocument();
+    expect(screen.getByText("—")).toBeInTheDocument();          // the global sde-update row
+    expect(screen.getAllByText("TrilliumONE")).toHaveLength(7);
+  });
 });
