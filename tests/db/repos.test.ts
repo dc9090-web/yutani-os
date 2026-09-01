@@ -64,10 +64,10 @@ describe("characters", () => {
 describe("esi_cache", () => {
   it("round-trips and upserts", async () => {
     expect(await getCached(0, "/markets/prices")).toBeNull();
-    await putCached(0, "/markets/prices", { etag: "a", expiresAt: new Date("2030-01-01"), pages: 1, body: [1] });
-    await putCached(0, "/markets/prices", { etag: "b", expiresAt: null, pages: 2, body: [2] });
+    await putCached(0, "/markets/prices", { etag: "a", expiresAt: new Date("2030-01-01"), pages: 1, body: [1], lastModified: "Mon, 01 Sep 2026 10:00:00 GMT" });
+    await putCached(0, "/markets/prices", { etag: "b", expiresAt: null, pages: 2, body: [2], lastModified: "Mon, 01 Sep 2026 10:30:00 GMT" });
     const e = await getCached(0, "/markets/prices");
-    expect(e).toMatchObject({ etag: "b", expiresAt: null, pages: 2, body: [2] });
+    expect(e).toMatchObject({ etag: "b", expiresAt: null, pages: 2, body: [2], lastModified: "Mon, 01 Sep 2026 10:30:00 GMT" });
   });
 });
 

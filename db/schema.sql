@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS esi_cache (
   updated_at    timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (character_id, path)
 );
+ALTER TABLE esi_cache ADD COLUMN IF NOT EXISTS last_modified text;
 
 CREATE TABLE IF NOT EXISTS sync_runs (
   id            bigserial PRIMARY KEY,

@@ -70,7 +70,7 @@ export class EsiClient {
 
     const cached = await this.deps.cache.get(cid, key);
     if (!opts.fresh && cached?.expiresAt && cached.expiresAt.getTime() > this.now()) {
-      return { data: cached.body as T, status: 200, pages: cached.pages, fromCache: true, lastModified: null };
+      return { data: cached.body as T, status: 200, pages: cached.pages, fromCache: true, lastModified: cached.lastModified };
     }
 
     const headers = await this.headers(opts.characterId);
@@ -81,23 +81,31 @@ export class EsiClient {
     const expiresAt = parseHttpDate(res.headers.get("Expires"));
 
     if (res.status === 304 && cached) {
-      await this.deps.cache.put(cid, key, { ...cached, expiresAt: expiresAt ?? cached.expiresAt, pages });
-      return { data: cached.body as T, status: 304, pages, fromCache: true, lastModified: res.headers.get("Last-Modified") };
+      const lastModified = res.headers.get("Last-Modified") ?? cached.lastModified;
+      await this.deps.cache.put(cid, key, { ...cached, expiresAt: expiresAt ?? cached.expiresAt, pages, lastModified });
+      return { data: cached.body as T, status: 304, pages, fromCache: true, lastModified };
     }
     if (!res.ok) {
       const text = await res.text().catch(() => "");
       throw new EsiError(res.status, key, `ESI ${res.status} for ${key}: ${text.slice(0, 200)}`);
     }
     const data = (await res.json()) as T;
-    await this.deps.cache.put(cid, key, { etag: res.headers.get("ETag"), expiresAt, pages, body: data });
-    return { data, status: res.status, pages, fromCache: false, lastModified: res.headers.get("Last-Modified") };
+    const lastModified = res.headers.get("Last-Modified");
+    await this.deps.cache.put(cid, key, { etag: res.headers.get("ETag"), expiresAt, pages, body: data, lastModified });
+    return { data, status: res.status, pages, fromCache: false, lastModified };
   }
 
   /**
    * ESI's docs: every page of one paginated resource carries the same `Last-Modified`. A page that
    * disagrees means the data refreshed mid-walk and the assembled set is torn — discard it and walk
-   * again, this time ignoring any still-valid cached page (a cache hit has no Last-Modified to
-   * compare, so a cached page 1 would hide a second tear). Still torn → the caller gets a 409.
+   * again, this time bypassing any still-valid cached page so every page is re-fetched from the
+   * network (with `If-None-Match` still sent) instead of reusing a cached body that may already be
+   * stale relative to what a torn page 2 just revealed. Still torn → the caller gets a 409.
+   *
+   * `esi_cache.last_modified` is what makes a cache hit able to take part in this comparison at
+   * all; rows written before that column existed read back as NULL, which this code treats the
+   * same as "ESI sent no Last-Modified" — the comparison is skipped once for that row and it
+   * self-heals as soon as the row is next written by a real network response.
    */
   async getAll<T>(path: string, opts: Omit<GetOpts, "page" | "fresh"> = {}): Promise<T[]> {
     for (let attempt = 0; attempt < 2; attempt++) {

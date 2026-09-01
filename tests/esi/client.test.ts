@@ -206,4 +206,16 @@ describe("EsiClient", () => {
     expect(await client.getAll<number>("/z", { characterId: 1 })).toEqual([1, 2]);
     expect(calls.length).toBe(4);                    // page 1 was re-requested despite the fresh cache
   });
+  it("detects a tear even when page 1 is served from a cache hit that carries a Last-Modified", async () => {
+    const a = "Mon, 01 Sep 2026 10:00:00 GMT";
+    const b = "Mon, 01 Sep 2026 10:30:00 GMT";
+    const { client, calls, store } = make([
+      { status: 200, body: [2], headers: { "Last-Modified": b } },                 // page 2, torn vs cached page 1's a
+      { status: 200, body: [1], headers: { "X-Pages": "2", "Last-Modified": b } }, // retry: page 1 re-fetched fresh
+      { status: 200, body: [2], headers: { "Last-Modified": b } },                 // retry: page 2, now consistent
+    ]);
+    store.set("1/z?page=1", { etag: null, expiresAt: new Date(1_700_000_000_000 + 3_600_000), pages: 2, body: [1], lastModified: a });
+    expect(await client.getAll<number>("/z", { characterId: 1 })).toEqual([1, 2]);
+    expect(calls.length).toBe(3);                    // page 1's first read never hit the network at all
+  });
 });
