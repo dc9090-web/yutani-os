@@ -116,6 +116,14 @@ describe("resolveNames", () => {
     const h = harness({ esi: { post: async () => { throw new EsiError(503, "/universe/names", "down"); }, get: async () => ({ data: {} }) } as unknown as NameResolverDeps["esi"] });
     await expect(h.resolver.resolveNames([34])).rejects.toMatchObject({ status: 503 });
   });
+  it("never posts structure ids (>= 1e12); they resolve to unknown without a cached negative entry", async () => {
+    const h = harness();
+    const out = await h.resolver.resolveNames([34, 1035466617946]);
+    expect(h.posts).toEqual([[34]]);
+    expect(out.get(1035466617946)).toEqual({ name: null, category: "unknown" });
+    expect(out.get(34)!.name).toBe("Tritanium");
+    expect(h.names.has(1035466617946)).toBe(false);
+  });
 });
 
 describe("resolveLocations", () => {
@@ -133,6 +141,17 @@ describe("resolveLocations", () => {
     const out = await h.resolver.resolveLocations([1035466617946], 1);
     expect(out.get(1035466617946)).toEqual({ kind: "structure", name: null, solarSystemId: null });
     expect(h.structures.get(1035466617946)!.forbidden).toBe(true);
+  });
+  it("stores forbidden = true on a 404 (deleted/moved structure) and does not throw", async () => {
+    const h = harness({ esi: { post: async () => [], get: async () => { throw new EsiError(404, "/universe/structures/1", "Not found"); } } as unknown as NameResolverDeps["esi"] });
+    const out = await h.resolver.resolveLocations([1035466617946], 1);
+    expect(out.get(1035466617946)).toEqual({ kind: "structure", name: null, solarSystemId: null });
+    expect(h.structures.get(1035466617946)!.forbidden).toBe(true);
+  });
+  it("lets a 5xx on the structure fetch propagate instead of caching forbidden", async () => {
+    const h = harness({ esi: { post: async () => [], get: async () => { throw new EsiError(503, "/universe/structures/1", "down"); } } as unknown as NameResolverDeps["esi"] });
+    await expect(h.resolver.resolveLocations([1035466617946], 1)).rejects.toMatchObject({ status: 503 });
+    expect(h.structures.has(1035466617946)).toBe(false);
   });
   it("skips the structure call entirely when the token lacks the scope", async () => {
     const h = harness({ hasStructureScope: async () => false });

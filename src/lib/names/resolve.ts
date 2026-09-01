@@ -69,11 +69,19 @@ export function createNameResolver(deps: NameResolverDeps): NameResolver {
     const wanted = usable(ids);
     const out = new Map<number, ResolvedName>();
     if (wanted.length === 0) return out;
+
+    // Structure ids (>= 1e12) 404 the whole POST /universe/names batch and can never resolve
+    // there; they are named via /universe/structures/{id} instead, so skip them entirely here
+    // rather than caching a negative entry that would just get bisected out every time.
+    const postable = wanted.filter((id) => id < 1e12);
+    for (const id of wanted) if (id >= 1e12) out.set(id, { name: null, category: UNKNOWN_CATEGORY });
+    if (postable.length === 0) return out;
+
     const at = now();
-    for (const row of await deps.getNames(wanted)) {
+    for (const row of await deps.getNames(postable)) {
       if (isFresh(row, at)) out.set(row.id, { name: row.name, category: row.category });
     }
-    for (const batch of chunk(wanted.filter((id) => !out.has(id)), NAMES_CHUNK)) {
+    for (const batch of chunk(postable.filter((id) => !out.has(id)), NAMES_CHUNK)) {
       const resolved = await fetchNames(batch);
       const seen = new Set(resolved.map((r) => r.id));
       const rows = [
@@ -87,14 +95,19 @@ export function createNameResolver(deps: NameResolverDeps): NameResolver {
     return out;
   }
 
-  /** 403 means the character is not on the structure's ACL — remember that and stop asking. */
+  /**
+   * A 4xx means this id will never resolve for this character: 403 is an ACL miss, 404 is a
+   * structure that was deleted or moved out of range. Remember that and stop asking. A 5xx
+   * (including EsiUnavailableError, which is a 503) or a non-ESI error is transient or unrelated
+   * to this specific id, so it propagates and the run is retried instead of caching a false negative.
+   */
   async function fetchStructure(id: number, characterId: number, at: number): Promise<StructureRow> {
     let row: StructureInput;
     try {
       const { data } = await deps.esi.get<EsiStructure>(`/universe/structures/${id}`, { characterId });
       row = { id, name: data.name, solarSystemId: data.solar_system_id, typeId: data.type_id ?? null, ownerId: data.owner_id, forbidden: false };
     } catch (e) {
-      if (!(e instanceof EsiError) || e.status !== 403) throw e;
+      if (!(e instanceof EsiError) || e.status < 400 || e.status >= 500) throw e;
       row = { id, name: null, solarSystemId: null, typeId: null, ownerId: null, forbidden: true };
     }
     await deps.putStructure(row);
