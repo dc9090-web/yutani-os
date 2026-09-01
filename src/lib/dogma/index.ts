@@ -12,7 +12,8 @@ export {
 export { PENALTY_BASE, penalizeValues, round2 } from "./operators.js";
 export {
   CHARACTER_TYPE_ID, HARDPOINTS, SLOT_KINDS, UnknownTypeError, addModule, attachCharge, createFit,
-  effectiveState, fitItems, hardpointOf, makeItem, makeSkill, requiredSkills, slotOf,
+  defaultStateOfType, effectiveState, fitItems, hardpointOf, hardpointOfType, kindOfType, makeItem,
+  makeSkill, requiredSkills, slotOf, slotOfType,
   type Fit, type Hardpoint, type Item, type ItemDomain, type ItemKind, type SlotKind, type Slotted,
 } from "./fit.js";
 export {
