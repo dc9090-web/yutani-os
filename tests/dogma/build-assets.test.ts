@@ -146,4 +146,48 @@ describe("fitFromAssets", () => {
     expect(built.fit.modules.find((m) => m.slot === "high" && m.index === 2)?.item.charge).toBeUndefined();
     expect(built.unfittable).toEqual([{ typeId: 2889, quantity: 1, flag: "HiSlot2", name: null }]);
   });
+
+  it("picks the known, slot-matching singleton as the module regardless of entry order", () => {
+    // Unknown "ammo" and a known gun share HiSlot0 — the gun (known, carries the hi-slot marker) is
+    // the module; the unknown entry always lands in `unknown`, whichever order they arrive in.
+    const forward = fitFromAssets(SHIP, [
+      asset({ itemId: 6001, typeId: 999999, locationFlag: "HiSlot0", quantity: 50, isSingleton: false }),
+      asset({ itemId: 6002, typeId: 2889, locationFlag: "HiSlot0" }),
+    ], ctx);
+    expect(forward.fit.modules.map((m) => [m.item.typeId, m.slot, m.index])).toEqual([[2889, "high", 0]]);
+    expect(forward.unknown).toEqual([{ typeId: 999999, quantity: 50, flag: "HiSlot0", name: null }]);
+    expect(forward.unfittable).toEqual([]);
+
+    const reversed = fitFromAssets(SHIP, [
+      asset({ itemId: 6003, typeId: 2889, locationFlag: "HiSlot0" }),
+      asset({ itemId: 6004, typeId: 999999, locationFlag: "HiSlot0", quantity: 50, isSingleton: false }),
+    ], ctx);
+    expect(reversed.fit.modules.map((m) => [m.item.typeId, m.slot, m.index])).toEqual([[2889, "high", 0]]);
+    expect(reversed.unknown).toEqual([{ typeId: 999999, quantity: 50, flag: "HiSlot0", name: null }]);
+    expect(reversed.unfittable).toEqual([]);
+  });
+
+  it("sends a known singleton of the wrong slot kind to unfittable instead of treating it as the module", () => {
+    // Damage Control II (2048) is a low-slot module; a singleton of it under HiSlot0 is a real module,
+    // just the wrong kind for a hi slot — it's unfittable, not promoted into the slot.
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 6005, typeId: 2048, locationFlag: "HiSlot0" }),
+    ], ctx);
+    expect(built.fit.modules).toEqual([]);
+    expect(built.unfittable).toEqual([{ typeId: 2048, quantity: 1, flag: "HiSlot0", name: null }]);
+    expect(built.cargo).toEqual([]);
+    expect(built.unknown).toEqual([]);
+  });
+
+  it("treats a singleton charge sharing a module's flag as the charge, not a second module candidate", () => {
+    // Hail S (12608, category 8) carries no slot marker at all, so a singleton stack of it is a
+    // charge even though `is_singleton` is true (item 5).
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 6006, typeId: 2889, locationFlag: "HiSlot0" }),
+      asset({ itemId: 6007, typeId: 12608, locationFlag: "HiSlot0" }),
+    ], ctx);
+    expect(built.fit.modules.map((m) => [m.item.typeId, m.slot, m.index])).toEqual([[2889, "high", 0]]);
+    expect(built.fit.modules[0].item.charge?.typeId).toBe(12608);
+    expect(built.unfittable).toEqual([]);
+  });
 });

@@ -111,4 +111,31 @@ describe("fitFromFitting", () => {
     expect(built.fit.modules[0].item.charge).toBeUndefined();
     expect(built.unfittable).toEqual([{ typeId: 484, quantity: 1, flag: "HiSlot0", name: null }]);
   });
+
+  it("picks the known, slot-matching entry as the module regardless of row order", () => {
+    // Unknown "ammo" and a known gun share HiSlot1 — the gun (known, carries the hi-slot marker) is
+    // the module; the unknown entry always lands in `unknown`, whichever order the rows arrive in.
+    const forward = fitting(587, [[999999, 50, "HiSlot1"], [484, 1, "HiSlot1"]]);
+    const builtForward = fitFromFitting(forward, forward.items, ctx);
+    expect(builtForward.fit.modules.map((m) => [m.item.typeId, m.slot, m.index])).toEqual([[484, "high", 1]]);
+    expect(builtForward.unknown).toEqual([{ typeId: 999999, quantity: 50, flag: "HiSlot1", name: null }]);
+    expect(builtForward.unfittable).toEqual([]);
+
+    const reversed = fitting(587, [[484, 1, "HiSlot1"], [999999, 50, "HiSlot1"]]);
+    const builtReversed = fitFromFitting(reversed, reversed.items, ctx);
+    expect(builtReversed.fit.modules.map((m) => [m.item.typeId, m.slot, m.index])).toEqual([[484, "high", 1]]);
+    expect(builtReversed.unknown).toEqual([{ typeId: 999999, quantity: 50, flag: "HiSlot1", name: null }]);
+    expect(builtReversed.unfittable).toEqual([]);
+  });
+
+  it("sends a known entry of the wrong slot kind to unfittable instead of treating it as the module", () => {
+    // Damage Control II (2048) is a low-slot module; a row of it under HiSlot0 is a real module, just
+    // the wrong kind for a hi slot — it's unfittable, not promoted into the slot.
+    const f = fitting(587, [[2048, 1, "HiSlot0"]]);
+    const built = fitFromFitting(f, f.items, ctx);
+    expect(built.fit.modules).toEqual([]);
+    expect(built.unfittable).toEqual([{ typeId: 2048, quantity: 1, flag: "HiSlot0", name: null }]);
+    expect(built.cargo).toEqual([]);
+    expect(built.unknown).toEqual([]);
+  });
 });

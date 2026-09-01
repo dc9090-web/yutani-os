@@ -75,18 +75,31 @@ export function fitFromAssets(shipAsset: AssetRow, childAssets: AssetRow[], ctx:
 
   for (const flag of orderedFlags(slotted.keys())) {
     const group = slotted.get(flag) ?? [];
-    // The singleton is the module; anything non-singleton sharing its flag is a charge. With no
-    // singleton at all there is no module to hang a charge under, so the whole group is cargo — a
-    // charge is never promoted into the slot on its own (review tightening #1).
-    const candidates = group.filter((g) => g.isSingleton);
-    if (candidates.length === 0) { built.cargo.push(...group.map((g) => g.entry)); continue; }
-    const [module, ...extra] = candidates;
+    const { slot, index } = slotFromFlag(flag)!;
+    const matches: FitEntry[] = [];
+    const charges: FitEntry[] = [];
+    for (const g of group) {
+      // The singleton is the module; anything non-singleton sharing its flag is a charge — including
+      // a non-singleton entry whose type happens to carry a slot marker, since a stack is never the
+      // module (review tightening #1's non-promotion extends here too).
+      if (!g.isSingleton) { classifyKnownOrUnknown(built, ctx.data, g.entry, charges); continue; }
+      switch (slotVerdict(ctx.data, g.entry.typeId, slot)) {
+        case "unknown": built.unknown.push(g.entry); break;
+        case "module": matches.push(g.entry); break;
+        // A singleton of the wrong slot kind (e.g. a low-slot module singleton under a HiSlot flag) is
+        // neither the module nor a charge — it's unfittable (review tightening: known-and-marker-kind).
+        case "mismatch": built.unfittable.push(g.entry); break;
+        // A singleton that carries no slot marker at all (category 8 charges can be singleton, item 5)
+        // is a charge.
+        case "charge": charges.push(g.entry); break;
+      }
+    }
+    if (matches.length === 0) { built.cargo.push(...charges); continue; }
+    const [module, ...extra] = matches;
     // A second singleton sharing the flag is not a charge either — it's an unfittable extra module
     // (review tightening #2).
-    built.unfittable.push(...extra.map((g) => g.entry));
-    const { slot, index } = slotFromFlag(flag)!;
-    const charges = group.filter((g) => !g.isSingleton).map((g) => g.entry);
-    fitOneModule(built, ctx, module.entry, slot, index, charges);
+    built.unfittable.push(...extra);
+    fitOneModule(built, ctx, module, slot, index, charges);
   }
 
   clearMemo(built.fit);
@@ -111,18 +124,28 @@ export function fitFromFitting(fitting: FittingRow, items: FittingItemRow[], ctx
 
   for (const flag of orderedFlags(slotted.keys())) {
     const group = slotted.get(flag) ?? [];
-    // The module is the entry whose type carries the slot's marker effect. A type this SDE build
-    // doesn't know can't be ruled out either way, so it stays a candidate (and any build failure lands
-    // it in `unknown`, same as fitFromAssets). With no candidate at all the whole group is cargo — a
-    // charge is never promoted into the slot on its own (review tightening #1).
-    const candidates = group.filter((entry) => isModuleCandidate(ctx.data, entry.typeId));
-    if (candidates.length === 0) { built.cargo.push(...group); continue; }
-    const [module, ...extra] = candidates;
-    // A second marker-carrying (or unresolvable) entry sharing the flag is not a charge either — it's
-    // an unfittable extra module (review tightening #2).
-    built.unfittable.push(...extra);
     const { slot, index } = slotFromFlag(flag)!;
-    const charges = group.filter((entry) => !isModuleCandidate(ctx.data, entry.typeId));
+    const matches: FitEntry[] = [];
+    const charges: FitEntry[] = [];
+    for (const entry of group) {
+      switch (slotVerdict(ctx.data, entry.typeId, slot)) {
+        // A type this SDE build doesn't know can't be ruled out either way, so it's neither a module
+        // candidate nor a charge — it always lands in `unknown` (never unfittable, never promoted).
+        case "unknown": built.unknown.push(entry); break;
+        // The entry's type carries this flag's own slot marker: a module candidate.
+        case "module": matches.push(entry); break;
+        // The entry's type carries a *different* slot's marker — a real module, just the wrong kind
+        // for this flag, so it can't be a charge either. Unfittable.
+        case "mismatch": built.unfittable.push(entry); break;
+        // The entry's type carries no slot marker at all — a charge (or cargo, if no module).
+        case "charge": charges.push(entry); break;
+      }
+    }
+    if (matches.length === 0) { built.cargo.push(...charges); continue; }
+    const [module, ...extra] = matches;
+    // A second marker-carrying entry sharing the flag is not a charge either — it's an unfittable
+    // extra module (review tightening #2).
+    built.unfittable.push(...extra);
     fitOneModule(built, ctx, module, slot, index, charges);
   }
 
@@ -130,14 +153,26 @@ export function fitFromFitting(fitting: FittingRow, items: FittingItemRow[], ctx
   return built;
 }
 
-function carriesSlotMarker(data: DogmaData, typeId: TypeId): boolean {
+type SlotVerdict = "unknown" | "module" | "mismatch" | "charge";
+
+/**
+ * Where a known-or-unknown type stands relative to a slot flag's own kind:
+ *  - `unknown`  — this SDE build doesn't have the type at all.
+ *  - `module`   — it carries *this* flag's slot marker: a candidate for the module.
+ *  - `mismatch` — it carries a *different* slot's marker: a module, just the wrong kind here.
+ *  - `charge`   — it carries no slot marker at all.
+ */
+function slotVerdict(data: DogmaData, typeId: TypeId, flagSlot: SlotKind): SlotVerdict {
   const type = data.types.get(typeId);
-  return type !== undefined && slotOfType(type) !== null;
+  if (!type) return "unknown";
+  const kind = slotOfType(type);
+  if (kind === null) return "charge";
+  return kind === flagSlot ? "module" : "mismatch";
 }
 
-/** A type this build doesn't know can't be confirmed as a charge, so it isn't excluded as a candidate. */
-function isModuleCandidate(data: DogmaData, typeId: TypeId): boolean {
-  return !data.types.has(typeId) || carriesSlotMarker(data, typeId);
+/** For a non-singleton asset row: unknown types always land in `unknown`, known types are a charge. */
+function classifyKnownOrUnknown(built: BuiltFit, data: DogmaData, entry: FitEntry, charges: FitEntry[]): void {
+  if (data.types.has(entry.typeId)) charges.push(entry); else built.unknown.push(entry);
 }
 
 function startFit(ctx: FitContext, shipTypeId: TypeId): BuiltFit {
