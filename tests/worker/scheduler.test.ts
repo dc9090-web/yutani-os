@@ -54,4 +54,36 @@ describe("Scheduler", () => {
     expect(markNeedsReauth).not.toHaveBeenCalled();
     expect(finished[0].status).toBe("error"); expect(finished[0].error).toBe("forbidden");
   });
+  it("runs a global job with no characters at all and records character_id = null", async () => {
+    const run = vi.fn(async (ctx: { esi: unknown }) => { expect(Object.keys(ctx)).toEqual(["esi"]); return 7; });
+    const { s, runs, finished, advance } = make([{ name: "g", scope: "global", intervalMs: 60_000, run }], []);
+    expect(await s.tick()).toBe(1);
+    expect(runs).toEqual([{ job: "g", cid: null }]);
+    expect(finished).toEqual([{ id: 1, status: "ok", rows: 7 }]);
+    advance(30_000); expect(await s.tick()).toBe(0);    // not due yet
+    advance(30_000); expect(await s.tick()).toBe(1);    // interval elapsed
+    expect(runs).toEqual([{ job: "g", cid: null }, { job: "g", cid: null }]);
+  });
+
+  it("runs global jobs without staggering them behind character jobs", async () => {
+    const { s, runs } = make([
+      { name: "c", intervalMs: 60_000, run: async () => 1 },
+      { name: "g", scope: "global", intervalMs: 60_000, run: async () => 2 },
+    ]);
+    // character 1 is due at t=0, character 2 at t=5s; the global job is never staggered
+    expect(await s.tick()).toBe(2);
+    expect(runs).toEqual([{ job: "g", cid: null }, { job: "c", cid: 1 }]);
+  });
+
+  it("records a global job error without flagging any character for re-authorisation", async () => {
+    const markNeedsReauth = vi.fn(async () => {});
+    const { s, finished } = make(
+      [{ name: "g", scope: "global", intervalMs: 60_000, run: async () => { throw new Error("sde boom"); } }],
+      [],
+      markNeedsReauth,
+    );
+    await s.tick();
+    expect(finished).toEqual([{ id: 1, status: "error", error: "sde boom" }]);
+    expect(markNeedsReauth).not.toHaveBeenCalled();
+  });
 });
