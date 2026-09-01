@@ -3,7 +3,7 @@ import type { GlobalSyncJob, JobOutcome } from "../scheduler.js";
 import { fetchAggregates } from "../../lib/market/fuzzwork.js";
 import { typesOfInterest } from "../../lib/market/interest.js";
 import {
-  upsertEsiPrices, upsertJitaPrices, type EsiPriceRow, type JitaPriceRow,
+  touchMissingJitaPrices, upsertEsiPrices, upsertJitaPrices, type EsiPriceRow, type JitaPriceRow,
 } from "../../lib/db/market-prices.js";
 
 /** Spec §3. ESI caches /markets/prices for an hour, so the interval and the cache line up exactly. */
@@ -33,6 +33,8 @@ export interface MarketPricesDeps {
   fetchAggregates: (typeIds: number[]) => Promise<JitaPriceRow[]>;
   upsertEsiPrices: (rows: EsiPriceRow[]) => Promise<number>;
   upsertJitaPrices: (rows: JitaPriceRow[]) => Promise<number>;
+  /** See `touchMissingJitaPrices`: an id Fuzzwork's response left out, never a stored price nulled. */
+  touchMissingJitaPrices: (typeIds: number[]) => Promise<number>;
   log?: (msg: string) => void;
 }
 
@@ -68,6 +70,11 @@ export function createMarketPricesJob(deps: MarketPricesDeps): GlobalSyncJob {
         return { rows, warn: `Fuzzwork aggregates failed for ${typeIds.length} types: ${message}` };
       }
       rows += await deps.upsertJitaPrices(jita);
+      // A type of interest Fuzzwork's response left out entirely still needs its `updated_at`
+      // touched, or `stalePriceIds` (and so the fitting editor's Fuzzwork top-up) reports it every
+      // single call. This never nulls a price already on file — see `touchMissingJitaPrices`.
+      const missing = typeIds.filter((id) => !jita.some((r) => r.typeId === id));
+      if (missing.length > 0) rows += await deps.touchMissingJitaPrices(missing);
       log(`market-prices: ${jita.length} Jita aggregates for ${typeIds.length} types of interest`);
       return rows;
     },
@@ -80,5 +87,6 @@ export const marketPricesJob: GlobalSyncJob = createMarketPricesJob({
   fetchAggregates: (typeIds) => fetchAggregates(typeIds),
   upsertEsiPrices: (rows) => upsertEsiPrices(rows),
   upsertJitaPrices: (rows) => upsertJitaPrices(rows),
+  touchMissingJitaPrices: (typeIds) => touchMissingJitaPrices(typeIds),
   log: (msg) => console.log(`[worker] ${msg}`),
 });

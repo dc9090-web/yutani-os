@@ -73,6 +73,13 @@ describe("POST /api/fits/import", () => {
     await expect(res.json()).resolves.toMatchObject({ unresolved: [] });
   });
 
+  it("clamps a fit name over 60 chars instead of storing one a later save would 400 on", async () => {
+    const longName = "A".repeat(80);
+    const res = await IMPORT(post("import", { text: `[Rifter, ${longName}]\nDamage Control II\n` }));
+    expect(res.status).toBe(201);
+    expect(createFit).toHaveBeenCalledWith(expect.objectContaining({ name: "A".repeat(60) }));
+  });
+
   it("reports names it could not resolve without failing", async () => {
     const res = await IMPORT(post("import", { text: "[Rifter, Typos]\nDamage Controll II\n" }));
     expect(res.status).toBe(201);

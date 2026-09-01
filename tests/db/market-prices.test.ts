@@ -2,7 +2,9 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { Pool } from "pg";
 import { resetDb } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { getPrices, upsertEsiPrices, upsertJitaPrices, stalePriceIds } from "../../src/lib/db/market-prices.js";
+import {
+  getPrices, upsertEsiPrices, upsertJitaPrices, stalePriceIds, touchMissingJitaPrices,
+} from "../../src/lib/db/market-prices.js";
 
 let pool: Pool;
 
@@ -53,6 +55,30 @@ describe("market_prices repo", () => {
       { typeId: 44992, sellMin: 20, buyMax: 19 },
     ])).resolves.toBe(1);
     expect((await getPrices([44992])).get(44992)).toEqual({ sell: 20, buy: 19, adjusted: 2 });
+  });
+});
+
+describe("touchMissingJitaPrices", () => {
+  it("gives a brand-new id a NULL-jita row that still drops out of stalePriceIds", async () => {
+    expect(await stalePriceIds([424242], 24)).toEqual([424242]);
+    expect(await touchMissingJitaPrices([424242])).toBe(1);
+    expect(await stalePriceIds([424242], 24)).toEqual([]);
+    expect((await getPrices([424242])).get(424242)).toEqual({ sell: null, buy: null, adjusted: null });
+  });
+
+  it("bumps updated_at for an existing row without nulling its non-null jita price", async () => {
+    await upsertJitaPrices([{ typeId: 77001, sellMin: 5.5, buyMax: 5.1 }]);
+    await pool.query("UPDATE market_prices SET updated_at = now() - interval '30 hours' WHERE type_id = 77001");
+    expect(await stalePriceIds([77001], 24)).toEqual([77001]);
+
+    await touchMissingJitaPrices([77001]);
+
+    expect(await stalePriceIds([77001], 24)).toEqual([]);
+    expect((await getPrices([77001])).get(77001)).toEqual({ sell: 5.5, buy: 5.1, adjusted: null });
+  });
+
+  it("no-ops on empty input", async () => {
+    expect(await touchMissingJitaPrices([])).toBe(0);
   });
 });
 

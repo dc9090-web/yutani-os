@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
-import { parseFitCreate, parseFitItems, parseFitPatch } from "../../src/lib/fits/parse.js";
+import { clampFitName, parseFitCreate, parseFitItems, parseFitPatch } from "../../src/lib/fits/parse.js";
 
 const { listFits, getFit, createFit, updateFit, deleteFit } = vi.hoisted(() => ({
   listFits: vi.fn(), getFit: vi.fn(), createFit: vi.fn(), updateFit: vi.fn(), deleteFit: vi.fn(),
@@ -66,12 +66,40 @@ describe("parseFitCreate / parseFitPatch", () => {
     expect(parseFitCreate({ name: "ok", shipTypeId: "587" })).toBeNull();
   });
 
+  it("rejects a name that would break an EFT header: newline, carriage return or ]", () => {
+    expect(parseFitCreate({ name: "Line\nBreak", shipTypeId: 587 })).toBeNull();
+    expect(parseFitCreate({ name: "Carriage\rReturn", shipTypeId: 587 })).toBeNull();
+    expect(parseFitCreate({ name: "Closing]Bracket", shipTypeId: 587 })).toBeNull();
+    expect(parseFitPatch({ name: "Closing]Bracket" })).toBeNull();
+  });
+
   it("tells an absent characterId from an explicit null", () => {
     expect(parseFitPatch({ name: "New" })).toEqual({ name: "New" });
     expect(parseFitPatch({ characterId: null })).toEqual({ characterId: null });
     expect(parseFitPatch({ characterId: 669539978 })).toEqual({ characterId: 669539978 });
     expect(parseFitPatch({ characterId: 0 })).toBeNull();
     expect(parseFitPatch({})).toEqual({});
+  });
+});
+
+describe("clampFitName", () => {
+  it("trims and passes a plain name through untouched", () => {
+    expect(clampFitName("  Cheap Rifter  ")).toBe("Cheap Rifter");
+  });
+  it("caps a long name at MAX_FIT_NAME", () => {
+    const clamped = clampFitName("x".repeat(100));
+    expect(clamped).toBe("x".repeat(60));
+    expect(clamped.length).toBe(60);
+  });
+  it("strips newlines, carriage returns and ] so the result stays EFT-header-safe", () => {
+    expect(clampFitName("Line\nBreak")).toBe("LineBreak");
+    expect(clampFitName("Carriage\rReturn")).toBe("CarriageReturn");
+    expect(clampFitName("Closing]Bracket]")).toBe("ClosingBracket");
+  });
+  it("falls back to a placeholder when nothing survives", () => {
+    expect(clampFitName("")).toBe("Unnamed fit");
+    expect(clampFitName("   ")).toBe("Unnamed fit");
+    expect(clampFitName("\n\r]")).toBe("Unnamed fit");
   });
 });
 

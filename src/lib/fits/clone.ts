@@ -10,6 +10,7 @@ import { loadFitData } from "../ships/load.js";
 import { assembledShips } from "../view/ships.js";
 import { docItemsFromBuilt } from "./doc.js";
 import { assignEftItems, tokeniseEft } from "./eft.js";
+import { clampFitName } from "./parse.js";
 
 export type CloneOutcome =
   | { kind: "ok"; fit: FitRow; unresolved: string[] }
@@ -35,7 +36,8 @@ export async function fitFromEftText(text: string): Promise<CloneOutcome> {
 
   // EFT text carries no pilot, so an imported fit is All skills V until you pick a character.
   const fit = await createFit({
-    name: assigned.name, shipTypeId: assigned.shipTypeId, characterId: null, items: assigned.items,
+    name: clampFitName(assigned.name), shipTypeId: assigned.shipTypeId, characterId: null,
+    items: assigned.items,
   });
   return { kind: "ok", fit, unresolved: assigned.unresolved };
 }
@@ -48,7 +50,7 @@ export async function fitFromSavedFitting(characterId: number, fittingId: number
   try {
     const built = fitFromFitting(fitting, fitting.items, loaded.ctx);
     const fit = await createFit({
-      name: fitting.name === "" ? `Fitting ${fittingId}` : fitting.name,
+      name: clampFitName(fitting.name === "" ? `Fitting ${fittingId}` : fitting.name),
       description: fitting.description,
       shipTypeId: fitting.shipTypeId,
       characterId,
@@ -70,7 +72,7 @@ export async function fitFromAssetShip(characterId: number, itemId: number): Pro
     const built = fitFromAssets(group.ship, group.children, loaded.ctx);
     const typeName = loaded.ctx.data.types.get(group.ship.typeId)?.name;
     const fit = await createFit({
-      name: group.ship.name ?? typeName ?? `Ship ${itemId}`,
+      name: clampFitName(group.ship.name ?? typeName ?? `Ship ${itemId}`),
       description: "",
       shipTypeId: group.ship.typeId,
       characterId,

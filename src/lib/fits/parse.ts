@@ -53,10 +53,26 @@ export function parseFitItems(raw: unknown): FitItem[] | null {
   return out;
 }
 
+// Would break a stored name back out of an EFT `[Hull, Name]` header, so it is never accepted,
+// generated names are clamped clean instead (see `clampFitName`).
+const UNSAFE_NAME_CHARS = /[\n\r\]]/;
+
 function parseName(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const name = raw.trim();
+  if (UNSAFE_NAME_CHARS.test(name)) return null;
   return name.length >= 1 && name.length <= MAX_FIT_NAME ? name : null;
+}
+
+/**
+ * The three "make me a new fit" sources (spec §6) and the editor toolbar's Clone build a name from
+ * data `parseFitCreate`/`parseFitPatch` would reject outright — an EFT header's fit name, a saved
+ * fitting's name, an asset's custom name, `"${name} copy"`. Rather than 400 later, clean it up front:
+ * trim, drop the characters `parseName` rejects, cap at `MAX_FIT_NAME`, and never hand back empty.
+ */
+export function clampFitName(raw: string): string {
+  const cleaned = raw.trim().replace(/[\n\r\]]/g, "").slice(0, MAX_FIT_NAME);
+  return cleaned.length > 0 ? cleaned : "Unnamed fit";
 }
 
 function parseDescription(raw: unknown): string | null {

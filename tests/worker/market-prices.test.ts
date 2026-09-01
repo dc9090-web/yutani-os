@@ -19,6 +19,7 @@ function deps(over: Partial<MarketPricesDeps> = {}): MarketPricesDeps {
     fetchAggregates: vi.fn(async () => [{ typeId: 34, sellMin: 3.85, buyMax: 3.67 }]),
     upsertEsiPrices: vi.fn(async (rows) => rows.length),
     upsertJitaPrices: vi.fn(async (rows) => rows.length),
+    touchMissingJitaPrices: vi.fn(async () => 0),
     log: () => {},
     ...over,
   };
@@ -49,6 +50,14 @@ describe("market-prices job", () => {
     expect(d.upsertEsiPrices).toHaveBeenCalledWith(ESI_PRICES);
     expect(d.fetchAggregates).toHaveBeenCalledWith([34, 587]);
     expect(d.upsertJitaPrices).toHaveBeenCalledWith([{ typeId: 34, sellMin: 3.85, buyMax: 3.67 }]);
+    // 587 is a type of interest but Fuzzwork's response (mocked above) left it out entirely.
+    expect(d.touchMissingJitaPrices).toHaveBeenCalledWith([587]);
+  });
+
+  it("does not touch anything when every type of interest came back from Fuzzwork", async () => {
+    const d = deps({ typesOfInterest: vi.fn(async () => [34]) });
+    await createMarketPricesJob(d).run({ esi });
+    expect(d.touchMissingJitaPrices).not.toHaveBeenCalled();
   });
 
   it("skips Fuzzwork entirely when nothing is of interest yet", async () => {

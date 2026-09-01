@@ -94,6 +94,33 @@ describe("FitEditor", () => {
     expect(screen.getByText("Saved")).toBeInTheDocument();
   });
 
+  it("the Save button PUTs immediately, without waiting for the autosave debounce", async () => {
+    await renderEditor();
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    fireEvent.change(screen.getByLabelText("Fit name"), { target: { value: "Renamed" } });
+    expect(screen.getByRole("button", { name: "Save" })).not.toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    // No `vi.advanceTimersByTime` — the PUT must land well inside the 2 s debounce window.
+    await waitFor(() => expect(puts).toHaveLength(1));
+    expect(puts[0].url).toBe("/api/fits/7");
+    expect(puts[0].body).toMatchObject({ name: "Renamed" });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Save" })).toBeDisabled());
+  });
+
+  it("flushes a dirty doc before Clone creates the copy", async () => {
+    await renderEditor();
+    fireEvent.change(screen.getByLabelText("Fit name"), { target: { value: "Renamed" } });
+    fireEvent.click(screen.getByRole("button", { name: "Clone" }));
+
+    await waitFor(() => expect(puts).toHaveLength(2));
+    expect(puts[0].url).toBe("/api/fits/7");                    // the flush's PUT saves first...
+    expect(puts[0].body).toMatchObject({ name: "Renamed" });
+    expect(puts[1].url).toBe("/api/fits");                      // ...then Clone's POST
+    expect(puts[1].body).toMatchObject({ name: "Renamed copy" });
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/fitting/7"));
+  });
+
   it("switching to a character changes the missing-skill list", async () => {
     await renderEditor();
     globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {

@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconCopy, IconFileExport, IconTrash } from "@tabler/icons-react";
+import { IconCopy, IconDeviceFloppy, IconFileExport, IconTrash } from "@tabler/icons-react";
 import type { SlotKind } from "../../lib/dogma/index.js";
 import {
   dogmaData, ensureTypes, getDogmaMeta, pricesFor, skillContext, type SkillContext,
@@ -9,6 +9,7 @@ import {
 import type { FitDoc, FitItem, FitItemState } from "../../lib/fits/doc.js";
 import { computeEditor, fitTypeIds } from "../../lib/fits/editor-view.js";
 import { exportEft } from "../../lib/fits/eft.js";
+import { clampFitName } from "../../lib/fits/parse.js";
 import {
   fitTypeInto, removeSlot, setEntryQuantity, setSlotCharge, setSlotState,
 } from "../../lib/fits/slots.js";
@@ -120,12 +121,27 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
     }
   }, [fit.id]);
 
+  // Held so the manual Save button and the pre-Delete/Clone flush can cancel a pending autosave
+  // instead of racing it — otherwise a flushed save and the timer it preempted would both fire.
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const payload = toPayload(doc);
     if (JSON.stringify(payload) === savedRef.current) return;
-    const timer = setTimeout(() => { void save(payload); }, AUTOSAVE_MS);
-    return () => clearTimeout(timer);
+    timerRef.current = setTimeout(() => { timerRef.current = null; void save(payload); }, AUTOSAVE_MS);
+    return () => { if (timerRef.current !== null) { clearTimeout(timerRef.current); timerRef.current = null; } };
   }, [doc, save]);
+
+  // Spec §4's manual Save, and the "flush before Delete/Clone" rule: same PUT `save` uses, just
+  // not waiting out the 2 s debounce first.
+  const flush = useCallback(async () => {
+    if (timerRef.current !== null) { clearTimeout(timerRef.current); timerRef.current = null; }
+    const payload = toPayload(doc);
+    if (JSON.stringify(payload) === savedRef.current) return;
+    await save(payload);
+  }, [doc, save]);
+
+  const dirty = JSON.stringify(toPayload(doc)) !== savedRef.current;
 
   const result = useMemo(() => {
     if (context === null || loads === 0) return null;
@@ -146,9 +162,10 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
   }, [selected]);
 
   const clone = async () => {
+    await flush();
     const res = await fetch("/api/fits", {
       method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...toPayload(doc), name: `${doc.name} copy`, shipTypeId: doc.shipTypeId }),
+      body: JSON.stringify({ ...toPayload(doc), name: clampFitName(`${doc.name} copy`), shipTypeId: doc.shipTypeId }),
     });
     if (!res.ok) { setSaveState("error"); return; }
     const body = (await res.json()) as { fit: { id: number } };
@@ -156,6 +173,7 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
   };
 
   const remove = async () => {
+    await flush();
     const res = await fetch(`/api/fits/${fit.id}`, { method: "DELETE" });
     if (!res.ok) { setSaveState("error"); return; }
     router.push("/fitting");
@@ -189,7 +207,7 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
     <>
       <div className="fit-toolbar">
         <input
-          className="fit-name-input" value={doc.name} aria-label="Fit name"
+          className="fit-name-input" value={doc.name} aria-label="Fit name" maxLength={60}
           onChange={(e) => setDoc((current) => ({ ...current, name: e.target.value }))}
         />
         <label className="faint" htmlFor="fit-pilot">Pilot</label>
@@ -204,6 +222,12 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
           <option value="all-v">All skills V</option>
           {characters.map((c) => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
         </select>
+        <button
+          type="button" className="fit-btn" disabled={!dirty || saveState === "saving"}
+          onClick={() => { void flush(); }}
+        >
+          <IconDeviceFloppy size={14} /> Save
+        </button>
         <button type="button" className="fit-btn" onClick={() => setShowExport(true)}>
           <IconFileExport size={14} /> Export EFT
         </button>

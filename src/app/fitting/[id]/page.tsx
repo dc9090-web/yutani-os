@@ -21,6 +21,7 @@ export default async function FitEditorPage({ params }: { params: Promise<{ id: 
 
   return (
     <FitEditor
+      key={fit.id}
       fit={{
         id: fit.id, name: fit.name, description: fit.description, shipTypeId: fit.shipTypeId,
         characterId: fit.characterId, items: fit.items,

@@ -55,6 +55,30 @@ export async function upsertJitaPrices(rows: JitaPriceRow[]): Promise<number> {
   return written;
 }
 
+/**
+ * For type ids Fuzzwork's response left out entirely — not the same as an explicit no-orders
+ * answer, which `fetchAggregates` already turns into a real null-valued row via `upsertJitaPrices`.
+ * An omission means "no information", so this only ever touches `updated_at`: a fresh row is
+ * inserted with the jita columns at their NULL default, and an existing row's jita columns (which
+ * may hold a genuine non-null price from an earlier run) are left completely alone. This is what
+ * keeps `stalePriceIds` from re-reporting — and the editor from re-requesting — an id Fuzzwork
+ * simply never mentions.
+ */
+export async function touchMissingJitaPrices(typeIds: number[]): Promise<number> {
+  const wanted = [...new Set(typeIds)];
+  if (wanted.length === 0) return 0;
+  let written = 0;
+  for (const batch of chunk(wanted, INSERT_BATCH)) {
+    const res = await getPool().query(
+      `INSERT INTO market_prices (type_id, updated_at)
+       SELECT *, now() FROM unnest($1::int[])
+       ON CONFLICT (type_id) DO UPDATE SET updated_at = now()`,
+      [batch]);
+    written += res.rowCount ?? 0;
+  }
+  return written;
+}
+
 /** One query per page (spec §4). Types with no row at all are simply absent from the map. */
 export async function getPrices(typeIds: number[]): Promise<Map<number, Price>> {
   const wanted = [...new Set(typeIds)];
