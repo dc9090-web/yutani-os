@@ -6,7 +6,7 @@
 import { accountQueueEnds, getAttributes, listSkillQueue, listSkills } from "../db/character-skills.js";
 import { listImplants } from "../db/character-clones.js";
 import { getCharacter } from "../db/characters.js";
-import type { PlanRow } from "../db/skill-plans.js";
+import type { PlanEntryRow, PlanRow } from "../db/skill-plans.js";
 import { getAlphaSkills, getTypeAttributes, listPlanSkills } from "../sde/repo.js";
 import {
   addAttributes, effectiveAttributes, implantBonuses, isLegalBase, type AttributeSet,
@@ -146,4 +146,47 @@ export async function computePlan(plan: PlanRow, opts: ComputeOptions = {}): Pro
     trained: context.trained, queued: context.queued, partialSp: context.partialSp, startAt,
   });
   return { plan, context, catalogue, entries, timeline, attributes, startAt };
+}
+
+export interface PlanSummary {
+  id: number; characterId: number; name: string; remap: AttributeSet | null;
+  createdAt: Date; updatedAt: Date; entries: PlanEntryRow[];
+  entryCount: number; totalSp: number; totalMs: number; doneAt: Date;
+}
+
+/**
+ * The `/skills` Plans section and `GET /api/skill-plans`. Every plan in a list belongs to the same
+ * character, so the catalogue and the context are read ONCE rather than once per plan.
+ */
+export async function summarisePlans(
+  plans: readonly PlanRow[], opts: ComputeOptions = {},
+): Promise<PlanSummary[]> {
+  if (plans.length === 0) return [];
+  const now = opts.now ?? new Date();
+  const [catalogue, context] = await Promise.all([
+    loadSkillCatalogue(), loadPlanContext(plans[0].characterId),
+  ]);
+  const index = catalogueFrom(catalogue);
+  const known = new Map(context.trained);
+  for (const [skillId, level] of context.queued) {
+    if ((known.get(skillId) ?? 0) < level) known.set(skillId, level);
+  }
+  const startAt = opts.afterQueue === true && context.queueEndsAt !== null
+    && context.queueEndsAt.getTime() > now.getTime() ? context.queueEndsAt : now;
+
+  return plans.map((plan) => {
+    const attributes = addAttributes(
+      (opts.remap === undefined ? plan.remap : opts.remap) ?? context.base, context.implantBonus);
+    const entries = expandPlan(plan.entries, known, index);
+    const timeline = planTimeline({
+      entries, catalogue: index, attributes,
+      trained: context.trained, queued: context.queued, partialSp: context.partialSp, startAt,
+    });
+    return {
+      id: plan.id, characterId: plan.characterId, name: plan.name, remap: plan.remap,
+      createdAt: plan.createdAt, updatedAt: plan.updatedAt, entries: plan.entries,
+      entryCount: entries.length, totalSp: timeline.totalSp, totalMs: timeline.totalMs,
+      doneAt: timeline.doneAt,
+    };
+  });
 }
