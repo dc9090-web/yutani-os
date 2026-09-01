@@ -120,11 +120,13 @@ export const SDE_TABLE_DEFS: readonly SdeTable[] = [
       id: "int", name: "text", display_name: "text", description: "text", category_id: "int",
       unit_id: "int", data_type: "int", default_value: "float8", high_is_good: "bool",
       stackable: "bool", published: "bool", display_when_zero: "bool", icon_id: "int",
+      max_attribute_id: "int", min_attribute_id: "int",
     }),
     map: (r) => [
       int(r._key), en(r.name), en(r.displayName), en(r.description), int(r.attributeCategoryID),
       int(r.unitID), int(r.dataType), num(r.defaultValue), bool(r.highIsGood),
       bool(r.stackable), bool(r.published), bool(r.displayWhenZero), int(r.iconID),
+      int(r.maxAttributeID), int(r.minAttributeID),
     ],
   },
   {

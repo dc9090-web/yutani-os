@@ -87,6 +87,21 @@ describe("dogma", () => {
   it("maps attribute 64, whose description is a plain string and whose stackable is false", async () => {
     expect(await row("sde_dogma_attributes", "dogmaAttributes.jsonl", 64)).toEqual([
       64, "damageMultiplier", "Damage Modifier", "Damage multiplier.", 29, 104, 5, 1, true, false, true, false, 1432,
+      null, null,
+    ]);
+  });
+
+  it("maps attribute 37's maxAttributeID (the calculator's upper cap)", async () => {
+    expect(await row("sde_dogma_attributes", "dogmaAttributes.jsonl", 37)).toEqual([
+      37, "maxVelocity", "Maximum Velocity", "Maximum velocity of ship", 17, 11, 4, 0, true, false, true, false,
+      1389, 2033, null,
+    ]);
+  });
+
+  it("maps attribute 20's minAttributeID", async () => {
+    expect(await row("sde_dogma_attributes", "dogmaAttributes.jsonl", 20)).toEqual([
+      20, "speedFactor", "Maximum Velocity Bonus", "Factor by which topspeed increases.", 28, 124, 5, 1, true, false,
+      true, false, 1389, null, 2266,
     ]);
   });
 

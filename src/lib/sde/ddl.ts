@@ -106,7 +106,9 @@ const TABLE_BODIES: Record<SdeTableName, string> = {
     stackable         boolean,
     published         boolean,
     display_when_zero boolean,
-    icon_id           int`,
+    icon_id           int,
+    max_attribute_id  int,
+    min_attribute_id  int`,
   sde_dogma_effects: `
     id                                 int PRIMARY KEY,
     name                               text,
