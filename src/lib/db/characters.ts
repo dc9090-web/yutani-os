@@ -42,6 +42,9 @@ export async function updateCharacterInfo(id: number, info: { name: string; corp
 export async function setTokenStatus(id: number, status: TokenStatus): Promise<void> {
   await getPool().query("UPDATE characters SET token_status = $2, updated_at = now() WHERE id = $1", [id, status]);
 }
+export async function updateRefreshToken(id: number, refreshTokenEnc: string): Promise<void> {
+  await getPool().query("UPDATE characters SET refresh_token_enc = $2, updated_at = now() WHERE id = $1", [id, refreshTokenEnc]);
+}
 export async function deleteCharacter(id: number): Promise<void> {
   await getPool().query("DELETE FROM characters WHERE id = $1", [id]);
 }

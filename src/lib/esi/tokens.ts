@@ -1,5 +1,5 @@
 import type { AppConfig } from "../config.js";
-import type { getCharacter, setTokenStatus } from "../db/characters.js";
+import type { getCharacter, setTokenStatus, updateRefreshToken } from "../db/characters.js";
 import { decryptSecret } from "../auth/crypto.js";
 import { SsoError, type refreshAccessToken, type SsoMetadata } from "../auth/sso.js";
 
@@ -8,6 +8,7 @@ export class NeedsReauthError extends Error {
 }
 export interface TokenStoreDeps {
   config: AppConfig; getCharacter: typeof getCharacter; setTokenStatus: typeof setTokenStatus;
+  updateRefreshToken: typeof updateRefreshToken; encrypt: (plain: string) => string;
   refresh: typeof refreshAccessToken; metadata: () => Promise<SsoMetadata>; now?: () => number;
 }
 const EARLY_MS = 60_000;
@@ -36,6 +37,9 @@ export class TokenStore {
     const refreshToken = decryptSecret(c.refreshTokenEnc, this.deps.config.sessionSecret);
     try {
       const t = await this.deps.refresh({ metadata: await this.deps.metadata(), clientId: this.deps.config.eveClientId, clientSecret: this.deps.config.eveClientSecret, refreshToken });
+      if (t.refresh_token && t.refresh_token !== refreshToken) {
+        await this.deps.updateRefreshToken(characterId, this.deps.encrypt(t.refresh_token));
+      }
       const now = (this.deps.now ?? Date.now)();
       this.cache.set(characterId, { token: t.access_token, expiresAt: now + t.expires_in * 1000 });
       return t.access_token;

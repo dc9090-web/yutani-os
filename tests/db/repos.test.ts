@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { resetDb } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
 import { createAccount, listAccounts, renameAccount, deleteAccount } from "../../src/lib/db/accounts.js";
-import { upsertCharacter, listCharacters, getCharacter, setCharacterAccount, updateCharacterInfo, setTokenStatus, deleteCharacter } from "../../src/lib/db/characters.js";
+import { upsertCharacter, listCharacters, getCharacter, setCharacterAccount, updateCharacterInfo, setTokenStatus, updateRefreshToken, deleteCharacter } from "../../src/lib/db/characters.js";
 import { getCached, putCached } from "../../src/lib/db/esi-cache.js";
 import { startRun, finishRun, latestRuns } from "../../src/lib/db/sync-runs.js";
 
@@ -46,6 +46,11 @@ describe("characters", () => {
     expect((await getCharacter(tril.id))!.accountId).toBe(a.id);
     await deleteAccount(a.id);
     expect((await getCharacter(tril.id))!.accountId).toBeNull();
+  });
+  it("updates the refresh token", async () => {
+    await upsertCharacter(tril);
+    await updateRefreshToken(tril.id, "enc-rotated");
+    expect((await getCharacter(tril.id))!.refreshTokenEnc).toBe("enc-rotated");
   });
   it("updates public info and deletes", async () => {
     await upsertCharacter(tril);
