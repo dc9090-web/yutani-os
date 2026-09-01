@@ -7,3 +7,5 @@ deploy/ansible/vars/secrets.yml
 *.log
 .DS_Store
 .superpowers/
+tsconfig.tsbuildinfo
+next-env.d.ts

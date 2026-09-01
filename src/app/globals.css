@@ -1,0 +1,161 @@
+:root {
+  --bg: #070d1c;
+  --bg-2: #0a1326;
+  --card: #0e1830;
+  --raised: #13203a;
+  --border: #1d2c4a;
+  --border-hi: #2c4068;
+  --divider: #27406a;
+  --hairline: #16233e;
+  --text: #e9f0ff;
+  --text-2: #dfe7f5;
+  --muted: #8aa0c6;
+  --faint: #76849f;
+  --dim: #5b6b86;
+  --accent: #4d8dff;
+  --accent-2: #5eb0ff;
+  --pos: #34d399;
+  --neg: #f76d7a;
+  --aurora: linear-gradient(90deg, #a5b4fc, #4d8dff, #22d3ee, #5eead4, #4d8dff, #a5b4fc);
+  --col: 1123px;
+}
+
+* { box-sizing: border-box; }
+html, body { padding: 0; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ---------- header (sticky, frosted, 80px) ---------- */
+.app-header {
+  position: sticky; top: 0; z-index: 100; height: 80px;
+  /* Lift into the View Transitions top layer so the Overview sort's card snapshots
+     (also in that layer) don't paint over the header — see the ::view-transition rule below. */
+  view-transition-name: app-header;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7, 13, 28, 0.72);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+.app-bar-inner {
+  max-width: var(--col); height: 100%; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; gap: 30px;
+}
+.logo-lockup { display: flex; align-items: center; gap: 14px; text-decoration: none; flex: 0 0 auto; }
+.logo-divider { width: 1px; height: 22px; background: var(--divider); display: block; }
+.wordmark {
+  font-family: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600; font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  background: var(--aurora); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: gradFlow 6s linear infinite;
+}
+
+.top-nav { flex: 1; display: flex; align-items: center; justify-content: center; gap: 18px; white-space: nowrap; }
+.nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none;
+  transition: color 150ms ease; line-height: 1.2;
+  /* Mirror the bottom underline space on top so the link text stays vertically
+     centered (otherwise it rides ~4px high vs the INTELLIGENCE wordmark). */
+  padding: 2px 0; border-top: 2px solid transparent; border-bottom: 2px solid transparent;
+}
+.nav-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-link[data-active] { color: var(--accent); }
+
+.user-menu { margin-left: auto; display: flex; align-items: center; gap: 9px; flex: 0 0 auto; cursor: pointer; background: none; border: none; padding: 0; font: inherit; color: inherit; }
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--raised); border: 1px solid var(--divider);
+  display: grid; place-items: center; flex: 0 0 auto;
+}
+.user-name { font-size: 14px; font-weight: 500; color: var(--text); transition: color 150ms ease; }
+.user-caret {
+  width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-top: 5px solid var(--faint);
+}
+.user-menu:hover .user-name { color: var(--accent); }
+
+/* ---------- main + footer ---------- */
+.app-main { max-width: var(--col); margin: 0 auto; padding: 32px 24px 80px; }
+.app-footer {
+  max-width: var(--col); margin: 48px auto 0; padding: 28px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; gap: 11px; text-align: center;
+}
+.footer-mark { height: 30px; opacity: 0.85; }
+.footer-copy { font-size: 12px; color: var(--faint); }
+
+/* ---------- mobile bottom tab bar (≤760px only) ---------- */
+.bottom-bar { display: none; }
+
+@keyframes gradFlow { from { background-position: 0% center; } to { background-position: 200% center; } }
+
+@media (max-width: 760px) {
+  .top-nav { display: none; }
+  .user-name, .user-caret { display: none; }
+  .app-main { padding: 18px 14px 24px; }
+  /* Clear the fixed 62px bottom tab bar (+ iOS home-indicator safe area) so the
+     footer mark/copyright aren't hidden behind it when scrolled to the bottom. */
+  .app-footer { margin-top: 32px; padding: 24px 14px calc(62px + env(safe-area-inset-bottom, 0px) + 24px); }
+  .bottom-bar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; height: 62px;
+    /* Same reason as .app-header: keep the fixed tab bar above the sort's card snapshots. */
+    view-transition-name: bottom-bar;
+    border-top: 1px solid var(--border);
+    background: rgba(7, 13, 28, 0.94);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    padding: 0 4px; justify-content: space-between;
+  }
+  .bottom-item {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; color: var(--faint); text-decoration: none;
+  }
+  .bottom-item span { font-size: 9px; font-weight: 500; letter-spacing: 0.2px; }
+  .bottom-item[data-active] { color: var(--accent); }
+}
+
+/* ---------- Login ---------- */
+.login-page { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow: hidden; background: var(--bg); }
+.login-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
+.login-logo { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 26px; }
+.login-logo-img { width: 172px; height: auto; }
+.login-wordmark { font-family: var(--font-grotesk), sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; background: var(--aurora); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradFlow 6s linear infinite; }
+.login-card { position: relative; z-index: 1; width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 34px 32px; box-shadow: 0 18px 50px rgba(2, 6, 23, 0.45); }
+.login-h1 { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 22px; margin: 0 0 4px; color: var(--text); }
+.login-sub { margin: 0 0 20px; font-size: 13px; color: var(--faint); }
+.login-msg { font-size: 13px; color: var(--neg); }
+.login-copy { position: relative; z-index: 1; margin-top: 24px; font-size: 12px; color: var(--dim); }
+.login-sent-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(77, 141, 255, 0.14); color: var(--accent); display: grid; place-items: center; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+/* ---------- EVE additions ---------- */
+.logo-text { font-family: var(--font-poppins), sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 1px; color: var(--text); }
+.char-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--divider); object-fit: cover; background: var(--raised); }
+.char-avatar.warn { border-color: var(--neg); }
+.char-group-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); padding: 6px 12px 2px; }
+.page-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 32px; line-height: 1.1; margin: 0 0 8px; color: var(--text); }
+.page-sub { margin: 0 0 24px; font-size: 13px; color: var(--faint); }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.card-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 16px; color: var(--text); margin: 0 0 14px; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .pos { color: var(--pos); } .neg { color: var(--neg); }
+.char-card { display: flex; gap: 16px; align-items: center; }
+.char-card img { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
+.char-card h3 { margin: 0; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
+.char-card p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.coming-soon { text-align: center; padding: 64px 24px; color: var(--faint); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { text-align: left; font-weight: 500; color: var(--faint); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.table td { padding: 10px; border-bottom: 1px solid var(--hairline); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+.badge.ok { background: rgba(52,211,153,.14); color: var(--pos); }
+.badge.error, .badge.needs_reauth { background: rgba(247,109,122,.14); color: var(--neg); }
+.badge.running { background: rgba(77,141,255,.14); color: var(--accent); }
+.sso-btn { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; }
+.sso-btn:hover { background: var(--accent-2); }
