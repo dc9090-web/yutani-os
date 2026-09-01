@@ -2,6 +2,9 @@
  * Pure view helpers for the Ships pages. No I/O, no React — every function here is unit-tested and
  * the components stay dumb (the phase-3b pattern).
  */
+import type { AssetRow } from "../db/character-assets.js";
+import { CATEGORY, type BuiltFit, type DogmaData, type FitStats, type Problem } from "../dogma/index.js";
+import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 
 /** dogmaUnits 105 Percentage, 109 Modifier Percent, 127 Absolute Percent all display as "%". */
 const PERCENT_UNIT_IDS: ReadonlySet<number> = new Set([105, 109, 127]);
@@ -41,4 +44,104 @@ export function gauge(
     percent: Math.round(Math.min(100, raw) * 10) / 10,
     over: pool.used > pool.output,
   };
+}
+
+/** An assembled hull and the asset rows sitting directly inside it. */
+export interface ShipGroup { ship: AssetRow; children: AssetRow[] }
+
+/**
+ * Spec §4's "fitted ships": every assembled (singleton) asset whose type is in category 6, together
+ * with the rows whose `location_id` is that ship's `item_id` — which is where ESI puts fitted
+ * modules, their charges, the drone bay and the cargo hold alike (phase 4a's builder sorts them out).
+ *
+ * A hull whose type the SDE does not know cannot be recognised as a ship and gets no card; spec §6's
+ * `Unknown type (id)` rule is about the *contents* of a known ship (`BuiltFit.unknown`). A ship
+ * inside another ship gets its own group as well as a line in its parent's cargo — both are true.
+ */
+export function assembledShips(assets: AssetRow[], data: DogmaData): ShipGroup[] {
+  const byLocation = new Map<number, AssetRow[]>();
+  for (const asset of assets) {
+    const bucket = byLocation.get(asset.locationId);
+    if (bucket === undefined) byLocation.set(asset.locationId, [asset]);
+    else bucket.push(asset);
+  }
+  return assets
+    .filter((a) => a.isSingleton && data.types.get(a.typeId)?.categoryId === CATEGORY.ship)
+    .map((ship) => ({ ship, children: byLocation.get(ship.itemId) ?? [] }));
+}
+
+/**
+ * Where the card says the ship is. A `location_type` of "item" means the parent is another of the
+ * character's items (a ship maintenance bay, a container), and `locationLabels` must never be asked
+ * about an item id — so that case is answered from the asset rows instead.
+ */
+export function shipLocationLabel(
+  ship: AssetRow,
+  places: ReadonlyMap<number, { name: string }>,
+  byItemId: ReadonlyMap<number, AssetRow>,
+  data: DogmaData,
+): string {
+  if (ship.locationType !== "item") {
+    return places.get(ship.locationId)?.name ?? `Unknown location (${ship.locationId})`;
+  }
+  const parent = byItemId.get(ship.locationId);
+  if (parent === undefined) return `Container ${ship.locationId}`;
+  return parent.name ?? data.types.get(parent.typeId)?.name ?? `Container ${ship.locationId}`;
+}
+
+/**
+ * Spec §4's estimated value: ship + fitted modules + their charges + drones + cargo. A loaded charge
+ * counts as **one** unit — the engine models it as a single item with no stack size; ammunition in
+ * the cargo hold is counted at its real quantity.
+ */
+export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
+  const entries: ValuedEntry[] = [{ typeId: built.fit.ship.typeId, quantity: 1 }];
+  for (const slotted of built.fit.modules) {
+    entries.push({ typeId: slotted.item.typeId, quantity: 1 });
+    if (slotted.item.charge !== undefined) entries.push({ typeId: slotted.item.charge.typeId, quantity: 1 });
+  }
+  for (const drone of built.drones) entries.push({ typeId: drone.typeId, quantity: drone.quantity });
+  for (const item of built.cargo) entries.push({ typeId: item.typeId, quantity: item.quantity });
+  return entries;
+}
+
+/** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */
+export interface ShipCardView {
+  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+  cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
+  value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
+}
+
+export function toShipCard(input: {
+  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+  stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
+}): ShipCardView {
+  const roll = rollUpValue(input.entries, input.prices);
+  return {
+    key: input.key, href: input.href, name: input.name, typeId: input.typeId,
+    typeName: input.typeName, location: input.location,
+    cpu: gauge("CPU", "tf", input.stats.cpu),
+    power: gauge("Powergrid", "MW", input.stats.power),
+    missingSkills: input.problems.filter((p) => p.kind === "skill").length,
+    value: iskShort(roll.total), valueRaw: roll.total, unpriced: unpricedNote(roll.unpriced), error: null,
+  };
+}
+
+/**
+ * Spec §6: an engine exception is caught per fit and the card says so. `valueRaw` is -1 so these
+ * sort below a genuinely worthless fit rather than mixing in with the zero-value ones.
+ */
+export function errorShipCard(input: {
+  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+}): ShipCardView {
+  return {
+    ...input, cpu: null, power: null, missingSkills: 0,
+    value: null, valueRaw: -1, unpriced: null, error: "Could not compute",
+  };
+}
+
+/** Spec §4: value descending. Ties break on type name then key so the order is never Map-dependent. */
+export function sortShipCards(cards: ShipCardView[]): ShipCardView[] {
+  return [...cards].sort((a, b) =>
+    b.valueRaw - a.valueRaw || a.typeName.localeCompare(b.typeName) || a.key.localeCompare(b.key));
 }

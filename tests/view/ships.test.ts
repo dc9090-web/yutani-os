@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { bonusLabel, gauge, stripBonusMarkup } from "../../src/lib/view/ships.js";
+import {
+  assembledShips, bonusLabel, errorShipCard, fitValueEntries, gauge, shipLocationLabel,
+  sortShipCards, stripBonusMarkup, toShipCard,
+} from "../../src/lib/view/ships.js";
+import type { AssetRow } from "../../src/lib/db/character-assets.js";
 
 describe("stripBonusMarkup", () => {
   it("removes the SDE's showinfo anchors", () => {
@@ -50,5 +54,125 @@ describe("gauge", () => {
   it("treats any usage of a zero output as full and over", () => {
     expect(gauge("Powergrid", "MW", { used: 5, output: 0 })).toMatchObject({ percent: 100, over: true });
     expect(gauge("Powergrid", "MW", { used: 0, output: 0 })).toMatchObject({ percent: 0, over: false });
+  });
+});
+
+function asset(over: Partial<AssetRow> & { itemId: number; typeId: number }): AssetRow {
+  return {
+    quantity: 1, locationId: 60003760, locationType: "station", locationFlag: "Hangar",
+    isSingleton: false, isBlueprintCopy: false, name: null, ...over,
+  };
+}
+
+/** A stand-in for DogmaData: assembledShips and shipLocationLabel only read `types`. */
+const data = {
+  types: new Map([
+    [587, { id: 587, groupId: 25, categoryId: 6, name: "Rifter", attrs: new Map(), effects: new Map() }],
+    [519, { id: 519, groupId: 76, categoryId: 7, name: "Gyrostabilizer II", attrs: new Map(), effects: new Map() }],
+    [28606, { id: 28606, groupId: 448, categoryId: 6, name: "Orca", attrs: new Map(), effects: new Map() }],
+  ]),
+  attributes: new Map(), effects: new Map(), groups: new Map(),
+} as unknown as import("../../src/lib/dogma/index.js").DogmaData;
+
+describe("assembledShips", () => {
+  it("finds assembled hulls and the items sitting inside them", () => {
+    const rows = [
+      asset({ itemId: 1, typeId: 587, isSingleton: true, name: "Scarlet Dart" }),
+      asset({ itemId: 2, typeId: 519, isSingleton: true, locationId: 1, locationType: "item", locationFlag: "LoSlot0" }),
+      asset({ itemId: 3, typeId: 519, quantity: 4 }),                       // a packaged stack in the hangar
+      asset({ itemId: 4, typeId: 587, quantity: 2 }),                       // packaged hulls: not assembled
+    ];
+    const groups = assembledShips(rows, data);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].ship.itemId).toBe(1);
+    expect(groups[0].children.map((c) => c.itemId)).toEqual([2]);
+  });
+
+  it("gives a ship inside another ship its own group", () => {
+    const rows = [
+      asset({ itemId: 1, typeId: 28606, isSingleton: true }),
+      asset({ itemId: 2, typeId: 587, isSingleton: true, locationId: 1, locationType: "item", locationFlag: "ShipHangar" }),
+    ];
+    expect(assembledShips(rows, data).map((g) => g.ship.itemId)).toEqual([1, 2]);
+  });
+
+  it("ignores a hull whose type the SDE does not know", () => {
+    expect(assembledShips([asset({ itemId: 1, typeId: 999999, isSingleton: true })], data)).toEqual([]);
+  });
+});
+
+describe("shipLocationLabel", () => {
+  const places = new Map([[60003760, { name: "Jita IV - Moon 4 - Caldari Navy Assembly Plant" }]]);
+
+  it("names the place a ship is parked in", () => {
+    const ship = asset({ itemId: 1, typeId: 587, isSingleton: true });
+    expect(shipLocationLabel(ship, places, new Map(), data)).toBe("Jita IV - Moon 4 - Caldari Navy Assembly Plant");
+  });
+
+  it("falls back to a readable placeholder for an unresolved place", () => {
+    const ship = asset({ itemId: 1, typeId: 587, locationId: 60000001 });
+    expect(shipLocationLabel(ship, places, new Map(), data)).toBe("Unknown location (60000001)");
+  });
+
+  it("names the containing ship when the parent is an item", () => {
+    const carrier = asset({ itemId: 9, typeId: 28606, isSingleton: true, name: "Mule" });
+    const ship = asset({ itemId: 1, typeId: 587, locationId: 9, locationType: "item", locationFlag: "ShipHangar" });
+    expect(shipLocationLabel(ship, places, new Map([[9, carrier]]), data)).toBe("Mule");
+    const unnamed = { ...carrier, name: null };
+    expect(shipLocationLabel(ship, places, new Map([[9, unnamed]]), data)).toBe("Orca");
+    expect(shipLocationLabel(ship, places, new Map(), data)).toBe("Container 9");
+  });
+});
+
+describe("toShipCard / errorShipCard / sortShipCards", () => {
+  const stats = {
+    cpu: { used: 121.5, output: 162.5 }, power: { used: 30, output: 51.25 },
+    calibration: { used: 0, output: 400 },
+    slots: { high: { used: 1, total: 4 }, mid: { used: 0, total: 3 }, low: { used: 1, total: 3 }, rig: { used: 0, total: 3 }, subsystem: { used: 0, total: 0 } },
+    hardpoints: { turret: { used: 1, total: 3 }, launcher: { used: 0, total: 2 } },
+    modules: [],
+  } as unknown as import("../../src/lib/dogma/index.js").FitStats;
+  const base = { key: "asset:1", href: "/ships/asset/1", name: "Scarlet Dart", typeId: 587, typeName: "Rifter", location: "Jita 4-4" };
+
+  it("builds a card with both gauges, the missing-skill count and the value", () => {
+    const card = toShipCard({
+      ...base, stats,
+      problems: [
+        { kind: "skill", detail: "Minmatar Frigate I required", skill: { skillTypeId: 3329, required: 1, have: 0 } },
+        { kind: "cpu", detail: "CPU over" },
+      ] as unknown as import("../../src/lib/dogma/index.js").Problem[],
+      entries: [{ typeId: 587, quantity: 1 }],
+      prices: new Map([[587, { sell: 8_000_000, buy: null, adjusted: null }]]),
+    });
+    expect(card.cpu!.text).toBe("121.50 / 162.50 tf");
+    expect(card.power!.over).toBe(false);
+    expect(card.missingSkills).toBe(1);
+    expect(card.value).toBe("8.0M ISK");
+    expect(card.valueRaw).toBe(8_000_000);
+    expect(card.unpriced).toBeNull();
+    expect(card.error).toBeNull();
+  });
+
+  it("reports unpriced entries", () => {
+    const card = toShipCard({ ...base, stats, problems: [], entries: [{ typeId: 587, quantity: 1 }], prices: new Map() });
+    expect(card.value).toBe("0 ISK");
+    expect(card.unpriced).toBe("1 item unpriced");
+  });
+
+  it("builds a could-not-compute card with no gauges, sorted last", () => {
+    const broken = errorShipCard(base);
+    expect(broken.error).toBe("Could not compute");
+    expect(broken.cpu).toBeNull();
+    expect(broken.power).toBeNull();
+    const worthless = toShipCard({ ...base, key: "asset:2", stats, problems: [], entries: [], prices: new Map() });
+    expect(sortShipCards([broken, worthless]).map((c) => c.key)).toEqual(["asset:2", "asset:1"]);
+  });
+
+  it("sorts by value descending", () => {
+    const make = (key: string, sell: number) => toShipCard({
+      ...base, key, stats, problems: [], entries: [{ typeId: 587, quantity: 1 }],
+      prices: new Map([[587, { sell, buy: null, adjusted: null }]]),
+    });
+    expect(sortShipCards([make("a", 10), make("b", 900), make("c", 100)]).map((c) => c.key)).toEqual(["b", "c", "a"]);
   });
 });
