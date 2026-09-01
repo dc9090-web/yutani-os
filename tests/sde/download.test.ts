@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { downloadSde, SDE_ZIP_URL } from "../../src/lib/sde/download.js";
+import { sdeUserAgent } from "../../src/lib/sde/version.js";
 
 let dir: string;
 beforeAll(async () => { dir = await mkdtemp(path.join(os.tmpdir(), "eve-dl-")); });
@@ -14,7 +15,9 @@ describe("downloadSde", () => {
     const dest = path.join(dir, "sde.zip");
     await downloadSde(dest, fetchImpl as unknown as typeof fetch);
     expect(await readFile(dest, "utf8")).toBe("PK pretend zip");
-    expect((fetchImpl.mock.calls[0] as unknown as [string])[0]).toBe(SDE_ZIP_URL);
+    const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe(SDE_ZIP_URL);
+    expect((init.headers as Record<string, string>)["user-agent"]).toBe(sdeUserAgent());
   });
 
   it("throws on a non-2xx response", async () => {

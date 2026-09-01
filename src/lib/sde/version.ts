@@ -24,5 +24,12 @@ export async function fetchLatestBuild(fetchImpl: typeof fetch = fetch): Promise
   if (typeof record.buildNumber !== "number" || typeof record.releaseDate !== "string") {
     throw new Error(`SDE version poll returned an unexpected record: ${line}`);
   }
-  return { buildNumber: record.buildNumber, releaseDate: new Date(record.releaseDate) };
+  if (!Number.isInteger(record.buildNumber) || record.buildNumber <= 0) {
+    throw new Error(`SDE version poll returned an invalid buildNumber: ${record.buildNumber}`);
+  }
+  const releaseDate = new Date(record.releaseDate);
+  if (Number.isNaN(releaseDate.getTime())) {
+    throw new Error(`SDE version poll returned an invalid releaseDate: ${record.releaseDate}`);
+  }
+  return { buildNumber: record.buildNumber, releaseDate };
 }

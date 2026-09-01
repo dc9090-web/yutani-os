@@ -30,6 +30,20 @@ describe("fetchLatestBuild", () => {
     await expect(fetchLatestBuild(junk as unknown as typeof fetch)).rejects.toThrow(/unexpected/i);
   });
 
+  it("throws on an invalid releaseDate", async () => {
+    const fetchImpl = vi.fn(
+      async () => new Response('{"_key": "sde", "buildNumber": 3484357, "releaseDate": "not-a-date"}\n', { status: 200 }),
+    );
+    await expect(fetchLatestBuild(fetchImpl as unknown as typeof fetch)).rejects.toThrow(/invalid releaseDate/i);
+  });
+
+  it("throws on a non-positive-integer buildNumber", async () => {
+    const fetchImpl = vi.fn(
+      async () => new Response('{"_key": "sde", "buildNumber": -1, "releaseDate": "2026-08-28T11:07:12Z"}\n', { status: 200 }),
+    );
+    await expect(fetchLatestBuild(fetchImpl as unknown as typeof fetch)).rejects.toThrow(/invalid buildNumber/i);
+  });
+
   it("falls back to a default user agent", () => {
     expect(sdeUserAgent()).toBe("EVE-Plasma (dac9dc@gmail.com)");
   });
