@@ -90,6 +90,13 @@ The worker polls CCP's Static Data Export on a schedule; there is nothing to pro
   ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
   ```
 
+- **A release that adds new `sde_*` tables needs a forced import.** The `sde-update` job only
+  downloads when the published build number differs from `sde_meta.build_number`, so tables added by
+  a migration stay empty until `npm run sde:import` is run by hand (the command above). Phase 6's
+  `sde_alpha_skills` and `sde_skill_plans` were filled that way.
+```
+```markdown
+
 ## Market prices
 
 The worker's `market-prices` job runs hourly and fills the `market_prices` table from two sources:
@@ -124,6 +131,30 @@ deploy for up to an hour.
 
 Fits live in our own `fits` / `fit_items` tables and are **never pushed to ESI** — the
 `esi-fittings.write_fittings.v1` scope is not requested. Export is EFT text.
+
+Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
+`/api/health`, `/auth/*` and `/_next/*`.
+
+## Skill planner
+
+`/skills` lists each character's plans; `/skills/plans/<id>` is the editor. All the training maths
+lives in `src/lib/skills/**`, which is pure and isomorphic — the server computes the timeline for
+the page and the API, and the editor recomputes it locally on every keystroke with the same code,
+so the two cannot disagree.
+
+- SP for a level is `ceil(250 * rank * 2^(2.5 * (level - 1)))`, cumulative. Training rate is
+  `primary + secondary / 2` SP per minute at the Omega rate; primary/secondary come from dogma
+  attributes 180/181 and the values are attribute ids 164–168.
+- Effective attributes are `character_attributes` (base, implants excluded) plus the 175–179 bonuses
+  on `character_implants`. If the stored five values are not each 17–27 and totalling 99, the
+  attributes panel says so rather than guessing.
+- `POST /api/skill-plans/<id>/optimise` brute-forces all 2,885 legal remaps and returns the fastest
+  plus the time it saves. It writes nothing; the editor decides whether to store it.
+- `GET /api/skill-plans/<id>/export?format=evemon|ingame` returns `text/plain`, one line per skill
+  level: `Gunnery V` for EVEMon, `Gunnery 5` for the in-game skill-plan importer.
+- Two reference tables come from the SDE: `sde_alpha_skills` (175 rows — clone grade 1) badges
+  Alpha-trainable levels, and `sde_skill_plans` (40 rows) is CCP's certified career plans, offered
+  as templates.
 
 Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
 `/api/health`, `/auth/*` and `/_next/*`.
