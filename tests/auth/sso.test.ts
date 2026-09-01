@@ -79,6 +79,14 @@ describe("sso", () => {
     expect(v).toEqual({ characterId: 669539978, name: "TrilliumONE", scopes: ["esi-skills.read_skills.v1", "esi-assets.read_assets.v1"], owner: "own" });
   });
 
+  it("accepts the issuer EVE actually publishes (no trailing slash) and a metadata-supplied issuer", async () => {
+    const noSlash = await signedJwt({ name: "n", scp: [], owner: "o" }, { iss: "https://login.eveonline.com" });
+    await expect(verifyEveJwt(noSlash.token, { jwks: noSlash.jwks, clientId: "cid" })).resolves.toMatchObject({ characterId: 669539978 });
+    const custom = await signedJwt({ name: "n", scp: [], owner: "o" }, { iss: "https://sisilogin.testeveonline.com" });
+    await expect(verifyEveJwt(custom.token, { jwks: custom.jwks, clientId: "cid", issuer: "https://sisilogin.testeveonline.com" })).resolves.toMatchObject({ characterId: 669539978 });
+    await expect(verifyEveJwt(custom.token, { jwks: custom.jwks, clientId: "cid" })).rejects.toBeInstanceOf(SsoError);
+  });
+
   it("accepts a single-string scp and rejects wrong aud/iss", async () => {
     const one = await signedJwt({ name: "n", scp: "esi-skills.read_skills.v1", owner: "o" });
     expect((await verifyEveJwt(one.token, { jwks: one.jwks, clientId: "cid" })).scopes).toEqual(["esi-skills.read_skills.v1"]);

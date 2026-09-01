@@ -3,6 +3,8 @@ export interface AppConfig {
   allowedCharacterIds: Set<number>;
   esiBaseUrl: string; esiCompatibilityDate: string; esiUserAgent: string;
   sessionSecret: string; databaseUrl: string;
+  /** Public origin (from EVE_CALLBACK_URL). Route handlers behind Traefik see the container origin, so redirects use this. */
+  siteOrigin: string;
 }
 
 const REQUIRED = ["EVE_CLIENT_ID", "EVE_CLIENT_SECRET", "EVE_CALLBACK_URL", "ALLOWED_CHARACTER_IDS",
@@ -26,6 +28,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     esiBaseUrl: env.ESI_BASE_URL ?? "https://esi.evetech.net",
     esiCompatibilityDate: env.ESI_COMPATIBILITY_DATE!, esiUserAgent: env.ESI_USER_AGENT!,
     sessionSecret: env.SESSION_SECRET!, databaseUrl: env.DATABASE_URL!,
+    siteOrigin: new URL(env.EVE_CALLBACK_URL!).origin,
   };
 }
 

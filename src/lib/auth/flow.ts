@@ -40,7 +40,7 @@ export async function completeLogin(
     tokens = await deps.exchange({ metadata, clientId: config.eveClientId, clientSecret: config.eveClientSecret, code: a.code, verifier: saved.verifier });
   } catch (e) { throw new AuthError("token", (e as Error).message); }
   let verified;
-  try { verified = await deps.verify(tokens.access_token, { jwks: deps.jwks(metadata), clientId: config.eveClientId }); }
+  try { verified = await deps.verify(tokens.access_token, { jwks: deps.jwks(metadata), clientId: config.eveClientId, issuer: metadata.issuer }); }
   catch (e) { throw new AuthError("jwt", (e as Error).message); }
   if (!config.allowedCharacterIds.has(verified.characterId)) throw new AuthError("not-allowed", `character ${verified.characterId} is not allow-listed`);
   await deps.upsert({ id: verified.characterId, name: verified.name, refreshTokenEnc: encryptSecret(tokens.refresh_token, config.sessionSecret), scopes: verified.scopes });

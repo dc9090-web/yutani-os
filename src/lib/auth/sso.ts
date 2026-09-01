@@ -71,10 +71,15 @@ export function refreshAccessToken(a: { metadata: SsoMetadata; clientId: string;
   return tokenRequest(a.metadata, a.clientId, a.clientSecret, { grant_type: "refresh_token", refresh_token: a.refreshToken }, a.fetchImpl ?? fetch);
 }
 
-export async function verifyEveJwt(token: string, a: { jwks: JWTVerifyGetKey; clientId: string }): Promise<VerifiedToken> {
+// EVE's metadata publishes `https://login.eveonline.com` (no trailing slash); the docs also mention the
+// slash and bare-host forms. The issuer from the live metadata document is always accepted too.
+const KNOWN_ISSUERS = ["https://login.eveonline.com", "https://login.eveonline.com/", "login.eveonline.com"];
+
+export async function verifyEveJwt(token: string, a: { jwks: JWTVerifyGetKey; clientId: string; issuer?: string }): Promise<VerifiedToken> {
   let payload;
+  const issuer = a.issuer && !KNOWN_ISSUERS.includes(a.issuer) ? [...KNOWN_ISSUERS, a.issuer] : KNOWN_ISSUERS;
   try {
-    ({ payload } = await jwtVerify(token, a.jwks, { issuer: ["https://login.eveonline.com/", "login.eveonline.com"], audience: "EVE Online" }));
+    ({ payload } = await jwtVerify(token, a.jwks, { issuer, audience: "EVE Online" }));
   } catch (e) { throw new SsoError("jwt", `JWT verification failed: ${(e as Error).message}`); }
   const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
   if (!aud.includes(a.clientId)) throw new SsoError("jwt", "JWT audience does not include our client id");

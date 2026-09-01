@@ -18,6 +18,10 @@ describe("config", () => {
     expect(c.allowedCharacterIds.has(2)).toBe(true);
     expect(c.esiBaseUrl).toBe("https://esi.evetech.net");
   });
+  it("derives siteOrigin from the callback URL (route handlers behind Traefik see localhost)", () => {
+    expect(loadConfig(full).siteOrigin).toBe("https://x");
+    expect(loadConfig({ ...full, EVE_CALLBACK_URL: "https://eve.plasma66.com/auth/callback" }).siteOrigin).toBe("https://eve.plasma66.com");
+  });
   it("names every missing variable", () => {
     const { EVE_CLIENT_SECRET: _a, DATABASE_URL: _b, ...rest } = full;
     expect(() => loadConfig(rest)).toThrow(/EVE_CLIENT_SECRET, DATABASE_URL/);

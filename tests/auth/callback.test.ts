@@ -29,8 +29,10 @@ import { GET } from "../../src/app/auth/callback/route.js";
 import { completeLogin } from "../../src/lib/auth/flow.js";
 import { readSession, verifyPayload, SESSION_COOKIE, SESSION_MAX_AGE } from "../../src/lib/auth/session.js";
 
+// Behind Traefik the route handler sees the container's own origin, not the public one —
+// redirects must be built from the configured site origin, never from req.nextUrl.
 function req(): NextRequest {
-  return new NextRequest("https://eve.plasma66.com/auth/callback?code=c0de&state=st");
+  return new NextRequest("http://localhost:3000/auth/callback?code=c0de&state=st");
 }
 
 describe("auth callback", () => {
@@ -54,5 +56,13 @@ describe("auth callback", () => {
     const cookie = res.cookies.get(SESSION_COOKIE)?.value;
     const payload = verifyPayload<SessionPayload>(cookie, process.env.SESSION_SECRET!, SESSION_MAX_AGE);
     expect(payload).toMatchObject({ activeCharacterId: 2 });
+  });
+});
+
+describe("auth callback failure path", () => {
+  it("redirects to the public /login with the error code, not the container origin", async () => {
+    vi.mocked(completeLogin).mockRejectedValueOnce(Object.assign(new Error("bad"), { name: "AuthError", code: "jwt" }));
+    const res = await GET(req());
+    expect(res.headers.get("location")).toMatch(/^https:\/\/eve\.plasma66\.com\/login\?error=/);
   });
 });

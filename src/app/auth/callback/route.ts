@@ -11,14 +11,14 @@ export async function GET(req: NextRequest) {
       { code: url.searchParams.get("code"), state: url.searchParams.get("state"), oauthCookie: req.cookies.get(OAUTH_COOKIE)?.value }, config);
     const existing = await readSession();
     const payload: SessionPayload = { activeCharacterId: existing?.activeCharacterId ?? characterId, iat: Math.floor(Date.now() / 1000) };
-    const res = NextResponse.redirect(new URL(existing ? "/settings" : "/", url.origin));
+    const res = NextResponse.redirect(new URL(existing ? "/settings" : "/", config.siteOrigin));
     res.cookies.set(SESSION_COOKIE, signPayload(payload, config.sessionSecret), cookieOptions(SESSION_MAX_AGE));
     res.cookies.delete(OAUTH_COOKIE);
     return res;
   } catch (e) {
     const code = e instanceof AuthError ? e.code : "unknown";
     console.error("[auth] callback failed:", code, (e as Error).message);
-    const res = NextResponse.redirect(new URL(`/login?error=${code}`, url.origin));
+    const res = NextResponse.redirect(new URL(`/login?error=${code}`, config.siteOrigin));
     res.cookies.delete(OAUTH_COOKIE);
     return res;
   }
