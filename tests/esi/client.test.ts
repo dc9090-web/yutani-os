@@ -33,6 +33,12 @@ describe("EsiClient", () => {
     expect(calls[0].url).toBe("https://esi.test/characters/1");
     expect(store.get("1/characters/1")?.etag).toBe('"e1"');
   });
+  it("stores expiresAt: null and does not throw when Expires is unparsable", async () => {
+    const { client, store } = make([{ status: 200, body: { name: "T" }, headers: { Expires: "garbage" } }]);
+    const r = await client.get<{ name: string }>("/characters/1", { characterId: 1 });
+    expect(r.data.name).toBe("T");
+    expect(store.get("1/characters/1")?.expiresAt).toBeNull();
+  });
   it("serves from cache before Expires without fetching, then sends If-None-Match and accepts 304", async () => {
     const { client, calls, advance } = make([
       { status: 200, body: [1], headers: { ETag: '"e1"', Expires: future(1_700_000_000_000, 60) } },

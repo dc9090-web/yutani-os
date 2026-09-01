@@ -5,7 +5,7 @@ export interface EsiDeps {
   fetchImpl?: typeof fetch; getAccessToken: (characterId: number) => Promise<string>;
   cache: { get: typeof getCached; put: typeof putCached };
   config: Pick<AppConfig, "esiBaseUrl" | "esiCompatibilityDate" | "esiUserAgent">;
-  now?: () => number; sleep?: (ms: number) => Promise<void>;
+  now?: () => number; sleep?: (ms: number) => Promise<void>; timeoutMs?: number;
 }
 export interface EsiResult<T> { data: T; status: number; pages: number; fromCache: boolean }
 export class EsiError extends Error {
@@ -25,7 +25,7 @@ export function parseLimit(v: string | null): { tokens: number; windowMs: number
 }
 
 export class EsiClient {
-  private fetchImpl: typeof fetch; private now: () => number; private sleep: (ms: number) => Promise<void>;
+  private fetchImpl: typeof fetch; private now: () => number; private sleep: (ms: number) => Promise<void>; private timeoutMs: number;
   private haltUntil = 0;
   private groupWait = new Map<string, number>();   // group → time when it is OK to call again
   private pathGroup = new Map<string, string>();   // path (no query) → rate-limit group
@@ -33,6 +33,7 @@ export class EsiClient {
   constructor(private deps: EsiDeps) {
     this.fetchImpl = deps.fetchImpl ?? fetch; this.now = deps.now ?? Date.now;
     this.sleep = deps.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
+    this.timeoutMs = deps.timeoutMs ?? 30_000;
   }
 
   async get<T>(path: string, opts: GetOpts = {}): Promise<EsiResult<T>> {
@@ -54,19 +55,23 @@ export class EsiClient {
     if (opts.characterId) headers.Authorization = `Bearer ${await this.deps.getAccessToken(opts.characterId)}`;
     if (cached?.etag) headers["If-None-Match"] = cached.etag;
 
-    let res = await this.fetchImpl(url, { headers });
+    let res = await this.fetchImpl(url, { headers, signal: AbortSignal.timeout(this.timeoutMs) });
     this.noteRateLimit(url.pathname, res);
     if (res.status === 429) {
       const retry = Number(res.headers.get("Retry-After") ?? "5");
       await this.sleep(retry * 1000);
-      res = await this.fetchImpl(url, { headers });
+      res = await this.fetchImpl(url, { headers, signal: AbortSignal.timeout(this.timeoutMs) });
       this.noteRateLimit(url.pathname, res);
     }
     if (res.status === 420) { this.haltUntil = this.now() + HALT_MS; throw new EsiError(420, key, "ESI error limit reached; halting for 60s"); }
 
     const pages = Number(res.headers.get("X-Pages") ?? cached?.pages ?? 1) || 1;
     const expiresHeader = res.headers.get("Expires");
-    const expiresAt = expiresHeader ? new Date(expiresHeader) : null;
+    let expiresAt: Date | null = null;
+    if (expiresHeader) {
+      const d = new Date(expiresHeader);
+      expiresAt = Number.isNaN(d.getTime()) ? null : d;
+    }
 
     if (res.status === 304 && cached) {
       await this.deps.cache.put(cid, key, { ...cached, expiresAt: expiresAt ?? cached.expiresAt, pages });
