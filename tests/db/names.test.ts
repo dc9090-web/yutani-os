@@ -38,6 +38,14 @@ describe("names repo", () => {
     expect(await getStructures([])).toEqual([]);
     expect(await putNames([])).toBe(0);
   });
+  it("collapses duplicate ids within one putNames call instead of throwing", async () => {
+    const count = await putNames([
+      { id: 1, category: "character", name: "A" },
+      { id: 1, category: "character", name: "B" },
+    ]);
+    expect(count).toBe(1);
+    expect((await getName(1))!.name).toBe("B");
+  });
   it("stores a resolved structure and a forbidden one", async () => {
     await putStructure({ id: 1035466617946, name: "Perimeter - Tranquility Trading Tower", solarSystemId: 30000144, typeId: 35834, ownerId: 98599770, forbidden: false });
     await putStructure({ id: 1040000000001, name: null, solarSystemId: null, typeId: null, ownerId: null, forbidden: true });

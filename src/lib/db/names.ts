@@ -23,18 +23,23 @@ export async function getName(id: number): Promise<UniverseName | null> {
   return (await getNames([id]))[0] ?? null;
 }
 
-/** Returns the number of rows written. `updated_at` is refreshed so the TTL rules restart. */
+/**
+ * Returns the number of rows written. `updated_at` is refreshed so the TTL rules restart.
+ * Duplicate ids within `rows` are collapsed (last write wins) before upserting, since
+ * `ON CONFLICT DO UPDATE` cannot affect the same row twice within one statement.
+ */
 export async function putNames(rows: { id: number; category: string; name: string | null }[]): Promise<number> {
   if (rows.length === 0) return 0;
+  const deduped = [...new Map(rows.map((r) => [r.id, r])).values()];
   const pool = getPool();
-  for (const batch of chunk(rows, UPSERT_BATCH)) {
+  for (const batch of chunk(deduped, UPSERT_BATCH)) {
     await pool.query(
       `INSERT INTO universe_names (id, category, name, updated_at)
        SELECT *, now() FROM unnest($1::bigint[], $2::text[], $3::text[])
        ON CONFLICT (id) DO UPDATE SET category = EXCLUDED.category, name = EXCLUDED.name, updated_at = now()`,
       [batch.map((r) => String(r.id)), batch.map((r) => r.category), batch.map((r) => r.name)]);
   }
-  return rows.length;
+  return deduped.length;
 }
 
 export async function getStructures(ids: number[]): Promise<StructureRow[]> {
