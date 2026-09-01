@@ -3,7 +3,11 @@
  * the components stay dumb (the phase-3b pattern).
  */
 import type { AssetRow } from "../db/character-assets.js";
-import { CATEGORY, type BuiltFit, type DogmaData, type FitStats, type Problem } from "../dogma/index.js";
+import type { FittingRow } from "../db/character-fittings.js";
+import {
+  CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
+  type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
+} from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 
 /** dogmaUnits 105 Percentage, 109 Modifier Percent, 127 Absolute Percent all display as "%". */
@@ -144,4 +148,72 @@ export function errorShipCard(input: {
 export function sortShipCards(cards: ShipCardView[]): ShipCardView[] {
   return [...cards].sort((a, b) =>
     b.valueRaw - a.valueRaw || a.typeName.localeCompare(b.typeName) || a.key.localeCompare(b.key));
+}
+
+/** A saved fit is not anywhere, so its card's location line says what it is instead. */
+export const SAVED_FIT_LOCATION = "Saved fit";
+
+export interface ComputedFit { built: BuiltFit; stats: FitStats; problems: Problem[] }
+
+/**
+ * Spec §6: engine exceptions are caught per fit and logged, and the card says "Could not compute".
+ * The build *and* the maths are inside the try — `fitStats` and `validateFit` both call `getAttr`,
+ * so a cycle or an unknown attribute surfaces after a perfectly successful build.
+ */
+export function computeFit(build: () => BuiltFit, what: string): ComputedFit | null {
+  try {
+    const built = build();
+    return { built, stats: fitStats(built.fit), problems: validateFit(built.fit) };
+  } catch (e) {
+    console.error(`[ships] could not compute ${what}`, e);
+    return null;
+  }
+}
+
+/** Spec §4's "Fitted ships" grid, value descending. */
+export function assetShipCards(
+  groups: ShipGroup[],
+  ctx: FitContext,
+  places: ReadonlyMap<number, { name: string }>,
+  byItemId: ReadonlyMap<number, AssetRow>,
+  prices: ReadonlyMap<number, Price>,
+): ShipCardView[] {
+  return sortShipCards(groups.map((group) => {
+    const base = {
+      key: `asset:${group.ship.itemId}`,
+      href: `/ships/asset/${group.ship.itemId}`,
+      name: group.ship.name,
+      typeId: group.ship.typeId,
+      typeName: ctx.data.types.get(group.ship.typeId)?.name ?? `Unknown type (${group.ship.typeId})`,
+      location: shipLocationLabel(group.ship, places, byItemId, ctx.data),
+    };
+    const computed = computeFit(() => fitFromAssets(group.ship, group.children, ctx), base.key);
+    if (computed === null) return errorShipCard(base);
+    return toShipCard({
+      ...base, stats: computed.stats, problems: computed.problems,
+      entries: fitValueEntries(computed.built), prices,
+    });
+  }));
+}
+
+/** Spec §4's "Saved fits" grid — the same card, built from `character_fittings*`. */
+export function savedFitCards(
+  fittings: FittingRow[], ctx: FitContext, prices: ReadonlyMap<number, Price>,
+): ShipCardView[] {
+  return sortShipCards(fittings.map((fitting) => {
+    const base = {
+      key: `fit:${fitting.fittingId}`,
+      href: `/ships/fit/${fitting.fittingId}`,
+      name: fitting.name,
+      typeId: fitting.shipTypeId,
+      typeName: ctx.data.types.get(fitting.shipTypeId)?.name ?? `Unknown type (${fitting.shipTypeId})`,
+      location: SAVED_FIT_LOCATION,
+    };
+    const computed = computeFit(() => fitFromFitting(fitting, fitting.items, ctx), base.key);
+    if (computed === null) return errorShipCard(base);
+    return toShipCard({
+      ...base, stats: computed.stats, problems: computed.problems,
+      entries: fitValueEntries(computed.built), prices,
+    });
+  }));
 }

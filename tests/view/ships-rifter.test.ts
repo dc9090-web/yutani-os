@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
 import { fitFromAssets, fitStats, missingSkills, validateFit } from "../../src/lib/dogma/index.js";
-import { fitValueEntries, toShipCard } from "../../src/lib/view/ships.js";
+import { assetShipCards, computeFit, fitValueEntries, savedFitCards, toShipCard } from "../../src/lib/view/ships.js";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
+import type { FittingRow } from "../../src/lib/db/character-fittings.js";
 import type { Price } from "../../src/lib/view/price.js";
 
 function asset(over: Partial<AssetRow> & { itemId: number; typeId: number }): AssetRow {
@@ -98,5 +99,55 @@ describe("a Rifter built from asset rows", () => {
     });
     expect(card.unpriced).toBe("1 item unpriced");
     expect(card.valueRaw).toBe(12_100_100);
+  });
+});
+
+describe("computeFit", () => {
+  it("returns the built fit, its stats and its problems", () => {
+    const computed = computeFit(() => fitFromAssets(SHIP, CHILDREN, ctx), "asset:1000")!;
+    expect(computed.stats.cpu.output).toBe(162.5);
+    expect(computed.problems.some((p) => p.kind === "skill")).toBe(true);
+    expect(computed.built.fit.ship.typeId).toBe(587);
+  });
+
+  it("logs and returns null when the engine throws", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(computeFit(() => { throw new Error("unknown hull"); }, "asset:9")).toBeNull();
+    expect(spy).toHaveBeenCalledWith(expect.stringContaining("asset:9"), expect.any(Error));
+    spy.mockRestore();
+  });
+});
+
+describe("assetShipCards / savedFitCards", () => {
+  const places = new Map([[60003760, { name: "Jita 4-4" }]]);
+
+  it("builds one card per assembled ship, sorted by value", () => {
+    const groups = [{ ship: SHIP, children: CHILDREN }];
+    const cards = assetShipCards(groups, ctx, places, new Map([[1000, SHIP]]), PRICES);
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toMatchObject({
+      key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeName: "Rifter",
+      location: "Jita 4-4", value: "13.1M ISK", error: null,
+    });
+  });
+
+  it("shows Could not compute for a hull the engine cannot build", () => {
+    const broken = { ...SHIP, itemId: 2000, typeId: 999999 };
+    const cards = assetShipCards([{ ship: broken, children: [] }], ctx, places, new Map(), PRICES);
+    expect(cards[0].error).toBe("Could not compute");
+    expect(cards[0].typeName).toBe("Unknown type (999999)");
+  });
+
+  it("builds a card per saved fit, labelled as a saved fit", () => {
+    const fitting: FittingRow = {
+      fittingId: 7, name: "Solo Rifter", description: "", shipTypeId: 587,
+      items: [{ idx: 0, typeId: 519, quantity: 1, flag: "LoSlot0" }],
+    };
+    const cards = savedFitCards([fitting], ctx, PRICES);
+    expect(cards[0]).toMatchObject({
+      key: "fit:7", href: "/ships/fit/7", name: "Solo Rifter", typeName: "Rifter", location: "Saved fit",
+    });
+    expect(cards[0].cpu!.output).toBe(162.5);
+    expect(cards[0].valueRaw).toBe(9_000_000);   // 8,000,000 hull + 1,000,000 gyro
   });
 });
