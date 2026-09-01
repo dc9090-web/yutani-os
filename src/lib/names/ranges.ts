@@ -12,7 +12,7 @@ export function classifyLocation(id: number): LocationKind {
   return "unknown";
 }
 
-/** "Unknown structure (1035…)" — what the UI shows when a citadel is forbidden or never resolved. */
+/** "Unknown structure (id)" — what the UI shows when a citadel is forbidden or never resolved. */
 export function unknownStructureLabel(id: number): string {
-  return `Unknown structure (${String(id).slice(0, 4)}…)`;
+  return `Unknown structure (${id})`;
 }

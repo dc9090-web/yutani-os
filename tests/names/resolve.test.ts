@@ -91,9 +91,19 @@ describe("resolveNames", () => {
     const h = harness();
     await h.resolver.resolveNames(ids);
     expect(h.posts).toEqual([[34]]);
-    const many = harness({ esi: { post: async (_p: string, body: unknown) => (body as number[]).map((id) => ({ id, name: `n${id}`, category: "inventory_type" })), get: async () => ({ data: {} }) } as unknown as NameResolverDeps["esi"] });
+    const manyPosts: number[][] = [];
+    const many = harness({
+      esi: {
+        post: async (_p: string, body: unknown) => {
+          manyPosts.push(body as number[]);
+          return (body as number[]).map((id) => ({ id, name: `n${id}`, category: "inventory_type" }));
+        },
+        get: async () => ({ data: {} }),
+      } as unknown as NameResolverDeps["esi"],
+    });
     await many.resolver.resolveNames(Array.from({ length: 2500 }, (_, i) => 1_000_000 + i));
-    // posts are not recorded by this fake, so assert through the store instead
+    expect(manyPosts.length).toBe(3);
+    expect(manyPosts.map((p) => p.length)).toEqual([1000, 1000, 500]);
     expect(many.names.size).toBe(2500);
   });
   it("returns an empty map for no usable ids", async () => {

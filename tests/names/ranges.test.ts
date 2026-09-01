@@ -14,13 +14,15 @@ describe("classifyLocation", () => {
     expect(classifyLocation(29999999)).toBe("unknown");
     expect(classifyLocation(40000000)).toBe("unknown");
     expect(classifyLocation(70000000)).toBe("unknown");
-    expect(classifyLocation(1023456789012)).toBe("structure");
     expect(classifyLocation(0)).toBe("unknown");
+  });
+  it("has no upper bound on the structure range", () => {
+    expect(classifyLocation(1023456789012)).toBe("structure");
   });
 });
 
 describe("unknownStructureLabel", () => {
-  it("truncates the id the way the UI shows it", () => {
-    expect(unknownStructureLabel(1035466617946)).toBe("Unknown structure (1035…)");
+  it("shows the full id the way the UI shows it", () => {
+    expect(unknownStructureLabel(1035466617946)).toBe("Unknown structure (1035466617946)");
   });
 });

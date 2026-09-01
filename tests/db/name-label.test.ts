@@ -28,10 +28,10 @@ describe("locationLabel", () => {
     await putStructure({ id: 1035466617946, name: "Perimeter - Tranquility Trading Tower", solarSystemId: 30000144, typeId: 35834, ownerId: 98599770, forbidden: false });
     await putStructure({ id: 1040000000001, name: null, solarSystemId: null, typeId: null, ownerId: null, forbidden: true });
     expect(await locationLabel(1035466617946)).toEqual({ name: "Perimeter - Tranquility Trading Tower", solarSystemId: 30000144, kind: "structure" });
-    expect(await locationLabel(1040000000001)).toEqual({ name: "Unknown structure (1040…)", solarSystemId: null, kind: "structure" });
+    expect(await locationLabel(1040000000001)).toEqual({ name: "Unknown structure (1040000000001)", solarSystemId: null, kind: "structure" });
   });
   it("degrades for ids nothing knows about", async () => {
-    expect(await locationLabel(1099999999999)).toEqual({ name: "Unknown structure (1099…)", solarSystemId: null, kind: "structure" });
+    expect(await locationLabel(1099999999999)).toEqual({ name: "Unknown structure (1099999999999)", solarSystemId: null, kind: "structure" });
     expect(await locationLabel(60009999)).toEqual({ name: "Unknown station (60009999)", solarSystemId: null, kind: "station" });
     expect(await locationLabel(30009999)).toEqual({ name: "Unknown system (30009999)", solarSystemId: 30009999, kind: "system" });
     expect(await locationLabel(42)).toEqual({ name: "Unknown location (42)", solarSystemId: null, kind: "unknown" });
