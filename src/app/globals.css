@@ -139,6 +139,8 @@ body {
 .char-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--divider); object-fit: cover; background: var(--raised); }
 .char-avatar.warn { border-color: var(--neg); }
 .char-group-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); padding: 6px 12px 2px; }
+.menu-link-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; font-size: 14px; color: var(--text); text-decoration: none; border-radius: 6px; }
+.menu-link-item:hover { background: var(--raised); color: var(--accent); }
 .page-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 32px; line-height: 1.1; margin: 0 0 8px; color: var(--text); }
 .page-sub { margin: 0 0 24px; font-size: 13px; color: var(--faint); }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
