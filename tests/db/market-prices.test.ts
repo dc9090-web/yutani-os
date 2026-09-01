@@ -1,9 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import type { Pool } from "pg";
 import { resetDb } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { getPrices, upsertEsiPrices, upsertJitaPrices } from "../../src/lib/db/market-prices.js";
+import { getPrices, upsertEsiPrices, upsertJitaPrices, stalePriceIds } from "../../src/lib/db/market-prices.js";
 
-beforeAll(async () => { await resetDb(); }, 60_000);
+let pool: Pool;
+
+beforeAll(async () => { pool = await resetDb(); }, 60_000);
 afterAll(closePool);
 
 describe("market_prices repo", () => {
@@ -50,5 +53,17 @@ describe("market_prices repo", () => {
       { typeId: 44992, sellMin: 20, buyMax: 19 },
     ])).resolves.toBe(1);
     expect((await getPrices([44992])).get(44992)).toEqual({ sell: 20, buy: 19, adjusted: 2 });
+  });
+});
+
+describe("stalePriceIds", () => {
+  it("reports ids with no row and ids older than the age limit", async () => {
+    await upsertJitaPrices([{ typeId: 34, sellMin: 4.2, buyMax: 4 }]);
+    await pool.query("UPDATE market_prices SET updated_at = now() - interval '30 hours' WHERE type_id = 34");
+    await upsertJitaPrices([{ typeId: 35, sellMin: 8, buyMax: 7 }]);
+
+    expect((await stalePriceIds([34, 35, 36], 24)).sort((a, b) => a - b)).toEqual([34, 36]);
+    expect(await stalePriceIds([35], 24)).toEqual([]);
+    expect(await stalePriceIds([], 24)).toEqual([]);
   });
 });

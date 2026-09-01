@@ -64,3 +64,19 @@ export async function getPrices(typeIds: number[]): Promise<Map<number, Price>> 
      FROM market_prices WHERE type_id = ANY($1::int[])`, [wanted]);
   return new Map(rows.map((r) => [r.typeId, { sell: num(r.sell), buy: num(r.buy), adjusted: num(r.adjusted) }]));
 }
+
+/**
+ * Which of these types the designer must not trust: no row at all, or a row older than
+ * `maxAgeHours`. Spec §6 — the fitting designer tops these up from Fuzzwork before answering
+ * rather than waiting for the hourly job.
+ */
+export async function stalePriceIds(typeIds: number[], maxAgeHours: number): Promise<number[]> {
+  const wanted = [...new Set(typeIds)];
+  if (wanted.length === 0) return [];
+  const { rows } = await getPool().query<{ id: number }>(
+    `SELECT w.id FROM unnest($1::int[]) AS w(id)
+     LEFT JOIN market_prices p ON p.type_id = w.id
+     WHERE p.type_id IS NULL OR p.updated_at < now() - make_interval(hours => $2)`,
+    [wanted, maxAgeHours]);
+  return rows.map((r) => r.id);
+}
