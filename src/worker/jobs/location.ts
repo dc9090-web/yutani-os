@@ -3,7 +3,7 @@ import { hasScope } from "../../lib/auth/sso.js";
 import { getCharacter } from "../../lib/db/characters.js";
 import { upsertLocation, type LocationInput } from "../../lib/db/character-location.js";
 import { resolveLocations } from "../../lib/names/index.js";
-import { EsiUnavailableError } from "../../lib/esi/client.js";
+import { isAuthOrOutage } from "./resolve-guard.js";
 
 /**
  * 15 minutes, not the 5-second ESI cache: this answers "where is my character" on the Overview,
@@ -68,7 +68,7 @@ export function createLocationJob(deps: LocationJobDeps): CharacterSyncJob {
         try {
           await deps.resolveLocations([docked], characterId);
         } catch (e) {
-          if (e instanceof EsiUnavailableError) throw e;
+          if (isAuthOrOutage(e)) throw e;
           // The location itself was already written; the next run's resolveLocations retries this.
           console.warn(`[location] location resolution failed for ${characterId}: ${e instanceof Error ? e.message : String(e)}`);
         }

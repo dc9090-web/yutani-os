@@ -153,6 +153,11 @@ describe("resolveLocations", () => {
     await expect(h.resolver.resolveLocations([1035466617946], 1)).rejects.toMatchObject({ status: 503 });
     expect(h.structures.has(1035466617946)).toBe(false);
   });
+  it("lets a 401 on the structure fetch propagate instead of caching forbidden", async () => {
+    const h = harness({ esi: { post: async () => [], get: async () => { throw new EsiError(401, "/universe/structures/1", "token rejected"); } } as unknown as NameResolverDeps["esi"] });
+    await expect(h.resolver.resolveLocations([1035466617946], 1)).rejects.toMatchObject({ status: 401 });
+    expect(h.structures.has(1035466617946)).toBe(false);
+  });
   it("skips the structure call entirely when the token lacks the scope", async () => {
     const h = harness({ hasStructureScope: async () => false });
     const out = await h.resolver.resolveLocations([1035466617946], 1);

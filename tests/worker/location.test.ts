@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { createLocationJob, locationJob, LOCATION_INTERVAL_MS, LOCATION_RETRY_MS, type LocationJobDeps } from "../../src/worker/jobs/location.js";
 import type { LocationInput } from "../../src/lib/db/character-location.js";
-import { EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { EsiError, EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { NeedsReauthError } from "../../src/lib/esi/tokens.js";
 import { esiFixture } from "../fixtures/esi.js";
 
 const CID = 669539978;
@@ -98,5 +99,17 @@ describe("location job", () => {
       resolveLocations: async () => { throw new EsiUnavailableError("/universe/structures/1", Date.now() + 60_000); },
     });
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
+  });
+  it("still rejects when resolveLocations throws a NeedsReauthError", async () => {
+    const h = harness(ALL, { solar_system_id: 30000144, structure_id: 1035466617946 }, {
+      resolveLocations: async () => { throw new NeedsReauthError(CID); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(NeedsReauthError);
+  });
+  it("still rejects when resolveLocations throws an EsiError(401)", async () => {
+    const h = harness(ALL, { solar_system_id: 30000144, structure_id: 1035466617946 }, {
+      resolveLocations: async () => { throw new EsiError(401, "/universe/structures/1", "token rejected"); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toMatchObject({ status: 401 });
   });
 });

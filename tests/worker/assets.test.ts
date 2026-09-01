@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { createAssetsJob, assetsJob, ASSETS_INTERVAL_MS, ASSETS_RETRY_MS, ASSET_NAMES_CHUNK, type AssetsJobDeps } from "../../src/worker/jobs/assets.js";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
-import { EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { EsiError, EsiUnavailableError } from "../../src/lib/esi/client.js";
+import { NeedsReauthError } from "../../src/lib/esi/tokens.js";
 import { esiFixture } from "../fixtures/esi.js";
 
 const CID = 669539978;
@@ -138,5 +139,17 @@ describe("assets job", () => {
       resolveLocations: async () => { throw new EsiUnavailableError("/universe/structures/1", Date.now() + 60_000); },
     });
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(EsiUnavailableError);
+  });
+  it("still rejects when resolveLocations throws a NeedsReauthError", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      resolveLocations: async () => { throw new NeedsReauthError(CID); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toBeInstanceOf(NeedsReauthError);
+  });
+  it("still rejects when resolveLocations throws an EsiError(401)", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      resolveLocations: async () => { throw new EsiError(401, "/universe/structures/1", "token rejected"); },
+    });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toMatchObject({ status: 401 });
   });
 });

@@ -5,7 +5,7 @@ import { getCharacter } from "../../lib/db/characters.js";
 import { replaceAssets, type AssetRow } from "../../lib/db/character-assets.js";
 import { resolveLocations } from "../../lib/names/index.js";
 import { getTypes } from "../../lib/sde/repo.js";
-import { EsiUnavailableError } from "../../lib/esi/client.js";
+import { isAuthOrOutage } from "./resolve-guard.js";
 
 export const ASSETS_INTERVAL_MS = 60 * 60 * 1000;
 export const ASSETS_RETRY_MS = 10 * 60 * 1000;
@@ -69,7 +69,7 @@ export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
       try {
         await deps.resolveLocations(roots, characterId);
       } catch (e) {
-        if (e instanceof EsiUnavailableError) throw e;
+        if (isAuthOrOutage(e)) throw e;
         // The assets themselves were already written; the next run's resolveLocations retries this.
         console.warn(`[assets] location resolution failed for ${characterId}: ${e instanceof Error ? e.message : String(e)}`);
       }

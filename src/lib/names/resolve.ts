@@ -96,10 +96,12 @@ export function createNameResolver(deps: NameResolverDeps): NameResolver {
   }
 
   /**
-   * A 4xx means this id will never resolve for this character: 403 is an ACL miss, 404 is a
-   * structure that was deleted or moved out of range. Remember that and stop asking. A 5xx
-   * (including EsiUnavailableError, which is a 503) or a non-ESI error is transient or unrelated
-   * to this specific id, so it propagates and the run is retried instead of caching a false negative.
+   * A 4xx (other than 401) means this id will never resolve for this character: 403 is an ACL
+   * miss, 404 is a structure that was deleted or moved out of range. Remember that and stop
+   * asking. A 401 means the token itself was rejected — not this id's problem — so it must
+   * propagate for the scheduler's markNeedsReauth path to fire, same as a 5xx (including
+   * EsiUnavailableError, a 503) or a non-ESI error, all of which are transient or unrelated to
+   * this specific id and get the run retried instead of caching a false negative.
    */
   async function fetchStructure(id: number, characterId: number, at: number): Promise<StructureRow> {
     let row: StructureInput;
@@ -107,8 +109,11 @@ export function createNameResolver(deps: NameResolverDeps): NameResolver {
       const { data } = await deps.esi.get<EsiStructure>(`/universe/structures/${id}`, { characterId });
       row = { id, name: data.name, solarSystemId: data.solar_system_id, typeId: data.type_id ?? null, ownerId: data.owner_id, forbidden: false };
     } catch (e) {
-      if (!(e instanceof EsiError) || e.status < 400 || e.status >= 500) throw e;
-      row = { id, name: null, solarSystemId: null, typeId: null, ownerId: null, forbidden: true };
+      if (e instanceof EsiError && e.status >= 400 && e.status < 500 && e.status !== 401) {
+        row = { id, name: null, solarSystemId: null, typeId: null, ownerId: null, forbidden: true };
+      } else {
+        throw e;
+      }
     }
     await deps.putStructure(row);
     return { ...row, updatedAt: new Date(at) };
