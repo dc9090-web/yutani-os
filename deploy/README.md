@@ -108,6 +108,26 @@ job retries after 10 minutes.
 Prices are empty until the first run, so `/ships` shows `0 ISK` and "n items unpriced" on a fresh
 deploy for up to an hour.
 
+## Fitting designer
+
+`/fitting` runs the dogma engine **in the browser**. Three routes feed it:
+
+- `GET /api/dogma/meta` — the attribute/effect/group half of `DogmaData`, ~1.25 MB of JSON, with
+  `Cache-Control: public, max-age=86400` and `ETag: "sde-<build>"`. A browser revalidates once a
+  day and gets a 304 unless the SDE was re-imported.
+- `GET /api/dogma/types?ids=` — up to 200 type ids plus their `requiredSkillN` closure, memoised
+  per id in the tab.
+- `GET /api/market/prices?ids=` — serves `market_prices` and, for ids with no row or a row older
+  than 24 h, fetches Jita aggregates from Fuzzwork **synchronously** (one chunk of ≤ 500) before
+  answering, so a freshly browsed module is priced immediately instead of waiting for the hourly
+  job. A Fuzzwork failure is logged and the stored (ESI) prices are served.
+
+Fits live in our own `fits` / `fit_items` tables and are **never pushed to ESI** — the
+`esi-fittings.write_fittings.v1` scope is not requested. Export is EFT text.
+
+Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
+`/api/health`, `/auth/*` and `/_next/*`.
+
 ## Logs and troubleshooting
 
 ```
