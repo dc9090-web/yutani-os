@@ -228,3 +228,15 @@ CREATE TABLE IF NOT EXISTS structures (
   forbidden        bool NOT NULL DEFAULT false,
   updated_at       timestamptz NOT NULL DEFAULT now()
 );
+
+-- Spec §3: two sources, one row per type. ESI /markets/prices supplies the reference values
+-- (adjusted/average); Fuzzwork's Jita (region 10000002) aggregates supply the tradeable ones.
+-- NULL means "that source has no price for this type" — never 0.
+CREATE TABLE IF NOT EXISTS market_prices (
+  type_id         int PRIMARY KEY,
+  adjusted_price  numeric,
+  average_price   numeric,
+  jita_sell_min   numeric,
+  jita_buy_max    numeric,
+  updated_at      timestamptz NOT NULL DEFAULT now()
+);

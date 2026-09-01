@@ -18,6 +18,7 @@ describe("schema", () => {
       "character_fittings", "character_implants", "character_jump_clones", "character_location",
       "character_skill_queue", "character_skill_summary", "character_skills", "character_wallet",
       "character_wallet_journal", "character_wallet_transactions", "characters", "esi_cache",
+      "market_prices",
       "sde_categories", "sde_constellations", "sde_dogma_attribute_categories", "sde_dogma_attributes",
       "sde_dogma_effect_modifiers", "sde_dogma_effects", "sde_dogma_units", "sde_groups",
       "sde_market_groups", "sde_meta", "sde_meta_groups", "sde_regions", "sde_solar_systems",
