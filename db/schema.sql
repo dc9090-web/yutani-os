@@ -45,3 +45,186 @@ CREATE TABLE IF NOT EXISTS sync_runs (
   error         text
 );
 CREATE INDEX IF NOT EXISTS sync_runs_latest_idx ON sync_runs (job, character_id, started_at DESC);
+
+-- ── Phase 3: character sync ─────────────────────────────────────────────────
+-- Every per-character table cascades from characters(id). ESI enums (location_flag, ref_type,
+-- location_type, name category) are raw text: CCP adds members without a compatibility-date bump.
+-- No foreign keys to sde_* — that reference data is swapped wholesale by the sde-update job.
+
+CREATE TABLE IF NOT EXISTS character_skill_summary (
+  character_id    bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  total_sp        bigint NOT NULL DEFAULT 0,
+  unallocated_sp  bigint,                        -- absent from ESI, not zero, when there is none
+  updated_at      timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS character_skills (
+  character_id   bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  skill_id       int NOT NULL,
+  trained_level  int NOT NULL,
+  active_level   int NOT NULL,
+  skillpoints    bigint NOT NULL,
+  PRIMARY KEY (character_id, skill_id)
+);
+
+CREATE TABLE IF NOT EXISTS character_skill_queue (
+  character_id       bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  queue_position     int NOT NULL,
+  skill_id           int NOT NULL,
+  finished_level     int NOT NULL,
+  start_date         timestamptz,                -- a paused queue omits the dates entirely
+  finish_date        timestamptz,
+  level_start_sp     bigint,
+  level_end_sp       bigint,
+  training_start_sp  bigint,
+  PRIMARY KEY (character_id, queue_position)
+);
+CREATE INDEX IF NOT EXISTS character_skill_queue_finish_idx ON character_skill_queue (character_id, finish_date);
+
+CREATE TABLE IF NOT EXISTS character_attributes (
+  character_id                 bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  charisma                     int NOT NULL,
+  intelligence                 int NOT NULL,
+  memory                       int NOT NULL,
+  perception                   int NOT NULL,
+  willpower                    int NOT NULL,
+  bonus_remaps                 int,
+  last_remap_date              timestamptz,
+  accrued_remap_cooldown_date  timestamptz,
+  updated_at                   timestamptz NOT NULL DEFAULT now()
+);
+
+-- Implants on the ACTIVE clone (GET /implants). Jump-clone implants live on the jump clone row.
+CREATE TABLE IF NOT EXISTS character_implants (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  type_id       int NOT NULL,
+  PRIMARY KEY (character_id, type_id)
+);
+
+CREATE TABLE IF NOT EXISTS character_clones (
+  character_id              bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  home_location_id          bigint,              -- home_location is optional, and so are its fields
+  home_location_type        text,                -- station | structure
+  last_clone_jump_date      timestamptz,
+  last_station_change_date  timestamptz,
+  updated_at                timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS character_jump_clones (
+  character_id   bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  jump_clone_id  bigint NOT NULL,
+  location_id    bigint,
+  location_type  text,                           -- station | structure
+  name           text,
+  implants       int[] NOT NULL DEFAULT '{}',    -- may be empty, never absent
+  PRIMARY KEY (character_id, jump_clone_id)
+);
+
+CREATE TABLE IF NOT EXISTS character_assets (
+  character_id       bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  item_id            bigint NOT NULL,
+  type_id            int NOT NULL,
+  quantity           bigint NOT NULL,
+  location_id        bigint NOT NULL,
+  location_type      text NOT NULL,              -- station | solar_system | item | other
+  location_flag      text NOT NULL,              -- 89-member enum that grows without notice
+  is_singleton       bool NOT NULL DEFAULT false,
+  is_blueprint_copy  bool NOT NULL DEFAULT false,-- ESI only ever sends true; absent means false
+  name               text,                       -- from POST /assets/names, singletons only
+  PRIMARY KEY (character_id, item_id)
+);
+CREATE INDEX IF NOT EXISTS character_assets_location_idx ON character_assets (character_id, location_id);
+
+CREATE TABLE IF NOT EXISTS character_fittings (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  fitting_id    bigint NOT NULL,
+  name          text NOT NULL DEFAULT '',
+  description   text NOT NULL DEFAULT '',
+  ship_type_id  int NOT NULL,
+  PRIMARY KEY (character_id, fitting_id)
+);
+
+CREATE TABLE IF NOT EXISTS character_fitting_items (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  fitting_id    bigint NOT NULL,
+  idx           int NOT NULL,                    -- position in the ESI items array
+  type_id       int NOT NULL,
+  quantity      int NOT NULL,
+  flag          text NOT NULL,                   -- fitting flag set; 'Invalid' is a real member
+  PRIMARY KEY (character_id, fitting_id, idx)
+);
+
+CREATE TABLE IF NOT EXISTS character_wallet (
+  character_id  bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  balance       numeric(20,2) NOT NULL DEFAULT 0,
+  updated_at    timestamptz NOT NULL DEFAULT now()
+);
+
+-- ESI keeps 30 days; we accumulate forever, deduplicated on the stable journal id.
+CREATE TABLE IF NOT EXISTS character_wallet_journal (
+  character_id     bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  id               bigint NOT NULL,
+  date             timestamptz NOT NULL,
+  ref_type         text NOT NULL,                -- ~180-member enum that grows without notice
+  description      text NOT NULL DEFAULT '',
+  amount           numeric(20,2),                -- optional despite being the point of the record
+  balance          numeric(20,2),
+  reason           text,
+  context_id       bigint,
+  context_id_type  text,
+  first_party_id   bigint,
+  second_party_id  bigint,
+  tax              numeric(20,2),
+  tax_receiver_id  bigint,
+  PRIMARY KEY (character_id, id)
+);
+CREATE INDEX IF NOT EXISTS character_wallet_journal_date_idx ON character_wallet_journal (character_id, date DESC);
+
+CREATE TABLE IF NOT EXISTS character_wallet_transactions (
+  character_id    bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  transaction_id  bigint NOT NULL,
+  date            timestamptz NOT NULL,
+  type_id         int NOT NULL,
+  quantity        bigint NOT NULL,
+  unit_price      numeric(20,2) NOT NULL,
+  client_id       bigint,
+  location_id     bigint,
+  is_buy          bool NOT NULL DEFAULT false,
+  is_personal     bool NOT NULL DEFAULT false,
+  journal_ref_id  bigint,                        -- joins to character_wallet_journal.id
+  PRIMARY KEY (character_id, transaction_id)
+);
+CREATE INDEX IF NOT EXISTS character_wallet_transactions_date_idx ON character_wallet_transactions (character_id, date DESC);
+
+CREATE TABLE IF NOT EXISTS character_location (
+  character_id     bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  solar_system_id  int,
+  station_id       bigint,                       -- exactly one of station/structure when docked,
+  structure_id     bigint,                       -- neither when in space
+  ship_item_id     bigint,
+  ship_type_id     int,
+  ship_name        text,
+  online           bool,                         -- NULL when the online scope is missing
+  last_login       timestamptz,
+  last_logout      timestamptz,
+  updated_at       timestamptz NOT NULL DEFAULT now()
+);
+
+-- POST /universe/names cache. name IS NULL together with category 'unknown' = unresolvable.
+CREATE TABLE IF NOT EXISTS universe_names (
+  id          bigint PRIMARY KEY,
+  category    text NOT NULL,
+  name        text,
+  updated_at  timestamptz NOT NULL DEFAULT now()
+);
+
+-- GET /universe/structures/{id} cache. forbidden = the character is not on the structure's ACL.
+CREATE TABLE IF NOT EXISTS structures (
+  id               bigint PRIMARY KEY,
+  name             text,
+  solar_system_id  int,
+  type_id          int,
+  owner_id         bigint,
+  forbidden        bool NOT NULL DEFAULT false,
+  updated_at       timestamptz NOT NULL DEFAULT now()
+);
