@@ -77,6 +77,37 @@ describe("listCombatRows", () => {
     expect(rows[0].ourShipTypeId).toBe(621);
   });
 
+  it("picks the LATERAL's lowest attacking character id when neither of ours is the victim", async () => {
+    // Neither C nor D is the victim here — both are attackers, on different ships with different
+    // weapons. Decision 11 says "our ship" is the lowest of our ids AMONG THE ATTACKERS; this is
+    // the only fixture where that pick can't short-circuit via the role='loss' branch, so it is the
+    // one case that would catch an ORDER BY a.character_id regression (e.g. ASC flipped to DESC).
+    const C = 91000001; // lower id
+    const D = 91000002; // higher id
+    await pool.query(
+      "INSERT INTO characters (id, name, refresh_token_enc) VALUES ($1, 'C', 'e'), ($2, 'D', 'e')", [C, D]);
+    const base = esiFixture<EsiKillmail>("killmail");
+    await saveKillmails(
+      [toKillmailWrite(killmail(4, "2026-08-15T12:00:00Z", {
+        victim: { ...base.victim, character_id: 90000002 },
+        attackers: [
+          { character_id: D, corporation_id: 98000003, damage_done: 50, final_blow: true,
+            security_status: 0.2, ship_type_id: 11400, weapon_type_id: 2410 },
+          { character_id: C, corporation_id: 98000004, damage_done: 20, final_blow: false,
+            security_status: 0.3, ship_type_id: 671, weapon_type_id: 2488 },
+        ],
+      }), "h4", "esi")],
+      [{ characterId: C, killmailId: 4, role: "kill" }, { characterId: D, killmailId: 4, role: "kill" }]);
+
+    const rows = await listCombatRows([C, D], { since: null });
+    expect(rows).toHaveLength(1);
+    // C < D, so the LATERAL must pick C's row, not D's (D has final_blow and a higher damage_done,
+    // so a naive "final blow" or "most damage" pick would wrongly return D's ship/weapon here).
+    expect(rows[0]).toMatchObject({
+      killmailId: 4, role: "kill", ourShipTypeId: 671, weaponTypeId: 2488, finalBlow: false,
+    });
+  });
+
   it("returns nothing for a character with no killmails and for an empty id list", async () => {
     expect(await listCombatRows([], { since: null })).toEqual([]);
     expect(await listCombatRows([1234], { since: null })).toEqual([]);
