@@ -39,4 +39,19 @@ describe("typesOfInterest", () => {
     const ids = await typesOfInterest();
     expect(ids.filter((id) => id === 34)).toEqual([34]);
   });
+
+  it("adds killmail item and victim ship types inside the 90-day window", async () => {
+    await pool.query(
+      `INSERT INTO killmails (killmail_id, killmail_hash, killmail_time, victim_ship_type_id, source)
+       VALUES (1, 'h', now() - interval '10 days', 24698, 'esi'),
+              (2, 'h', now() - interval '200 days', 11567, 'zkb')`);
+    await pool.query(
+      `INSERT INTO killmail_items (killmail_id, idx, item_type_id, flag)
+       VALUES (1, 0, 12058, 27), (2, 0, 41155, 27)`);
+    const ids = await typesOfInterest();
+    expect(ids).toContain(24698);      // victim ship, 10 days ago
+    expect(ids).toContain(12058);      // its module
+    expect(ids).not.toContain(11567);  // 200 days ago, outside the window
+    expect(ids).not.toContain(41155);
+  });
 });
