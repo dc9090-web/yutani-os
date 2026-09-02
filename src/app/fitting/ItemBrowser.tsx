@@ -4,7 +4,7 @@ import { IconChevronRight, IconPlus } from "@tabler/icons-react";
 import type { SlotKind } from "../../lib/dogma/index.js";
 import { dogmaData, ensureTypes } from "../../lib/fits/client-data.js";
 import { canFitShip, chargeFits, CHARGE_GROUP_ATTRS } from "../../lib/fits/slots.js";
-import { typeIconUrl } from "../../lib/fits/editor-view.js";
+import { typeDesc, typeIconUrl } from "../../lib/fits/editor-view.js";
 
 export interface BrowseType {
   id: number; name: string | null; groupId: number | null; categoryId: number | null;
@@ -93,12 +93,11 @@ export function ItemBrowser({ shipTypeId, selected, onFit, onCharge }: {
 
   return (
     <div className="card">
-      <h2 className="card-title">{chargeMode === null ? "Items" : `Charges for ${chargeMode.name}`}</h2>
+      <h2 className="card-title">{chargeMode === null ? "Add items" : `Charges for ${chargeMode.name}`}</h2>
 
-      <label className="faint" htmlFor="item-search">Search items</label>
       <input
         id="item-search" className="filter-input" type="search" value={query}
-        placeholder="Gyrostabilizer, Hail S, Warrior II, …"
+        placeholder="Search: Gyrostabilizer, Hail S, Warrior II, …"
         aria-label="Search items"
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -142,7 +141,7 @@ export function ItemBrowser({ shipTypeId, selected, onFit, onCharge }: {
           <li key={row.id} className="browser-row">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img className="module-icon" src={typeIconUrl(row.id)} alt="" />
-            <span>{row.name}</span>
+            <span data-desc={typeDesc(data, row.id)}>{row.name}</span>
             {row.metaGroup === null ? <span /> : <span className="badge meta">{row.metaGroup}</span>}
             <button
               type="button" className="icon-btn"

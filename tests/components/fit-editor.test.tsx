@@ -48,8 +48,13 @@ beforeEach(() => {
 });
 afterEach(() => { vi.useRealTimers(); });
 
+const SHIP = { typeName: "Rifter", raceName: "Minmatar", groupName: "Frigate" };
+
 async function renderEditor() {
-  render(<FitEditor fit={FIT} characters={[{ id: 669539978, name: "TrilliumONE" }]} bonuses={[]} />);
+  render(
+    <FitEditor
+      fit={FIT} characters={[{ id: 669539978, name: "TrilliumONE" }]} bonuses={[]} ship={SHIP}
+    />);
   // All skills V by default (characterId null), so the first gauge is the all-V number.
   await waitFor(() => expect(screen.getByText("20.25 / 162.50 tf")).toBeInTheDocument());
 }
@@ -59,6 +64,15 @@ describe("FitEditor", () => {
     await renderEditor();
     expect(screen.getByText("10.80 / 51.25 MW")).toBeInTheDocument();
     expect(screen.getByText(/No problems/)).toBeInTheDocument();
+  });
+
+  it("shows the ship-identity pills and hull render in the toolbar", async () => {
+    await renderEditor();
+    const identity = screen.getByAltText("Rifter").closest(".fit-identity") as HTMLElement;
+    expect(within(identity).getByText("Minmatar")).toBeInTheDocument();
+    expect(within(identity).getByText("Frigate")).toBeInTheDocument();
+    expect(within(identity).getByText("Rifter")).toBeInTheDocument();
+    expect(screen.getByAltText("Rifter")).toHaveAttribute("data-desc", "Rifter — Frigate");
   });
 
   it("adding a module updates the CPU gauge, and taking it offline gives the CPU back", async () => {
@@ -77,7 +91,7 @@ describe("FitEditor", () => {
     fireEvent.change(screen.getByLabelText("Search items"), { target: { value: "autocannon" } });
     // The three already-fitted guns also render "200mm AutoCannon II" as their slot name, so
     // scope to the item browser card — the same within(...) pattern Task 14/15 already ruled on.
-    const browser = screen.getByText("Items").closest(".card") as HTMLElement;
+    const browser = screen.getByText("Add items").closest(".card") as HTMLElement;
     await waitFor(() => expect(within(browser).getByText("200mm AutoCannon II")).toBeInTheDocument());
     fireEvent.click(within(browser).getByRole("button", { name: "Fit 200mm AutoCannon II" }));
     await waitFor(() => expect(screen.getByText("Slots")).toBeInTheDocument());

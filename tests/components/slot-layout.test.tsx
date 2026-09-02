@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { fixtureData } from "../dogma/fixture.js";
 import { CATEGORY } from "../../src/lib/dogma/index.js";
 import { computeEditor } from "../../src/lib/fits/editor-view.js";
@@ -24,24 +24,28 @@ function renderLayout(over: Partial<Parameters<typeof SlotLayout>[0]> = {}) {
   const result = computeEditor(DOC, { data, skills: allV, implants: [] }, new Map());
   if (result.kind !== "ok") throw new Error("expected ok");
   const props = {
-    blocks: result.view.blocks, drones: result.view.drones, cargo: result.view.cargo,
-    unknown: result.view.unknown, selected: null,
+    blocks: result.view.blocks, selected: null,
     onSelect: vi.fn(), onRemove: vi.fn(), onState: vi.fn(),
-    onClearCharge: vi.fn(), onQuantity: vi.fn(), onRemoveEntry: vi.fn(), ...over,
+    onClearCharge: vi.fn(), ...over,
   };
   render(<SlotLayout {...props} />);
   return props;
 }
 
 describe("SlotLayout", () => {
-  it("renders every slot the hull has, empties included, with the loaded charge", () => {
+  it("merges every slot kind into one Modules card with a column-header row", () => {
     renderLayout();
+    // One "Modules" card, not one card per slot kind (design hand-back part B).
+    expect(screen.getAllByText("Modules")).toHaveLength(1);
     expect(screen.getByText("High")).toBeInTheDocument();
     expect(screen.getAllByText("200mm AutoCannon II")).toHaveLength(1);
     expect(screen.getByText("· Hail S")).toBeInTheDocument();      // the loaded charge, not the cargo row
     // The Rifter has 3 high, 3 mid, 4 low and 3 rig slots; 2 are filled, so 11 read "Empty".
     expect(screen.getAllByText("Empty")).toHaveLength(11);
     expect(screen.queryByText("Subsystems")).toBeNull();
+    // The slot-head column labels.
+    expect(screen.getByText("CPU tf")).toBeInTheDocument();
+    expect(screen.getByText("PG MW")).toBeInTheDocument();
   });
 
   it("selects a slot, changes its state, unloads its charge and removes it", () => {
@@ -72,15 +76,19 @@ describe("SlotLayout", () => {
     expect(cpu).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("shows the drone bay and the cargo hold with editable quantities", () => {
-    const props = renderLayout();
-    const drones = screen.getByRole("group", { name: "Drone bay" });
-    expect(within(drones).getByText("Hobgoblin II")).toBeInTheDocument();
-    fireEvent.change(within(drones).getByLabelText("Hobgoblin II quantity"), { target: { value: "3" } });
-    expect(props.onQuantity).toHaveBeenCalledWith("DroneBay", 2456, 3);
+  it("puts a hover description on the fitted module and leaves the empty row without one", () => {
+    renderLayout();
+    const gun = screen.getByRole("button", { name: /select 200mm AutoCannon II/i });
+    expect(gun).toHaveAttribute("data-desc", "200mm AutoCannon II — Projectile Weapon");
+    const empty = screen.getAllByRole("button", { name: /select empty/i })[0];
+    expect(empty).not.toHaveAttribute("data-desc");
+  });
 
-    const cargo = screen.getByRole("group", { name: "Cargo" });
-    fireEvent.click(within(cargo).getByRole("button", { name: "Remove Hail S" }));
-    expect(props.onRemoveEntry).toHaveBeenCalledWith("Cargo", 12608);
+  it("marks an over-filled slot section's count", () => {
+    // Low has 1 module fitted against the Rifter's 4 low slots — not over — so assert the shape
+    // the CSS hook needs instead: a non-over section has no `.over` class on its `.slot-count`.
+    renderLayout();
+    const low = screen.getByText("Low").parentElement!;
+    expect(low.querySelector(".slot-count")).not.toHaveClass("over");
   });
 });

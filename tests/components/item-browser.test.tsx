@@ -49,9 +49,13 @@ describe("ItemBrowser", () => {
   it("searches after the debounce and lists results with their meta-group badge", async () => {
     const onFit = vi.fn();
     render(<ItemBrowser shipTypeId={587} selected={null} onFit={onFit} onCharge={vi.fn()} />);
+    expect(screen.getByText("Add items")).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Search items"), { target: { value: "autocannon" } });
     await waitFor(() => expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument());
     expect(screen.getByText("Tech II")).toBeInTheDocument();
+    // The design hand-back's `data-desc` hover tooltip (part E): "name — group" since the real
+    // flavour text is not loaded anywhere in this app.
+    expect(screen.getByText("200mm AutoCannon II")).toHaveAttribute("data-desc", "200mm AutoCannon II — Projectile Weapon");
 
     fireEvent.click(screen.getByRole("button", { name: "Fit 200mm AutoCannon II" }));
     expect(onFit).toHaveBeenCalledWith(2889);

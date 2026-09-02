@@ -13,8 +13,9 @@ import { clampFitName } from "../../lib/fits/parse.js";
 import {
   fitTypeInto, removeSlot, setEntryQuantity, setSlotCharge, setSlotState,
 } from "../../lib/fits/slots.js";
-import type { BonusView } from "../../lib/view/fit-sheet.js";
+import { shipRenderUrl, type BonusView } from "../../lib/view/fit-sheet.js";
 import type { Price } from "../../lib/view/price.js";
+import { CargoCard } from "./CargoCard.js";
 import { ItemBrowser } from "./ItemBrowser.js";
 import { SlotLayout } from "./SlotLayout.js";
 import { StatsPanel } from "./StatsPanel.js";
@@ -29,6 +30,10 @@ export interface FitEditorProps {
   };
   characters: { id: number; name: string }[];
   bonuses: BonusView[];
+  /** The hull's identity for the toolbar's ship-type pills (design hand-back part A). Read
+   *  server-side in `[id]/page.tsx`, the same batched `getTypes`/`getRaces`/`getGroups` pattern
+   *  `/ships` (`ShipCard.tsx`) already uses — `null` when the SDE does not know the race or group. */
+  ship: { typeName: string; raceName: string | null; groupName: string | null };
 }
 
 interface SavePayload {
@@ -45,7 +50,7 @@ function toPayload(doc: FitDoc): SavePayload {
 
 const SAVE_LABELS = { idle: "", saving: "Saving…", saved: "Saved", error: "Could not save — retrying on the next change" };
 
-export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
+export function FitEditor({ fit, characters, bonuses, ship }: FitEditorProps) {
   const router = useRouter();
   const [doc, setDoc] = useState<FitDoc>(() => ({
     id: fit.id, name: fit.name, description: fit.description, shipTypeId: fit.shipTypeId,
@@ -203,64 +208,91 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
     .find((b) => b.slot === selected?.slot)?.rows
     .find((r) => r.index === selected?.index)?.typeId ?? null;
 
+  // Task 4 part F: no flavour text is loaded for hulls either, so the render's tooltip is the same
+  // "name — group" fallback every other `data-desc` in this page uses.
+  const hullDesc = ship.groupName === null ? ship.typeName : `${ship.typeName} — ${ship.groupName}`;
+
   return (
     <>
       <div className="fit-toolbar">
-        <input
-          className="fit-name-input" value={doc.name} aria-label="Fit name" maxLength={60}
-          onChange={(e) => setDoc((current) => ({ ...current, name: e.target.value }))}
-        />
-        <label className="faint" htmlFor="fit-pilot">Pilot</label>
-        <select
-          id="fit-pilot" className="fit-select" aria-label="Pilot"
-          value={doc.characterId === "all-v" ? "all-v" : String(doc.characterId)}
-          onChange={(e) => setDoc((current) => ({
-            ...current,
-            characterId: e.target.value === "all-v" ? "all-v" : Number(e.target.value),
-          }))}
-        >
-          <option value="all-v">All skills V</option>
-          {characters.map((c) => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
-        </select>
-        <button
-          type="button" className="fit-btn" disabled={!dirty || saveState === "saving"}
-          onClick={() => { void flush(); }}
-        >
-          <IconDeviceFloppy size={14} /> Save
-        </button>
-        <button type="button" className="fit-btn" onClick={() => setShowExport(true)}>
-          <IconFileExport size={14} /> Export EFT
-        </button>
-        <button type="button" className="fit-btn" onClick={() => { void clone(); }}>
-          <IconCopy size={14} /> Clone
-        </button>
-        <button type="button" className="fit-btn danger" onClick={() => { void remove(); }}>
-          <IconTrash size={14} /> Delete
-        </button>
-        <span className={`save-state${saveState === "error" ? " error" : ""}`}>{SAVE_LABELS[saveState]}</span>
+        <div className="fit-identity">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="fit-hull-render" src={shipRenderUrl(doc.shipTypeId)} alt={ship.typeName}
+            data-desc={hullDesc}
+          />
+          <div className="fit-identity-text">
+            <input
+              className="fit-name-input" value={doc.name} aria-label="Fit name" maxLength={60}
+              onChange={(e) => setDoc((current) => ({ ...current, name: e.target.value }))}
+            />
+            <div className="fit-identity-meta">
+              <span className="ship-type-pills">
+                {ship.raceName === null ? null : <span className="pill">{ship.raceName}</span>}
+                {ship.groupName === null ? null : <span className="pill">{ship.groupName}</span>}
+                <span className="pill">{ship.typeName}</span>
+              </span>
+              <span className="meta-divider" aria-hidden="true" />
+              <label className="faint" htmlFor="fit-pilot">Pilot</label>
+              <select
+                id="fit-pilot" className="fit-select" aria-label="Pilot"
+                value={doc.characterId === "all-v" ? "all-v" : String(doc.characterId)}
+                onChange={(e) => setDoc((current) => ({
+                  ...current,
+                  characterId: e.target.value === "all-v" ? "all-v" : Number(e.target.value),
+                }))}
+              >
+                <option value="all-v">All skills V</option>
+                {characters.map((c) => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="fit-actions">
+          <span className={`save-state${saveState === "error" ? " error" : ""}`}>{SAVE_LABELS[saveState]}</span>
+          <button
+            type="button" className="fit-btn" disabled={!dirty || saveState === "saving"}
+            onClick={() => { void flush(); }}
+          >
+            <IconDeviceFloppy size={14} /> Save
+          </button>
+          <button type="button" className="fit-btn" onClick={() => setShowExport(true)}>
+            <IconFileExport size={14} /> Export EFT
+          </button>
+          <button type="button" className="fit-btn" onClick={() => { void clone(); }}>
+            <IconCopy size={14} /> Clone
+          </button>
+          <button type="button" className="fit-btn danger" onClick={() => { void remove(); }}>
+            <IconTrash size={14} /> Delete
+          </button>
+        </div>
       </div>
 
       <div className="fit-editor">
         <div className="fit-editor-main">
           <SlotLayout
             blocks={result.view.blocks}
-            drones={result.view.drones} cargo={result.view.cargo} unknown={result.view.unknown}
             selected={selected}
             onSelect={(slot, index) => setSelected({ slot, index })}
             onRemove={(slot, index) => setDoc((c) => removeSlot(c, slot, index))}
             onState={(slot, index, state: FitItemState) => setDoc((c) => setSlotState(c, slot, index, state))}
             onClearCharge={(slot, index) => setDoc((c) => setSlotCharge(c, slot, index, null))}
-            onQuantity={(flag, typeId, quantity) => setDoc((c) => setEntryQuantity(c, flag, typeId, quantity))}
-            onRemoveEntry={(flag, typeId) => setDoc((c) => setEntryQuantity(c, flag, typeId, 0))}
           />
-          <ItemBrowser
-            shipTypeId={doc.shipTypeId}
-            selected={selected === null || selectedTypeId === null
-              ? null
-              : { slot: selected.slot, index: selected.index, typeId: selectedTypeId }}
-            onFit={fitType}
-            onCharge={loadCharge}
-          />
+          <div className="fit-lower">
+            <CargoCard
+              drones={result.view.drones} cargo={result.view.cargo} unknown={result.view.unknown}
+              onQuantity={(flag, typeId, quantity) => setDoc((c) => setEntryQuantity(c, flag, typeId, quantity))}
+              onRemoveEntry={(flag, typeId) => setDoc((c) => setEntryQuantity(c, flag, typeId, 0))}
+            />
+            <ItemBrowser
+              shipTypeId={doc.shipTypeId}
+              selected={selected === null || selectedTypeId === null
+                ? null
+                : { slot: selected.slot, index: selected.index, typeId: selectedTypeId }}
+              onFit={fitType}
+              onCharge={loadCharge}
+            />
+          </div>
         </div>
         <StatsPanel view={result.view} bonuses={bonuses} skillsSynced={context?.synced ?? false} />
       </div>
@@ -273,7 +305,7 @@ export function FitEditor({ fit, characters, bonuses }: FitEditorProps) {
               className="eft-text" aria-label="EFT text" readOnly
               value={exportEft(doc, dogmaData(), result.totals)}
             />
-            <div className="fit-toolbar">
+            <div className="fit-actions">
               <button
                 type="button" className="fit-btn"
                 onClick={() => {
