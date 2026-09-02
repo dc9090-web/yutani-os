@@ -1,0 +1,27 @@
+[
+  { "killmail_id": 110000001, "killmail_time": "2021-04-07T04:27:41Z", "solar_system_id": 30002320,
+    "victim": { "character_id": 2112625428, "corporation_id": 98000002, "damage_taken": 1420,
+      "ship_type_id": 587,
+      "items": [ { "item_type_id": 3634, "flag": 27, "singleton": 0, "quantity_dropped": 1 } ] },
+    "attackers": [ { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 1420,
+      "final_blow": true, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 } ],
+    "zkb": { "hash": "349571831ca127c015bc34050b4c02b29927827d", "totalValue": 60633419.79,
+      "points": 1, "npc": false, "solo": true, "awox": false } },
+  { "killmail_id": 110000002, "killmail_time": "2021-04-06T22:10:03Z", "solar_system_id": 30002320,
+    "victim": { "character_id": 2124678472, "corporation_id": 98000003, "damage_taken": 9800,
+      "ship_type_id": 11393, "items": [] },
+    "attackers": [
+      { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 5000,
+        "final_blow": false, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 },
+      { "character_id": 90000001, "corporation_id": 98000001, "damage_done": 4800,
+        "final_blow": true, "security_status": -1.2, "ship_type_id": 621, "weapon_type_id": 2929 } ],
+    "zkb": { "hash": "b0f0e1d2c3b4a5968778695a4b3c2d1e0f102030", "totalValue": 210500000,
+      "points": 8, "npc": false, "solo": false, "awox": false } },
+  { "killmail_id": 110000003, "killmail_time": "2021-04-05T11:00:00Z", "solar_system_id": 30000144,
+    "victim": { "corporation_id": 1000035, "faction_id": 500003, "damage_taken": 300,
+      "ship_type_id": 3766, "items": [] },
+    "attackers": [ { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 300,
+      "final_blow": true, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 } ],
+    "zkb": { "hash": "c1d2e3f405162738495a6b7c8d9e0f1020304050", "totalValue": 12000,
+      "points": 1, "npc": true, "solo": true, "awox": false } }
+]
