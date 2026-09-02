@@ -159,6 +159,48 @@ so the two cannot disagree.
 Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
 `/api/health`, `/auth/*` and `/_next/*`.
 
+## Combat (killmails & PvP stats)
+
+`/combat` is the killboard: stats tiles, a twelve-month activity strip, top ships and systems, and
+the killmail table. `/combat/<id>` is one killmail — victim, fit, attackers — and "Open in fitting
+designer" turns the victim's fit into a local fit.
+
+Three jobs feed it, and none of the pages ever calls ESI:
+
+- **`killmails`** (per character, hourly). Walks `GET /characters/{id}/killmails/recent` — at most
+  10 pages, stopping as soon as a whole page holds only ids we already have — then fetches each new
+  body from the **public** `GET /killmails/{id}/{hash}`. The body route takes no token, so it uses
+  the generous `killmail` bucket (3600 tokens/15 min) rather than `char-killmail` (30/15 min).
+  ESI only keeps **90 days**.
+- **`killmail-backfill`** (global, every 15 minutes). Walks
+  `https://zkillboard.com/api/{kills|losses}/characterID/{id}/page/{n}/` — 200 killmails a page,
+  pages 1–100, so up to 20,000 per filter. zKillboard publishes no rate limit, only etiquette, so
+  the client sends a descriptive `User-Agent`, asks for gzip, waits **2 s between requests** and
+  spends at most **20 pages per run**. A zKillboard page carries the full ESI killmail plus a `zkb`
+  block, so no second ESI call is needed and `zkb.hash` is the hash we store.
+- **`killmail-values`** (global, hourly). Values the newest 500 unvalued killmails from
+  `market_prices`: victim hull plus every item at destroyed + dropped quantity. A killmail with any
+  unpriced type stays NULL and is retried — `typesOfInterest` now feeds killmail types from the
+  last 90 days to the Fuzzwork half of `market-prices`, so those prices arrive. The displayed value
+  is `zkb_total_value` first, ours second.
+
+Killmails are **immutable**: `(killmail_id, killmail_hash)` is stored once, never re-fetched, and
+only the `zkb_*` and `computed_value` columns are ever updated.
+
+**A character must have logged in since the killmail scope was added.** The portal grants
+`esi-killmails.read_killmails.v1`, but a refresh token minted before that grant cannot use it: the
+`killmails` job records `warn: killmail scope not on this token yet — log the character in again`
+on `/settings` and returns no rows. Fix it with **Add character** in the top-right menu — the SSO
+round trip mints a new token with the full scope set. The zKillboard backfill needs no scope, so
+history appears either way.
+
+Item slots on a killmail come from the raw numeric `invFlags` id, not the string enum the assets and
+fittings endpoints use: low 11–18, mid 19–26, high 27–34, rigs 92–94, subsystems 125–132, drone bay
+87, cargo 5, implants 89, fighter bay 158.
+
+Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
+`/api/health`, `/auth/*` and `/_next/*`.
+
 ## Logs and troubleshooting
 
 ```
