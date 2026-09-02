@@ -15,10 +15,12 @@ describe("schema", () => {
     expect(rows.map((r) => r.table_name).sort()).toEqual([
       "accounts",
       "character_assets", "character_attributes", "character_clones", "character_fitting_items",
-      "character_fittings", "character_implants", "character_jump_clones", "character_location",
+      "character_fittings", "character_implants", "character_jump_clones", "character_killmails",
+      "character_location",
       "character_skill_queue", "character_skill_summary", "character_skills", "character_wallet",
       "character_wallet_journal", "character_wallet_transactions", "characters", "esi_cache",
       "fit_items", "fits",
+      "killmail_attackers", "killmail_backfill", "killmail_items", "killmails",
       "market_prices",
       "sde_alpha_skills",
       "sde_categories", "sde_constellations", "sde_dogma_attribute_categories", "sde_dogma_attributes",
@@ -65,6 +67,18 @@ describe("schema", () => {
     await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (43, 'Levels', 'enc') ON CONFLICT (id) DO NOTHING");
     await pool.query("INSERT INTO skill_plans (id, character_id, name) VALUES (901, 43, 'Levels')");
     await expect(pool.query("INSERT INTO skill_plan_entries (plan_id, position, skill_id, level) VALUES (901, 0, 3300, 6)"))
+      .rejects.toThrow(/check/i);
+  });
+  it("constrains killmails.source and character_killmails.role", async () => {
+    await expect(pool.query(
+      `INSERT INTO killmails (killmail_id, killmail_hash, killmail_time, source)
+       VALUES (1, 'h', now(), 'bogus')`)).rejects.toThrow(/check/i);
+    await pool.query(
+      `INSERT INTO killmails (killmail_id, killmail_hash, killmail_time, source)
+       VALUES (1, 'h', now(), 'esi')`);
+    await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (77, 'Role', 'enc')");
+    await expect(pool.query(
+      "INSERT INTO character_killmails (character_id, killmail_id, role) VALUES (77, 1, 'assist')"))
       .rejects.toThrow(/check/i);
   });
 });

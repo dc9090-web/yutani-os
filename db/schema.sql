@@ -291,3 +291,91 @@ CREATE TABLE IF NOT EXISTS skill_plan_entries (
   note      text,
   PRIMARY KEY (plan_id, position)
 );
+
+-- ── Phase 7: combat (killmails & PvP stats) ─────────────────────────────────
+-- Killmails are immutable and shared: one row however many of our characters were on it, and no
+-- foreign key to characters, so a killmail survives a character being removed. Only the zkb_* and
+-- computed_value columns are ever updated (spec §3).
+CREATE TABLE IF NOT EXISTS killmails (
+  killmail_id                bigint PRIMARY KEY,
+  killmail_hash              text NOT NULL,
+  killmail_time              timestamptz NOT NULL,
+  solar_system_id            int,
+  moon_id                    bigint,
+  war_id                     bigint,
+  victim_character_id        bigint,                 -- absent for structure/POS/NPC losses
+  victim_corporation_id      bigint,
+  victim_alliance_id         bigint,
+  victim_faction_id          int,
+  victim_ship_type_id        int,
+  damage_taken               bigint,
+  position_x                 float8,
+  position_y                 float8,
+  position_z                 float8,
+  attacker_count             int NOT NULL DEFAULT 0,
+  final_blow_character_id    bigint,
+  final_blow_ship_type_id    int,
+  final_blow_weapon_type_id  int,
+  zkb_total_value            numeric,
+  zkb_points                 int,
+  zkb_npc                    bool,
+  zkb_solo                   bool,
+  zkb_awox                   bool,
+  computed_value             numeric,
+  value_checked_at           timestamptz,            -- last time killmail-values examined this row,
+                                                      -- priced or not (starvation guard, see Task 6)
+  source                     text NOT NULL CHECK (source IN ('esi', 'zkb')),
+  fetched_at                 timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS killmails_time_idx ON killmails (killmail_time DESC);
+CREATE INDEX IF NOT EXISTS killmails_unvalued_idx
+  ON killmails (value_checked_at NULLS FIRST, killmail_time DESC) WHERE computed_value IS NULL;
+
+CREATE TABLE IF NOT EXISTS killmail_attackers (
+  killmail_id      bigint NOT NULL REFERENCES killmails(killmail_id) ON DELETE CASCADE,
+  idx              int NOT NULL,                     -- position in ESI's attackers array
+  character_id     bigint,                           -- NPC attackers have a faction and no character
+  corporation_id   bigint,
+  alliance_id      bigint,
+  faction_id       int,
+  ship_type_id     int,
+  weapon_type_id   int,
+  damage_done      bigint NOT NULL DEFAULT 0,
+  final_blow       bool NOT NULL DEFAULT false,
+  security_status  float8,
+  PRIMARY KEY (killmail_id, idx)
+);
+CREATE INDEX IF NOT EXISTS killmail_attackers_character_idx ON killmail_attackers (character_id);
+
+-- flag is the raw numeric SDE invFlags id, NOT the assets/fittings string enum (research §8d).
+-- parent_idx is the containing row's idx; ESI nests exactly one level.
+CREATE TABLE IF NOT EXISTS killmail_items (
+  killmail_id         bigint NOT NULL REFERENCES killmails(killmail_id) ON DELETE CASCADE,
+  idx                 int NOT NULL,
+  parent_idx          int,
+  item_type_id        int NOT NULL,
+  flag                int NOT NULL,
+  singleton           int NOT NULL DEFAULT 0,        -- an integer, not a bool
+  quantity_destroyed  bigint NOT NULL DEFAULT 0,
+  quantity_dropped    bigint NOT NULL DEFAULT 0,
+  PRIMARY KEY (killmail_id, idx)
+);
+CREATE INDEX IF NOT EXISTS killmail_items_type_idx ON killmail_items (item_type_id);
+
+CREATE TABLE IF NOT EXISTS character_killmails (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  killmail_id   bigint NOT NULL REFERENCES killmails(killmail_id) ON DELETE CASCADE,
+  role          text NOT NULL CHECK (role IN ('kill', 'loss')),
+  PRIMARY KEY (character_id, killmail_id)
+);
+CREATE INDEX IF NOT EXISTS character_killmails_idx ON character_killmails (character_id, killmail_id DESC);
+
+-- One page cursor per (character, kind). Created on first sight of a character by the backfill job.
+CREATE TABLE IF NOT EXISTS killmail_backfill (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  kind          text NOT NULL CHECK (kind IN ('kills', 'losses')),
+  next_page     int NOT NULL DEFAULT 1,
+  done          bool NOT NULL DEFAULT false,
+  updated_at    timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (character_id, kind)
+);
