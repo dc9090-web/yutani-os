@@ -335,3 +335,25 @@ body {
 .km-ship { display: inline-flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; }
 .km-ship:hover { color: var(--accent-2); }
 .km-corp { display: block; font-size: 11px; }
+.combat-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 20px; }
+.combat-tabs { display: inline-flex; gap: 4px; }
+.combat-tab {
+  padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--card); color: var(--muted); font-size: 13px; text-decoration: none;
+}
+.combat-tab:hover { border-color: var(--border-hi); color: var(--text); }
+.combat-tab[data-active] { background: var(--raised); border-color: var(--accent); color: var(--text); }
+.card-grid.stat-tiles { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-bottom: 20px; }
+.card-grid.top-lists { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.month-strip { display: flex; gap: 6px; align-items: stretch; height: 160px; }
+.month-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.month-half { flex: 1; width: 100%; display: flex; }
+.month-half.up { align-items: flex-end; }
+.month-half.down { align-items: flex-start; }
+.month-bar { width: 100%; border-radius: 3px; min-height: 1px; }
+.month-bar.kill { background: var(--pos); }
+.month-bar.loss { background: var(--neg); }
+.month-label { font-size: 11px; color: var(--faint); }
+.month-legend { margin: 10px 0 0; font-size: 12px; }
+.top-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; }
+.top-list li { display: flex; justify-content: space-between; gap: 12px; }
