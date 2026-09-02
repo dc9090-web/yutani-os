@@ -5,9 +5,10 @@ import type { CharacterSyncJob, GlobalSyncJob, SyncJob } from "../../src/worker/
 const isGlobal = (j: SyncJob): j is GlobalSyncJob => j.scope === "global";
 
 describe("worker job registration", () => {
-  it("registers the two global jobs plus the seven character jobs, globals first", () => {
+  it("registers the two global jobs plus the eight character jobs, globals first", () => {
     expect(ALL_JOBS.map((j) => j.name)).toEqual([
-      "sde-update", "market-prices", "character-info", "skills", "clones", "assets", "fittings", "wallet", "location",
+      "sde-update", "market-prices", "character-info", "skills", "clones", "assets", "fittings",
+      "wallet", "location", "killmails",
     ]);
     expect(ALL_JOBS[0].scope).toBe("global");
     expect(ALL_JOBS[1].scope).toBe("global");
@@ -30,11 +31,12 @@ describe("worker job registration", () => {
     expect(byName.get("character-info")).toBe(6 * 60 * 60 * 1000);
     expect(byName.get("location")).toBe(15 * 60 * 1000);
     expect(byName.get("market-prices")).toBe(60 * 60 * 1000);
+    expect(byName.get("killmails")).toBe(60 * 60 * 1000);
   });
-  it("marks exactly two jobs global; the other seven run per character", () => {
+  it("marks exactly two jobs global; the other eight run per character", () => {
     expect(ALL_JOBS.filter(isGlobal)).toHaveLength(2);
     const characterJobs = ALL_JOBS.filter((j): j is CharacterSyncJob => !isGlobal(j));
-    expect(characterJobs).toHaveLength(7);
+    expect(characterJobs).toHaveLength(8);
     for (const job of characterJobs) expect(job.scope ?? "character").toBe("character");
   });
 });

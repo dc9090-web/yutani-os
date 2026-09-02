@@ -8,12 +8,14 @@ import { assetsJob } from "./assets.js";
 import { fittingsJob } from "./fittings.js";
 import { walletJob } from "./wallet.js";
 import { locationJob } from "./location.js";
+import { killmailsJob } from "./killmails.js";
 
 /**
  * Registration order. The two global jobs come first so a fresh database imports the SDE and pulls
- * prices on the very first tick; the character jobs are staggered by the scheduler, so with 7 jobs
+ * prices on the very first tick; the character jobs are staggered by the scheduler, so with 8 jobs
  * x 4 characters the per-tick fan-out stays small.
  */
 export const ALL_JOBS: SyncJob[] = [
-  sdeUpdateJob, marketPricesJob, characterInfoJob, skillsJob, clonesJob, assetsJob, fittingsJob, walletJob, locationJob,
+  sdeUpdateJob, marketPricesJob, characterInfoJob, skillsJob, clonesJob, assetsJob, fittingsJob,
+  walletJob, locationJob, killmailsJob,
 ];
