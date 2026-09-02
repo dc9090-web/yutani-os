@@ -8,7 +8,7 @@ const refresh = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 
 const PLANS: PlanListRow[] = [{
-  id: 7, name: "Gunnery", entries: 3, remaining: "4 h 10 m", doneAt: "2026-09-01 04:10",
+  id: 7, name: "Gunnery", entries: 3, remaining: "4h 10m", doneAt: "2026-09-01 04:10",
 }];
 const LONG_TEMPLATE_NAME = "x".repeat(MAX_PLAN_NAME + 5);
 const TEMPLATES = [
@@ -37,7 +37,7 @@ describe("PlansCard", () => {
   it("lists the plans with their remaining time", () => {
     card();
     expect(screen.getByRole("link", { name: "Gunnery" })).toHaveAttribute("href", "/skills/plans/7");
-    expect(screen.getByText("4 h 10 m")).toBeInTheDocument();
+    expect(screen.getByText("4h 10m")).toBeInTheDocument();
     expect(screen.getByText("2026-09-01 04:10")).toBeInTheDocument();
   });
 

@@ -12,7 +12,7 @@ const full: OverviewCard = {
   dockedAt: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
   ship: "Rifter — Scarlet Dart",
   online: true,
-  training: "Caldari Frigate V · finishes in 3 h 12 m",
+  training: "Caldari Frigate V · 3h 12m",
   totalSp: "47.4M SP",
   account: "Main",
   tags: ["Miner", "Scanner"],
@@ -28,7 +28,7 @@ describe("CharacterCard", () => {
     expect(screen.getByText("0.9")).toHaveClass("sec-high");
     expect(screen.getByText(/Caldari Navy Assembly Plant/)).toBeInTheDocument();
     expect(screen.getByText("Rifter — Scarlet Dart")).toBeInTheDocument();
-    expect(screen.getByText("Caldari Frigate V · finishes in 3 h 12 m")).toBeInTheDocument();
+    expect(screen.getByText("Caldari Frigate V · 3h 12m")).toBeInTheDocument();
     expect(screen.getByText("47.4M SP")).toBeInTheDocument();
   });
 

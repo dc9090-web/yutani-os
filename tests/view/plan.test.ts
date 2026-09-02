@@ -18,15 +18,20 @@ const START = new Date("2026-09-01T00:00:00Z");
 
 describe("duration", () => {
   it("prints days, hours and minutes, ending in minutes", () => {
-    expect(duration(480_000_000)).toBe("5 d 13 h 20 m");     // 8,000 minutes
-    expect(duration(16_406_250)).toBe("4 h 33 m");           // 273.4375 → 273 minutes
-    expect(duration(720_000)).toBe("12 m");
-    expect(duration(86_400_000)).toBe("1 d");
+    expect(duration(480_000_000)).toBe("5d 13h 20m");     // 8,000 minutes
+    expect(duration(16_406_250)).toBe("4h 33m");           // 273.4375 → 273 minutes
+    expect(duration(720_000)).toBe("12m");
+    expect(duration(86_400_000)).toBe("1d");
   });
   it("handles the small and the empty cases", () => {
-    expect(duration(1000)).toBe("< 1 m");
-    expect(duration(0)).toBe("0 m");
-    expect(duration(-5)).toBe("0 m");
+    expect(duration(1000)).toBe("< 1m");
+    expect(duration(0)).toBe("0m");
+    expect(duration(-5)).toBe("0m");
+  });
+  it("zero-pads minutes to two digits once a larger unit precedes them", () => {
+    expect(duration(101_340_000)).toBe("1d 4h 09m");   // 1,689 minutes: 1 d 4 h 9 m
+    expect(duration(11_100_000)).toBe("3h 05m");        // 185 minutes: 3 h 5 m
+    expect(duration(300_000)).toBe("5m");                // 5 minutes alone: no larger unit, no padding
   });
 });
 
@@ -48,14 +53,14 @@ describe("planView", () => {
     expect(view.rows.map((r) => r.alpha)).toEqual([true, true, true]);
     expect(view.rows[2]).toMatchObject({ skill: "Gunnery", group: "Gunnery", rank: "×1", unknown: false });
     // Only the planned level costs anything: 6,585 SP at 32 SP/min = 205.78 min.
-    expect(view.rows.map((r) => r.time)).toEqual(["—", "—", "3 h 26 m"]);
-    expect(view.rows.map((r) => r.cumulative)).toEqual(["—", "—", "3 h 26 m"]);
+    expect(view.rows.map((r) => r.time)).toEqual(["—", "—", "3h 26m"]);
+    expect(view.rows.map((r) => r.cumulative)).toEqual(["—", "—", "3h 26m"]);
     expect(view.rows[2].doneAt).toBe("2026-09-01 03:25");
   });
 
   it("totals the remaining work", () => {
     const view = planView(timeline, CATALOGUE);
-    expect(view.totals).toMatchObject({ entries: 3, remaining: 1, sp: "6k SP", time: "3 h 26 m" });
+    expect(view.totals).toMatchObject({ entries: 3, remaining: 1, sp: "6k SP", time: "3h 26m" });
     expect(view.unknownCount).toBe(0);
   });
 
@@ -112,9 +117,9 @@ describe("remapSuggestion", () => {
       ["Perception", 21, 27, "+6"], ["Willpower", 22, 21, "-1"],
     ]);
     // 409,600,000 ms = 6,826.67 min → 6,827 min = 4 d (5,760) + 1,067 min = 17 h 47 m.
-    expect(view.totalTime).toBe("4 d 17 h 47 m");
-    expect(view.currentTime).toBe("5 d 13 h 20 m");
-    expect(view.saved).toBe("19 h 33 m");
+    expect(view.totalTime).toBe("4d 17h 47m");
+    expect(view.currentTime).toBe("5d 13h 20m");
+    expect(view.saved).toBe("19h 33m");
     expect(view.alreadyOptimal).toBe(false);
   });
 
@@ -123,6 +128,6 @@ describe("remapSuggestion", () => {
       remap: BASE, totalMs: 480_000_000, currentMs: 480_000_000, savedMs: 0, candidates: 2885,
     });
     expect(view.alreadyOptimal).toBe(true);
-    expect(view.saved).toBe("0 m");
+    expect(view.saved).toBe("0m");
   });
 });

@@ -53,21 +53,25 @@ function span(ms: number): string {
 }
 
 /**
- * "5 d 13 h 20 m" — a training span, as the planner shows it. Distinct from `relativeTime`'s
+ * "5d 13h 20m" — a training span, as the planner shows it. Distinct from `relativeTime`'s
  * private `span`, which collapses anything over a day to whole days: right for "synced 2 days ago",
- * useless for a plan whose length is the whole point.
+ * useless for a plan whose length is the whole point. Minutes are zero-padded to two digits once a
+ * larger unit (day or hour) precedes them, matching the design hand-back's "1d 4h 09m".
  */
 export function duration(ms: number): string {
-  if (ms <= 0) return "0 m";
+  if (ms <= 0) return "0m";
   const minutes = Math.round(ms / MINUTE);
-  if (minutes === 0) return "< 1 m";
+  if (minutes === 0) return "< 1m";
   const days = Math.floor(minutes / 1440);
   const hours = Math.floor((minutes % 1440) / 60);
   const rest = minutes % 60;
   const parts: string[] = [];
-  if (days > 0) parts.push(`${days} d`);
-  if (hours > 0) parts.push(`${hours} h`);
-  if (rest > 0 || parts.length === 0) parts.push(`${rest} m`);
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (rest > 0 || parts.length === 0) {
+    const padded = parts.length > 0 ? String(rest).padStart(2, "0") : String(rest);
+    parts.push(`${padded}m`);
+  }
   return parts.join(" ");
 }
 
@@ -112,9 +116,10 @@ export function stamp(date: Date | null): string {
 export interface QueueHeadLabel { skillName: string; finishedLevel: number; finishDate: Date | null }
 
 /**
- * "Caldari Frigate V · finishes in 3 h 12 m" — the Overview's training line. A stale head — its
+ * "Caldari Frigate V · 3h 12m" — the Overview's training line. No "finishes in" lead-in: the
+ * design hand-back's duration format stands on its own next to the skill name. A stale head — its
  * finishDate already passed — means the sync just hasn't caught up with ESI yet, not that the
- * skill is still finishing "3 h ago"; render it as still-in-progress instead of a confusing past tense.
+ * skill is still finishing "3h ago"; render it as still-in-progress instead of a confusing past tense.
  */
 export function trainingLabel(head: QueueHeadLabel | null, now: Date = new Date()): string {
   if (head === null) return "Queue empty";
@@ -122,7 +127,7 @@ export function trainingLabel(head: QueueHeadLabel | null, now: Date = new Date(
   // A paused queue comes back from ESI with no dates at all (phase 3a stores them as NULL).
   if (head.finishDate === null) return `${skill} · paused`;
   if (head.finishDate.getTime() <= now.getTime()) return `${skill} · finishing`;
-  return `${skill} · finishes ${relativeTime(head.finishDate, now)}`;
+  return `${skill} · ${duration(head.finishDate.getTime() - now.getTime())}`;
 }
 
 /**

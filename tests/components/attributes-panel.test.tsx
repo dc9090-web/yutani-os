@@ -19,7 +19,7 @@ const SUGGESTION: RemapSuggestionView = {
     { key: "charisma", label: "Charisma", from: 18, to: 17, delta: "-1" },
     { key: "perception", label: "Perception", from: 21, to: 27, delta: "+6" },
   ],
-  totalTime: "4 d 17 h 47 m", currentTime: "5 d 13 h 20 m", saved: "19 h 33 m", alreadyOptimal: false,
+  totalTime: "4d 17h 47m", currentTime: "5d 13h 20m", saved: "19h 33m", alreadyOptimal: false,
 };
 
 const onOptimise = vi.fn(); const onToggleRemap = vi.fn();
@@ -52,14 +52,14 @@ describe("AttributesPanel", () => {
     render(<AttributesPanel panel={PANEL} suggestion={SUGGESTION} optimising={false} usingRemap={false}
                             onOptimise={onOptimise} onToggleRemap={onToggleRemap} />);
     expect(screen.getByText("+6")).toBeInTheDocument();
-    expect(screen.getByText("19 h 33 m")).toBeInTheDocument();
-    expect(screen.getByText("4 d 17 h 47 m")).toBeInTheDocument();
+    expect(screen.getByText("19h 33m")).toBeInTheDocument();
+    expect(screen.getByText("4d 17h 47m")).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText("Plan with this remap"));
     expect(onToggleRemap).toHaveBeenCalledWith(true);
   });
 
   it("says when the current attributes are already optimal", () => {
-    render(<AttributesPanel panel={PANEL} suggestion={{ ...SUGGESTION, alreadyOptimal: true, saved: "0 m" }}
+    render(<AttributesPanel panel={PANEL} suggestion={{ ...SUGGESTION, alreadyOptimal: true, saved: "0m" }}
                             optimising={false} usingRemap={false}
                             onOptimise={onOptimise} onToggleRemap={onToggleRemap} />);
     expect(screen.getByText("Already optimal for this plan.")).toBeInTheDocument();

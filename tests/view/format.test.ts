@@ -101,7 +101,7 @@ describe("security", () => {
 describe("trainingLabel", () => {
   it("names the head entry and when it finishes", () => {
     expect(trainingLabel({ skillName: "Caldari Frigate", finishedLevel: 5, finishDate: new Date("2026-09-01T15:12:00Z") }, NOW))
-      .toBe("Caldari Frigate V · finishes in 3 h 12 m");
+      .toBe("Caldari Frigate V · 3h 12m");
   });
   it("says paused when the queue carries no dates", () => {
     expect(trainingLabel({ skillName: "Gunnery", finishedLevel: 3, finishDate: null }, NOW)).toBe("Gunnery III · paused");

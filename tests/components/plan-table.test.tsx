@@ -5,7 +5,7 @@ import type { PlanRowView } from "../../src/lib/view/plan.js";
 
 const row = (over: Partial<PlanRowView>): PlanRowView => ({
   position: 1, skillId: 3300, skill: "Gunnery", group: "Gunnery", level: "I", levelNumber: 1,
-  rank: "×1", sp: "250 SP", time: "8 m", cumulative: "8 m", doneAt: "2026-09-01 00:08",
+  rank: "×1", sp: "250 SP", time: "8m", cumulative: "8m", doneAt: "2026-09-01 00:08",
   status: "planned", statusLabel: "Planned", prereq: false, alpha: true, note: null, unknown: false,
   entryIndex: null, ...over,
 });

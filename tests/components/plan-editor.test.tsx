@@ -62,7 +62,7 @@ describe("PlanEditor", () => {
     // Gunnery I..III = 8,000 SP at perception 21 + willpower 22/2 = 32 SP/min = 250 min.
     expect(screen.getAllByRole("row")).toHaveLength(4);
     // Both the totals card and the last row's cumulative cell read the same span.
-    expect(screen.getAllByText("4 h 10 m").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("4h 10m").length).toBeGreaterThan(0);
   });
 
   it("adds a skill and inserts its prerequisites", async () => {
@@ -136,7 +136,7 @@ describe("PlanEditor", () => {
     editor();
     fireEvent.click(screen.getByRole("button", { name: "Find optimal remap" }));
     await waitFor(() => expect(optimiseCalls).toBe(1));
-    expect(await screen.findByText("19 h 33 m")).toBeInTheDocument();
+    expect(await screen.findByText("19h 33m")).toBeInTheDocument();
     fireEvent.click(screen.getByLabelText("Plan with this remap"));
     await vi.advanceTimersByTimeAsync(AUTOSAVE_MS + 50);
     await waitFor(() => expect(puts.some((p) =>
