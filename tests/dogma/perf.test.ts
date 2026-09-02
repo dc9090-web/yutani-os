@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, fitPerformance } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, fitPerformance, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -253,7 +253,7 @@ describe("capacitor", () => {
     // u = (1 + √(1 − 0.36)) / 2 = (1 + 0.8) / 2 = 0.9  →  level = 0.81
     const prop = b.active([[ATTR.capacitorNeed, 45], [PERF_ATTR.duration, 10_000]]);
     const fit = buildFit(b.data, b.hull(HULL), { modules: [[prop, "mid", 0]] });
-    expect(fitPerformance(fit).capStable).toEqual({ stable: true, level: 0.81 });
+    expect(stableLevel(fitPerformance(fit).capStable)).toBeCloseTo(0.81, 12);
   });
 
   it("empties in (4/D)·arctan(a/D) seconds once the drain passes the peak", () => {
@@ -278,6 +278,22 @@ describe("capacitor", () => {
     expect(fitPerformance(fit).capStable).toEqual({ stable: true, level: 0.25 });
   });
 
+  it("stays on the stable branch when the drain ties the peak in floating point", () => {
+    const b = bench();
+    // A tie the two spellings of the same comparison disagree about: capacity 168 GJ, T = 125 s,
+    // 33.6 GJ per 10 s cycle.
+    //   peak  = 2.5 × 168 / 125 = 3.36        usage = 33.6 / 10 = 3.36
+    // but `usage > peak` is *true* by one ulp, while a = 10/125 = 0.08, b = 3.36/168 = 0.02 give
+    // 4b − a = 0 exactly. Deciding the branch on `usage <= peak` and then taking √(a(4b − a)) sends
+    // the unstable formula a D of 0 and returns lastsSeconds: Infinity. One discriminant for both
+    // lands it here instead, at the peak-recharge fraction.
+    const hull = HULL.map(([a, v]) => [a, a === PERF_ATTR.capacitorCapacity ? 168
+      : a === PERF_ATTR.rechargeRate ? 125_000 : v] as const);
+    const drain = b.active([[ATTR.capacitorNeed, 33.6], [PERF_ATTR.duration, 10_000]]);
+    const fit = buildFit(b.data, b.hull(hull), { modules: [[drain, "mid", 0]] });
+    expect(fitPerformance(fit).capStable).toEqual({ stable: true, level: 0.25 });
+  });
+
   it("charges nothing for a module that is merely online", () => {
     const b = bench();
     const drain = b.active([[ATTR.capacitorNeed, 250], [PERF_ATTR.duration, 10_000]]);
@@ -291,7 +307,7 @@ describe("capacitor", () => {
     const b = bench();
     const drain = b.active([[ATTR.capacitorNeed, 45], [PERF_ATTR.speed, 10_000]]);
     const fit = buildFit(b.data, b.hull(HULL), { modules: [[drain, "mid", 0]] });
-    expect(fitPerformance(fit).capStable).toEqual({ stable: true, level: 0.81 });
+    expect(stableLevel(fitPerformance(fit).capStable)).toBeCloseTo(0.81, 12);
   });
 
   it("ignores a capacitor cost with no cycle to spread it over", () => {
@@ -346,6 +362,12 @@ describe("a hull that carries nothing", () => {
     });
   });
 });
+
+/** The stable capacitor level, having first insisted the fit is stable at all. */
+function stableLevel(cap: CapStability | null): number {
+  expect(cap).toMatchObject({ stable: true });
+  return (cap as { stable: true; level: number }).level;
+}
 
 /**
  * Euler integration of dC/dt = C_max·(10/T)·(√f − f) − U from a full capacitor — the same ODE the

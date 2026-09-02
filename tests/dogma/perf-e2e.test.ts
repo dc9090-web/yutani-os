@@ -4,8 +4,8 @@
  * ⚠ Hand-derived from the snapshots, not verified against Pyfa or the client — the same caveat as
  * rifter-e2e.test.ts (research §8). Every derivation is written out beside the number it pins, and
  * every input is a value the snapshot actually contains, so a disagreement with the game is a
- * disagreement about *mechanics*, not arithmetic. Two are already known and called out below: the
- * unscaled hull role bonus, and the 33 % structure resonance the SDE gives every hull.
+ * disagreement about *mechanics*, not arithmetic. One is already known and called out below: a fit
+ * with no ship-class skill trained receives its hull's role bonus unscaled.
  */
 import { describe, it, expect } from "vitest";
 import { ATTR, State } from "../../src/lib/dogma/data.js";
@@ -63,8 +63,10 @@ describe("a bare Rifter", () => {
     // armour    450 / mean(0.4, 0.65, 0.75, 0.9)  = 450 / 0.675 =  666.6666666666666
     // structure 350 / mean(0.67, 0.67, 0.67, 0.67)= 350 / 0.67  =  522.3880597014925
     //                                                    total  = 1809.744381540573
-    // ⚠ The 0.67 structure resonances are what the SDE gives every hull (both snapshots agree);
-    // the client shows 0 % structure resists, so this layer is ~172 EHP higher than in game.
+    // The 0.67 structure resonances are correct, not an import artefact: every hull innately
+    // resists 33 % of structure damage. It is what makes a Damage Control's 0.6 hull resonance land
+    // at 0.6 × 0.67 = 0.402 — the ~60 % structure resistance everyone quotes. Both snapshots agree,
+    // and DCU II carries exactly 0.6 in 974-977.
     expect(perf.ehp).toBeCloseTo(1809.744381540573, 9);
   });
 

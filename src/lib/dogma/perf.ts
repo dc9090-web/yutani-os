@@ -45,7 +45,9 @@ export const PERF_ATTR = {
   scanResolution: 564,
   /** The *structure* resonances. The hull layer uses the unprefixed family, not `hull*DamageResonance`
    *  (974-977) — those are the Damage Control's own bonus attributes, which the SDE's effect 2302
-   *  applies *to* 109/110/111/113 (verified in the rifter snapshot). */
+   *  applies *to* 109/110/111/113 (verified in the rifter snapshot). Hulls carry an innate 0.67
+   *  here: every ship resists 33 % of structure damage before any module, which is why a Damage
+   *  Control's 0.6 lands at 0.6 x 0.67 = 0.402 — the familiar ~60 % structure resistance. */
   emDamageResonance: 113,
   explosiveDamageResonance: 111,
   kineticDamageResonance: 109,
@@ -96,13 +98,27 @@ export type CapStability =
   | { stable: false; lastsSeconds: number };
 
 export interface FitPerformance {
-  /** Turrets + launchers + drones, damage per second. `null` when nothing on the fit deals damage. */
+  /**
+   * Turrets + launchers + drones, damage per second. `null` when nothing on the fit deals damage.
+   *
+   * Cycle time only — reloads are not modelled, so a weapon that has to stop and reload (a launcher
+   * emptying its magazine, an ancillary repairer) reads slightly optimistic against Pyfa's
+   * reload-aware sustained figure. Pyfa's *un*-reloaded number is the one this matches.
+   */
   dps: number | null;
   /** One full volley (alpha) — the same weapons, without the cycle division. */
   volley: number | null;
   /** Shield + armour + structure, each divided by its mean resonance (an omni damage profile). */
   ehp: number | null;
-  /** m/s, with the propulsion module in whatever state it is fitted at. */
+  /**
+   * m/s — the hull's modified `maxVelocity`, cold.
+   *
+   * A fitted microwarpdrive or afterburner does **not** raise it: their speed bonus is effect
+   * 6730/6731, which carries no `modifierInfo` in the SDE (EOS and Pyfa hard-code the
+   * speedFactor/speedBoostFactor/massAddition maths), and this engine does not implement it yet.
+   * `alignTime` is cold for the same reason — the module's `massAddition` is not applied either.
+   * What a running MWD *does* change is `capacitorCapacity`, through ordinary SDE modifiers.
+   */
   maxVelocity: number | null;
   /** Seconds to reach 75 % of top speed — the align time. */
   alignTime: number | null;
@@ -204,6 +220,8 @@ function weaponDamage(fit: Fit): { dps: number; volley: number } | null {
  * resonance of an even profile is the plain mean, and dividing the raw pool by it is exactly what
  * Pyfa's `DamagePattern.effectivify` does. A layer with no hit points contributes nothing; a
  * resonance the data set does not define is read as 1 (no resistance), the SDE's own default.
+ * The structure layer is not resistance-free on a bare hull, though: every ship has an innate 0.67
+ * to all four damage types, a 33 % structure resist before any module is fitted.
  *
  * `null` only when the hull has no layer at all.
  */
@@ -265,23 +283,33 @@ function alignTime(fit: Fit): number | null {
  *
  *     lastsSeconds = (4/D) arctan(a/D),   D = sqrt(a (4b - a))
  *
- * — no time-step simulation, and no step size to justify. It models a smooth constant drain rather
- * than EVE's discrete per-cycle draw, and it ignores cap boosters and any other injection, so it is
- * an estimate; tests/dogma/perf.test.ts checks it against a numerically integrated drain.
+ * — no time-step simulation, and no step size to justify. `4b - a > 0` is `U` past the peak, so the
+ * one discriminant both picks the branch and supplies `D`; see the comment in the body.
+ *
+ * It models a smooth constant drain rather than EVE's discrete per-cycle draw, and it ignores cap
+ * boosters and any other injection, so it is an estimate; tests/dogma/perf.test.ts checks it
+ * against a numerically integrated drain.
  */
 function capStability(fit: Fit, capacity: number | null, rechargeTime: number | null): CapStability | null {
   if (capacity === null || rechargeTime === null || capacity <= 0 || rechargeTime <= 0) return null;
   const usage = capacitorUsage(fit);
-  const peak = 2.5 * capacity / rechargeTime;
   if (usage <= 0) return { stable: true, level: 1 };
-  if (usage <= peak) {
-    const k = usage * rechargeTime / (10 * capacity);
-    const u = (1 + Math.sqrt(Math.max(0, 1 - 4 * k))) / 2;
-    return { stable: true, level: u * u };
-  }
   const a = 10 / rechargeTime;
   const b = usage / capacity;
-  const d = Math.sqrt(a * (4 * b - a));
+  // `disc` is the discriminant of a u^2 - a u + b, and it decides the branch *and* feeds both
+  // formulas. Testing `usage <= 2.5 * capacity / rechargeTime` instead would be the same comparison
+  // spelled a second way, and the two round differently: at a tie the unstable branch takes
+  // sqrt(0) = 0 and reports an infinite `lastsSeconds` (capacity 168, rechargeRate 125 000, 33.6 GJ
+  // per 10 s cycle is one such fit — it is pinned in the tests).
+  const disc = a * (4 * b - a);
+  if (!(disc > 0)) {
+    // Stable. With k = b/a, 1 - 4k = -disc/a^2, so the upper root (1 + sqrt(1 - 4k)) / 2 is
+    // (1 + sqrt(-disc)/a) / 2 — the same quantity, never rounded a second time. b > 0 keeps it
+    // under 1, and disc = 0 (drain exactly at the peak) gives level 1/4.
+    const u = (1 + Math.sqrt(-disc) / a) / 2;
+    return { stable: true, level: u * u };
+  }
+  const d = Math.sqrt(disc);
   return { stable: false, lastsSeconds: 4 / d * Math.atan(a / d) };
 }
 
