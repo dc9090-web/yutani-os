@@ -3,7 +3,7 @@ import { createPlan, listPlans } from "../../../lib/db/skill-plans.js";
 import { getCharacter } from "../../../lib/db/characters.js";
 import { getCareerPlan } from "../../../lib/sde/repo.js";
 import { summarisePlans } from "../../../lib/skills/load.js";
-import { parsePlanCreate } from "../../../lib/skills/parse.js";
+import { MAX_PLAN_ENTRIES, parsePlanCreate } from "../../../lib/skills/parse.js";
 import { parseId } from "../../../lib/api/json.js";
 
 const bad = () => NextResponse.json({ error: "bad request" }, { status: 400 });
@@ -27,7 +27,11 @@ export async function POST(req: NextRequest) {
   if (input.templateId !== null) {
     const template = await getCareerPlan(input.templateId);
     if (template === null) return missing();
-    entries = template.skills.map((s) => ({ skillId: s.skillId, level: s.level, note: null }));
+    // A career plan's own skill list is CCP's data, not user input, so `parsePlanEntries`'s
+    // MAX_PLAN_ENTRIES check never runs on this path — clamp it here instead of letting an
+    // oversized template silently write more rows than a client-built plan ever could.
+    entries = template.skills.slice(0, MAX_PLAN_ENTRIES)
+      .map((s) => ({ skillId: s.skillId, level: s.level, note: null }));
   }
   const plan = await createPlan({ characterId: input.characterId, name: input.name, entries });
   return NextResponse.json({ plan }, { status: 201 });

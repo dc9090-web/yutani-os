@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
+import { MAX_PLAN_ENTRIES } from "../../src/lib/skills/parse.js";
 
 const { listPlans, getPlan, createPlan, updatePlan, deletePlan } = vi.hoisted(() => ({
   listPlans: vi.fn(), getPlan: vi.fn(), createPlan: vi.fn(), updatePlan: vi.fn(), deletePlan: vi.fn(),
@@ -37,8 +38,17 @@ beforeEach(() => {
   updatePlan.mockImplementation(async (id: number) => (id === 7 ? PLAN : null));
   deletePlan.mockImplementation(async (id: number) => id === 7);
   getCharacter.mockImplementation(async (id: number) => (id === 669539978 ? { id, name: "TrilliumONE" } : null));
-  getCareerPlan.mockImplementation(async (id: number) =>
-    (id === 4 ? { id: 4, name: "Minmatar Militia Fighter", description: "", skills: [{ skillId: 3327, level: 1 }], milestones: [] } : null));
+  getCareerPlan.mockImplementation(async (id: number) => {
+    if (id === 4) return { id: 4, name: "Minmatar Militia Fighter", description: "", skills: [{ skillId: 3327, level: 1 }], milestones: [] };
+    if (id === 5) {
+      return {
+        id: 5, name: "Oversized", description: "",
+        skills: Array.from({ length: MAX_PLAN_ENTRIES + 20 }, (_, i) => ({ skillId: 3300 + i, level: 1 })),
+        milestones: [],
+      };
+    }
+    return null;
+  });
   computePlan.mockResolvedValue({ plan: PLAN, timeline: TIMELINE, startAt: new Date("2026-09-01T00:00:00Z") });
 });
 
@@ -74,6 +84,15 @@ describe("POST /api/skill-plans", () => {
     expect(createPlan).toHaveBeenCalledWith({
       characterId: 669539978, name: "Militia", entries: [{ skillId: 3327, level: 1, note: null }],
     });
+  });
+
+  it("clamps an oversized template's skill list to MAX_PLAN_ENTRIES instead of 400ing", async () => {
+    const res = await POST(body("/api/skill-plans", "POST",
+      { characterId: 669539978, name: "Oversized", templateId: 5 }));
+    expect(res.status).toBe(201);
+    const call = createPlan.mock.calls[0][0] as { entries: unknown[] };
+    expect(call.entries).toHaveLength(MAX_PLAN_ENTRIES);
+    expect(call.entries[0]).toEqual({ skillId: 3300, level: 1, note: null });
   });
 
   it("404s on an unknown character and on an unknown template", async () => {
