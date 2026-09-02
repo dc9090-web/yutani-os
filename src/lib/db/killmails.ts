@@ -1,6 +1,9 @@
 import { getPool } from "./client.js";
 import { chunk } from "../chunk.js";
-import type { CharacterKillmailLink, KillmailWrite } from "../combat/killmail.js";
+import type {
+  CharacterKillmailLink, KillRole, KillmailAttackerRow, KillmailItemRow, KillmailWrite,
+} from "../combat/killmail.js";
+import type { StatRow } from "../combat/stats.js";
 
 /** zKillboard hands over 200 killmails a page; 500 rows an INSERT keeps the arrays small. */
 export const KILLMAIL_INSERT_BATCH = 500;
@@ -151,4 +154,182 @@ export async function saveKillmails(
   } finally {
     client.release();
   }
+}
+
+/** Spec §6: the table shows 50 at a time and "more" loads the next 50. */
+export const COMBAT_PAGE_SIZE = 50;
+/** A hard ceiling on the statistics query, so "All" on a 20,000-killmail backfill stays bounded. */
+export const STAT_ROW_CAP = 20_000;
+
+export interface CombatRow extends StatRow {
+  victimCharacterId: number | null; victimCorporationId: number | null; attackerCount: number;
+}
+export interface CombatQuery { since: Date | null; limit?: number; offset?: number }
+
+interface CombatDbRow {
+  killmailId: string; role: KillRole; time: Date; value: string | null;
+  solarSystemId: number | null; victimCharacterId: string | null; victimCorporationId: string | null;
+  victimShipTypeId: number | null; ourShipTypeId: number | null; weaponTypeId: number | null;
+  solo: boolean; finalBlow: boolean; attackerCount: number;
+}
+
+const numeric = (v: string | null): number | null => (v === null ? null : Number(v));
+
+/**
+ * One killmail, one row, however many of our characters were on it (Decision 11):
+ * `DISTINCT ON (killmail_id)` with `role = 'loss'` sorted first means a loss beats a kill, and the
+ * LATERAL join picks the attacker row belonging to the LOWEST of our character ids. Displayed value
+ * is `zkb_total_value ?? computed_value` (spec §4's ruling).
+ */
+const COMBAT_SELECT = `
+  SELECT DISTINCT ON (k.killmail_id)
+    k.killmail_id AS "killmailId",
+    ck.role,
+    k.killmail_time AS "time",
+    COALESCE(k.zkb_total_value, k.computed_value) AS value,
+    k.solar_system_id AS "solarSystemId",
+    k.victim_character_id AS "victimCharacterId",
+    k.victim_corporation_id AS "victimCorporationId",
+    k.victim_ship_type_id AS "victimShipTypeId",
+    CASE WHEN ck.role = 'loss' THEN k.victim_ship_type_id ELSE mine.ship_type_id END AS "ourShipTypeId",
+    CASE WHEN ck.role = 'loss' THEN NULL ELSE mine.weapon_type_id END AS "weaponTypeId",
+    COALESCE(k.zkb_solo, k.attacker_count = 1) AS solo,
+    COALESCE(mine.final_blow, false) AS "finalBlow",
+    k.attacker_count AS "attackerCount"
+  FROM character_killmails ck
+  JOIN killmails k ON k.killmail_id = ck.killmail_id
+  LEFT JOIN LATERAL (
+    SELECT a.ship_type_id, a.weapon_type_id, a.final_blow
+    FROM killmail_attackers a
+    WHERE a.killmail_id = k.killmail_id AND a.character_id = ANY($1::bigint[])
+    ORDER BY a.character_id
+    LIMIT 1
+  ) mine ON true
+  WHERE ck.character_id = ANY($1::bigint[])
+    AND ($2::timestamptz IS NULL OR k.killmail_time >= $2)
+  ORDER BY k.killmail_id, (ck.role = 'loss') DESC`;
+
+function toCombatRow(r: CombatDbRow): CombatRow {
+  return {
+    killmailId: Number(r.killmailId), role: r.role, time: r.time, value: numeric(r.value),
+    solarSystemId: r.solarSystemId,
+    victimCharacterId: r.victimCharacterId === null ? null : Number(r.victimCharacterId),
+    victimCorporationId: r.victimCorporationId === null ? null : Number(r.victimCorporationId),
+    victimShipTypeId: r.victimShipTypeId, ourShipTypeId: r.ourShipTypeId,
+    weaponTypeId: r.weaponTypeId, solo: r.solo, finalBlow: r.finalBlow,
+    attackerCount: r.attackerCount,
+  };
+}
+
+async function combatRows(
+  characterIds: number[], since: Date | null, limit: number, offset: number,
+): Promise<CombatRow[]> {
+  if (characterIds.length === 0) return [];
+  const { rows } = await getPool().query<CombatDbRow>(
+    `SELECT * FROM (${COMBAT_SELECT}) t ORDER BY t."time" DESC, t."killmailId" DESC LIMIT $3 OFFSET $4`,
+    [characterIds.map(String), since, limit, offset]);
+  return rows.map(toCombatRow);
+}
+
+export function listCombatRows(characterIds: number[], q: CombatQuery): Promise<CombatRow[]> {
+  return combatRows(characterIds, q.since, q.limit ?? COMBAT_PAGE_SIZE, q.offset ?? 0);
+}
+
+/** Every row in the period, for the statistics — capped so "All" cannot page in the whole backfill. */
+export function allCombatRows(characterIds: number[], since: Date | null): Promise<CombatRow[]> {
+  return combatRows(characterIds, since, STAT_ROW_CAP, 0);
+}
+
+export async function countCombatRows(characterIds: number[], since: Date | null): Promise<number> {
+  if (characterIds.length === 0) return 0;
+  const { rows } = await getPool().query<{ n: number }>(
+    `SELECT count(DISTINCT ck.killmail_id)::int AS n
+     FROM character_killmails ck
+     JOIN killmails k ON k.killmail_id = ck.killmail_id
+     WHERE ck.character_id = ANY($1::bigint[])
+       AND ($2::timestamptz IS NULL OR k.killmail_time >= $2)`,
+    [characterIds.map(String), since]);
+  return rows[0]?.n ?? 0;
+}
+
+export interface KillmailHeadRow {
+  killmailId: number; killmailHash: string; killmailTime: Date;
+  solarSystemId: number | null; moonId: number | null; warId: number | null;
+  victimCharacterId: number | null; victimCorporationId: number | null;
+  victimAllianceId: number | null; victimFactionId: number | null;
+  victimShipTypeId: number | null; damageTaken: number | null; attackerCount: number;
+  zkbTotalValue: number | null; zkbPoints: number | null;
+  zkbNpc: boolean | null; zkbSolo: boolean | null; zkbAwox: boolean | null;
+  computedValue: number | null; source: "esi" | "zkb";
+}
+export interface KillmailFull {
+  head: KillmailHeadRow; attackers: KillmailAttackerRow[]; items: KillmailItemRow[];
+  roles: { characterId: number; role: KillRole }[];
+}
+
+/** The whole killmail for the detail page: four queries, no joins to fan rows out. */
+export async function getKillmail(killmailId: number): Promise<KillmailFull | null> {
+  const pool = getPool();
+  const { rows } = await pool.query<Record<string, string | number | boolean | Date | null>>(
+    `SELECT killmail_id AS "killmailId", killmail_hash AS "killmailHash",
+            killmail_time AS "killmailTime", solar_system_id AS "solarSystemId",
+            moon_id AS "moonId", war_id AS "warId",
+            victim_character_id AS "victimCharacterId", victim_corporation_id AS "victimCorporationId",
+            victim_alliance_id AS "victimAllianceId", victim_faction_id AS "victimFactionId",
+            victim_ship_type_id AS "victimShipTypeId", damage_taken AS "damageTaken",
+            attacker_count AS "attackerCount", zkb_total_value AS "zkbTotalValue",
+            zkb_points AS "zkbPoints", zkb_npc AS "zkbNpc", zkb_solo AS "zkbSolo",
+            zkb_awox AS "zkbAwox", computed_value AS "computedValue", source
+     FROM killmails WHERE killmail_id = $1`, [String(killmailId)]);
+  const raw = rows[0];
+  if (raw === undefined) return null;
+
+  const [attackers, items, roles] = await Promise.all([
+    pool.query<Record<string, string | number | boolean | null>>(
+      `SELECT idx, character_id AS "characterId", corporation_id AS "corporationId",
+              alliance_id AS "allianceId", faction_id AS "factionId", ship_type_id AS "shipTypeId",
+              weapon_type_id AS "weaponTypeId", damage_done AS "damageDone",
+              final_blow AS "finalBlow", security_status AS "securityStatus"
+       FROM killmail_attackers WHERE killmail_id = $1 ORDER BY idx`, [String(killmailId)]),
+    pool.query<Record<string, string | number | null>>(
+      `SELECT idx, parent_idx AS "parentIdx", item_type_id AS "itemTypeId", flag, singleton,
+              quantity_destroyed AS "quantityDestroyed", quantity_dropped AS "quantityDropped"
+       FROM killmail_items WHERE killmail_id = $1 ORDER BY idx`, [String(killmailId)]),
+    pool.query<{ characterId: string; role: KillRole }>(
+      `SELECT character_id AS "characterId", role FROM character_killmails
+       WHERE killmail_id = $1 ORDER BY character_id`, [String(killmailId)]),
+  ]);
+
+  const big = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v));
+  return {
+    head: {
+      killmailId, killmailHash: raw.killmailHash as string,
+      killmailTime: raw.killmailTime as Date,
+      solarSystemId: raw.solarSystemId as number | null,
+      moonId: big(raw.moonId), warId: big(raw.warId),
+      victimCharacterId: big(raw.victimCharacterId),
+      victimCorporationId: big(raw.victimCorporationId),
+      victimAllianceId: big(raw.victimAllianceId),
+      victimFactionId: raw.victimFactionId as number | null,
+      victimShipTypeId: raw.victimShipTypeId as number | null,
+      damageTaken: big(raw.damageTaken), attackerCount: raw.attackerCount as number,
+      zkbTotalValue: big(raw.zkbTotalValue), zkbPoints: raw.zkbPoints as number | null,
+      zkbNpc: raw.zkbNpc as boolean | null, zkbSolo: raw.zkbSolo as boolean | null,
+      zkbAwox: raw.zkbAwox as boolean | null,
+      computedValue: big(raw.computedValue), source: raw.source as "esi" | "zkb",
+    },
+    attackers: attackers.rows.map((a) => ({
+      idx: a.idx as number, characterId: big(a.characterId), corporationId: big(a.corporationId),
+      allianceId: big(a.allianceId), factionId: a.factionId as number | null,
+      shipTypeId: a.shipTypeId as number | null, weaponTypeId: a.weaponTypeId as number | null,
+      damageDone: Number(a.damageDone), finalBlow: a.finalBlow as boolean,
+      securityStatus: a.securityStatus === null ? null : Number(a.securityStatus),
+    })),
+    items: items.rows.map((i) => ({
+      idx: i.idx as number, parentIdx: i.parentIdx as number | null,
+      itemTypeId: i.itemTypeId as number, flag: i.flag as number, singleton: i.singleton as number,
+      quantityDestroyed: Number(i.quantityDestroyed), quantityDropped: Number(i.quantityDropped),
+    })),
+    roles: roles.rows.map((r) => ({ characterId: Number(r.characterId), role: r.role })),
+  };
 }
