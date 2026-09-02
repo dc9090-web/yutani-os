@@ -5,7 +5,7 @@ import type { ShipCardView } from "../../src/lib/view/ships.js";
 
 const card: ShipCardView = {
   key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeId: 587, typeName: "Rifter",
-  groupName: "Frigate",
+  groupName: "Frigate", raceName: "Minmatar",
   location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
   cpu: { label: "CPU", unit: "tf", used: 121.5, output: 162.5, text: "121.50 / 162.50 tf", percent: 74.8, over: false },
   power: { label: "Powergrid", unit: "MW", used: 60, output: 51.25, text: "60.00 / 51.25 MW", percent: 100, over: true },
@@ -13,11 +13,16 @@ const card: ShipCardView = {
 };
 
 describe("ShipCard", () => {
-  it("shows the custom name, type, location and value, linking to the sheet", () => {
-    render(<ShipCard card={card} />);
+  it("shows the custom name, race/category/type pills, location and value, linking to the sheet", () => {
+    const { container } = render(<ShipCard card={card} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/ships/asset/1000");
     expect(screen.getByText("Scarlet Dart")).toBeInTheDocument();
-    expect(screen.getByText("Frigate, Rifter")).toBeInTheDocument();
+    const pills = container.querySelector(".ship-type-pills");
+    expect(pills).not.toBeNull();
+    expect(pills!.querySelectorAll(".pill")).toHaveLength(3);
+    expect(screen.getByText("Minmatar")).toHaveClass("pill");
+    expect(screen.getByText("Frigate")).toHaveClass("pill");
+    expect(screen.getByText("Rifter")).toHaveClass("pill");
     expect(screen.getByText(/Caldari Navy Assembly Plant/)).toBeInTheDocument();
     expect(screen.getByText("13.1M ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
@@ -32,8 +37,10 @@ describe("ShipCard", () => {
     expect(img).toHaveAttribute("alt", "");
   });
 
-  it("falls back to the type name alone when the hull's group is unknown", () => {
-    render(<ShipCard card={{ ...card, groupName: null }} />);
+  it("omits the category and race pills when the hull's group or race is unknown", () => {
+    const { container } = render(<ShipCard card={{ ...card, groupName: null, raceName: null }} />);
+    const pills = container.querySelector(".ship-type-pills")!;
+    expect(pills.querySelectorAll(".pill")).toHaveLength(1);
     expect(screen.getByText("Rifter")).toBeInTheDocument();
   });
 

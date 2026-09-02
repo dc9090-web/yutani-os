@@ -163,13 +163,16 @@ body {
 
 /* ---------- Overview cards (phase 3) ---------- */
 .card-grid.overview { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
-.ov-card { display: flex; flex-direction: column; gap: 14px; }
-.ov-head { display: flex; gap: 14px; align-items: center; }
-.ov-portrait { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
-.ov-name { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
-.ov-corp { margin: 2px 0 6px; font-size: 13px; color: var(--muted); }
-.ov-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ov-card { display: flex; flex-direction: column; gap: 12px; }
+.ov-head { display: flex; gap: 12px; align-items: center; }
+.ov-id { min-width: 0; }
+.ov-portrait { width: 56px; height: 56px; border-radius: 10px; border: 1px solid var(--divider); }
+.ov-name { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-poppins), sans-serif; font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-corp { margin: 2px 0 0; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-status { margin-left: auto; align-self: flex-start; flex: 0 0 auto; }
+.ov-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .pill { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; background: var(--raised); border: 1px solid var(--border); color: var(--muted); }
+.ship-type-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
 .pill.main { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
 .pill.alt { background: var(--accent-2); border-color: var(--accent-2); color: var(--bg); font-weight: 600; }
 .pill.pvp { border-color: var(--neg); color: var(--neg); }
@@ -177,10 +180,20 @@ body {
 .pill.scanner { border-color: var(--pos); color: var(--pos); }
 .tag-chip { padding: 2px 8px; border-radius: 99px; font-size: 11px; background: var(--raised); border: 1px solid var(--border); color: var(--muted); cursor: pointer; font: inherit; }
 .tag-chip.on { border-color: var(--accent); color: var(--text); }
-.ov-rows { margin: 0; display: grid; gap: 6px; }
-.ov-row { display: grid; grid-template-columns: 86px 1fr; gap: 10px; align-items: baseline; }
+.ov-rows { margin: 0; display: grid; gap: 8px; }
+.ov-row { display: grid; grid-template-columns: 72px 1fr; gap: 10px; align-items: baseline; }
 .ov-row dt { font-size: 12px; color: var(--faint); }
-.ov-row dd { margin: 0; font-size: 13px; color: var(--text); }
+.ov-row dd { margin: 0; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-station { color: var(--faint); }
+.ov-ship-pills { margin-top: 0; display: inline-flex; }
+.ov-foot { margin-top: auto; border-top: 1px solid var(--hairline); padding-top: 12px; display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.ov-training { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.ov-training-top { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+.ov-training-top span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-training .progress { height: 6px; min-width: 0; }
+.ov-sp { text-align: right; flex: 0 0 auto; display: grid; gap: 0; }
+.ov-sp-label { font-size: 11px; color: var(--faint); }
+.ov-sp-val { font-family: var(--font-poppins), sans-serif; font-size: 16px; font-weight: 600; }
 
 /* Shared by every phase-3 page. */
 .online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }

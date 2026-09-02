@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { WARN_PREFIX, grouped, isWarning, isk, sp, roman, relativeTime, secClass, secText, stamp, trainingLabel } from "../../src/lib/view/format.js";
+import {
+  WARN_PREFIX, grouped, isWarning, isk, iskWhole, sp, overviewTraining, roman, relativeTime,
+  secClass, secText, stamp,
+} from "../../src/lib/view/format.js";
 
 const NOW = new Date("2026-09-01T12:00:00Z");
 
@@ -28,6 +31,14 @@ describe("isk", () => {
   });
 });
 
+describe("iskWhole", () => {
+  it("groups the value with no decimals and the ISK suffix", () => {
+    expect(iskWhole(128450032.1)).toBe("128,450,032 ISK");
+    expect(iskWhole(12300)).toBe("12,300 ISK");
+    expect(iskWhole(0)).toBe("0 ISK");
+  });
+});
+
 describe("sp", () => {
   it("switches units at a million and at a thousand", () => {
     expect(sp(47382910)).toBe("47.4M SP");
@@ -37,6 +48,11 @@ describe("sp", () => {
     expect(sp(45255)).toBe("45k SP");
     expect(sp(512)).toBe("512 SP");
     expect(sp(0)).toBe("0 SP");
+  });
+  it("drops the unit suffix when withUnit is false", () => {
+    expect(sp(47382910, false)).toBe("47.4M");
+    expect(sp(850000, false)).toBe("850k");
+    expect(sp(512, false)).toBe("512");
   });
 });
 
@@ -98,22 +114,35 @@ describe("security", () => {
   });
 });
 
-describe("trainingLabel", () => {
-  it("names the head entry and when it finishes", () => {
-    expect(trainingLabel({ skillName: "Caldari Frigate", finishedLevel: 5, finishDate: new Date("2026-09-01T15:12:00Z") }, NOW))
-      .toBe("Caldari Frigate V · 3h 12m");
+describe("overviewTraining", () => {
+  it("names the head entry, its remaining time, and the elapsed percent between start and finish", () => {
+    expect(overviewTraining({
+      skillName: "Caldari Frigate", finishedLevel: 5,
+      startDate: new Date("2026-09-01T09:12:00Z"), finishDate: new Date("2026-09-01T15:12:00Z"),
+    }, NOW)).toEqual({ active: true, skill: "Caldari Frigate V", time: "3h 12m", percent: 47 });
   });
-  it("says paused when the queue carries no dates", () => {
-    expect(trainingLabel({ skillName: "Gunnery", finishedLevel: 3, finishDate: null }, NOW)).toBe("Gunnery III · paused");
+  it("reports 0% when the head carries no start date", () => {
+    expect(overviewTraining({
+      skillName: "Caldari Frigate", finishedLevel: 5, startDate: null,
+      finishDate: new Date("2026-09-01T15:12:00Z"),
+    }, NOW)).toMatchObject({ percent: 0 });
+  });
+  it("says paused, with 0% progress, when the queue carries no dates at all", () => {
+    expect(overviewTraining({ skillName: "Gunnery", finishedLevel: 3, startDate: null, finishDate: null }, NOW))
+      .toEqual({ active: true, skill: "Gunnery III", time: "paused", percent: 0 });
   });
   it("says the queue is empty", () => {
-    expect(trainingLabel(null, NOW)).toBe("Queue empty");
+    expect(overviewTraining(null, NOW)).toEqual({ active: false, label: "Queue empty" });
   });
-  it("says finishing, not a past-tense relative time, when the head's finishDate has already passed", () => {
-    expect(trainingLabel({ skillName: "Caldari Frigate", finishedLevel: 5, finishDate: new Date("2026-09-01T08:48:00Z") }, NOW))
-      .toBe("Caldari Frigate V · finishing");
+  it("reports 100% and a zero duration, not a past-tense time, when the head's finishDate has already passed", () => {
+    expect(overviewTraining({
+      skillName: "Caldari Frigate", finishedLevel: 5,
+      startDate: new Date("2026-09-01T02:48:00Z"), finishDate: new Date("2026-09-01T08:48:00Z"),
+    }, NOW)).toEqual({ active: true, skill: "Caldari Frigate V", time: "0m", percent: 100 });
     // Exactly now counts as stale too, not "in 0 m".
-    expect(trainingLabel({ skillName: "Gunnery", finishedLevel: 3, finishDate: NOW }, NOW)).toBe("Gunnery III · finishing");
+    expect(overviewTraining({
+      skillName: "Gunnery", finishedLevel: 3, startDate: new Date("2026-09-01T06:00:00Z"), finishDate: NOW,
+    }, NOW)).toEqual({ active: true, skill: "Gunnery III", time: "0m", percent: 100 });
   });
 });
 

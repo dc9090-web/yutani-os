@@ -74,7 +74,7 @@ describe("a Rifter built from asset rows", () => {
     const stats = fitStats(built.fit);
     const card = toShipCard({
       key: "asset:1000", href: "/ships/asset/1000", name: SHIP.name, typeId: 587, typeName: "Rifter",
-      groupName: "Frigate", location: "Jita 4-4", stats, problems: validateFit(built.fit),
+      groupName: "Frigate", raceName: "Minmatar", location: "Jita 4-4", stats, problems: validateFit(built.fit),
       entries: fitValueEntries(built), prices: PRICES,
     });
     expect(card.cpu!.text).toBe(`${stats.cpu.used.toFixed(2)} / 162.50 tf`);
@@ -87,6 +87,7 @@ describe("a Rifter built from asset rows", () => {
     expect(card.value).toBe("13.1M ISK");
     expect(card.unpriced).toBeNull();
     expect(card.groupName).toBe("Frigate");
+    expect(card.raceName).toBe("Minmatar");
   });
 
   it("counts entries with no price at all", () => {
@@ -95,7 +96,7 @@ describe("a Rifter built from asset rows", () => {
     prices.delete(519);
     const card = toShipCard({
       key: "asset:1000", href: "/ships/asset/1000", name: SHIP.name, typeId: 587, typeName: "Rifter",
-      groupName: "Frigate", location: "Jita 4-4", stats: fitStats(built.fit), problems: [],
+      groupName: "Frigate", raceName: "Minmatar", location: "Jita 4-4", stats: fitStats(built.fit), problems: [],
       entries: fitValueEntries(built), prices,
     });
     expect(card.unpriced).toBe("1 item unpriced");
@@ -121,23 +122,25 @@ describe("computeFit", () => {
 
 describe("assetShipCards / savedFitCards", () => {
   const places = new Map([[60003760, { name: "Jita 4-4" }]]);
+  const races = new Map([[587, "Minmatar"]]);
 
   it("builds one card per assembled ship, sorted by value", () => {
     const groups = [{ ship: SHIP, children: CHILDREN }];
-    const cards = assetShipCards(groups, ctx, places, new Map([[1000, SHIP]]), PRICES);
+    const cards = assetShipCards(groups, ctx, places, new Map([[1000, SHIP]]), PRICES, races);
     expect(cards).toHaveLength(1);
     expect(cards[0]).toMatchObject({
       key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeName: "Rifter",
-      groupName: "Frigate", location: "Jita 4-4", value: "13.1M ISK", error: null,
+      groupName: "Frigate", raceName: "Minmatar", location: "Jita 4-4", value: "13.1M ISK", error: null,
     });
   });
 
   it("shows Could not compute for a hull the engine cannot build", () => {
     const broken = { ...SHIP, itemId: 2000, typeId: 999999 };
-    const cards = assetShipCards([{ ship: broken, children: [] }], ctx, places, new Map(), PRICES);
+    const cards = assetShipCards([{ ship: broken, children: [] }], ctx, places, new Map(), PRICES, races);
     expect(cards[0].error).toBe("Could not compute");
     expect(cards[0].typeName).toBe("Unknown type (999999)");
     expect(cards[0].groupName).toBeNull();
+    expect(cards[0].raceName).toBeNull();
   });
 
   it("builds a card per saved fit, labelled as a saved fit", () => {
@@ -145,10 +148,10 @@ describe("assetShipCards / savedFitCards", () => {
       fittingId: 7, name: "Solo Rifter", description: "", shipTypeId: 587,
       items: [{ idx: 0, typeId: 519, quantity: 1, flag: "LoSlot0" }],
     };
-    const cards = savedFitCards([fitting], ctx, PRICES);
+    const cards = savedFitCards([fitting], ctx, PRICES, races);
     expect(cards[0]).toMatchObject({
       key: "fit:7", href: "/ships/fit/7", name: "Solo Rifter", typeName: "Rifter",
-      groupName: "Frigate", location: "Saved fit",
+      groupName: "Frigate", raceName: "Minmatar", location: "Saved fit",
     });
     expect(cards[0].cpu!.output).toBe(162.5);
     expect(cards[0].valueRaw).toBe(9_000_000);   // 8,000,000 hull + 1,000,000 gyro

@@ -13,7 +13,11 @@ export function ShipCard({ card }: { card: ShipCardView }) {
         <img src={shipRenderUrl(card.typeId)} alt="" className="ship-render" />
         <div>
           <h2 className="ship-name">{card.name ?? card.typeName}</h2>
-          <p className="ship-type muted">{card.groupName ? `${card.groupName}, ${card.typeName}` : card.typeName}</p>
+          <div className="ship-type-pills">
+            {card.raceName === null ? null : <span className="pill">{card.raceName}</span>}
+            {card.groupName === null ? null : <span className="pill">{card.groupName}</span>}
+            <span className="pill">{card.typeName}</span>
+          </div>
         </div>
       </div>
       <p className="ship-loc faint">{card.location}</p>

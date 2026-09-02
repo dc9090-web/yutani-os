@@ -3,6 +3,7 @@ import { listCharacters } from "../../lib/db/characters.js";
 import { getPrices } from "../../lib/db/market-prices.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { loadFitData } from "../../lib/ships/load.js";
+import { getRaces, getTypes } from "../../lib/sde/repo.js";
 import { pickActive } from "../../lib/view/characters.js";
 import { assembledShips, assetShipCards, savedFitCards } from "../../lib/view/ships.js";
 import { NoCharacter } from "../components/NoCharacter.js";
@@ -24,13 +25,23 @@ export default async function ShipsPage() {
     ...assets.map((a) => a.typeId),
     ...fittings.flatMap((f) => [f.shipTypeId, ...f.items.map((i) => i.typeId)]),
   ];
-  const [prices, places] = await Promise.all([
+  // Ship identity pills (design hand-back) need each hull's race, which `DogmaData` doesn't carry —
+  // one extra `getTypes` batch over just the hull ids, joined against the (tiny, unfiltered) race table.
+  const hullTypeIds = [...new Set([...groups.map((g) => g.ship.typeId), ...fittings.map((f) => f.shipTypeId)])];
+  const [prices, places, hullTypes, races] = await Promise.all([
     getPrices(priceIds),
     locationLabels(groups.filter((g) => g.ship.locationType !== "item").map((g) => g.ship.locationId)),
+    getTypes(hullTypeIds),
+    getRaces(),
   ]);
+  const raceNames = new Map<number, string>();
+  for (const [typeId, type] of hullTypes) {
+    const raceName = type.raceId === null ? undefined : races.get(type.raceId);
+    if (raceName !== undefined) raceNames.set(typeId, raceName);
+  }
 
-  const ships = assetShipCards(groups, ctx, places, byItemId, prices);
-  const fits = savedFitCards(fittings, ctx, prices);
+  const ships = assetShipCards(groups, ctx, places, byItemId, prices, raceNames);
+  const fits = savedFitCards(fittings, ctx, prices, raceNames);
 
   return (<>
     <h1 className="page-title">Ships</h1>

@@ -23,11 +23,25 @@ export function isk(value: number): string {
   return `${grouped(fixed === "-0.00" ? "0.00" : fixed)} ISK`;
 }
 
-/** "12.3M SP" / "850k SP" / "512 SP". The k branch floors so 999,999 never reads "1000k SP". */
-export function sp(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M SP`;
-  if (value >= 1_000) return `${Math.floor(value / 1_000)}k SP`;
-  return `${grouped(Math.round(value))} SP`;
+/**
+ * "128,450,032 ISK" — the Overview wallet row (design hand-back): whole ISK only, no decimals.
+ * `isk()` itself keeps its two decimals everywhere else (spec §7), so this is a separate function
+ * rather than a flag on it.
+ */
+export function iskWhole(value: number): string {
+  return `${grouped(Math.round(value))} ISK`;
+}
+
+/**
+ * "12.3M SP" / "850k SP" / "512 SP". The k branch floors so 999,999 never reads "1000k SP".
+ * `withUnit = false` drops the trailing " SP" for a spot (the Overview footer) where the label next
+ * to it already says "Total SP".
+ */
+export function sp(value: number, withUnit = true): string {
+  const unit = withUnit ? " SP" : "";
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M${unit}`;
+  if (value >= 1_000) return `${Math.floor(value / 1_000)}k${unit}`;
+  return `${grouped(Math.round(value))}${unit}`;
 }
 
 const ROMAN = ["", "I", "II", "III", "IV", "V"];
@@ -113,21 +127,33 @@ export function stamp(date: Date | null): string {
   return date === null ? "—" : date.toISOString().replace("T", " ").slice(0, 16);
 }
 
-export interface QueueHeadLabel { skillName: string; finishedLevel: number; finishDate: Date | null }
+export interface QueueHeadView {
+  skillName: string; finishedLevel: number; startDate: Date | null; finishDate: Date | null;
+}
+
+/** The Overview footer's `.ov-training` block (design hand-back): a skill name, its `.dur` remaining
+ *  time, and a mini progress bar — or, when there is nothing training, a faint one-line message. */
+export type OverviewTraining =
+  | { active: true; skill: string; time: string; percent: number }
+  | { active: false; label: string };
 
 /**
- * "Caldari Frigate V · 3h 12m" — the Overview's training line. No "finishes in" lead-in: the
- * design hand-back's duration format stands on its own next to the skill name. A stale head — its
- * finishDate already passed — means the sync just hasn't caught up with ESI yet, not that the
- * skill is still finishing "3h ago"; render it as still-in-progress instead of a confusing past tense.
+ * Skill name + level, a `duration()` remaining-time string, and a 0–100 fill percent derived from
+ * the queue head's start/finish bounds against `now`. A stale head — its finishDate already passed —
+ * means the sync just hasn't caught up with ESI yet, not that the skill is still finishing "3h ago";
+ * render it as 100% complete instead of a confusing past tense. A paused queue comes back from ESI
+ * with no dates at all (phase 3a stores them as NULL): the remaining time cannot be known, so `time`
+ * says so and `percent` is 0 rather than guessed.
  */
-export function trainingLabel(head: QueueHeadLabel | null, now: Date = new Date()): string {
-  if (head === null) return "Queue empty";
+export function overviewTraining(head: QueueHeadView | null, now: Date = new Date()): OverviewTraining {
+  if (head === null) return { active: false, label: "Queue empty" };
   const skill = `${head.skillName} ${roman(head.finishedLevel)}`;
-  // A paused queue comes back from ESI with no dates at all (phase 3a stores them as NULL).
-  if (head.finishDate === null) return `${skill} · paused`;
-  if (head.finishDate.getTime() <= now.getTime()) return `${skill} · finishing`;
-  return `${skill} · ${duration(head.finishDate.getTime() - now.getTime())}`;
+  if (head.finishDate === null) return { active: true, skill, time: "paused", percent: 0 };
+  const remaining = head.finishDate.getTime() - now.getTime();
+  if (remaining <= 0) return { active: true, skill, time: duration(0), percent: 100 };
+  const percent = head.startDate === null ? 0 : Math.max(0, Math.min(100, Math.round(
+    ((now.getTime() - head.startDate.getTime()) / (head.finishDate.getTime() - head.startDate.getTime())) * 100)));
+  return { active: true, skill, time: duration(remaining), percent };
 }
 
 /**

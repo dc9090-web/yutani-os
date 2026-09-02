@@ -128,20 +128,20 @@ export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
 /** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */
 export interface ShipCardView {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
-  groupName: string | null; location: string;
+  groupName: string | null; raceName: string | null; location: string;
   cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
   value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
 }
 
 export function toShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
-  groupName: string | null; location: string;
+  groupName: string | null; raceName: string | null; location: string;
   stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
 }): ShipCardView {
   const roll = rollUpValue(input.entries, input.prices);
   return {
     key: input.key, href: input.href, name: input.name, typeId: input.typeId,
-    typeName: input.typeName, groupName: input.groupName, location: input.location,
+    typeName: input.typeName, groupName: input.groupName, raceName: input.raceName, location: input.location,
     cpu: gauge("CPU", "tf", input.stats.cpu),
     power: gauge("Powergrid", "MW", input.stats.power),
     missingSkills: input.problems.filter((p) => p.kind === "skill").length,
@@ -155,7 +155,7 @@ export function toShipCard(input: {
  */
 export function errorShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
-  groupName: string | null; location: string;
+  groupName: string | null; raceName: string | null; location: string;
 }): ShipCardView {
   return {
     ...input, cpu: null, power: null, missingSkills: 0,
@@ -195,13 +195,15 @@ export function computeFit(build: () => BuiltFit, what: string): ComputedFit | n
   }
 }
 
-/** Spec §4's "Fitted ships" grid, value descending. */
+/** Spec §4's "Fitted ships" grid, value descending. `raceNames` is the hull typeId -> race name
+ *  join the page does once via `getTypes`/`getRaces` — `DogmaData` carries no race data. */
 export function assetShipCards(
   groups: ShipGroup[],
   ctx: FitContext,
   places: ReadonlyMap<number, { name: string }>,
   byItemId: ReadonlyMap<number, AssetRow>,
   prices: ReadonlyMap<number, Price>,
+  raceNames: ReadonlyMap<number, string>,
 ): ShipCardView[] {
   return sortShipCards(groups.map((group) => {
     const base = {
@@ -211,6 +213,7 @@ export function assetShipCards(
       typeId: group.ship.typeId,
       typeName: ctx.data.types.get(group.ship.typeId)?.name ?? `Unknown type (${group.ship.typeId})`,
       groupName: groupNameFor(group.ship.typeId, ctx.data),
+      raceName: raceNames.get(group.ship.typeId) ?? null,
       location: shipLocationLabel(group.ship, places, byItemId, ctx.data),
     };
     const computed = computeFit(() => fitFromAssets(group.ship, group.children, ctx), base.key);
@@ -225,6 +228,7 @@ export function assetShipCards(
 /** Spec §4's "Saved fits" grid — the same card, built from `character_fittings*`. */
 export function savedFitCards(
   fittings: FittingRow[], ctx: FitContext, prices: ReadonlyMap<number, Price>,
+  raceNames: ReadonlyMap<number, string>,
 ): ShipCardView[] {
   return sortShipCards(fittings.map((fitting) => {
     const base = {
@@ -234,6 +238,7 @@ export function savedFitCards(
       typeId: fitting.shipTypeId,
       typeName: ctx.data.types.get(fitting.shipTypeId)?.name ?? `Unknown type (${fitting.shipTypeId})`,
       groupName: groupNameFor(fitting.shipTypeId, ctx.data),
+      raceName: raceNames.get(fitting.shipTypeId) ?? null,
       location: SAVED_FIT_LOCATION,
     };
     const computed = computeFit(() => fitFromFitting(fitting, fitting.items, ctx), base.key);

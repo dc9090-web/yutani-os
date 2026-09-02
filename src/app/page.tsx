@@ -3,10 +3,10 @@ import { listCharacters } from "../lib/db/characters.js";
 import { getWallet } from "../lib/db/character-wallet.js";
 import { getLocation } from "../lib/db/character-location.js";
 import { getSkillSummary, listSkillQueue } from "../lib/db/character-skills.js";
-import { getSolarSystems, getTypes } from "../lib/sde/repo.js";
+import { getGroups, getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
 import { tagsByCharacter } from "../lib/db/tags.js";
-import { isk, secClass, secText, sp, trainingLabel } from "../lib/view/format.js";
+import { iskWhole, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
 
@@ -45,30 +45,43 @@ export default async function Overview() {
     locationLabels([...placeIds]),
   ]);
 
+  // The ship's group (its category pill, e.g. "Frigate") lives on sde_groups, keyed by the hull
+  // type's group id — not knowable until `types` comes back, so this is a third, smaller wave.
+  const groupIds = new Set<number>();
+  for (const row of rows) {
+    const groupId = row.location?.shipTypeId == null ? null : types.get(row.location.shipTypeId)?.groupId ?? null;
+    if (groupId !== null && groupId !== undefined) groupIds.add(groupId);
+  }
+  const groups = await getGroups([...groupIds]);
+
   const cards: OverviewCard[] = rows.map(({ character, wallet, location, summary, head }) => {
     const system = location?.solarSystemId == null ? null : systems.get(location.solarSystemId) ?? null;
     const docked = location?.stationId ?? location?.structureId ?? null;
-    const shipType = location?.shipTypeId == null ? null : types.get(location.shipTypeId)?.name ?? null;
+    const shipType = location?.shipTypeId == null ? null : types.get(location.shipTypeId) ?? null;
     const headName = head === null ? null : types.get(head.skillId)?.name ?? `Skill ${head.skillId}`;
     return {
       id: character.id,
       name: character.name,
       corp: `${character.corporationName ?? "—"}${character.allianceName ? ` · ${character.allianceName}` : ""}`,
       needsReauth: character.tokenStatus === "needs_reauth",
-      balance: wallet === null ? null : isk(wallet.balance),
+      balance: wallet === null ? null : iskWhole(wallet.balance),
       system: location?.solarSystemId == null ? null : {
         name: system?.name ?? `Unknown system (${location.solarSystemId})`,
         sec: secText(system?.securityStatus ?? null),
         secClass: secClass(system?.securityStatus ?? null),
       },
       dockedAt: docked === null ? null : places.get(docked)?.name ?? null,
-      ship: shipType === null ? null : `${shipType}${location?.shipName ? ` — ${location.shipName}` : ""}`,
+      ship: shipType?.name == null ? null : {
+        typeName: shipType.name,
+        groupName: shipType.groupId == null ? null : groups.get(shipType.groupId)?.name ?? null,
+        customName: location?.shipName ?? null,
+      },
       online: location?.online ?? null,
       // "Not synced" means the skills job has never written a summary; an empty queue is different.
-      training: summary === null ? "Not synced"
-        : trainingLabel(head === null || headName === null ? null
-          : { skillName: headName, finishedLevel: head.finishedLevel, finishDate: head.finishDate }, now),
-      totalSp: summary === null ? null : sp(summary.totalSp),
+      training: summary === null ? { active: false, label: "Not synced" }
+        : overviewTraining(head === null || headName === null ? null
+          : { skillName: headName, finishedLevel: head.finishedLevel, startDate: head.startDate, finishDate: head.finishDate }, now),
+      totalSp: summary === null ? null : sp(summary.totalSp, false),
       account: character.accountId == null ? null : accountNames.get(character.accountId) ?? null,
       tags: tagsByChar.get(character.id) ?? [],
     };
