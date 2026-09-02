@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ShipCardView } from "../../lib/view/ships.js";
+import { shipRenderUrl } from "../../lib/view/fit-sheet.js";
 import { Gauge } from "./Gauge.js";
 
 /** One fitted ship or saved fit. The whole card is the link to its sheet. */
@@ -9,10 +10,10 @@ export function ShipCard({ card }: { card: ShipCardView }) {
     <Link href={card.href} className="card ship-card">
       <div className="ship-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://images.evetech.net/types/${card.typeId}/icon?size=64`} alt="" className="ship-icon" />
+        <img src={shipRenderUrl(card.typeId)} alt="" className="ship-render" />
         <div>
           <h2 className="ship-name">{card.name ?? card.typeName}</h2>
-          <p className="ship-type muted">{card.typeName}</p>
+          <p className="ship-type muted">{card.groupName ? `${card.groupName}, ${card.typeName}` : card.typeName}</p>
         </div>
       </div>
       <p className="ship-loc faint">{card.location}</p>

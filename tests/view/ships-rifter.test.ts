@@ -74,7 +74,7 @@ describe("a Rifter built from asset rows", () => {
     const stats = fitStats(built.fit);
     const card = toShipCard({
       key: "asset:1000", href: "/ships/asset/1000", name: SHIP.name, typeId: 587, typeName: "Rifter",
-      location: "Jita 4-4", stats, problems: validateFit(built.fit),
+      groupName: "Frigate", location: "Jita 4-4", stats, problems: validateFit(built.fit),
       entries: fitValueEntries(built), prices: PRICES,
     });
     expect(card.cpu!.text).toBe(`${stats.cpu.used.toFixed(2)} / 162.50 tf`);
@@ -86,6 +86,7 @@ describe("a Rifter built from asset rows", () => {
     expect(card.valueRaw).toBe(13_100_100);
     expect(card.value).toBe("13.1M ISK");
     expect(card.unpriced).toBeNull();
+    expect(card.groupName).toBe("Frigate");
   });
 
   it("counts entries with no price at all", () => {
@@ -94,7 +95,7 @@ describe("a Rifter built from asset rows", () => {
     prices.delete(519);
     const card = toShipCard({
       key: "asset:1000", href: "/ships/asset/1000", name: SHIP.name, typeId: 587, typeName: "Rifter",
-      location: "Jita 4-4", stats: fitStats(built.fit), problems: [],
+      groupName: "Frigate", location: "Jita 4-4", stats: fitStats(built.fit), problems: [],
       entries: fitValueEntries(built), prices,
     });
     expect(card.unpriced).toBe("1 item unpriced");
@@ -127,7 +128,7 @@ describe("assetShipCards / savedFitCards", () => {
     expect(cards).toHaveLength(1);
     expect(cards[0]).toMatchObject({
       key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeName: "Rifter",
-      location: "Jita 4-4", value: "13.1M ISK", error: null,
+      groupName: "Frigate", location: "Jita 4-4", value: "13.1M ISK", error: null,
     });
   });
 
@@ -136,6 +137,7 @@ describe("assetShipCards / savedFitCards", () => {
     const cards = assetShipCards([{ ship: broken, children: [] }], ctx, places, new Map(), PRICES);
     expect(cards[0].error).toBe("Could not compute");
     expect(cards[0].typeName).toBe("Unknown type (999999)");
+    expect(cards[0].groupName).toBeNull();
   });
 
   it("builds a card per saved fit, labelled as a saved fit", () => {
@@ -145,7 +147,8 @@ describe("assetShipCards / savedFitCards", () => {
     };
     const cards = savedFitCards([fitting], ctx, PRICES);
     expect(cards[0]).toMatchObject({
-      key: "fit:7", href: "/ships/fit/7", name: "Solo Rifter", typeName: "Rifter", location: "Saved fit",
+      key: "fit:7", href: "/ships/fit/7", name: "Solo Rifter", typeName: "Rifter",
+      groupName: "Frigate", location: "Saved fit",
     });
     expect(cards[0].cpu!.output).toBe(162.5);
     expect(cards[0].valueRaw).toBe(9_000_000);   // 8,000,000 hull + 1,000,000 gyro

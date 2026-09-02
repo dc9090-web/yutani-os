@@ -5,6 +5,7 @@ import type { ShipCardView } from "../../src/lib/view/ships.js";
 
 const card: ShipCardView = {
   key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeId: 587, typeName: "Rifter",
+  groupName: "Frigate",
   location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
   cpu: { label: "CPU", unit: "tf", used: 121.5, output: 162.5, text: "121.50 / 162.50 tf", percent: 74.8, over: false },
   power: { label: "Powergrid", unit: "MW", used: 60, output: 51.25, text: "60.00 / 51.25 MW", percent: 100, over: true },
@@ -16,11 +17,24 @@ describe("ShipCard", () => {
     render(<ShipCard card={card} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/ships/asset/1000");
     expect(screen.getByText("Scarlet Dart")).toBeInTheDocument();
-    expect(screen.getByText("Rifter")).toBeInTheDocument();
+    expect(screen.getByText("Frigate, Rifter")).toBeInTheDocument();
     expect(screen.getByText(/Caldari Navy Assembly Plant/)).toBeInTheDocument();
     expect(screen.getByText("13.1M ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
     expect(screen.getByText("2 missing skills")).toBeInTheDocument();
+  });
+
+  it("shows the ship's in-game render, not the generic type icon", () => {
+    const { container } = render(<ShipCard card={card} />);
+    const img = container.querySelector<HTMLImageElement>(".ship-render");
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute("src", "https://images.evetech.net/types/587/render?size=128");
+    expect(img).toHaveAttribute("alt", "");
+  });
+
+  it("falls back to the type name alone when the hull's group is unknown", () => {
+    render(<ShipCard card={{ ...card, groupName: null }} />);
+    expect(screen.getByText("Rifter")).toBeInTheDocument();
   });
 
   it("draws both gauges and marks only the over-budget one", () => {

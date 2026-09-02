@@ -132,7 +132,7 @@ describe("toShipCard / errorShipCard / sortShipCards", () => {
     hardpoints: { turret: { used: 1, total: 3 }, launcher: { used: 0, total: 2 } },
     modules: [],
   } as unknown as import("../../src/lib/dogma/index.js").FitStats;
-  const base = { key: "asset:1", href: "/ships/asset/1", name: "Scarlet Dart", typeId: 587, typeName: "Rifter", location: "Jita 4-4" };
+  const base = { key: "asset:1", href: "/ships/asset/1", name: "Scarlet Dart", typeId: 587, typeName: "Rifter", groupName: "Frigate", location: "Jita 4-4" };
 
   it("builds a card with both gauges, the missing-skill count and the value", () => {
     const card = toShipCard({

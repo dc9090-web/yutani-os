@@ -127,19 +127,21 @@ export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
 
 /** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */
 export interface ShipCardView {
-  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+  key: string; href: string; name: string | null; typeId: number; typeName: string;
+  groupName: string | null; location: string;
   cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
   value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
 }
 
 export function toShipCard(input: {
-  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+  key: string; href: string; name: string | null; typeId: number; typeName: string;
+  groupName: string | null; location: string;
   stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
 }): ShipCardView {
   const roll = rollUpValue(input.entries, input.prices);
   return {
     key: input.key, href: input.href, name: input.name, typeId: input.typeId,
-    typeName: input.typeName, location: input.location,
+    typeName: input.typeName, groupName: input.groupName, location: input.location,
     cpu: gauge("CPU", "tf", input.stats.cpu),
     power: gauge("Powergrid", "MW", input.stats.power),
     missingSkills: input.problems.filter((p) => p.kind === "skill").length,
@@ -152,12 +154,19 @@ export function toShipCard(input: {
  * sort below a genuinely worthless fit rather than mixing in with the zero-value ones.
  */
 export function errorShipCard(input: {
-  key: string; href: string; name: string | null; typeId: number; typeName: string; location: string;
+  key: string; href: string; name: string | null; typeId: number; typeName: string;
+  groupName: string | null; location: string;
 }): ShipCardView {
   return {
     ...input, cpu: null, power: null, missingSkills: 0,
     value: null, valueRaw: -1, unpriced: null, error: "Could not compute",
   };
+}
+
+/** The hull's group name ("Frigate", "Strategic Cruiser", …), or null when the type is unknown. */
+function groupNameFor(typeId: number, data: DogmaData): string | null {
+  const groupId = data.types.get(typeId)?.groupId;
+  return groupId === undefined ? null : data.groups.get(groupId)?.name ?? null;
 }
 
 /** Spec §4: value descending. Ties break on type name then key so the order is never Map-dependent. */
@@ -201,6 +210,7 @@ export function assetShipCards(
       name: group.ship.name,
       typeId: group.ship.typeId,
       typeName: ctx.data.types.get(group.ship.typeId)?.name ?? `Unknown type (${group.ship.typeId})`,
+      groupName: groupNameFor(group.ship.typeId, ctx.data),
       location: shipLocationLabel(group.ship, places, byItemId, ctx.data),
     };
     const computed = computeFit(() => fitFromAssets(group.ship, group.children, ctx), base.key);
@@ -223,6 +233,7 @@ export function savedFitCards(
       name: fitting.name,
       typeId: fitting.shipTypeId,
       typeName: ctx.data.types.get(fitting.shipTypeId)?.name ?? `Unknown type (${fitting.shipTypeId})`,
+      groupName: groupNameFor(fitting.shipTypeId, ctx.data),
       location: SAVED_FIT_LOCATION,
     };
     const computed = computeFit(() => fitFromFitting(fitting, fitting.items, ctx), base.key);

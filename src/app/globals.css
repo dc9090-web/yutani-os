@@ -236,7 +236,7 @@ body {
 .ship-card { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
 .ship-card:hover { border-color: var(--border-hi); }
 .ship-head { display: flex; gap: 12px; align-items: center; }
-.ship-icon { width: 48px; height: 48px; border-radius: 8px; border: 1px solid var(--divider); background: var(--raised); }
+.ship-render { width: 64px; height: 64px; border-radius: 8px; border: 1px solid var(--divider); background: var(--raised); object-fit: cover; }
 .ship-name { margin: 0; font-family: var(--font-poppins), sans-serif; font-size: 16px; font-weight: 600; }
 .ship-type { margin: 2px 0 0; font-size: 13px; }
 .ship-loc { font-size: 12px; margin: 6px 0 2px; }
