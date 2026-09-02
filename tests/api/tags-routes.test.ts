@@ -14,6 +14,7 @@ const { DELETE } = await import("../../src/app/api/tags/[id]/route.js");
 const { PUT } = await import("../../src/app/api/characters/[id]/tags/route.js");
 
 const TAG = { id: 1, name: "Miner" };
+const TAG2 = { id: 2, name: "Scanner" };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const post = (body: unknown) =>
   new NextRequest("https://eve.plasma66.com/api/tags", {
@@ -26,7 +27,7 @@ const put = (body: unknown, url = "https://eve.plasma66.com/api/characters/1/tag
 
 beforeEach(() => {
   vi.resetAllMocks();
-  listTags.mockResolvedValue([TAG]);
+  listTags.mockResolvedValue([TAG, TAG2]);
   createTag.mockResolvedValue(TAG);
   deleteTag.mockResolvedValue(undefined);
   setCharacterTags.mockResolvedValue(undefined);
@@ -37,7 +38,7 @@ describe("the tags routes", () => {
   it("lists tags", async () => {
     const res = await LIST();
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual([TAG]);
+    expect(await res.json()).toEqual([TAG, TAG2]);
   });
 
   it("creates with a 201, trimming the name", async () => {
@@ -88,6 +89,13 @@ describe("the tags routes", () => {
     expect((await PUT(put({ tagIds: "nope" }), ctx("1"))).status).toBe(400);
     expect((await PUT(put({ tagIds: [1.5] }), ctx("1"))).status).toBe(400);
     expect((await PUT(put({ tagIds: [0] }), ctx("1"))).status).toBe(400);
+    expect(setCharacterTags).not.toHaveBeenCalled();
+  });
+
+  it("400s a tag id that does not exist, instead of letting the FK insert fail with a 500", async () => {
+    const res = await PUT(put({ tagIds: [1, 999] }), ctx("1"));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "unknown tag" });
     expect(setCharacterTags).not.toHaveBeenCalled();
   });
 });

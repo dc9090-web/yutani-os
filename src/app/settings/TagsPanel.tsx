@@ -20,7 +20,7 @@ export function TagsPanel({ tags }: { tags: Tag[] }) {
         <Group key={t.id} justify="space-between" mb="xs">
           <span>{t.name}</span>
           <Button size="xs" variant="subtle" color="red" disabled={busy} aria-label={`Delete ${t.name}`}
-            onClick={() => void call(`/api/tags/${t.id}`, "DELETE")}>Delete</Button>
+            onClick={() => { if (window.confirm(`Delete tag "${t.name}"? It will be removed from every character it is assigned to.`)) void call(`/api/tags/${t.id}`, "DELETE"); }}>Delete</Button>
         </Group>
       ))}
       <Group mt="md">

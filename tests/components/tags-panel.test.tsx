@@ -19,6 +19,7 @@ beforeEach(() => {
     calls.push({ url: String(input), method: init?.method ?? "GET", body: init?.body ? JSON.parse(String(init.body)) : undefined });
     return { ok: true, status: init?.method === "POST" ? 201 : 204, json: async () => ({ id: 3, name: "Hauler" }) } as Response;
   }) as typeof fetch;
+  window.confirm = vi.fn(() => true);
 });
 
 describe("TagsPanel", () => {
@@ -36,10 +37,19 @@ describe("TagsPanel", () => {
     expect(refresh).toHaveBeenCalled();
   });
 
-  it("deletes a tag", async () => {
+  it("deletes a tag after confirming, with a warning that assignments are removed too", async () => {
     ui(TAGS);
     fireEvent.click(screen.getByRole("button", { name: "Delete Miner" }));
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining("every character"));
     await waitFor(() => expect(calls[0]).toMatchObject({ url: "/api/tags/1", method: "DELETE" }));
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it("does not delete when the confirm is dismissed", () => {
+    window.confirm = vi.fn(() => false);
+    ui(TAGS);
+    fireEvent.click(screen.getByRole("button", { name: "Delete Miner" }));
+    expect(calls).toHaveLength(0);
+    expect(refresh).not.toHaveBeenCalled();
   });
 });
