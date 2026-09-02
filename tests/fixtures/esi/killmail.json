@@ -1,0 +1,30 @@
+{
+  "killmail_id": 120000001,
+  "killmail_time": "2026-09-01T12:00:00Z",
+  "solar_system_id": 30000142,
+  "victim": {
+    "character_id": 669539978,
+    "corporation_id": 98000001,
+    "alliance_id": 99000001,
+    "damage_taken": 4210,
+    "ship_type_id": 621,
+    "position": { "x": 1.5e11, "y": -2.5e10, "z": 3.75e11 },
+    "items": [
+      { "item_type_id": 3634, "flag": 27, "singleton": 0, "quantity_dropped": 1 },
+      { "item_type_id": 11488, "flag": 5, "singleton": 0, "quantity_destroyed": 1,
+        "items": [
+          { "item_type_id": 34, "flag": 0, "singleton": 0, "quantity_destroyed": 5000 },
+          { "item_type_id": 35, "flag": 0, "singleton": 0, "quantity_dropped": 2000 }
+        ] },
+      { "item_type_id": 2456, "flag": 87, "singleton": 0, "quantity_destroyed": 5 }
+    ]
+  },
+  "attackers": [
+    { "character_id": 2112625428, "corporation_id": 98000002, "damage_done": 1200,
+      "final_blow": false, "security_status": -1.4, "ship_type_id": 587, "weapon_type_id": 2929 },
+    { "character_id": 2124678472, "corporation_id": 98000002, "alliance_id": 99000002,
+      "damage_done": 3010, "final_blow": true, "security_status": 0.6,
+      "ship_type_id": 11393, "weapon_type_id": 3025 },
+    { "faction_id": 500003, "damage_done": 0, "final_blow": false, "security_status": 0 }
+  ]
+}
