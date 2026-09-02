@@ -132,6 +132,43 @@ describe("computeEditor", () => {
     expect(result.view.value.unpriced).toContain("2 items");
   });
 
+  it("formats the Ship stats card's perf numbers from real engine output, all skills V", () => {
+    // Pinned against tests/dogma/perf-e2e.test.ts's "at all skills V" fixture — same hull, same guns,
+    // same charge, all skills V — so these are the gate-approved engine numbers, not new ones:
+    //   dps 119.9352, volley 252.9883125, ehp 2107.0080631326127, maxVelocity 456.25,
+    //   alignTime 4.26002711994698, capacitorCapacity 250, capRechargeTime 125,
+    //   capStable { stable: true, level: 1 }, maxTargets 4, maxTargetRange 22500,
+    //   scanResolution 660, signatureRadius 35.
+    const result = computeEditor(THREE_GUNS, ctxAllV, PRICES);
+    if (result.kind !== "ok") throw new Error("expected ok");
+    expect(result.view.perf).toEqual({
+      dps: "119.9",            // 119.9352.toFixed(1)
+      volley: "253.0",         // 252.9883125.toFixed(1) — 0.9883 rounds up to the next tenth
+      ehp: "2,107",            // Math.round(2107.0080631326127), grouped
+      maxVelocity: "456.3 m/s", // 456.25.toFixed(1) — binary 456.25 is exact, and .toFixed rounds it up
+      alignTime: "4.26 s",     // 4.26002711994698.toFixed(2)
+      capacitorCapacity: "250 GJ",
+      capRechargeTime: "125 s",
+      capStable: "Cap stable · 100%",
+      capStableOk: true,
+      maxTargets: "4",
+      maxTargetRange: "22.5 km",  // 22500 m / 1000, one decimal
+      scanResolution: "660 mm",
+      signatureRadius: "35 m",
+    });
+  });
+
+  it("shows dashes for damage output and 'Cap lasts …' when the fit has no weapons but drains its cap", () => {
+    // No guns fitted, so dps/volley stay null → "—"; everything else the hull alone can answer still
+    // computes (the bare-hull case in the "no weapons" e2e fixture, pinned the same way as above).
+    const bare = doc([]);
+    const result = computeEditor(bare, ctxAllV, PRICES);
+    if (result.kind !== "ok") throw new Error("expected ok");
+    expect(result.view.perf).toMatchObject({
+      dps: "—", volley: "—", ehp: "2,107", capStable: "Cap stable · 100%", capStableOk: true,
+    });
+  });
+
   it("returns an error result and logs when the engine throws", () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     expect(computeEditor(doc([]), { ...ctxAllV, data: { ...data, types: new Map() } }, PRICES))

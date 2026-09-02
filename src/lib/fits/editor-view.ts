@@ -4,11 +4,13 @@
  * interactive page.
  */
 import {
-  ATTR, HARDPOINTS, SLOT_KINDS, explain, fitStats, itemLabel, missingSkills, round2, validateFit,
-  type AttrId, type DogmaData, type Fit, type FitContext, type FitStats, type Hardpoint, type Item,
-  type ModuleStat, type Problem, type ProblemKind, type SlotKind,
+  ATTR, HARDPOINTS, SLOT_KINDS, explain, fitPerformance, fitStats, itemLabel, missingSkills, round2,
+  validateFit,
+  type AttrId, type CapStability, type DogmaData, type Fit, type FitContext, type FitPerformance,
+  type FitStats, type Hardpoint, type Item, type ModuleStat, type Problem, type ProblemKind,
+  type SlotKind,
 } from "../dogma/index.js";
-import { isk } from "../view/format.js";
+import { duration, grouped, isk } from "../view/format.js";
 import { priceOf, rollUpValue, unpricedNote, iskShort, type Price, type ValuedEntry } from "../view/price.js";
 import { gauge, type GaugeView } from "../view/ships.js";
 import {
@@ -33,11 +35,25 @@ export interface EditorEntryRow {
   /** `data-desc` tooltip text (Task 4 part E). */
   desc: string;
 }
+/**
+ * The Ship stats card's "Performance" numbers (Task 5b), pre-formatted from `fitPerformance` exactly
+ * the way the design hand-back's fitting-editor.html screen shows them. `capStableOk` is only
+ * meaningful when `capStable !== "—"` — StatsPanel checks the text itself before reading it, the same
+ * "null renders as the dash" convention `fitPerformance` documents.
+ */
+export interface EditorPerfView {
+  dps: string; volley: string; ehp: string;
+  maxVelocity: string; alignTime: string;
+  capacitorCapacity: string; capRechargeTime: string;
+  capStable: string; capStableOk: boolean;
+  maxTargets: string; maxTargetRange: string; scanResolution: string; signatureRadius: string;
+}
 export interface EditorView {
   gauges: GaugeView[]; counters: CounterView[]; blocks: EditorSlotBlock[];
   problems: ProblemView[]; missing: MissingSkillView[];
   drones: EditorEntryRow[]; cargo: EditorEntryRow[]; unknown: EditorEntryRow[];
   value: { total: string; unpriced: string | null };
+  perf: EditorPerfView;
 }
 export type EditorResult =
   | { kind: "ok"; view: EditorView; totals: SlotTotals; built: DocFit }
@@ -108,6 +124,57 @@ export function typeDesc(data: DogmaData, typeId: number): string {
   const groupId = data.types.get(typeId)?.groupId;
   const group = groupId === undefined ? undefined : data.groups.get(groupId)?.name ?? undefined;
   return group === undefined ? name : `${name} — ${group}`;
+}
+
+const PERF_DASH = "—";
+
+/** `value` with `decimals` places, `grouped()`'s thousands separators, and an optional unit suffix. */
+function fmtDecimal(value: number | null, decimals: number, unit = ""): string {
+  return value === null ? PERF_DASH : `${grouped(value.toFixed(decimals))}${unit}`;
+}
+
+/** `value` rounded to the nearest whole number, grouped, with an optional unit suffix. */
+function fmtInt(value: number | null, unit = ""): string {
+  return value === null ? PERF_DASH : `${grouped(Math.round(value))}${unit}`;
+}
+
+/**
+ * "Cap stable · 68%" (a whole-percent capacitor level) or "Cap lasts 2m" (via the Task-1 `duration()`
+ * — the estimate is typically well under an hour, so its day/hour digits never fire, but reusing one
+ * formatter keeps this consistent with every other "how long until" string in the app) when the fit
+ * drains faster than the capacitor can recharge. `ok` selects the badge/row colour: green for stable,
+ * amber for a fit that empties its cap.
+ */
+function capStableText(stability: CapStability | null): { text: string; ok: boolean } {
+  if (stability === null) return { text: PERF_DASH, ok: false };
+  if (stability.stable) return { text: `Cap stable · ${Math.round(stability.level * 100)}%`, ok: true };
+  return { text: `Cap lasts ${duration(stability.lastsSeconds * 1000)}`, ok: false };
+}
+
+/**
+ * `FitPerformance`'s raw numbers, pre-formatted for the Ship stats card. Every field lines up 1:1
+ * with `FitPerformance`'s own — Shield/Total EHP split, warp speed and mass, which the design
+ * hand-back's mock screen also shows, have no counterpart in the engine's output yet (Recorded
+ * deviation, Task 5b) and are left off the card rather than invented here.
+ */
+function perfView(perf: FitPerformance): EditorPerfView {
+  const cap = capStableText(perf.capStable);
+  return {
+    dps: fmtDecimal(perf.dps, 1),
+    volley: fmtDecimal(perf.volley, 1),
+    ehp: fmtInt(perf.ehp),
+    maxVelocity: fmtDecimal(perf.maxVelocity, 1, " m/s"),
+    alignTime: fmtDecimal(perf.alignTime, 2, " s"),
+    capacitorCapacity: fmtInt(perf.capacitorCapacity, " GJ"),
+    capRechargeTime: fmtInt(perf.capRechargeTime, " s"),
+    capStable: cap.text,
+    capStableOk: cap.ok,
+    maxTargets: perf.maxTargets === null ? PERF_DASH : String(perf.maxTargets),
+    maxTargetRange: perf.maxTargetRange === null
+      ? PERF_DASH : `${grouped((perf.maxTargetRange / 1000).toFixed(1))} km`,
+    scanResolution: fmtInt(perf.scanResolution, " mm"),
+    signatureRadius: fmtInt(perf.signatureRadius, " m"),
+  };
 }
 
 function entryRow(entry: FitItem, data: DogmaData, prices: ReadonlyMap<number, Price>): EditorEntryRow {
@@ -199,6 +266,7 @@ export function editorView(input: {
     cargo: built.cargo.map((c) => entryRow(c, data, prices)),
     unknown: built.unknown.map((u) => entryRow(u, data, prices)),
     value: { total: iskShort(roll.total), unpriced: unpricedNote(roll.unpriced) },
+    perf: perfView(fitPerformance(built.fit)),
   };
 }
 

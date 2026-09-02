@@ -57,12 +57,44 @@ describe("StatsPanel", () => {
     expect(within(fitting).getByText("Estimated value").tagName).toBe("SPAN");
   });
 
-  it("shows the Ship stats placeholder with em-dashes and no real numbers yet", () => {
+  it("shows the Ship stats card's real perf numbers, dashes where the fit can't answer", () => {
     renderPanel();
     const shipStats = screen.getByText("Ship stats").closest(".card") as HTMLElement;
-    expect(within(shipStats).getAllByText("—").length).toBeGreaterThan(0);
-    expect(within(shipStats).getByText("Performance stats arrive with the next update")).toBeInTheDocument();
-    expect(within(shipStats).queryByText(/Cap stable/)).toBeNull();
+    // The single gun carries no charge, so damage output stays unanswerable.
+    expect(within(shipStats).getAllByText("—").length).toBeGreaterThanOrEqual(2);   // DPS, Volley
+    expect(within(shipStats).getByText("1,810")).toBeInTheDocument();               // EHP
+    expect(within(shipStats).getByText("365.0 m/s")).toBeInTheDocument();
+    expect(within(shipStats).getByText("4.73 s")).toBeInTheDocument();
+    expect(within(shipStats).getByText("250 GJ")).toBeInTheDocument();
+    expect(within(shipStats).getByText("125 s")).toBeInTheDocument();
+    expect(within(shipStats).getByText("Cap stable · 100%")).toBeInTheDocument();
+    expect(within(shipStats).getByText("22.5 km")).toBeInTheDocument();
+    expect(within(shipStats).getByText("660 mm")).toBeInTheDocument();
+    expect(within(shipStats).getByText("35 m")).toBeInTheDocument();
+    expect(within(shipStats).getByText("Includes drones in bay")).toBeInTheDocument();
+  });
+
+  it("puts a green 'Cap stable' badge in the Fitting card title when the cap holds", () => {
+    renderPanel();
+    const fitting = screen.getByText("Fitting").closest(".card") as HTMLElement;
+    const badge = within(fitting).getByText("Cap stable · 100%");
+    expect(badge).toHaveClass("badge", "ok");
+  });
+
+  it("puts an amber 'Cap lasts' badge in the Fitting card title when the fit outruns its cap", () => {
+    const draining: FitDoc = {
+      id: 1, name: "MWD spam", description: "", shipTypeId: 587, characterId: 1,
+      items: [0, 1, 2].map((i) => (
+        { typeId: 440, quantity: 1, flag: `MedSlot${i}`, chargeTypeId: null, state: "active" as const }
+      )),
+    };
+    const result = computeEditor(draining, { data, skills: new Map(), implants: [] }, new Map());
+    if (result.kind !== "ok") throw new Error("expected ok");
+    render(<StatsPanel view={result.view} bonuses={BONUSES} skillsSynced />);
+    const fitting = screen.getByText("Fitting").closest(".card") as HTMLElement;
+    const badge = within(fitting).getByText(/^Cap lasts/);
+    expect(badge).toHaveClass("badge", "warn");
+    expect(result.view.perf.capStableOk).toBe(false);
   });
 
   it("red-tints the Problems card and puts the count in the title when there are problems", () => {
