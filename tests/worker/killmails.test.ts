@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import {
-  createKillmailsJob, killmailsJob, KILLMAILS_INTERVAL_MS, KILLMAILS_RETRY_MS,
+  createKillmailsJob, killmailsJob, redactKillmailHash, KILLMAILS_INTERVAL_MS, KILLMAILS_RETRY_MS,
   KILLMAILS_SCOPE, MAX_KILLMAIL_PAGES, type EsiKillmailRef, type KillmailsJobDeps,
 } from "../../src/worker/jobs/killmails.js";
 import type { CharacterKillmailLink, EsiKillmail, KillmailWrite } from "../../src/lib/combat/killmail.js";
@@ -16,6 +16,7 @@ type Call = { path: string; characterId: number | undefined; page: number | unde
 function harness(opts: {
   scopes?: string[]; pages?: EsiKillmailRef[][]; known?: number[];
   listError?: unknown; listErrorAtPage?: number;
+  bodyError?: (path: string) => unknown;
 } = {}) {
   const pages = opts.pages ?? [[ref(120000001), ref(120000002)], []];
   const calls: Call[] = [];
@@ -40,6 +41,7 @@ function harness(opts: {
         }
         return { data: pages[(o?.page ?? 1) - 1] ?? [] };
       }
+      if (opts.bodyError !== undefined) throw opts.bodyError(path);
       const id = Number(path.split("/")[2]);
       return { data: body(id) };
     }),
@@ -150,5 +152,33 @@ describe("killmails job", () => {
     });
     expect(await job.run({ characterId: CID, esi: h.esi as never })).toBe(4);
     warn.mockRestore();
+  });
+
+  it("strips the killmail hash from a failing body fetch's error before it propagates", async () => {
+    const h = harness({
+      pages: [[ref(120000001)], []],
+      bodyError: (path) => new EsiError(500, path, `ESI 500 for ${path}: server error`),
+    });
+    let caught: unknown;
+    try {
+      await h.job.run({ characterId: CID, esi: h.esi as never });
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(EsiError);
+    const message = (caught as Error).message;
+    expect(message).toContain("120000001");
+    expect(message).not.toContain("hash-120000001");
+    expect(message).toContain("<hash>");
+  });
+
+  it("redactKillmailHash leaves a non-EsiError and an error with no hash in it alone", () => {
+    const plain = new Error("not an esi error, has hash-120000001 in it too");
+    expect(redactKillmailHash(plain, "hash-120000001")).toBe(plain);
+    expect(plain.message).toContain("hash-120000001");
+
+    const noHash = new EsiError(500, "/killmails/1/h", "ESI 500 for /killmails/1/h: oops");
+    const original = noHash.message;
+    expect((redactKillmailHash(noHash, "hash-not-present") as Error).message).toBe(original);
   });
 });

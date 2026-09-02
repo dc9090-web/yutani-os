@@ -17,7 +17,7 @@ export default async function KillmailPage(
 
   const killmailId = parseId((await params).killmailId);
   if (killmailId === null) notFound();
-  const view = await loadKillmailDetail(killmailId, characters.map((c) => c.id));
+  const view = await loadKillmailDetail(killmailId, character.id);
   if (view === null) notFound();
 
   return (<>

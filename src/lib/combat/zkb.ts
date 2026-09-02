@@ -31,18 +31,47 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
 }
 
+/** `undefined` (the field is absent) or an integer — never a string, a float, or `null`. */
+function isOptionalInt(v: unknown): boolean {
+  return v === undefined || Number.isInteger(v);
+}
+
+/**
+ * `toKillmailWrite` (`src/lib/combat/killmail.ts`) trusts `damage_taken` and `ship_type_id`
+ * directly — no `?? undefined` guard — and they flow straight into a `bigint[]`/`int[]` INSERT
+ * param. A malformed value here (missing, a string, a float where an id is expected) must fail
+ * the whole page rather than let `String(undefined)` or a stray float reach that param.
+ */
+function isValidVictim(v: Record<string, unknown>): boolean {
+  if (typeof v.damage_taken !== "number" || typeof v.ship_type_id !== "number") return false;
+  return isOptionalInt(v.character_id) && isOptionalInt(v.corporation_id)
+    && isOptionalInt(v.alliance_id) && isOptionalInt(v.faction_id);
+}
+
+/** Same trust, same hazard, for each attacker: `damage_done` and `final_blow` are used as-is. */
+function isValidAttacker(a: unknown): boolean {
+  if (!isRecord(a)) return false;
+  if (typeof a.damage_done !== "number" || typeof a.final_blow !== "boolean") return false;
+  return isOptionalInt(a.character_id) && isOptionalInt(a.corporation_id) && isOptionalInt(a.alliance_id)
+    && isOptionalInt(a.faction_id) && isOptionalInt(a.ship_type_id) && isOptionalInt(a.weapon_type_id);
+}
+
 /**
  * `null` means "this is not a zKillboard page" — an HTML error document, a rate-limit JSON object,
- * a record with no usable hash. The job turns that into an error run and leaves its cursor alone.
+ * a record with no usable hash, or a record whose numeric fields the mapper trusts don't hold up
+ * (research §6: zKillboard's own data is not always ESI-shaped). The job turns that into an error
+ * run and leaves its cursor alone rather than storing rubbish or corrupting a query param.
  */
 export function parseZkbPage(body: unknown): ZkbRecord[] | null {
   if (!Array.isArray(body)) return null;
   for (const row of body) {
     if (!isRecord(row)) return null;
-    if (typeof row.killmail_id !== "number" || typeof row.killmail_time !== "string") return null;
-    if (!isRecord(row.victim) || !Array.isArray(row.attackers)) return null;
+    if (!Number.isInteger(row.killmail_id) || typeof row.killmail_time !== "string") return null;
+    if (!isRecord(row.victim) || !isValidVictim(row.victim)) return null;
+    if (!Array.isArray(row.attackers) || !row.attackers.every(isValidAttacker)) return null;
     const zkb = row.zkb;
     if (!isRecord(zkb) || typeof zkb.hash !== "string" || zkb.hash.length === 0) return null;
+    if (zkb.totalValue !== undefined && typeof zkb.totalValue !== "number") return null;
   }
   return body as ZkbRecord[];
 }

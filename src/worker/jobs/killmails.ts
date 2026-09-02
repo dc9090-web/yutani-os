@@ -22,6 +22,20 @@ export const MAX_KILLMAIL_PAGES = 10;
 
 export interface EsiKillmailRef { killmail_id: number; killmail_hash: string }
 
+/**
+ * The killmail hash is a bearer credential — anyone holding it can fetch the body from ESI's
+ * public route without a token — so it must never end up in `sync_runs.error` (the scheduler
+ * records `Error#message` verbatim, `src/worker/scheduler.ts`). `EsiError`'s message embeds the
+ * request path, which for `/killmails/{id}/{hash}` includes the hash; this replaces it with
+ * `<hash>` in place before the error propagates, keeping the killmail id for diagnosis.
+ */
+export function redactKillmailHash(e: unknown, hash: string): unknown {
+  if (e instanceof EsiError && e.message.includes(hash)) {
+    e.message = e.message.split(hash).join("<hash>");
+  }
+  return e;
+}
+
 export interface KillmailsJobDeps {
   getCharacter: (id: number) => Promise<{ scopes: string[] } | null>;
   knownKillmailIds: (ids: number[]) => Promise<Set<number>>;
@@ -71,8 +85,13 @@ export function createKillmailsJob(deps: KillmailsJobDeps): CharacterSyncJob {
         for (const r of fresh) {
           // Public route: NO characterId, so no Authorization header, the generous `killmail`
           // bucket (3600/15m) instead of `char-killmail`, and a shared character_id = 0 cache row.
-          const body = (await esi.get<EsiKillmail>(
-            `/killmails/${r.killmail_id}/${r.killmail_hash}`)).data;
+          let body: EsiKillmail;
+          try {
+            body = (await esi.get<EsiKillmail>(
+              `/killmails/${r.killmail_id}/${r.killmail_hash}`)).data;
+          } catch (e) {
+            throw redactKillmailHash(e, r.killmail_hash);
+          }
           writes.push(toKillmailWrite(body, r.killmail_hash, "esi"));
           const role = roleFor(body, characterId);
           if (role !== null) links.push({ characterId, killmailId: r.killmail_id, role });

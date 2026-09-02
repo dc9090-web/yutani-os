@@ -40,8 +40,7 @@ export interface AttackerView {
   damage: string; share: string; finalBlow: boolean; security: string;
 }
 export interface KillmailView {
-  header: KillmailHeaderView; victim: VictimView;
-  slots: FitSlotView[]; attackers: AttackerView[]; fittedTypeIds: number[];
+  header: KillmailHeaderView; victim: VictimView; slots: FitSlotView[]; attackers: AttackerView[];
 }
 
 /** Spec §4's ruling: the displayed value is zKillboard's, falling back to ours. */
@@ -49,22 +48,19 @@ function displayValue(head: KillmailFull["head"]): number | null {
   return head.zkbTotalValue ?? head.computedValue;
 }
 
-/** The slots a fit can actually hold — what "Open in fitting designer" is allowed to use. */
-const FITTABLE: ReadonlySet<KillmailSlot> = new Set<KillmailSlot>([
-  "high", "mid", "low", "rig", "subsystem", "drone",
-]);
-
 export function killmailView(
-  full: KillmailFull, labels: Labels, prices: ReadonlyMap<number, Price>, viewerIds: number[],
+  full: KillmailFull, labels: Labels, prices: ReadonlyMap<number, Price>, activeCharacterId: number,
 ): KillmailView {
   const head = full.head;
   const system = head.solarSystemId === null ? undefined : labels.systems.get(head.solarSystemId);
   const security = system?.security ?? null;
   const value = displayValue(head);
 
-  // A killmail several of our characters were on is a loss if any of them died (Decision 11).
-  const mine = full.roles.filter((r) => viewerIds.includes(r.characterId));
-  const roleLabel = mine.length === 0 ? null : mine.some((r) => r.role === "loss") ? "Loss" : "Kill";
+  // Spec §6: the K/L badge is for the active character, not "any of our characters" — the active
+  // character is the victim -> Loss, the active character is among the attackers -> Kill,
+  // otherwise (this killmail is none of the active character's business) no badge at all.
+  const active = full.roles.find((r) => r.characterId === activeCharacterId);
+  const roleLabel = active === undefined ? null : active.role === "loss" ? "Loss" : "Kill";
 
   const flags = [
     head.zkbSolo === true ? "Solo" : null,
@@ -74,7 +70,6 @@ export function killmailView(
 
   const byIdx = new Map(full.items.map((i) => [i.idx, i]));
   const bySlot = new Map<KillmailSlot, FitItemView[]>();
-  const fittedTypeIds: number[] = [];
   for (const item of full.items) {
     // A container's contents belong to the container's slot, not to flag 0's "other".
     const parent = item.parentIdx === null ? null : byIdx.get(item.parentIdx) ?? null;
@@ -91,7 +86,6 @@ export function killmailView(
       inContainer: parent === null ? null : typeOf(parent.itemTypeId, labels),
     });
     bySlot.set(slot, rows);
-    if (parent === null && FITTABLE.has(slot)) fittedTypeIds.push(item.itemTypeId);
   }
   const slots: FitSlotView[] = KILLMAIL_SLOT_ORDER
     .filter((slot) => bySlot.has(slot))
@@ -136,6 +130,6 @@ export function killmailView(
       shipRender: head.victimShipTypeId === null ? null : renderUrl(head.victimShipTypeId),
       damageTaken: grouped(damageTaken),
     },
-    slots, attackers, fittedTypeIds,
+    slots, attackers,
   };
 }

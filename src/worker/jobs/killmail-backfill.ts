@@ -1,6 +1,6 @@
 import type { GlobalSyncJob } from "../scheduler.js";
 import { listCharacters } from "../../lib/db/characters.js";
-import { saveKillmails } from "../../lib/db/killmails.js";
+import { saveKillmails, unresolvedPartyIds } from "../../lib/db/killmails.js";
 import {
   advanceBackfill, ensureBackfillRows, listUnfinishedBackfill, type BackfillCursor,
 } from "../../lib/db/killmail-backfill.js";
@@ -44,6 +44,12 @@ export interface BackfillJobDeps {
   fetchPage: (kind: ZkbKind, characterId: number, page: number) => Promise<ZkbRecord[]>;
   saveKillmails: (writes: KillmailWrite[], links: CharacterKillmailLink[]) => Promise<number>;
   resolveNames: (ids: number[]) => Promise<unknown>;
+  /**
+   * Party ids from already-stored killmails that `universe_names` has no row for — what an
+   * earlier run's `NAMES_PER_RUN_CAP` left behind. Called with whatever is left of this run's own
+   * cap, so the sweep can never itself push a run's ids over NAMES_PER_RUN_CAP.
+   */
+  unresolvedPartyIds: (limit: number) => Promise<number[]>;
 }
 
 export function createKillmailBackfillJob(deps: BackfillJobDeps): GlobalSyncJob {
@@ -92,6 +98,14 @@ export function createKillmailBackfillJob(deps: BackfillJobDeps): GlobalSyncJob 
         if (budget === 0) break;
       }
 
+      // Party-id deferral sweep (spec §3 corrected): ids an earlier run's NAMES_PER_RUN_CAP left
+      // behind are never re-produced by this run's own page loop — killmails are immutable and
+      // never re-processed — so pick up as many of them as this run's remaining cap allows.
+      const remainingCap = NAMES_PER_RUN_CAP - parties.size;
+      if (remainingCap > 0) {
+        for (const id of await deps.unresolvedPartyIds(remainingCap)) parties.add(id);
+      }
+
       if (parties.size > 0) {
         try {
           await deps.resolveNames([...parties]);
@@ -115,4 +129,5 @@ export const killmailBackfillJob: GlobalSyncJob = createKillmailBackfillJob({
   fetchPage: (kind, characterId, page) => zkb.fetchPage(kind, characterId, page),
   saveKillmails,
   resolveNames,
+  unresolvedPartyIds,
 });

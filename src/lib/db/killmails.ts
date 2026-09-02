@@ -50,8 +50,11 @@ function dedupeLinks(links: CharacterKillmailLink[]): CharacterKillmailLink[] {
  * One transaction for a batch of killmails and the links that say which of our characters were on
  * them. Spec §3: everything is `ON CONFLICT DO NOTHING` except the five `zkb_*` columns, which are
  * COALESCEd so a later zKillboard sighting fills in what ESI never sends and a later ESI sighting
- * (which carries no zkb block at all) cannot blank them. `source` is whichever source got there
- * first — it records provenance, not freshness.
+ * (which carries no zkb block at all) cannot blank them. The `WHERE` clause gates the UPDATE
+ * per-column — it fires whenever ANY one of the five columns would go from NULL to a real value,
+ * not just `zkb_total_value` — so a zkb record with `points`/`solo`/`npc` but no `totalValue` still
+ * lands (a zero-ISK npc kill, for instance, has no total value but does have those flags).
+ * `source` is whichever source got there first — it records provenance, not freshness.
  *
  * A link may be upgraded from `kill` to `loss` (a character can be the victim of a killmail we
  * first saw them attacking on — a self-destruct or a mistake in an earlier role assignment) but
@@ -89,7 +92,11 @@ export async function saveKillmails(
            zkb_npc         = COALESCE(EXCLUDED.zkb_npc,         killmails.zkb_npc),
            zkb_solo        = COALESCE(EXCLUDED.zkb_solo,        killmails.zkb_solo),
            zkb_awox        = COALESCE(EXCLUDED.zkb_awox,        killmails.zkb_awox)
-         WHERE killmails.zkb_total_value IS NULL AND EXCLUDED.zkb_total_value IS NOT NULL`,
+         WHERE (EXCLUDED.zkb_total_value IS NOT NULL AND killmails.zkb_total_value IS NULL)
+            OR (EXCLUDED.zkb_points      IS NOT NULL AND killmails.zkb_points      IS NULL)
+            OR (EXCLUDED.zkb_npc         IS NOT NULL AND killmails.zkb_npc         IS NULL)
+            OR (EXCLUDED.zkb_solo        IS NOT NULL AND killmails.zkb_solo        IS NULL)
+            OR (EXCLUDED.zkb_awox        IS NOT NULL AND killmails.zkb_awox        IS NULL)`,
         [k.map((r) => String(r.killmailId)), k.map((r) => r.killmailHash), k.map((r) => r.killmailTime),
          k.map((r) => r.solarSystemId), k.map((r) => big(r.moonId)), k.map((r) => big(r.warId)),
          k.map((r) => big(r.victimCharacterId)), k.map((r) => big(r.victimCorporationId)),
@@ -154,6 +161,36 @@ export async function saveKillmails(
   } finally {
     client.release();
   }
+}
+
+/**
+ * Ids referenced by already-stored killmails (`killmails.victim_*`, `killmail_attackers.*`) that
+ * `universe_names` has no row for — the ones an earlier backfill run's `NAMES_PER_RUN_CAP` dropped.
+ * Killmails are immutable and never re-processed, so nothing else would ever pick these up again;
+ * the backfill job sweeps this after its page loop, bounded by whatever is left of its own
+ * per-run cap so this can never itself blow that cap.
+ */
+export async function unresolvedPartyIds(limit: number): Promise<number[]> {
+  if (limit <= 0) return [];
+  const { rows } = await getPool().query<{ id: string }>(
+    `SELECT DISTINCT ids.id FROM (
+       SELECT victim_character_id AS id FROM killmails WHERE victim_character_id IS NOT NULL
+       UNION
+       SELECT victim_corporation_id AS id FROM killmails WHERE victim_corporation_id IS NOT NULL
+       UNION
+       SELECT victim_alliance_id AS id FROM killmails WHERE victim_alliance_id IS NOT NULL
+       UNION
+       SELECT character_id AS id FROM killmail_attackers WHERE character_id IS NOT NULL
+       UNION
+       SELECT corporation_id AS id FROM killmail_attackers WHERE corporation_id IS NOT NULL
+       UNION
+       SELECT alliance_id AS id FROM killmail_attackers WHERE alliance_id IS NOT NULL
+     ) ids
+     WHERE NOT EXISTS (SELECT 1 FROM universe_names un WHERE un.id = ids.id)
+     ORDER BY ids.id
+     LIMIT $1`,
+    [limit]);
+  return rows.map((r) => Number(r.id));
 }
 
 /** Spec §6: the table shows 50 at a time and "more" loads the next 50. */

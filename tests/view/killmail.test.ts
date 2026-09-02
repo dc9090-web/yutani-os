@@ -53,7 +53,7 @@ const full: KillmailFull = {
 };
 
 describe("killmailView", () => {
-  const view = killmailView(full, labels, prices, [A]);
+  const view = killmailView(full, labels, prices, A);
 
   it("builds the header, preferring the zKillboard value", () => {
     expect(view.header).toEqual({
@@ -65,16 +65,30 @@ describe("killmailView", () => {
     });
   });
 
-  it("has no role label when none of our characters were on it, and lists the zkb flags", () => {
+  it("has no role label when the active character was not on this killmail, and lists the zkb flags", () => {
     const solo = killmailView(
-      { ...full, head: { ...full.head, zkbSolo: true, zkbNpc: true }, roles: [] }, labels, prices, [A]);
+      { ...full, head: { ...full.head, zkbSolo: true, zkbNpc: true }, roles: [] }, labels, prices, A);
     expect(solo.header.roleLabel).toBeNull();
     expect(solo.header.flags).toEqual(["Solo", "NPC"]);
   });
 
+  it("labels Kill when the active character is an attacker rather than the victim", () => {
+    const kill = killmailView(
+      { ...full, roles: [{ characterId: A, role: "kill" }] }, labels, prices, A);
+    expect(kill.header.roleLabel).toBe("Kill");
+  });
+
+  it("uses the active character's own role, not any other character's, when several were on it", () => {
+    const other = 2112625428;
+    const both = killmailView(
+      { ...full, roles: [{ characterId: A, role: "loss" }, { characterId: other, role: "kill" }] },
+      labels, prices, other);
+    expect(both.header.roleLabel).toBe("Kill");
+  });
+
   it("falls back to the computed value when zKillboard has none", () => {
     const computed = killmailView(
-      { ...full, head: { ...full.head, zkbTotalValue: null } }, labels, prices, [A]);
+      { ...full, head: { ...full.head, zkbTotalValue: null } }, labels, prices, A);
     expect(computed.header.value).toBe("8.1M ISK");
   });
 
@@ -111,12 +125,8 @@ describe("killmailView", () => {
   });
 
   it("shows a dash for an item with no price", () => {
-    const noPrice = killmailView(full, labels, new Map(), [A]);
+    const noPrice = killmailView(full, labels, new Map(), A);
     expect(noPrice.slots[0].rows[0].value).toBe("—");
-  });
-
-  it("lists only the fitted type ids, so the designer never tries to fit a cargo hold", () => {
-    expect(view.fittedTypeIds).toEqual([3634, 2456]);
   });
 
   it("sorts attackers by damage, marks the final blow and shows each one's share", () => {

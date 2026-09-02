@@ -21,7 +21,7 @@ import { killmailView, type KillmailView } from "../view/killmail.js";
 
 export interface CombatPageView {
   tiles: StatTile[]; months: MonthBarView[]; topLists: TopListView[];
-  rows: KillmailRowView[]; total: number; hasMore: boolean; backfill: string | null;
+  rows: KillmailRowView[]; hasMore: boolean; backfill: string | null;
 }
 
 /**
@@ -80,7 +80,6 @@ export async function loadCombatPage(
     months: monthBars(stats),
     topLists: topLists(stats, labels),
     rows: killmailRows(pageRows, labels),
-    total,
     hasMore: pageRows.length === COMBAT_PAGE_SIZE && total > COMBAT_PAGE_SIZE,
     backfill: backfillLine(backfill),
   };
@@ -101,7 +100,7 @@ export async function loadKillmailRows(
  * and one price query. Postgres only — an id no job has resolved shows as `ID <n>`.
  */
 export async function loadKillmailDetail(
-  killmailId: number, viewerIds: number[],
+  killmailId: number, activeCharacterId: number,
 ): Promise<KillmailView | null> {
   const full = await getKillmail(killmailId);
   if (full === null) return null;
@@ -131,5 +130,5 @@ export async function loadKillmailDetail(
       name: s.name ?? `Unknown system (${id})`, security: s.securityStatus,
     }])),
   };
-  return killmailView(full, labels, prices, viewerIds);
+  return killmailView(full, labels, prices, activeCharacterId);
 }

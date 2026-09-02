@@ -25,6 +25,7 @@ function fullPage(base: number): ZkbRecord[] {
 function harness(opts: {
   cursors?: BackfillCursor[];
   pages?: (kind: string, characterId: number, page: number) => ZkbRecord[] | Error;
+  unresolvedPartyIds?: (limit: number) => Promise<number[]>;
 } = {}) {
   const cursors = opts.cursors ?? [
     { characterId: A, kind: "kills", nextPage: 1, done: false, updatedAt: new Date(0) },
@@ -47,6 +48,7 @@ function harness(opts: {
     },
     saveKillmails: async (w, l) => { writes.push(...w); links.push(...l); return w.length; },
     resolveNames: async (ids) => { resolved.push(ids); return new Map(); },
+    unresolvedPartyIds: opts.unresolvedPartyIds ?? (async () => []),
   };
   return { job: createKillmailBackfillJob(deps), advanced, fetched, writes, links, resolved };
 }
@@ -141,5 +143,41 @@ describe("killmail-backfill job", () => {
     await h.job.run({ esi: undefined as never });
     expect(h.resolved).toHaveLength(1);
     expect(h.resolved[0]).toHaveLength(NAMES_PER_RUN_CAP);
+  });
+
+  it("sweeps ids an earlier run's cap dropped, even when this run fetches no pages", async () => {
+    // Every cursor is already done, so the page loop collects nothing this run — but a stored
+    // killmail from an earlier run still has an id with no universe_names row.
+    const h = harness({
+      cursors: [],
+      unresolvedPartyIds: async (limit) => {
+        expect(limit).toBe(NAMES_PER_RUN_CAP);
+        return [800_000_001];
+      },
+    });
+    await h.job.run({ esi: undefined as never });
+    expect(h.resolved).toEqual([[800_000_001]]);
+  });
+
+  it("does not let the sweep push a run's ids past NAMES_PER_RUN_CAP", async () => {
+    // The page loop alone already fills the cap, so there is no remaining budget for the sweep —
+    // it must not be called at all, let alone push the total past the cap.
+    const partyPage = (page: number): ZkbRecord[] => {
+      const template = fixture()[0];
+      return Array.from({ length: 200 }, (_, i) => ({
+        ...template,
+        killmail_id: page * 1000 + i,
+        victim: { ...template.victim, character_id: 800_000_000 + page * 1000 + i },
+      }));
+    };
+    let sweepCalled = false;
+    const h = harness({
+      pages: (_k, _c, page) => partyPage(page),
+      unresolvedPartyIds: async () => { sweepCalled = true; return [999_999_999]; },
+    });
+    await h.job.run({ esi: undefined as never });
+    expect(sweepCalled).toBe(false);
+    expect(h.resolved[0]).toHaveLength(NAMES_PER_RUN_CAP);
+    expect(h.resolved[0]).not.toContain(999_999_999);
   });
 });

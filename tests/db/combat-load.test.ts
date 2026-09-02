@@ -39,7 +39,6 @@ afterAll(closePool);
 describe("loadCombatPage", () => {
   it("builds every panel from Postgres alone", async () => {
     const view = await loadCombatPage([A], "90d", NOW);
-    expect(view.total).toBe(3);
     expect(view.hasMore).toBe(false);
     expect(view.rows.map((r) => r.killmailId)).toEqual([202, 201, 200]);
     expect(view.rows[0]).toMatchObject({
@@ -58,7 +57,6 @@ describe("loadCombatPage", () => {
 
   it("honours the period", async () => {
     const view = await loadCombatPage([A], "30d", new Date("2026-12-01T00:00:00Z"));
-    expect(view.total).toBe(0);
     expect(view.rows).toEqual([]);
   });
 });

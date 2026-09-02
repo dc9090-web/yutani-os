@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import type { Pool } from "pg";
 import { resetDb } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { knownKillmailIds, saveKillmails } from "../../src/lib/db/killmails.js";
+import { knownKillmailIds, saveKillmails, unresolvedPartyIds } from "../../src/lib/db/killmails.js";
 import { toKillmailWrite, type EsiKillmail } from "../../src/lib/combat/killmail.js";
 import { esiFixture } from "../fixtures/esi.js";
 
@@ -101,6 +101,20 @@ describe("saveKillmails", () => {
     expect(rows[0].role).toBe("loss");
   });
 
+  it("fills points and solo from a zkb sighting that carries no totalValue at all", async () => {
+    // 120000098 was saved ESI-only earlier in this file, so every zkb_* column starts NULL. The
+    // old single-column gate (WHERE zkb_total_value IS NULL AND EXCLUDED.zkb_total_value IS NOT
+    // NULL) would have skipped this UPDATE entirely and left points/solo unset.
+    await saveKillmails([toKillmailWrite({ ...body(), killmail_id: 120000098 }, "hash-98", "zkb", {
+      hash: "hash-98", points: 4, solo: true,
+    })], []);
+    const { rows } = await pool.query(
+      "SELECT zkb_total_value, zkb_points, zkb_solo FROM killmails WHERE killmail_id = 120000098");
+    expect(rows[0].zkb_total_value).toBeNull();
+    expect(rows[0].zkb_points).toBe(4);
+    expect(rows[0].zkb_solo).toBe(true);
+  });
+
   it("dies with the character but leaves the killmail itself alone", async () => {
     await pool.query("DELETE FROM characters WHERE id = $1", [CID]);
     expect((await pool.query("SELECT count(*)::int AS n FROM character_killmails")).rows[0].n).toBe(0);
@@ -115,5 +129,27 @@ describe("knownKillmailIds", () => {
   it("returns only the ids already stored, and nothing for an empty list", async () => {
     expect(await knownKillmailIds([])).toEqual(new Set());
     expect(await knownKillmailIds([120000001, 120000002])).toEqual(new Set([120000001]));
+  });
+});
+
+describe("unresolvedPartyIds", () => {
+  it("picks up a stored killmail's victim/attacker ids that universe_names has no row for", async () => {
+    // The killmails saved earlier in this file carry the fixture's victim and attacker ids; none
+    // of them have ever been given a universe_names row, so a later backfill run's sweep must
+    // still find them even though the killmails themselves are long since immutable and stored.
+    const ids = await unresolvedPartyIds(100);
+    expect(ids).toEqual(expect.arrayContaining(
+      [669539978, 98000001, 99000001, 2112625428, 98000002, 2124678472, 99000002]));
+  });
+
+  it("stops returning an id once universe_names has a row for it", async () => {
+    await pool.query(
+      "INSERT INTO universe_names (id, category, name) VALUES ($1, 'character', 'Trill')", [669539978]);
+    expect(await unresolvedPartyIds(100)).not.toContain(669539978);
+  });
+
+  it("is bounded by limit, and returns nothing for a limit of zero", async () => {
+    expect(await unresolvedPartyIds(0)).toEqual([]);
+    expect(await unresolvedPartyIds(1)).toHaveLength(1);
   });
 });

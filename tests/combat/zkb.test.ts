@@ -45,6 +45,32 @@ describe("parseZkbPage", () => {
     expect(parseZkbPage([{ killmail_id: 1 }])).toBeNull();
     expect(parseZkbPage([{ killmail_id: 1, killmail_time: "x", victim: {}, attackers: [], zkb: {} }])).toBeNull();
   });
+
+  it("rejects a page whose attacker is missing damage_done, before it ever reaches a bigint[] param", () => {
+    const rows = page();
+    const [first, ...rest] = rows[0].attackers;
+    const { damage_done: _dropped, ...withoutDamageDone } = first;
+    rows[0] = { ...rows[0], attackers: [withoutDamageDone, ...rest] } as typeof rows[0];
+    expect(parseZkbPage(rows)).toBeNull();
+  });
+
+  it("rejects a victim with no ship_type_id, and a zkb.totalValue that isn't a number", () => {
+    const rows = page();
+    const { ship_type_id: _dropped, ...victimWithoutShip } = rows[0].victim;
+    expect(parseZkbPage([{ ...rows[0], victim: victimWithoutShip }])).toBeNull();
+
+    const bad = page();
+    bad[0] = { ...bad[0], zkb: { ...bad[0].zkb, totalValue: "lots" as unknown as number } };
+    expect(parseZkbPage(bad)).toBeNull();
+  });
+
+  it("accepts a zkb record with no totalValue at all", () => {
+    const rows = page();
+    const { totalValue: _dropped, ...zkbWithoutValue } = rows[0].zkb;
+    const parsed = parseZkbPage([{ ...rows[0], zkb: zkbWithoutValue }]);
+    expect(parsed).not.toBeNull();
+    expect(parsed![0].zkb.totalValue).toBeUndefined();
+  });
 });
 
 describe("createZkbClient", () => {
