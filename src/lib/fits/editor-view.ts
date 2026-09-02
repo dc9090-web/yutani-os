@@ -21,6 +21,8 @@ import { allowedStates, slotGrid, slotTotals, type SlotTotals } from "./slots.js
 export interface EditorSlotRow {
   key: string; slot: SlotKind; index: number; over: boolean; typeId: number | null;
   name: string; iconUrl: string | null; charge: { typeId: number; name: string } | null;
+  /** `data-desc` tooltip text (Task 4 part E) — null for an empty slot, which has nothing to hover. */
+  desc: string | null;
   cpu: string; power: string; calibration: string;
   state: FitItemState | null; states: FitItemState[];
   cpuExplain: ExplainRowView[]; powerExplain: ExplainRowView[]; price: string | null;
@@ -28,6 +30,8 @@ export interface EditorSlotRow {
 export interface EditorSlotBlock { slot: SlotKind; title: string; used: number; total: number; rows: EditorSlotRow[] }
 export interface EditorEntryRow {
   key: string; typeId: number; flag: string; name: string; quantity: number; value: string | null;
+  /** `data-desc` tooltip text (Task 4 part E). */
+  desc: string;
 }
 export interface EditorView {
   gauges: GaugeView[]; counters: CounterView[]; blocks: EditorSlotBlock[];
@@ -94,12 +98,25 @@ function typeName(data: DogmaData, typeId: number): string {
   return data.types.get(typeId)?.name ?? `Unknown type (${typeId})`;
 }
 
+/**
+ * "name — group", the closest thing to a hover description this data model has. Task 4 part F: the
+ * SDE's flavour-text `description` column is not loaded anywhere in this app, and adding that import
+ * is out of scope for this task — so every `data-desc` in the fitting editor reads this instead.
+ */
+export function typeDesc(data: DogmaData, typeId: number): string {
+  const name = typeName(data, typeId);
+  const groupId = data.types.get(typeId)?.groupId;
+  const group = groupId === undefined ? undefined : data.groups.get(groupId)?.name ?? undefined;
+  return group === undefined ? name : `${name} — ${group}`;
+}
+
 function entryRow(entry: FitItem, data: DogmaData, prices: ReadonlyMap<number, Price>): EditorEntryRow {
   const unit = priceOf(prices.get(entry.typeId));
   return {
     key: `${entry.flag}:${entry.typeId}`,
     typeId: entry.typeId, flag: entry.flag, name: typeName(data, entry.typeId),
     quantity: entry.quantity, value: unit === null ? null : isk(unit * entry.quantity),
+    desc: typeDesc(data, entry.typeId),
   };
 }
 
@@ -123,7 +140,7 @@ export function editorView(input: {
         if (cell.item === null) {
           return {
             key, slot, index: cell.index, over: cell.over, typeId: null, name: "Empty", iconUrl: null,
-            charge: null, cpu: "—", power: "—", calibration: "—", state: null, states: [],
+            charge: null, desc: null, cpu: "—", power: "—", calibration: "—", state: null, states: [],
             cpuExplain: [], powerExplain: [], price: null,
           };
         }
@@ -134,6 +151,7 @@ export function editorView(input: {
           key, slot, index: cell.index, over: cell.over, typeId: cell.item.typeId,
           name: stat === undefined ? typeName(data, cell.item.typeId) : itemLabel(stat.item),
           iconUrl: typeIconUrl(cell.item.typeId),
+          desc: typeDesc(data, cell.item.typeId),
           charge: cell.item.chargeTypeId === null
             ? null
             : { typeId: cell.item.chargeTypeId, name: typeName(data, cell.item.chargeTypeId) },

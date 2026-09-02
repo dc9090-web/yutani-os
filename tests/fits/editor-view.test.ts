@@ -58,6 +58,7 @@ describe("computeEditor", () => {
     expect(high.rows[0]).toMatchObject({
       key: "high:0", cpu: "6.75", power: "3.60", state: "active", over: false,
       charge: { typeId: 12608, name: "Hail S" }, iconUrl: typeIconUrl(2889),
+      desc: "200mm AutoCannon II — Projectile Weapon",
     });
     expect(high.rows[0].states).toEqual(["offline", "online", "active", "overload"]);
     expect(high.rows[0].cpuExplain.length).toBeGreaterThan(0);
@@ -114,11 +115,17 @@ describe("computeEditor", () => {
     const result = computeEditor(stocked, ctxAllV, PRICES);
     if (result.kind !== "ok") throw new Error("expected ok");
     expect(result.view.drones).toEqual([
-      { key: "DroneBay:2456", typeId: 2456, flag: "DroneBay", name: "Hobgoblin II", quantity: 2, value: null },
+      {
+        key: "DroneBay:2456", typeId: 2456, flag: "DroneBay", name: "Hobgoblin II", quantity: 2, value: null,
+        desc: "Hobgoblin II — Combat Drone",
+      },
     ]);
     expect(result.view.cargo[0]).toMatchObject({ typeId: 12608, name: "Hail S", quantity: 600 });
     expect(result.view.unknown).toEqual([
-      { key: "MedSlot0:999999", typeId: 999999, flag: "MedSlot0", name: "Unknown type (999999)", quantity: 1, value: null },
+      {
+        key: "MedSlot0:999999", typeId: 999999, flag: "MedSlot0", name: "Unknown type (999999)", quantity: 1,
+        value: null, desc: "Unknown type (999999)",
+      },
     ]);
     // 8,000,000 (hull) + 1,500,000 (gun); the drones and ammo have no price.
     expect(result.view.value.total).toBe("9.5M ISK");
