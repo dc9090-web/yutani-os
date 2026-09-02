@@ -89,6 +89,21 @@ export function duration(ms: number): string {
   return parts.join(" ");
 }
 
+/**
+ * "3d 12h 09m 41s" — the live queue-countdown ticker (design hand-back). The only place seconds are
+ * shown at all: this re-renders every second, whereas `duration()` (which floors to whole minutes)
+ * is used everywhere else a span is displayed once and left alone.
+ */
+export function countdown(ms: number): string {
+  if (ms <= 0) return "Queue complete";
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+}
+
 /** "in 3 h 12 m" / "2 days ago" / "just now" / "never" — spec §7. */
 export function relativeTime(date: Date | null, now: Date = new Date()): string {
   if (date === null) return "never";

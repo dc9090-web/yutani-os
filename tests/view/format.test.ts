@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
-  WARN_PREFIX, grouped, isWarning, isk, iskWhole, sp, overviewTraining, roman, relativeTime,
+  WARN_PREFIX, countdown, grouped, isWarning, isk, iskWhole, sp, overviewTraining, roman, relativeTime,
   secClass, secText, stamp,
 } from "../../src/lib/view/format.js";
 
@@ -143,6 +143,23 @@ describe("overviewTraining", () => {
     expect(overviewTraining({
       skillName: "Gunnery", finishedLevel: 3, startDate: new Date("2026-09-01T06:00:00Z"), finishDate: NOW,
     }, NOW)).toEqual({ active: true, skill: "Gunnery III", time: "0m", percent: 100 });
+  });
+});
+
+describe("countdown", () => {
+  it("renders days, hours, minutes and seconds, unlike duration() which floors to minutes", () => {
+    const ms = ((3 * 24 + 12) * 3600 + 9 * 60 + 41) * 1000;
+    expect(countdown(ms)).toBe("3d 12h 9m 41s");
+  });
+
+  it("still prints every unit even when a larger one is zero", () => {
+    expect(countdown(5000)).toBe("0d 0h 0m 5s");
+    expect(countdown(0)).toBe("Queue complete");
+  });
+
+  it("reads 'Queue complete' once the target time has passed", () => {
+    expect(countdown(-1)).toBe("Queue complete");
+    expect(countdown(-60_000)).toBe("Queue complete");
   });
 });
 

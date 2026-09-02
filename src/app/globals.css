@@ -203,6 +203,8 @@ body {
 .sec-null { color: var(--neg); }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .dur { font-variant-numeric: tabular-nums; }
+.queue-countdown { margin: 0 0 14px; font-size: 13px; display: flex; align-items: baseline; gap: 8px; }
+.queue-countdown strong { font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif; font-size: 18px; font-weight: 600; color: var(--accent); }
 .card-stack { display: grid; gap: 20px; }
 
 /* ---------- Skills (phase 3) ---------- */
@@ -216,6 +218,8 @@ body {
 .attr-bonus { margin-left: 6px; font-size: 12px; color: var(--accent); }
 .progress { height: 10px; min-width: 80px; border-radius: 3px; background: var(--raised); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); }
+.progress-wrap { display: flex; align-items: center; gap: 10px; }
+.progress-pct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .skill-group { border-top: 1px solid var(--hairline); }
 .skill-group:first-child { border-top: 0; }
 .group-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 0; background: none; border: 0; color: var(--text); font: inherit; cursor: pointer; text-align: left; }
@@ -225,6 +229,12 @@ body {
 .level-box { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--border-hi); }
 .level-box.trained { background: rgba(77, 141, 255, 0.32); border-color: var(--accent); }
 .level-box.active { background: var(--accent); border-color: var(--accent); }
+.level-box.training { border-color: var(--accent); animation: levelBlink 1.1s ease-in-out infinite; }
+@keyframes levelBlink { 0%, 100% { background: rgba(77, 141, 255, 0.10); } 50% { background: var(--accent); } }
+.skill-group-list { display: grid; gap: 22px; }
+.skill-group-flat .group-head { display: flex; align-items: baseline; gap: 10px; font-size: 14px; font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 28px; }
+.skill-cell { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--hairline); }
 .clone-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
 .clone-list li { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
 
@@ -368,6 +378,7 @@ body {
 }
 .combat-tab:hover { border-color: var(--border-hi); color: var(--text); }
 .combat-tab[data-active] { background: var(--raised); border-color: var(--accent); color: var(--text); }
+.skill-tabs .combat-tab { border-radius: 6px; }
 .card-grid.stat-tiles { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-bottom: 20px; }
 .card-grid.top-lists { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 .month-strip { display: flex; gap: 6px; align-items: stretch; height: 160px; }

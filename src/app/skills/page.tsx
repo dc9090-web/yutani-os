@@ -6,12 +6,14 @@ import { listPlans } from "../../lib/db/skill-plans.js";
 import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../lib/sde/repo.js";
 import { summarisePlans } from "../../lib/skills/load.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { duration, relativeTime, roman, sp, stamp } from "../../lib/view/format.js";
+import { countdown, duration, relativeTime, sp, stamp } from "../../lib/view/format.js";
 import { attributeViews, groupSkills, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
+import { QueueCountdown } from "./QueueCountdown.js";
 import { QueueTable, type QueueEntryView } from "./QueueTable.js";
-import { SkillGroups, type SkillGroupProps } from "./SkillGroups.js";
+import { SkillTabs } from "./SkillTabs.js";
+import { TrainedSkills, type TrainedSkillGroupProps } from "./TrainedSkills.js";
 import { PlansCard, type PlanListRow } from "./PlansCard.js";
 
 export default async function SkillsPage() {
@@ -41,22 +43,31 @@ export default async function SkillsPage() {
     Promise.all(implantIds.map((id) => getTypeAttributes(id))),
   ]);
 
-  const entries: QueueEntryView[] = queue.map((q, index) => ({
-    position: q.queuePosition + 1,
-    skill: types.get(q.skillId)?.name ?? `Skill ${q.skillId}`,
-    level: roman(q.finishedLevel),
-    start: stamp(q.startDate),
-    finish: stamp(q.finishDate),
-    progress: index === 0 ? queueProgress(q, now) : null,
-  }));
+  // Each queue entry trains one level of a skill, so the level it starts from is always one below
+  // the level it finishes at — true for the head entry currently training and for every level of
+  // the same skill queued behind it, without needing the character's (possibly stale) skill sheet.
+  const entries: QueueEntryView[] = queue.map((q, index) => {
+    const durationMs = q.startDate !== null && q.finishDate !== null ? q.finishDate.getTime() - q.startDate.getTime() : null;
+    return {
+      position: q.queuePosition + 1,
+      skill: types.get(q.skillId)?.name ?? `Skill ${q.skillId}`,
+      trainedLevel: Math.max(0, q.finishedLevel - 1),
+      targetLevel: q.finishedLevel,
+      duration: durationMs === null ? "—" : duration(durationMs),
+      progress: index === 0 ? queueProgress(q, now) : null,
+    };
+  });
 
-  const groupProps: SkillGroupProps[] = groupSkills(skills, types, groups).map((group) => ({
+  const finalFinish = queue.length > 0 ? queue[queue.length - 1].finishDate : null;
+  const queueEtaMs = finalFinish === null ? null : finalFinish.getTime() - now.getTime();
+
+  const groupProps: TrainedSkillGroupProps[] = groupSkills(skills, types, groups).map((group) => ({
     groupId: group.groupId,
     name: group.name,
     groupSp: sp(group.groupSp),
     skills: group.skills.map((skill) => ({
       skillId: skill.skillId, name: skill.name,
-      trainedLevel: skill.trainedLevel, activeLevel: skill.activeLevel, sp: sp(skill.skillpoints),
+      trainedLevel: skill.trainedLevel, activeLevel: skill.activeLevel,
     })),
   }));
 
@@ -81,18 +92,24 @@ export default async function SkillsPage() {
         remapAvailable={attributes === null ? null : remapAvailability(attributes, now)}
       />
       <div className="card">
-        <h2 className="card-title">Training queue</h2>
-        <QueueTable entries={entries} />
+        <SkillTabs
+          queue={<>
+            {entries.length > 0 ? (
+              <QueueCountdown
+                finishAt={finalFinish === null ? null : finalFinish.getTime()}
+                initial={queueEtaMs === null ? "—" : countdown(queueEtaMs)}
+              />
+            ) : null}
+            <QueueTable entries={entries} />
+          </>}
+          trained={<TrainedSkills groups={groupProps} />}
+        />
       </div>
       <PlansCard
         characterId={character.id}
         plans={planRows}
         templates={templates.map((t) => ({ id: t.id, name: t.name ?? `Plan ${t.id}` }))}
       />
-      <div className="card">
-        <h2 className="card-title">Skills</h2>
-        <SkillGroups groups={groupProps} />
-      </div>
     </div>
   </>);
 }
