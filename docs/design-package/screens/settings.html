@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings — EVE Plasma (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="EVE — home">
+      <span class="logo-text">EVE</span>
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="wordmark">Plasma</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+          <a href="overview.html" class="nav-link">Overview</a>
+          <a href="skills.html" class="nav-link">Skills</a>
+          <a href="ships.html" class="nav-link">Ships</a>
+          <a href="fitting-editor.html" class="nav-link">Fitting</a>
+          <a href="#" class="nav-link">Assets</a>
+          <a href="#" class="nav-link">Wallet</a>
+          <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <!-- eslint-disable-next-line @next/next/no-img-element -->
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<main class="app-main">
+<h1 class="page-title">Settings</h1>
+<p class="page-sub">Accounts, characters, static data and sync status.</p>
+
+<!--
+  NOTE: AccountsPanel, CharactersPanel and TagsPanel are built with Mantine (Button, TextInput,
+  Group, NativeSelect) in the real app, not the hand-rolled Midnight classes used elsewhere.
+  Mantine's own stylesheet (@mantine/core/styles.css) is not bundled in this design package, so
+  the controls below are approximated with plain form elements and the closest Midnight classes
+  (.fit-btn, .filter-input, .fit-select) for visual parity. See README "Out of scope".
+-->
+<div class="card-grid" style="grid-template-columns: 1fr 2fr; margin-bottom: 20px;">
+
+  <div class="card">
+    <h2 class="card-title">Accounts</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span>Main</span>
+      <span style="display:flex; gap:6px;">
+        <button type="button" class="fit-btn">Rename</button>
+        <button type="button" class="fit-btn danger">Delete</button>
+      </span>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span>Alt</span>
+      <span style="display:flex; gap:6px;">
+        <button type="button" class="fit-btn">Rename</button>
+        <button type="button" class="fit-btn danger">Delete</button>
+      </span>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <input class="filter-input" style="margin:0;" placeholder="New account name (e.g. Main)">
+      <button type="button" class="fit-btn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Characters</h2>
+
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+          <div>
+            <div>TrilliumONE</div>
+            <div class="faint" style="font-size:12px;">Republic Fleet Reserves</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select class="fit-select">
+            <option>Unassigned</option>
+            <option selected>Main</option>
+            <option>Alt</option>
+          </select>
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button type="button" class="tag-chip on" aria-pressed="true">Miner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Scanner</button>
+        <button type="button" class="tag-chip on" aria-pressed="true">PvP</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <img src="https://images.evetech.net/characters/2118141166/portrait?size=64" alt="" class="char-avatar warn">
+          <div>
+            <div>Reacher-9<span class="badge needs_reauth" style="margin-left:8px;">needs re-authorisation</span></div>
+            <div class="faint" style="font-size:12px;">Republic Military School</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select class="fit-select">
+            <option>Unassigned</option>
+            <option>Main</option>
+            <option selected>Alt</option>
+          </select>
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:6px;">
+        <button type="button" class="tag-chip" aria-pressed="false">Miner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Scanner</button>
+        <button type="button" class="tag-chip on" aria-pressed="true">PvP</button>
+      </div>
+    </div>
+
+    <a class="fit-btn" href="#" style="margin-top:8px;">Add character</a>
+  </div>
+</div>
+
+<div class="card-grid" style="grid-template-columns: 1fr 2fr; margin-bottom: 20px;">
+
+  <div class="card">
+    <h2 class="card-title">Tags</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span>Miner</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete Miner">Delete</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span>Scanner</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete Scanner">Delete</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span>PvP</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete PvP">Delete</button>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <input class="filter-input" style="margin:0;" placeholder="New tag name (e.g. Miner)">
+      <button type="button" class="fit-btn">Add</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Static data</h2>
+    <table class="table">
+      <tbody>
+        <tr><th>SDE build</th><td>2026-08-18</td></tr>
+        <tr><th>Released</th><td class="muted">2026-08-18 11:00</td></tr>
+        <tr><th>Imported</th><td class="muted">2026-08-18 12:04</td></tr>
+        <tr><th>Types</th><td>48,120</td></tr>
+        <tr><th>Dogma attributes</th><td>3,412</td></tr>
+        <tr><th>Dogma effects</th><td>8,904</td></tr>
+        <tr><th>Solar systems</th><td>8,436</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="card-title">Sync status</h2>
+  <table class="table">
+    <thead><tr><th>Job</th><th>Character</th><th>Started</th><th>Status</th><th>Rows</th><th>Error</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>skills</td>
+        <td>TrilliumONE</td>
+        <td class="muted">2026-09-01 11:00</td>
+        <td><span class="badge ok">ok</span></td>
+        <td>142</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>killmails</td>
+        <td>TrilliumONE</td>
+        <td class="muted">2026-09-01 11:05</td>
+        <td><span class="badge running">running</span></td>
+        <td>—</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>assets</td>
+        <td>Reacher-9</td>
+        <td class="muted">2026-09-01 10:40</td>
+        <td><span class="badge error">error</span></td>
+        <td>—</td>
+        <td class="neg">401 — token needs re-authorisation</td>
+      </tr>
+      <tr>
+        <td>sde-import</td>
+        <td>—</td>
+        <td class="muted">2026-08-18 12:00</td>
+        <td><span class="badge ok">ok</span></td>
+        <td>48,120</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</main>
+<footer class="app-footer">
+  <!-- eslint-disable-next-line @next/next/no-img-element -->
+  <img src="../assets/eve-mark.svg" alt="" class="footer-mark">
+  <span class="footer-copy">EVE Online and the EVE logo are trademarks of CCP hf. This is a personal tool.</span>
+</footer>
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

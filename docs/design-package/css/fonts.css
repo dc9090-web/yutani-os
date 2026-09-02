@@ -1,0 +1,22 @@
+/*
+ * Design-package equivalent of src/app/fonts.ts.
+ *
+ * IMPORTANT — the real app does NOT hit Google's font CDN at runtime. It uses next/font/google
+ * (Inter, Poppins weights 500/600/700, Space Grotesk weights 500/600/700), which downloads the
+ * font files at build time and self-hosts them from the app's own origin, exposing them as the
+ * CSS custom properties --font-inter, --font-poppins and --font-grotesk (set on the <html>
+ * element via className, see src/app/layout.tsx). There is no @font-face block in the real
+ * codebase to copy verbatim — next/font generates it.
+ *
+ * For this standalone package we approximate the same three families via Google Fonts' hosted
+ * CSS, then re-declare the same three custom properties so globals.css (which references
+ * var(--font-inter) etc. unchanged) needs no edits.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+:root {
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-grotesk: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}

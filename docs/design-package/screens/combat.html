@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combat — EVE Plasma (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="EVE — home">
+      <span class="logo-text">EVE</span>
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="wordmark">Plasma</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+          <a href="overview.html" class="nav-link">Overview</a>
+          <a href="skills.html" class="nav-link">Skills</a>
+          <a href="ships.html" class="nav-link">Ships</a>
+          <a href="fitting-editor.html" class="nav-link">Fitting</a>
+          <a href="#" class="nav-link">Assets</a>
+          <a href="#" class="nav-link">Wallet</a>
+          <a href="combat.html" class="nav-link" data-active aria-current="page">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <!-- eslint-disable-next-line @next/next/no-img-element -->
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<main class="app-main">
+<h1 class="page-title">Combat</h1>
+<p class="page-sub">TrilliumONE</p>
+
+<div class="combat-filters">
+  <div class="combat-tabs" role="group" aria-label="Period">
+    <a class="combat-tab" href="#">7 days</a>
+    <a class="combat-tab" href="#" data-active aria-current="page">30 days</a>
+    <a class="combat-tab" href="#">90 days</a>
+    <a class="combat-tab" href="#">All time</a>
+  </div>
+  <a class="combat-tab" href="#">All characters</a>
+</div>
+
+<div class="card-grid stat-tiles">
+  <div class="card"><span class="stat-label">Kills</span><span class="stat-value">42</span></div>
+  <div class="card"><span class="stat-label">Losses</span><span class="stat-value">6</span></div>
+  <div class="card"><span class="stat-label">ISK destroyed</span><span class="stat-value">1.8B ISK</span></div>
+  <div class="card"><span class="stat-label">ISK lost</span><span class="stat-value">212M ISK</span></div>
+  <div class="card"><span class="stat-label">Efficiency</span><span class="stat-value">89%</span></div>
+</div>
+<p class="faint">Stats are based on the most recent 1,000 killmails in this period.</p>
+
+<div class="card-stack">
+  <div class="card">
+    <h2 class="card-title">Monthly activity</h2>
+    <div class="month-strip">
+      <div class="month-col" title="March — 6 kills, 1 loss">
+        <div class="month-half up"><div class="month-bar kill" style="height: 40%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 15%"></div></div>
+        <span class="month-label">Mar</span>
+      </div>
+      <div class="month-col" title="April — 9 kills, 0 losses">
+        <div class="month-half up"><div class="month-bar kill" style="height: 60%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 1%"></div></div>
+        <span class="month-label">Apr</span>
+      </div>
+      <div class="month-col" title="May — 3 kills, 2 losses">
+        <div class="month-half up"><div class="month-bar kill" style="height: 20%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 30%"></div></div>
+        <span class="month-label">May</span>
+      </div>
+      <div class="month-col" title="June — 12 kills, 1 loss">
+        <div class="month-half up"><div class="month-bar kill" style="height: 80%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 15%"></div></div>
+        <span class="month-label">Jun</span>
+      </div>
+      <div class="month-col" title="July — 7 kills, 0 losses">
+        <div class="month-half up"><div class="month-bar kill" style="height: 47%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 1%"></div></div>
+        <span class="month-label">Jul</span>
+      </div>
+      <div class="month-col" title="August — 5 kills, 2 losses">
+        <div class="month-half up"><div class="month-bar kill" style="height: 33%"></div></div>
+        <div class="month-half down"><div class="month-bar loss" style="height: 30%"></div></div>
+        <span class="month-label">Aug</span>
+      </div>
+    </div>
+    <p class="faint month-legend">Kills above the line, losses below.</p>
+  </div>
+
+  <div class="card-grid top-lists">
+    <div class="card">
+      <h2 class="card-title">Top ships flown</h2>
+      <ul class="top-list">
+        <li><span>Loki</span><span class="num muted">18</span></li>
+        <li><span>Rifter</span><span class="num muted">14</span></li>
+        <li><span>Drake</span><span class="num muted">10</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Top victims</h2>
+      <ul class="top-list">
+        <li><span>Catalyst</span><span class="num muted">6</span></li>
+        <li><span>Vexor</span><span class="num muted">4</span></li>
+        <li><span>Rifter</span><span class="num muted">3</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Top systems</h2>
+      <ul class="top-list">
+        <li><span>Amamake</span><span class="num muted">21</span></li>
+        <li><span>Rancer</span><span class="num muted">12</span></li>
+        <li><span>Jita</span><span class="num muted">3</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Killmails</h2>
+    <p class="faint">Backfilling older killmails from zKillboard — 340 of 612 imported so far.</p>
+    <table class="table killmail-table">
+      <thead>
+        <tr>
+          <th>Time</th><th></th><th>Ship</th><th>Victim</th><th>System</th>
+          <th class="num">Value</th><th class="num">Attackers</th><th>Our ship</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="muted">2026-08-31 22:14</td>
+          <td><span class="badge kill">Kill</span></td>
+          <td>
+            <a class="km-ship" href="killmail.html">
+              <img class="module-icon" alt="" src="https://images.evetech.net/types/17713/icon?size=32">
+              Catalyst
+            </a>
+          </td>
+          <td>Mordu's Legion Pilot<span class="faint km-corp">Mordu's Legion Command Staff</span></td>
+          <td>Amamake <span class="sec-low">0.4</span></td>
+          <td class="num">42,500,000 ISK</td>
+          <td class="num muted">3</td>
+          <td class="muted">Loki</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-08-30 19:02</td>
+          <td><span class="badge loss">Loss</span></td>
+          <td>
+            <a class="km-ship" href="killmail.html">
+              <img class="module-icon" alt="" src="https://images.evetech.net/types/587/icon?size=32">
+              Rifter
+            </a>
+          </td>
+          <td>TrilliumONE<span class="faint km-corp">Republic Fleet Reserves</span></td>
+          <td>Rancer <span class="sec-null">0.0</span></td>
+          <td class="num">8,450,000 ISK</td>
+          <td class="num muted">5</td>
+          <td class="muted">Rifter</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-08-29 03:47</td>
+          <td><span class="badge kill">Kill</span></td>
+          <td>
+            <a class="km-ship" href="killmail.html">
+              <img class="module-icon" alt="" src="https://images.evetech.net/types/626/icon?size=32">
+              Vexor
+            </a>
+          </td>
+          <td>Guristas Pilot<span class="faint km-corp">Guristas Pirates</span></td>
+          <td>Amamake <span class="sec-low">0.4</span></td>
+          <td class="num">61,200,000 ISK</td>
+          <td class="num muted">2</td>
+          <td class="muted">Loki</td>
+        </tr>
+      </tbody>
+    </table>
+    <button type="button" class="show-more">Show more</button>
+  </div>
+</div>
+</main>
+<footer class="app-footer">
+  <!-- eslint-disable-next-line @next/next/no-img-element -->
+  <img src="../assets/eve-mark.svg" alt="" class="footer-mark">
+  <span class="footer-copy">EVE Online and the EVE logo are trademarks of CCP hf. This is a personal tool.</span>
+</footer>
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>
