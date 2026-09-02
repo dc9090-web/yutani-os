@@ -6,6 +6,7 @@ import { parseId } from "../../../lib/api/json.js";
 import { loadKillmailDetail } from "../../../lib/combat/load.js";
 import { pickActive } from "../../../lib/view/characters.js";
 import { NoCharacter } from "../../components/NoCharacter.js";
+import { OpenInDesigner } from "../OpenInDesigner.js";
 
 export default async function KillmailPage(
   { params }: { params: Promise<{ killmailId: string }> },
@@ -53,7 +54,10 @@ export default async function KillmailPage(
       </div>
 
       <div className="card">
-        <h2 className="card-title">Fit</h2>
+        <div className="km-head-meta">
+          <h2 className="card-title">Fit</h2>
+          <OpenInDesigner killmailId={view.header.killmailId} characterId={character.id} />
+        </div>
         {view.slots.length === 0 ? <p className="faint">This killmail carries no items.</p> : (
           view.slots.map((slot) => (
             <div className="km-slot" key={slot.slot}>
