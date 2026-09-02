@@ -98,6 +98,12 @@ export const SDE_TABLE_DEFS: readonly SdeTable[] = [
     ],
   },
   {
+    table: "sde_races",
+    member: "races",
+    columns: cols({ id: "int", name: "text" }),
+    map: (r) => [int(r._key), en(r.name)],
+  },
+  {
     table: "sde_market_groups",
     member: "marketGroups",
     columns: cols({ id: "int", parent_id: "int", name: "text", description: "text", has_types: "bool", icon_id: "int" }),

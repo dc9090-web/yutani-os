@@ -26,7 +26,7 @@ describe("schema", () => {
       "sde_alpha_skills",
       "sde_categories", "sde_constellations", "sde_dogma_attribute_categories", "sde_dogma_attributes",
       "sde_dogma_effect_modifiers", "sde_dogma_effects", "sde_dogma_units", "sde_groups",
-      "sde_market_groups", "sde_meta", "sde_meta_groups", "sde_regions", "sde_skill_plans",
+      "sde_market_groups", "sde_meta", "sde_meta_groups", "sde_races", "sde_regions", "sde_skill_plans",
       "sde_solar_systems", "sde_stations", "sde_type_attributes", "sde_type_bonuses",
       "sde_type_effects", "sde_types",
       "skill_plan_entries", "skill_plans",

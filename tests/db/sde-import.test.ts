@@ -33,6 +33,7 @@ const EXPECTED_COUNTS = {
   sde_stations: 18,
   sde_alpha_skills: 175,
   sde_skill_plans: 40,
+  sde_races: 11,
 };
 
 beforeAll(async () => {
@@ -54,7 +55,7 @@ async function fixtureWithout(dropped: string[], name: string): Promise<string> 
     "dogmaAttributeCategories.jsonl", "dogmaAttributes.jsonl", "marketGroups.jsonl", "mapRegions.jsonl",
     "types.jsonl", "typeDogma.jsonl", "typeBonus.jsonl", "dogmaEffects.jsonl",
     "mapConstellations.jsonl", "mapSolarSystems.jsonl", "npcStations.jsonl",
-    "cloneGrades.jsonl", "skillPlans.jsonl",
+    "cloneGrades.jsonl", "skillPlans.jsonl", "races.jsonl",
   ]) {
     if (dropped.includes(member)) continue;
     const lines: string[] = [];

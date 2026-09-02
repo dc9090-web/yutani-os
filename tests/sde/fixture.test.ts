@@ -13,7 +13,7 @@ describe("sde-mini.zip", () => {
       "dogmaAttributeCategories.jsonl", "dogmaAttributes.jsonl", "marketGroups.jsonl", "mapRegions.jsonl",
       "types.jsonl", "typeDogma.jsonl", "typeBonus.jsonl", "dogmaEffects.jsonl",
       "mapConstellations.jsonl", "mapSolarSystems.jsonl", "npcStations.jsonl",
-      "cloneGrades.jsonl", "skillPlans.jsonl",
+      "cloneGrades.jsonl", "skillPlans.jsonl", "races.jsonl",
     ];
     const counts: Record<string, number> = {};
     for (const m of members) counts[m] = await fixtureCount(m);
@@ -36,6 +36,7 @@ describe("sde-mini.zip", () => {
       "npcStations.jsonl": 18,
       "cloneGrades.jsonl": 4,
       "skillPlans.jsonl": 40,
+      "races.jsonl": 11,
     });
   }, 30_000);
 

@@ -34,9 +34,9 @@ describe("field helpers", () => {
 });
 
 describe("every table def", () => {
-  it("covers 19 tables and declares a type for every column", () => {
-    expect(SDE_TABLE_DEFS.length).toBe(19);
-    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(19);
+  it("covers 20 tables and declares a type for every column", () => {
+    expect(SDE_TABLE_DEFS.length).toBe(20);
+    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(20);
     for (const def of SDE_TABLE_DEFS) {
       expect(def.columns.length).toBeGreaterThan(0);
       for (const c of def.columns) expect(["int", "text", "bool", "float8", "jsonb"]).toContain(c.type);
@@ -49,6 +49,11 @@ describe("simple mappers", () => {
     expect(await row("sde_categories", "categories.jsonl", 6)).toEqual([6, "Ship", true, null]);
     expect(await row("sde_groups", "groups.jsonl", 25)).toEqual([25, 6, "Frigate", true, null, false, false, false, false]);
     expect(await row("sde_market_groups", "marketGroups.jsonl", 64)).toEqual([64, 5, "Minmatar", "Minmatar frigate designs.", true, 20968]);
+  });
+
+  it("maps a race", async () => {
+    expect(await row("sde_races", "races.jsonl", 1)).toEqual([1, "Caldari"]);
+    expect(await row("sde_races", "races.jsonl", 2)).toEqual([2, "Minmatar"]);
   });
 
   it("maps a meta group, a dogma unit and an attribute category", async () => {

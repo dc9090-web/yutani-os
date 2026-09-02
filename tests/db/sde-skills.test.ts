@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
 import type { Pool } from "pg";
 import { resetDb, resetSde } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { getAlphaSkills, getCareerPlan, listCareerPlans, listPlanSkills } from "../../src/lib/sde/repo.js";
+import { getAlphaSkills, getCareerPlan, getRaces, listCareerPlans, listPlanSkills } from "../../src/lib/sde/repo.js";
 
 let pool: Pool;
 beforeAll(async () => { pool = await resetDb(); });
@@ -16,6 +16,21 @@ describe("getAlphaSkills", () => {
     expect(alpha.get(3300)).toBe(5);
     expect(alpha.get(3327)).toBe(3);
     expect(alpha.has(11207)).toBe(false);
+  });
+});
+
+describe("getRaces", () => {
+  it("maps race id to name", async () => {
+    await pool.query("INSERT INTO sde_races (id, name) VALUES (1, 'Caldari'), (2, 'Minmatar')");
+    const races = await getRaces();
+    expect(races.get(1)).toBe("Caldari");
+    expect(races.get(2)).toBe("Minmatar");
+    expect(races.has(4)).toBe(false);
+  });
+
+  it("is empty when the table has no rows", async () => {
+    const races = await getRaces();
+    expect(races.size).toBe(0);
   });
 });
 

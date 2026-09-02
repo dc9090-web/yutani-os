@@ -17,6 +17,7 @@ export const SDE_TABLES = [
   "sde_categories",
   "sde_groups",
   "sde_types",
+  "sde_races",
   "sde_market_groups",
   "sde_meta_groups",
   "sde_dogma_units",
@@ -75,6 +76,9 @@ const TABLE_BODIES: Record<SdeTableName, string> = {
     base_price                float8,
     portion_size              int,
     variation_parent_type_id  int`,
+  sde_races: `
+    id   int PRIMARY KEY,
+    name text`,
   sde_market_groups: `
     id          int PRIMARY KEY,
     parent_id   int,

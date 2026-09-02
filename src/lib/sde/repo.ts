@@ -263,6 +263,15 @@ export async function getAlphaSkills(): Promise<Map<number, number>> {
   return out;
 }
 
+/** id → name for every race (Caldari, Minmatar, …); a handful of rows, so no id filter. */
+export async function getRaces(): Promise<Map<number, string>> {
+  const { rows } = await getPool().query<{ id: number; name: string | null }>(
+    `SELECT id, name FROM sde_races`);
+  const out = new Map<number, string>();
+  for (const r of rows) if (r.name !== null) out.set(r.id, r.name);
+  return out;
+}
+
 /** `pg` parses a jsonb column into plain objects, so the arrays come back ready to use. */
 export async function listCareerPlans(): Promise<SdeCareerPlan[]> {
   const { rows } = await getPool().query<SdeCareerPlan>(

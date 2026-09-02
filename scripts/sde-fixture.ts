@@ -16,7 +16,7 @@ import { writeZip, type ZipMember } from "./lib/zip.js";
 const FULL_MEMBERS = [
   "_sde", "categories", "groups", "metaGroups", "dogmaUnits",
   "dogmaAttributeCategories", "dogmaAttributes", "marketGroups", "mapRegions",
-  "cloneGrades", "skillPlans",
+  "cloneGrades", "skillPlans", "races",
 ];
 
 /** Rifter, Gyrostabilizer II, Gunnery, Small Hybrid Turret, Small Projectile Turret,
