@@ -4,18 +4,20 @@
  * component — it pulls in `pg`.
  */
 import {
-  COMBAT_PAGE_SIZE, allCombatRows, countCombatRows, listCombatRows, type CombatRow,
+  COMBAT_PAGE_SIZE, allCombatRows, countCombatRows, getKillmail, listCombatRows, type CombatRow,
 } from "../db/killmails.js";
 import { backfillStatus } from "../db/killmail-backfill.js";
 // `../names/label.js`, not `../names/index.js`: the index also wires up the ESI client, and the
 // page side of phase 7 must never reach ESI. This is what `src/lib/view/wallet.ts` does too.
 import { displayNames } from "../names/label.js";
+import { getPrices } from "../db/market-prices.js";
 import { getSolarSystems, getTypes } from "../sde/repo.js";
 import { combatStats, periodStart, type CombatPeriod, type CombatStats } from "./stats.js";
 import {
   backfillLine, killmailRows, monthBars, statTiles, topLists,
   type KillmailRowView, type Labels, type MonthBarView, type StatTile, type TopListView,
 } from "../view/combat.js";
+import { killmailView, type KillmailView } from "../view/killmail.js";
 
 export interface CombatPageView {
   tiles: StatTile[]; months: MonthBarView[]; topLists: TopListView[];
@@ -92,4 +94,42 @@ export async function loadKillmailRows(
   const rows = await listCombatRows(characterIds, { since, limit: COMBAT_PAGE_SIZE, offset });
   const labels = await loadLabels(rows);
   return { rows: killmailRows(rows, labels), hasMore: rows.length === COMBAT_PAGE_SIZE };
+}
+
+/**
+ * The detail page's data: one killmail, one batched name lookup, one type lookup, one system lookup
+ * and one price query. Postgres only — an id no job has resolved shows as `ID <n>`.
+ */
+export async function loadKillmailDetail(
+  killmailId: number, viewerIds: number[],
+): Promise<KillmailView | null> {
+  const full = await getKillmail(killmailId);
+  if (full === null) return null;
+
+  const nameIds = new Set<number>();
+  const typeIds = new Set<number>();
+  for (const id of [full.head.victimCharacterId, full.head.victimCorporationId, full.head.victimAllianceId]) {
+    if (id !== null) nameIds.add(id);
+  }
+  for (const a of full.attackers) {
+    for (const id of [a.characterId, a.corporationId, a.allianceId]) if (id !== null) nameIds.add(id);
+    for (const id of [a.shipTypeId, a.weaponTypeId]) if (id !== null) typeIds.add(id);
+  }
+  if (full.head.victimShipTypeId !== null) typeIds.add(full.head.victimShipTypeId);
+  for (const item of full.items) typeIds.add(item.itemTypeId);
+
+  const [names, types, systems, prices] = await Promise.all([
+    displayNames([...nameIds]),
+    getTypes([...typeIds]),
+    getSolarSystems(full.head.solarSystemId === null ? [] : [full.head.solarSystemId]),
+    getPrices([...typeIds]),
+  ]);
+  const labels: Labels = {
+    names,
+    types: new Map([...types].flatMap(([id, t]) => (t.name === null ? [] : [[id, t.name] as const]))),
+    systems: new Map([...systems].map(([id, s]) => [id, {
+      name: s.name ?? `Unknown system (${id})`, security: s.securityStatus,
+    }])),
+  };
+  return killmailView(full, labels, prices, viewerIds);
 }

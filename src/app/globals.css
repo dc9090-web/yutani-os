@@ -357,3 +357,8 @@ body {
 .month-legend { margin: 10px 0 0; font-size: 12px; }
 .top-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; }
 .top-list li { display: flex; justify-content: space-between; gap: 12px; }
+.km-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.km-head-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.km-victim { display: flex; align-items: center; gap: 20px; }
+.km-victim .fit-render { margin-left: auto; }
+.km-slot + .km-slot { margin-top: 18px; }
