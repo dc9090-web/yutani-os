@@ -72,6 +72,10 @@ export function createKillmailsJob(deps: KillmailsJobDeps): CharacterSyncJob {
             warn = "killmail scope not on this token yet — log the character in again (ESI 403)";
             break;
           }
+          // Live ESI 404s a page past the last one instead of returning [] (seen in production:
+          // a character with exactly one page of kills 404s on page 2). Page 1 is different — a
+          // 404 there means the route itself failed and should surface as an error run.
+          if (e instanceof EsiError && e.status === 404 && page > 1) break;
           throw e;
         }
         if (refs.length === 0) break;

@@ -136,6 +136,24 @@ describe("killmails job", () => {
     expect(h.links).toEqual([{ characterId: CID, killmailId: 120000001, role: "loss" }]);
   });
 
+  it("treats a 404 on a later page as the end of the list, not an error", async () => {
+    // Live ESI 404s one page past the last instead of returning [] (seen in production with a
+    // character whose kills fit on one page).
+    const h = harness({
+      pages: [[ref(120000001)], [ref(120000002)]],
+      listError: new EsiError(404, "/killmails/recent", "ESI 404"),
+      listErrorAtPage: 2,
+    });
+    // Page 1's one killmail + its one loss link = 2; a clean run, no warning.
+    expect(await h.job.run({ characterId: CID, esi: h.esi as never })).toBe(2);
+    expect(h.writes.map((w) => w.killmail.killmailId)).toEqual([120000001]);
+  });
+
+  it("lets a 404 on page 1 propagate — that is a broken route, not pagination", async () => {
+    const h = harness({ listError: new EsiError(404, "/killmails/recent", "ESI 404") });
+    await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toThrow(/404/);
+  });
+
   it("lets a 401 propagate so the scheduler can mark the token for re-authorisation", async () => {
     const h = harness({ listError: new EsiError(401, "/killmails/recent", "ESI 401") });
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toThrow(/401/);
