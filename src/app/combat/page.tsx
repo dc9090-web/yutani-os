@@ -72,7 +72,7 @@ export default async function CombatPage(
       <div className="card">
         <h2 className="card-title">Killmails</h2>
         {view.backfill === null ? null : <p className="faint">{view.backfill}</p>}
-        <KillmailTable characterId={character.id} period={period} all={all}
+        <KillmailTable key={`${period}-${all}`} characterId={character.id} period={period} all={all}
                        initial={view.rows} initialHasMore={view.hasMore} />
       </div>
     </div>
