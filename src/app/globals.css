@@ -328,3 +328,10 @@ body {
 .skill-picker-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
 .skill-picker-row:hover { background: var(--raised); }
 @media (max-width: 900px) { .plan-editor { grid-template-columns: 1fr; } }
+
+/* ---------- Combat (phase 7) ---------- */
+.badge.kill { background: rgba(52,211,153,.14); color: var(--pos); }
+.badge.loss { background: rgba(247,109,122,.14); color: var(--neg); }
+.km-ship { display: inline-flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; }
+.km-ship:hover { color: var(--accent-2); }
+.km-corp { display: block; font-size: 11px; }
