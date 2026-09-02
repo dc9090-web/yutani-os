@@ -61,14 +61,15 @@ describe("parsePlanPatch", () => {
     expect(parsePlanPatch({ remap: null })).toEqual({ remap: null });
     expect(parsePlanPatch({ remap: REMAP })).toEqual({ remap: REMAP });
     expect(parsePlanPatch({ entries: [] })).toEqual({ entries: [] });
-    expect(parsePlanPatch({})).toEqual({});
   });
-  it("rejects a character id and any malformed field", () => {
+  it("rejects a character id, any malformed field, and an empty patch", () => {
     expect(parsePlanPatch({ characterId: 1 })).toBeNull();
     expect(parsePlanPatch({ name: "" })).toBeNull();
     expect(parsePlanPatch({ remap: { charisma: 1 } })).toBeNull();
     expect(parsePlanPatch({ entries: [{ skillId: 3300, level: 9 }] })).toBeNull();
     expect(parsePlanPatch([])).toBeNull();
+    // No recognised field means nothing to update — a 400, not a silent `updated_at` bump.
+    expect(parsePlanPatch({})).toBeNull();
   });
 });
 

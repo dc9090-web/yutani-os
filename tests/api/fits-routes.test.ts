@@ -54,6 +54,17 @@ describe("parseFitItems", () => {
     expect(parseFitItems("nope")).toBeNull();
     expect(parseFitItems(Array.from({ length: 201 }, () => ({ typeId: 1, flag: "Cargo" })))).toBeNull();
   });
+  it("rejects two items on the same slot flag, but allows drone bay and cargo to repeat", () => {
+    expect(parseFitItems([
+      { typeId: 2889, flag: "HiSlot0" }, { typeId: 2889, flag: "HiSlot0" },
+    ])).toBeNull();
+    expect(parseFitItems([
+      { typeId: 2456, quantity: 5, flag: "DroneBay" }, { typeId: 2454, quantity: 5, flag: "DroneBay" },
+    ])).toHaveLength(2);
+    expect(parseFitItems([
+      { typeId: 12608, quantity: 200, flag: "Cargo" }, { typeId: 12609, quantity: 100, flag: "Cargo" },
+    ])).toHaveLength(2);
+  });
 });
 
 describe("parseFitCreate / parseFitPatch", () => {
@@ -78,7 +89,9 @@ describe("parseFitCreate / parseFitPatch", () => {
     expect(parseFitPatch({ characterId: null })).toEqual({ characterId: null });
     expect(parseFitPatch({ characterId: 669539978 })).toEqual({ characterId: 669539978 });
     expect(parseFitPatch({ characterId: 0 })).toBeNull();
-    expect(parseFitPatch({})).toEqual({});
+  });
+  it("rejects an empty patch — no recognised field means nothing to update", () => {
+    expect(parseFitPatch({})).toBeNull();
   });
 });
 
@@ -137,6 +150,11 @@ describe("the fits routes", () => {
     expect((await PUT(put({ items: "nope" }), ctx("1"))).status).toBe(400);
     expect((await PUT(put({ name: "x" }), ctx("2"))).status).toBe(404);
     expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/fits/2"), ctx("2"))).status).toBe(404);
+  });
+
+  it("400s an empty PUT body instead of bumping updated_at for nothing", async () => {
+    expect((await PUT(put({}), ctx("1"))).status).toBe(400);
+    expect(updateFit).not.toHaveBeenCalled();
   });
 
   it("400s on a body that is not JSON at all", async () => {

@@ -116,6 +116,17 @@ export function topLists(stats: CombatStats, labels: Labels): TopListView[] {
 }
 
 /**
+ * When the statistics rowset comes back exactly at `STAT_ROW_CAP` (db/killmails.ts), older
+ * killmails were silently dropped from the tiles, the month strip and the top lists — worth a note
+ * near the tiles rather than a quietly wrong "All" period. `hitCap` is the plain
+ * `statRows.length === STAT_ROW_CAP` test; kept here as a pure string builder so the load layer
+ * (which does own the cap) does not have to also own the copy.
+ */
+export function statsTruncationNote(hitCap: boolean): string | null {
+  return hitCap ? "Statistics cover the most recent 20,000 killmails" : null;
+}
+
+/**
  * Spec §6's status line. `imported` is a count of linked killmails, not a stored counter
  * (Decision 8), and the per-kind cursors are summarised so the reader can see progress.
  */

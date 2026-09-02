@@ -32,6 +32,7 @@ export default async function CombatPage(
         </div>
       ))}
     </div>
+    {view.statsTruncated === null ? null : <p className="faint">{view.statsTruncated}</p>}
 
     <div className="card-stack">
       <div className="card">

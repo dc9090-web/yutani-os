@@ -1,6 +1,9 @@
 import { chunk } from "../chunk.js";
 import { getConfig } from "../config.js";
 import type { JitaPriceRow } from "../db/market-prices.js";
+import { FUZZWORK_CHUNK } from "./constants.js";
+
+export { FUZZWORK_CHUNK };
 
 /**
  * Fuzzwork's precalculated market aggregates (research §4). One request replaces ~371 pages of
@@ -10,11 +13,6 @@ import type { JitaPriceRow } from "../db/market-prices.js";
 export const FUZZWORK_AGGREGATES_URL = "https://market.fuzzwork.co.uk/aggregates/";
 /** The Forge — the region Jita is in (research §4, verified). */
 export const JITA_REGION_ID = 10000002;
-/**
- * Spec §3. The real limit is URI length, not a type count: 1300 ids answered 200 and 2000 earned a
- * `414 Request-URI Too Large` (research §4), so 500 leaves generous headroom.
- */
-export const FUZZWORK_CHUNK = 500;
 
 interface Side { min?: unknown; max?: unknown }
 interface Aggregate { buy?: Side; sell?: Side }

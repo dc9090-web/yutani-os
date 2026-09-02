@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { PlanEditor, AUTOSAVE_MS } from "../../src/app/skills/PlanEditor.js";
+import { MAX_PLAN_ENTRIES } from "../../src/lib/skills/parse.js";
 import type { PlanSkill } from "../../src/lib/skills/catalogue.js";
 
 const refresh = vi.fn();
@@ -159,5 +160,22 @@ describe("PlanEditor", () => {
   it("warns when the character has never been synced", () => {
     editor({ context: { ...CONTEXT, synced: false } });
     expect(screen.getByText(/No skills synced yet/)).toBeInTheDocument();
+  });
+
+  it("shows a message instead of silently dropping an add at the entry cap", async () => {
+    const full = Array.from({ length: MAX_PLAN_ENTRIES }, (_, i) => (
+      { skillId: 9000 + i, level: 1, note: null }
+    ));
+    editor({ plan: { ...PLAN, entries: full } });
+    expect(screen.getByText(`Plan is full — ${MAX_PLAN_ENTRIES} entries is the maximum.`)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Search skills"), { target: { value: "weapon" } });
+    fireEvent.click(await screen.findByRole("button", { name: "Add Weapon Upgrades I" }));
+    // The entry count stays at the cap — the click did not silently append past it.
+    expect(screen.getByText(`Plan is full — ${MAX_PLAN_ENTRIES} entries is the maximum.`)).toBeInTheDocument();
+  });
+
+  it("does not show the cap message below the entry cap", () => {
+    editor();
+    expect(screen.queryByText(/Plan is full/)).toBeNull();
   });
 });

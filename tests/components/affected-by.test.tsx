@@ -36,4 +36,29 @@ describe("AffectedBy", () => {
     expect(screen.queryByRole("button")).toBeNull();
     expect(screen.getByText("2.00")).toBeInTheDocument();
   });
+
+  it("closes on Escape", () => {
+    render(<AffectedBy label="CPU" value="6.75" rows={rows} />);
+    const button = screen.getByRole("button");
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText("Weapon Upgrades")).toBeNull();
+  });
+
+  it("closes on a click outside the popover", () => {
+    render(<div><AffectedBy label="CPU" value="6.75" rows={rows} /><button>Elsewhere</button></div>);
+    fireEvent.click(screen.getByRole("button", { name: /6.75/ }));
+    expect(screen.getByText("Weapon Upgrades")).toBeInTheDocument();
+    fireEvent.mouseDown(screen.getByRole("button", { name: "Elsewhere" }));
+    expect(screen.queryByText("Weapon Upgrades")).toBeNull();
+  });
+
+  it("stays open on a click inside the popover", () => {
+    render(<AffectedBy label="CPU" value="6.75" rows={rows} />);
+    fireEvent.click(screen.getByRole("button", { name: /6.75/ }));
+    fireEvent.mouseDown(screen.getByText("Weapon Upgrades"));
+    expect(screen.getByText("Weapon Upgrades")).toBeInTheDocument();
+  });
 });

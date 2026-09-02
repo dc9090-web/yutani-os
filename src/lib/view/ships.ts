@@ -93,20 +93,36 @@ export function shipLocationLabel(
   return parent.name ?? data.types.get(parent.typeId)?.name ?? `Container ${ship.locationId}`;
 }
 
+/** One labelled bucket of `fitValueGroups`'s walk — `/ships`'s flat total and the fit sheet's five
+ *  per-group value lines are two views onto the same five buckets. */
+export interface FitValueGroup { label: string; entries: ValuedEntry[] }
+
 /**
- * Spec §4's estimated value: ship + fitted modules + their charges + drones + cargo. A loaded charge
- * counts as **one** unit — the engine models it as a single item with no stack size; ammunition in
- * the cargo hold is counted at its real quantity.
+ * Spec §4's estimated value, walked once: ship, fitted modules, their charges, drones, cargo. A
+ * loaded charge counts as **one** unit — the engine models it as a single item with no stack size;
+ * ammunition in the cargo hold is counted at its real quantity. `fitValueEntries` (the flat total)
+ * and the fit sheet's per-group value lines both read this same walk, so the two can never drift
+ * apart (a pinned equal-totals test guards it).
  */
-export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
-  const entries: ValuedEntry[] = [{ typeId: built.fit.ship.typeId, quantity: 1 }];
+export function fitValueGroups(built: BuiltFit): FitValueGroup[] {
+  const moduleEntries: ValuedEntry[] = [];
+  const chargeEntries: ValuedEntry[] = [];
   for (const slotted of built.fit.modules) {
-    entries.push({ typeId: slotted.item.typeId, quantity: 1 });
-    if (slotted.item.charge !== undefined) entries.push({ typeId: slotted.item.charge.typeId, quantity: 1 });
+    moduleEntries.push({ typeId: slotted.item.typeId, quantity: 1 });
+    if (slotted.item.charge !== undefined) chargeEntries.push({ typeId: slotted.item.charge.typeId, quantity: 1 });
   }
-  for (const drone of built.drones) entries.push({ typeId: drone.typeId, quantity: drone.quantity });
-  for (const item of built.cargo) entries.push({ typeId: item.typeId, quantity: item.quantity });
-  return entries;
+  return [
+    { label: "Hull", entries: [{ typeId: built.fit.ship.typeId, quantity: 1 }] },
+    { label: "Modules & rigs", entries: moduleEntries },
+    { label: "Charges", entries: chargeEntries },
+    { label: "Drones", entries: built.drones.map((d) => ({ typeId: d.typeId, quantity: d.quantity })) },
+    { label: "Cargo", entries: built.cargo.map((c) => ({ typeId: c.typeId, quantity: c.quantity })) },
+  ];
+}
+
+/** The flat entry list `/ships`'s single running total prices — see `fitValueGroups`. */
+export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
+  return fitValueGroups(built).flatMap((g) => g.entries);
 }
 
 /** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */

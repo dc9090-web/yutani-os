@@ -31,10 +31,18 @@ function validFlag(flag: unknown): flag is string {
 export function parseFitItems(raw: unknown): FitItem[] | null {
   if (!Array.isArray(raw) || raw.length > MAX_FIT_ITEMS) return null;
   const out: FitItem[] = [];
+  // A slot flag names one fitting point — two items claiming the same `HiSlot0` can never both be
+  // fitted, so that is invalid input, not a "last one wins". Drone bay and cargo are not slots
+  // (many items share each of those flags), so only slot flags are checked for repeats.
+  const seenSlots = new Set<string>();
   for (const entry of raw) {
     const typeId = field(entry, "typeId");
     const flag = field(entry, "flag");
     if (!isPositiveInt(typeId) || !validFlag(flag)) return null;
+    if (flag !== CARGO_FLAG && flag !== DRONE_BAY_FLAG) {
+      if (seenSlots.has(flag)) return null;
+      seenSlots.add(flag);
+    }
 
     const rawQuantity = field(entry, "quantity");
     const quantity = rawQuantity === undefined ? 1 : rawQuantity;
@@ -125,5 +133,8 @@ export function parseFitPatch(body: unknown): FitPatchBody | null {
     if (items === null) return null;
     patch.items = items;
   }
+  // An empty patch recognises no field at all — accepting it would silently bump `updated_at` for
+  // no reason, so it is a 400 rather than a no-op write.
+  if (Object.keys(patch).length === 0) return null;
   return patch;
 }

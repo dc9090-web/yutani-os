@@ -8,7 +8,7 @@ import {
   type DogmaData, type DogmaMeta, type DogmaMetaJson, type DogmaType, type DogmaTypesJson,
 } from "../dogma/index.js";
 import { MAX_IDS } from "../api/json.js";
-import { FUZZWORK_CHUNK } from "../market/fuzzwork.js";
+import { FUZZWORK_CHUNK } from "../market/constants.js";
 import type { Price } from "../view/price.js";
 
 export interface SkillContext { skills: Map<number, number>; implants: number[]; synced: boolean }

@@ -269,6 +269,9 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
 
         <div className="card skill-picker">
           <h2 className="card-title">Add skill</h2>
+          {entries.length < MAX_PLAN_ENTRIES ? null : (
+            <p className="warn-text">Plan is full — {MAX_PLAN_ENTRIES} entries is the maximum.</p>
+          )}
           <input className="filter-input" aria-label="Search skills" value={query} placeholder="Search skills"
                  onChange={(e) => setQuery(e.target.value)} />
           <ul className="skill-picker-results">

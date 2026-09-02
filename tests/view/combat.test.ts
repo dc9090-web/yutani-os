@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
-  backfillLine, killmailRows, monthBars, nameOf, statTiles, topLists, typeOf, type Labels,
+  backfillLine, killmailRows, monthBars, nameOf, statTiles, statsTruncationNote, topLists, typeOf,
+  type Labels,
 } from "../../src/lib/view/combat.js";
 import { combatStats, type StatRow } from "../../src/lib/combat/stats.js";
 import type { CombatRow } from "../../src/lib/db/killmails.js";
@@ -147,5 +148,14 @@ describe("backfillLine", () => {
   it("is null before the job has ever run", () => {
     expect(backfillLine([])).toBeNull();
     expect(backfillLine([{ characterId: 1, imported: 0, cursors: [] }])).toBeNull();
+  });
+});
+
+describe("statsTruncationNote", () => {
+  it("notes the cap when the statistics rowset hit it", () => {
+    expect(statsTruncationNote(true)).toBe("Statistics cover the most recent 20,000 killmails");
+  });
+  it("is null otherwise", () => {
+    expect(statsTruncationNote(false)).toBeNull();
   });
 });

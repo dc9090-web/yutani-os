@@ -4,7 +4,8 @@
  * component — it pulls in `pg`.
  */
 import {
-  COMBAT_PAGE_SIZE, allCombatRows, countCombatRows, getKillmail, listCombatRows, type CombatRow,
+  COMBAT_PAGE_SIZE, STAT_ROW_CAP, allCombatRows, countCombatRows, getKillmail, listCombatRows,
+  type CombatRow,
 } from "../db/killmails.js";
 import { backfillStatus } from "../db/killmail-backfill.js";
 // `../names/label.js`, not `../names/index.js`: the index also wires up the ESI client, and the
@@ -14,14 +15,14 @@ import { getPrices } from "../db/market-prices.js";
 import { getSolarSystems, getTypes } from "../sde/repo.js";
 import { combatStats, periodStart, type CombatPeriod, type CombatStats } from "./stats.js";
 import {
-  backfillLine, killmailRows, monthBars, statTiles, topLists,
+  backfillLine, killmailRows, monthBars, statTiles, statsTruncationNote, topLists,
   type KillmailRowView, type Labels, type MonthBarView, type StatTile, type TopListView,
 } from "../view/combat.js";
 import { killmailView, type KillmailView } from "../view/killmail.js";
 
 export interface CombatPageView {
   tiles: StatTile[]; months: MonthBarView[]; topLists: TopListView[];
-  rows: KillmailRowView[]; hasMore: boolean; backfill: string | null;
+  rows: KillmailRowView[]; hasMore: boolean; backfill: string | null; statsTruncated: string | null;
 }
 
 /**
@@ -82,6 +83,7 @@ export async function loadCombatPage(
     rows: killmailRows(pageRows, labels),
     hasMore: pageRows.length === COMBAT_PAGE_SIZE && total > COMBAT_PAGE_SIZE,
     backfill: backfillLine(backfill),
+    statsTruncated: statsTruncationNote(statRows.length === STAT_ROW_CAP),
   };
 }
 

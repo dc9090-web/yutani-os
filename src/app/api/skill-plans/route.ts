@@ -4,6 +4,7 @@ import { getCharacter } from "../../../lib/db/characters.js";
 import { getCareerPlan } from "../../../lib/sde/repo.js";
 import { summarisePlans } from "../../../lib/skills/load.js";
 import { parsePlanCreate } from "../../../lib/skills/parse.js";
+import { parseId } from "../../../lib/api/json.js";
 
 const bad = () => NextResponse.json({ error: "bad request" }, { status: 400 });
 const missing = () => NextResponse.json({ error: "not found" }, { status: 404 });
@@ -11,8 +12,8 @@ const missing = () => NextResponse.json({ error: "not found" }, { status: 404 })
 /** Spec §6: the plan list is always scoped to one character. */
 export async function GET(req: NextRequest) {
   const raw = req.nextUrl.searchParams.get("characterId");
-  const characterId = raw === null ? NaN : Number(raw);
-  if (!Number.isInteger(characterId) || characterId <= 0) return bad();
+  const characterId = raw === null ? null : parseId(raw);
+  if (characterId === null) return bad();
   const plans = await listPlans(characterId);
   return NextResponse.json({ plans: await summarisePlans(plans) });
 }

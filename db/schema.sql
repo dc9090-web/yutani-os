@@ -195,6 +195,12 @@ CREATE TABLE IF NOT EXISTS character_wallet_transactions (
   PRIMARY KEY (character_id, transaction_id)
 );
 CREATE INDEX IF NOT EXISTS character_wallet_transactions_date_idx ON character_wallet_transactions (character_id, date DESC);
+-- `typesOfInterest` (src/lib/market/interest.ts) scans this table by `date` alone, across every
+-- character, to find recently-traded types; the index above is useless there because it leads on
+-- `character_id`. A covering index on `date` alone (with `type_id` along for the ride) lets that
+-- scan stay index-only.
+CREATE INDEX IF NOT EXISTS character_wallet_transactions_interest_idx
+  ON character_wallet_transactions (date) INCLUDE (type_id);
 
 CREATE TABLE IF NOT EXISTS character_location (
   character_id     bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,

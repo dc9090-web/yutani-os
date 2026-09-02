@@ -4,8 +4,8 @@ import {
   type Hardpoint, type Item, type ModuleStat, type Problem, type ProblemKind, type SlotKind,
 } from "../dogma/index.js";
 import { isk } from "./format.js";
-import { priceOf, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
-import { bonusLabel, gauge, type GaugeView } from "./ships.js";
+import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
+import { bonusLabel, fitValueGroups, gauge, type GaugeView } from "./ships.js";
 
 const SLOT_TITLES: Record<SlotKind, string> = {
   high: "High", mid: "Mid", low: "Low", rig: "Rigs", subsystem: "Subsystems",
@@ -141,10 +141,6 @@ function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<nu
   });
 }
 
-function entriesOf(list: FitEntry[]): ValuedEntry[] {
-  return list.map((e) => ({ typeId: e.typeId, quantity: e.quantity }));
-}
-
 export function buildFitSheet(input: FitSheetInput): FitSheetView {
   const { built, stats, prices } = input;
   const fit = built.fit;
@@ -184,21 +180,10 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Spec §4: ship + fitted + charges + drones + cargo. The per-group sums add up to exactly
-  // rollUpValue(fitValueEntries(built)) — a test pins that.
-  const moduleEntries: ValuedEntry[] = [];
-  const chargeEntries: ValuedEntry[] = [];
-  for (const slotted of fit.modules) {
-    moduleEntries.push({ typeId: slotted.item.typeId, quantity: 1 });
-    if (slotted.item.charge !== undefined) chargeEntries.push({ typeId: slotted.item.charge.typeId, quantity: 1 });
-  }
-  const groups: { label: string; entries: ValuedEntry[] }[] = [
-    { label: "Hull", entries: [{ typeId: fit.ship.typeId, quantity: 1 }] },
-    { label: "Modules & rigs", entries: moduleEntries },
-    { label: "Charges", entries: chargeEntries },
-    { label: "Drones", entries: entriesOf(built.drones) },
-    { label: "Cargo", entries: entriesOf(built.cargo) },
-  ];
+  // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
+  // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
+  // by construction, and a test pins that.
+  const groups = fitValueGroups(built);
   let total = 0;
   let unpriced = 0;
   const lines: ValueLineView[] = [];

@@ -107,6 +107,9 @@ export function parsePlanPatch(body: unknown): PlanPatchBody | null {
     if (entries === null) return null;
     patch.entries = entries;
   }
+  // An empty patch recognises no field at all — accepting it would silently bump `updated_at` for
+  // no reason, so it is a 400 rather than a no-op write (mirrors the fits route's same rule).
+  if (Object.keys(patch).length === 0) return null;
   return patch;
 }
 

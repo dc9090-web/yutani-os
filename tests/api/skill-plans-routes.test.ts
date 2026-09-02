@@ -118,6 +118,11 @@ describe("PUT /api/skill-plans/[id]", () => {
     expect((await PUT(body("/api/skill-plans/7", "PUT", { characterId: 1 }), ctx("7"))).status).toBe(400);
     expect((await PUT(body("/api/skill-plans/8", "PUT", { name: "x" }), ctx("8"))).status).toBe(404);
   });
+
+  it("400s an empty PUT body instead of bumping updated_at for nothing", async () => {
+    expect((await PUT(body("/api/skill-plans/7", "PUT", {}), ctx("7"))).status).toBe(400);
+    expect(updatePlan).not.toHaveBeenCalled();
+  });
 });
 
 describe("DELETE /api/skill-plans/[id]", () => {
