@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { CharacterCard, type OverviewCard } from "../../src/app/components/CharacterCard.js";
 
 const full: OverviewCard = {
@@ -14,11 +14,12 @@ const full: OverviewCard = {
   online: true,
   training: "Caldari Frigate V · finishes in 3 h 12 m",
   totalSp: "47.4M SP",
-  lastSync: "2 m ago",
+  account: "Main",
+  tags: ["Miner", "Scanner"],
 };
 
 describe("CharacterCard", () => {
-  it("shows the balance, location, ship, training, SP and last sync", () => {
+  it("shows the balance, location, ship, training and SP", () => {
     render(<CharacterCard card={full} />);
     expect(screen.getByRole("heading", { name: /TrilliumONE/ })).toBeInTheDocument();
     expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
@@ -29,7 +30,11 @@ describe("CharacterCard", () => {
     expect(screen.getByText("Rifter — Scarlet Dart")).toBeInTheDocument();
     expect(screen.getByText("Caldari Frigate V · finishes in 3 h 12 m")).toBeInTheDocument();
     expect(screen.getByText("47.4M SP")).toBeInTheDocument();
-    expect(screen.getByText("2 m ago")).toBeInTheDocument();
+  });
+
+  it("does not show a Last sync row", () => {
+    render(<CharacterCard card={full} />);
+    expect(screen.queryByText(/last sync/i)).not.toBeInTheDocument();
   });
 
   it("shows the online dot only when the online scope produced a value", () => {
@@ -50,11 +55,31 @@ describe("CharacterCard", () => {
   it("degrades to placeholders before the first sync", () => {
     render(<CharacterCard card={{
       ...full, balance: null, system: null, dockedAt: null, ship: null, online: null,
-      training: "Not synced", totalSp: null, lastSync: "never",
+      training: "Not synced", totalSp: null,
     }} />);
     expect(screen.getAllByText("Not synced yet")).toHaveLength(2);   // wallet and location
     expect(screen.getAllByText("—")).toHaveLength(2);                // ship and total SP
     expect(screen.getByText("Not synced")).toBeInTheDocument();
-    expect(screen.getByText("never")).toBeInTheDocument();
+  });
+
+  it("shows an account pill when the character is assigned to an account", () => {
+    render(<CharacterCard card={full} />);
+    const pills = screen.getByText("Main");
+    expect(pills).toHaveClass("pill");
+  });
+
+  it("shows no account pill when unassigned", () => {
+    render(<CharacterCard card={{ ...full, account: null }} />);
+    expect(screen.queryByText("Main")).not.toBeInTheDocument();
+  });
+
+  it("shows a pill per tag, and no pills row when there are no tags", () => {
+    render(<CharacterCard card={full} />);
+    const pillsRow = screen.getByText("Miner").closest<HTMLElement>(".ov-pills");
+    expect(pillsRow).not.toBeNull();
+    expect(within(pillsRow!).getByText("Scanner")).toBeInTheDocument();
+
+    const { container } = render(<CharacterCard card={{ ...full, account: null, tags: [] }} />);
+    expect(container.querySelector(".ov-pills")).toBeNull();
   });
 });

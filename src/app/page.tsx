@@ -1,18 +1,19 @@
+import { listAccounts } from "../lib/db/accounts.js";
 import { listCharacters } from "../lib/db/characters.js";
-import { latestRuns } from "../lib/db/sync-runs.js";
 import { getWallet } from "../lib/db/character-wallet.js";
 import { getLocation } from "../lib/db/character-location.js";
 import { getSkillSummary, listSkillQueue } from "../lib/db/character-skills.js";
 import { getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
-import { isk, relativeTime, secClass, secText, sp, trainingLabel } from "../lib/view/format.js";
+import { isk, secClass, secText, sp, trainingLabel } from "../lib/view/format.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
 
 export default async function Overview() {
-  const [characters, runs] = await Promise.all([listCharacters(), latestRuns()]);
+  const [characters, accounts] = await Promise.all([listCharacters(), listAccounts()]);
   if (characters.length === 0) return <NoCharacter title="Overview" />;
   const now = new Date();
+  const accountNames = new Map(accounts.map((a) => [a.id, a.name]));
 
   // Four repo reads per character, all in flight at once; the id -> name lookups below are then
   // batched across every character so the page never queries inside a row loop.
@@ -44,9 +45,6 @@ export default async function Overview() {
   ]);
 
   const cards: OverviewCard[] = rows.map(({ character, wallet, location, summary, head }) => {
-    const lastRun = runs
-      .filter((r) => r.characterId === character.id)
-      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())[0];
     const system = location?.solarSystemId == null ? null : systems.get(location.solarSystemId) ?? null;
     const docked = location?.stationId ?? location?.structureId ?? null;
     const shipType = location?.shipTypeId == null ? null : types.get(location.shipTypeId)?.name ?? null;
@@ -70,7 +68,8 @@ export default async function Overview() {
         : trainingLabel(head === null || headName === null ? null
           : { skillName: headName, finishedLevel: head.finishedLevel, finishDate: head.finishDate }, now),
       totalSp: summary === null ? null : sp(summary.totalSp),
-      lastSync: relativeTime(lastRun?.startedAt ?? null, now),
+      account: character.accountId == null ? null : accountNames.get(character.accountId) ?? null,
+      tags: [],
     };
   });
 

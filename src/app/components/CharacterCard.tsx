@@ -13,7 +13,8 @@ export interface OverviewCard {
   online: boolean | null;
   training: string;
   totalSp: string | null;
-  lastSync: string;
+  account: string | null;
+  tags: string[];
 }
 
 const NOT_SYNCED = <span className="faint">Not synced yet</span>;
@@ -34,6 +35,12 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
           </h3>
           <p className="ov-corp">{card.corp}</p>
           {card.needsReauth ? <span className="badge needs_reauth">re-authorise</span> : null}
+          {card.account === null && card.tags.length === 0 ? null : (
+            <div className="ov-pills">
+              {card.account === null ? null : <span className="pill">{card.account}</span>}
+              {card.tags.map((tag) => <span key={tag} className="pill">{tag}</span>)}
+            </div>
+          )}
         </div>
       </div>
       <dl className="ov-rows">
@@ -48,7 +55,6 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
         <div className="ov-row"><dt>Ship</dt><dd>{card.ship ?? DASH}</dd></div>
         <div className="ov-row"><dt>Training</dt><dd>{card.training}</dd></div>
         <div className="ov-row"><dt>Total SP</dt><dd>{card.totalSp ?? DASH}</dd></div>
-        <div className="ov-row"><dt>Last sync</dt><dd className="muted">{card.lastSync}</dd></div>
       </dl>
     </div>
   );
