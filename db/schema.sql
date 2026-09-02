@@ -385,3 +385,15 @@ CREATE TABLE IF NOT EXISTS killmail_backfill (
   updated_at    timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (character_id, kind)
 );
+
+-- User-managed character tags (e.g. "Miner", "Scanner") — Daniel creates the categories himself.
+CREATE TABLE IF NOT EXISTS character_tags (
+  id    serial PRIMARY KEY,
+  name  text NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS character_tag_map (
+  character_id  bigint NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+  tag_id        int NOT NULL REFERENCES character_tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (character_id, tag_id)
+);

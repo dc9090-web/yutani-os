@@ -5,12 +5,13 @@ import { getLocation } from "../lib/db/character-location.js";
 import { getSkillSummary, listSkillQueue } from "../lib/db/character-skills.js";
 import { getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
+import { tagsByCharacter } from "../lib/db/tags.js";
 import { isk, secClass, secText, sp, trainingLabel } from "../lib/view/format.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
 
 export default async function Overview() {
-  const [characters, accounts] = await Promise.all([listCharacters(), listAccounts()]);
+  const [characters, accounts, tagsByChar] = await Promise.all([listCharacters(), listAccounts(), tagsByCharacter()]);
   if (characters.length === 0) return <NoCharacter title="Overview" />;
   const now = new Date();
   const accountNames = new Map(accounts.map((a) => [a.id, a.name]));
@@ -69,7 +70,7 @@ export default async function Overview() {
           : { skillName: headName, finishedLevel: head.finishedLevel, finishDate: head.finishDate }, now),
       totalSp: summary === null ? null : sp(summary.totalSp),
       account: character.accountId == null ? null : accountNames.get(character.accountId) ?? null,
-      tags: [],
+      tags: tagsByChar.get(character.id) ?? [],
     };
   });
 

@@ -4,6 +4,24 @@ export function parseName(body: unknown): string | null {
   const name = raw.trim();
   return name.length >= 1 && name.length <= 40 ? name : null;
 }
+/** A character tag's name: trimmed, 1-30 chars — spec's tighter cap than an account name. */
+export function parseTagName(body: unknown): string | null {
+  const raw = (body as { name?: unknown } | null)?.name;
+  if (typeof raw !== "string") return null;
+  const name = raw.trim();
+  return name.length >= 1 && name.length <= 30 ? name : null;
+}
+/** `{ tagIds: number[] }` — an array of positive integers, or null on anything else (spec's 400). */
+export function parseTagIds(body: unknown): number[] | null {
+  const raw = (body as { tagIds?: unknown } | null)?.tagIds;
+  if (!Array.isArray(raw)) return null;
+  const ids: number[] = [];
+  for (const v of raw) {
+    if (typeof v !== "number" || !Number.isInteger(v) || v <= 0) return null;
+    ids.push(v);
+  }
+  return ids;
+}
 export function parseAccountId(body: unknown): number | null | undefined {
   if (!body || typeof body !== "object" || !("accountId" in body)) return undefined;
   const v = (body as { accountId: unknown }).accountId;
