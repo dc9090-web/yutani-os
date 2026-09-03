@@ -8,18 +8,18 @@ const locations: AssetViewLocation[] = [
     locationId: 60003760, label: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", itemCount: 3, volume: 27294,
     nodes: [
       {
-        itemId: 1035000000001, typeName: "Rifter", name: "Scarlet Dart", quantity: 1,
+        itemId: 1035000000001, typeId: 587, typeName: "Rifter", name: "Scarlet Dart", quantity: 1,
         flag: "Hangar", isBlueprintCopy: false, volume: 27289, iconUrl: "https://images.evetech.net/types/587/icon?size=32",
         children: [
-          { itemId: 2001, typeName: "Gyrostabilizer II", name: null, quantity: 1, flag: "Low slot 1", isBlueprintCopy: false, volume: 5, iconUrl: "https://images.evetech.net/types/519/icon?size=32", children: [] },
+          { itemId: 2001, typeId: 519, typeName: "Gyrostabilizer II", name: null, quantity: 1, flag: "Low slot 1", isBlueprintCopy: false, volume: 5, iconUrl: "https://images.evetech.net/types/519/icon?size=32", children: [] },
         ],
       },
-      { itemId: 2002, typeName: "Rifter Blueprint", name: null, quantity: 1, flag: "Hangar", isBlueprintCopy: true, volume: 0.01, iconUrl: "https://images.evetech.net/types/691/bpc?size=32", children: [] },
+      { itemId: 2002, typeId: 691, typeName: "Rifter Blueprint", name: null, quantity: 1, flag: "Hangar", isBlueprintCopy: true, volume: 0.01, iconUrl: "https://images.evetech.net/types/691/bpc?size=32", children: [] },
     ],
   },
   {
     locationId: 60008494, label: "Amarr VIII - Emperor Family Academy", itemCount: 1, volume: 1.2,
-    nodes: [{ itemId: 3001, typeName: "Tritanium", name: null, quantity: 120, flag: "Hangar", isBlueprintCopy: false, volume: 1.2, iconUrl: "https://images.evetech.net/types/34/icon?size=32", children: [] }],
+    nodes: [{ itemId: 3001, typeId: 34, typeName: "Tritanium", name: null, quantity: 120, flag: "Hangar", isBlueprintCopy: false, volume: 1.2, iconUrl: "https://images.evetech.net/types/34/icon?size=32", children: [] }],
   },
 ];
 
@@ -41,6 +41,14 @@ describe("AssetsBrowser", () => {
     expect(screen.getByText("Low slot 1")).toBeInTheDocument();
     expect(screen.getByText("BPC")).toHaveClass("bpc");
     expect(screen.queryByText("Tritanium")).toBeNull();
+  });
+
+  it("explains each item on hover from its type description, and stays quiet for one without", () => {
+    render(<AssetsBrowser locations={locations} descriptions={{ 587: "The Rifter is a very powerful combat frigate.", 519: "Gives a bonus to projectile turrets." }} />);
+    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
+    expect(screen.getByText("Rifter").closest(".tree-item")).toHaveAttribute("data-desc", "The Rifter is a very powerful combat frigate.");
+    expect(screen.getByText("Gyrostabilizer II").closest(".tree-item")).toHaveAttribute("data-desc", "Gives a bonus to projectile turrets.");
+    expect(screen.getByText("Rifter Blueprint").closest(".tree-item")).not.toHaveAttribute("data-desc");
   });
 
   it("shows each item's type icon and hides one the image server cannot supply", () => {

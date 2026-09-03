@@ -9,8 +9,9 @@ function volume(m3: number): string {
   return `${m3 >= 10 ? grouped(Math.round(m3)) : String(Math.round(m3 * 10) / 10)} m³`;
 }
 
-function ItemRow({ node, depth, collapsed, onToggle }: {
+function ItemRow({ node, depth, collapsed, onToggle, descriptions }: {
   node: AssetViewNode; depth: number; collapsed: Set<number>; onToggle: (itemId: number) => void;
+  descriptions: Record<number, string>;
 }) {
   const open = !collapsed.has(node.itemId);
   return (<>
@@ -22,22 +23,24 @@ function ItemRow({ node, depth, collapsed, onToggle }: {
             {open ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
           </button>
         )}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="item-icon" src={node.iconUrl} alt="" loading="lazy"
-        onError={(e) => e.currentTarget.classList.add("missing")} />
-      <span>{node.typeName}</span>
+      <span className="tree-item" data-desc={descriptions[node.typeId]}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="item-icon" src={node.iconUrl} alt="" loading="lazy"
+          onError={(e) => e.currentTarget.classList.add("missing")} />
+        <span>{node.typeName}</span>
+      </span>
       {node.name === null ? null : <span className="muted">{node.name}</span>}
       {node.isBlueprintCopy ? <span className="badge bpc">BPC</span> : null}
       {node.quantity > 1 ? <span className="muted">×{grouped(node.quantity)}</span> : null}
       <span className="tree-flag">{node.flag}</span>
     </li>
     {open ? node.children.map((child) => (
-      <ItemRow key={child.itemId} node={child} depth={depth + 1} collapsed={collapsed} onToggle={onToggle} />
+      <ItemRow key={child.itemId} node={child} depth={depth + 1} collapsed={collapsed} onToggle={onToggle} descriptions={descriptions} />
     )) : null}
   </>);
 }
 
-export function AssetsBrowser({ locations }: { locations: AssetViewLocation[] }) {
+export function AssetsBrowser({ locations, descriptions = {} }: { locations: AssetViewLocation[]; descriptions?: Record<number, string> }) {
   const [query, setQuery] = useState("");
   const [openLocations, setOpenLocations] = useState<number[]>([]);
   // Items default to expanded so a docked ship shows its fitted modules; this is the opt-out set.
@@ -83,7 +86,7 @@ export function AssetsBrowser({ locations }: { locations: AssetViewLocation[] })
             {open ? (
               <ul className="tree">
                 {location.nodes.map((node) => (
-                  <ItemRow key={node.itemId} node={node} depth={0} collapsed={collapsed} onToggle={toggleItem} />
+                  <ItemRow key={node.itemId} node={node} depth={0} collapsed={collapsed} onToggle={toggleItem} descriptions={descriptions} />
                 ))}
               </ul>
             ) : null}

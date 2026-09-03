@@ -256,6 +256,7 @@ body {
 .tree-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
 /* A type the image server has no picture for (some SKINs, odd categories) keeps its slot so the
    names stay aligned, but shows nothing. */
+.tree-item { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .item-icon { width: 22px; height: 22px; border-radius: 3px; flex: 0 0 auto; background: var(--raised); }
 .item-icon.missing { visibility: hidden; }
 .tree-toggle { width: 14px; padding: 0; background: none; border: 0; color: var(--faint); font: inherit; cursor: pointer; }

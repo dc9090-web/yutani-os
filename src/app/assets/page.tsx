@@ -4,6 +4,7 @@ import { listAssets } from "../../lib/db/character-assets.js";
 import { getGroups, getTypes } from "../../lib/sde/repo.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
+import { typeDescription } from "../../lib/view/format.js";
 import { buildAssetTree, isBlueprintCategory, locationDisplayLabel, sumVolume, toViewNodes, type AssetViewLocation, type TypeInfo } from "../../lib/view/assets.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { AssetsBrowser } from "./AssetsBrowser.js";
@@ -33,6 +34,13 @@ export default async function AssetsPage() {
     typeInfo.set(id, { name: type.name, volume: type.volume, isBlueprint: isBlueprintCategory(categoryId) });
   }
 
+  // Hover text, once per type rather than per item: a hangar of 800 rows is ~200 types.
+  const descriptions: Record<number, string> = {};
+  for (const [id, type] of types) {
+    const desc = typeDescription(type.description);
+    if (desc !== null) descriptions[id] = desc;
+  }
+
   const locations: AssetViewLocation[] = tree.map((location) => {
     const nodes = toViewNodes(location.nodes, typeInfo);
     return {
@@ -47,6 +55,6 @@ export default async function AssetsPage() {
   return (<>
     <h1 className="page-title">Assets</h1>
     <p className="page-sub">{character.name} · {rows.length} item{rows.length === 1 ? "" : "s"} in {locations.length} location{locations.length === 1 ? "" : "s"}</p>
-    <div className="card"><AssetsBrowser locations={locations} /></div>
+    <div className="card"><AssetsBrowser locations={locations} descriptions={descriptions} /></div>
   </>);
 }

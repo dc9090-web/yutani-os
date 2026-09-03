@@ -81,7 +81,7 @@ export function typeIconUrl(typeId: number, isBlueprint: boolean, isCopy: boolea
 }
 
 export interface AssetViewNode {
-  itemId: number; typeName: string; name: string | null; quantity: number;
+  itemId: number; typeId: number; typeName: string; name: string | null; quantity: number;
   flag: string; isBlueprintCopy: boolean; volume: number; iconUrl: string; children: AssetViewNode[];
 }
 
@@ -95,6 +95,7 @@ export function toViewNodes(nodes: AssetNode[], types: ReadonlyMap<number, TypeI
     const type = types.get(node.typeId);
     return {
       itemId: node.itemId,
+      typeId: node.typeId,
       typeName: type?.name ?? `Type ${node.typeId}`,
       name: node.name,
       quantity: node.quantity,

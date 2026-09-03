@@ -181,3 +181,20 @@ export const WARN_PREFIX = "warn: ";
 export function isWarning(error: string | null): boolean {
   return error !== null && error.startsWith(WARN_PREFIX);
 }
+
+const DESCRIPTION_MAX = 600;
+
+/**
+ * An SDE type description as hover text: anchors and other client markup stripped, CRLF and runs
+ * of blank lines collapsed to paragraph breaks (rendered with `white-space: pre-line`), and the
+ * rare multi-screen essay cut at a word boundary. Null when the SDE has nothing to say.
+ */
+export function typeDescription(raw: string | null | undefined): string | null {
+  if (raw == null) return null;
+  const text = raw.replace(/<[^>]*>/g, "").replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n").trim();
+  if (text === "") return null;
+  if (text.length <= DESCRIPTION_MAX) return text;
+  const cut = text.slice(0, DESCRIPTION_MAX);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), DESCRIPTION_MAX - 40)).trimEnd()}…`;
+}
