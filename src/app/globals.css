@@ -203,7 +203,8 @@ body {
 .ov-sp-val { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
 
 /* Shared by every phase-3 page. */
-.online-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); display: inline-block; }
+/* Only ever shown for a character who is online; offline and unknown show nothing. */
+.online-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .online-dot.on { background: var(--pos); box-shadow: 0 0 6px rgba(52, 211, 153, 0.6); }
 .sec-high { color: var(--pos); }
 .sec-low { color: var(--warn); }

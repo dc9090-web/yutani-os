@@ -42,9 +42,7 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
         <div className="ov-id">
           <h3 className="ov-name">
             {card.name}
-            {card.online === null ? null : (
-              <span className={`online-dot${card.online ? " on" : ""}`} title={card.online ? "Online" : "Offline"} />
-            )}
+            {card.online === true ? <span className="online-dot on" title="Online" /> : null}
           </h3>
           <p className="ov-corp">{card.corp}</p>
         </div>

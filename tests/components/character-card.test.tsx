@@ -50,12 +50,11 @@ describe("CharacterCard", () => {
     expect(bar.querySelector(".progress-fill")).toHaveStyle({ width: "64%" });
   });
 
-  it("shows the online dot only when the online scope produced a value", () => {
+  it("shows the online dot only while the character is online", () => {
     const { rerender, container } = render(<CharacterCard card={full} />);
     expect(container.querySelector(".online-dot.on")).not.toBeNull();
     rerender(<CharacterCard card={{ ...full, online: false }} />);
-    expect(container.querySelector(".online-dot")).not.toBeNull();
-    expect(container.querySelector(".online-dot.on")).toBeNull();
+    expect(container.querySelector(".online-dot")).toBeNull();   // offline: no grey dot
     rerender(<CharacterCard card={{ ...full, online: null }} />);
     expect(container.querySelector(".online-dot")).toBeNull();
   });
