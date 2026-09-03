@@ -86,6 +86,7 @@ describe("CharacterCard", () => {
   it("shows an account pill when the character is assigned to an account", () => {
     render(<CharacterCard card={full} />);
     expect(screen.getByText("Main")).toHaveClass("pill main");
+    expect(screen.getByText("Main").closest(".ov-head-right")).not.toBeNull();   // top-right of the card, not in the tag row
   });
 
   it("shows a plain pill for an account name that isn't Main or Alt", () => {

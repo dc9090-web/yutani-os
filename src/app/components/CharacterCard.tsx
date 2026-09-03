@@ -49,13 +49,17 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
           </h3>
           <p className="ov-corp">{card.corp}</p>
         </div>
-        {card.needsReauth ? <span className="badge needs_reauth ov-status">re-authorise</span> : null}
+        {card.account === null && !card.needsReauth ? null : (
+          <div className="ov-head-right">
+            {card.account === null ? null : (
+              <span className={pillClass(card.account, ACCOUNT_VARIANTS)}>{card.account}</span>
+            )}
+            {card.needsReauth ? <span className="badge needs_reauth ov-status">re-authorise</span> : null}
+          </div>
+        )}
       </div>
-      {card.account === null && card.tags.length === 0 ? null : (
+      {card.tags.length === 0 ? null : (
         <div className="ov-pills">
-          {card.account === null ? null : (
-            <span className={pillClass(card.account, ACCOUNT_VARIANTS)}>{card.account}</span>
-          )}
           {card.tags.map((tag) => <span key={tag} className={pillClass(tag, TAG_VARIANTS)}>{tag}</span>)}
         </div>
       )}
@@ -86,8 +90,11 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
             </>) : <span className="faint">{card.training.label}</span>}
           </div>
           {card.training.active ? (
-            <div className="progress" role="progressbar" aria-valuenow={card.training.percent} aria-valuemin={0} aria-valuemax={100}>
-              <div className="progress-fill" style={{ width: `${card.training.percent}%` }} />
+            <div className="progress-wrap">
+              <div className="progress" role="progressbar" aria-valuenow={card.training.percent} aria-valuemin={0} aria-valuemax={100}>
+                <div className="progress-fill" style={{ width: `${card.training.percent}%` }} />
+              </div>
+              <span className="progress-pct">{Math.round(card.training.percent)}%</span>
             </div>
           ) : null}
         </div>

@@ -173,7 +173,9 @@ body {
 .ov-portrait { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
 .ov-name { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ov-corp { margin: 2px 0 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ov-status { margin-left: auto; align-self: flex-start; flex: 0 0 auto; }
+/* Account pill (and the re-authorise badge when needed) sit top-right of the card. */
+.ov-head-right { margin-left: auto; align-self: flex-start; flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ov-status { flex: 0 0 auto; }
 .ov-pills { display: flex; flex-wrap: wrap; gap: 6px; }
 .pill { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; background: var(--raised); border: 1px solid var(--border); color: var(--muted); }
 .ship-type-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
@@ -198,7 +200,7 @@ body {
 .ov-training { flex: 1; min-width: 0; display: grid; gap: 7px; }
 .ov-training-top { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
 .ov-training-top span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ov-training .progress { height: 6px; min-width: 0; }
+.ov-training .progress { min-width: 0; }
 .ov-sp { text-align: right; flex: 0 0 auto; display: grid; gap: 0; }
 .ov-sp-label { font-size: 12px; color: var(--faint); }
 .ov-sp-val { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
@@ -227,6 +229,7 @@ body {
 .progress { height: 10px; min-width: 80px; border-radius: 3px; background: var(--raised); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); }
 .progress-wrap { display: flex; align-items: center; gap: 10px; }
+.progress-wrap .progress { flex: 1; }
 .progress-pct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .skill-group { border-top: 1px solid var(--hairline); }
 .skill-group:first-child { border-top: 0; }
@@ -268,7 +271,8 @@ body {
 .warn-text { color: var(--warn); }
 .gauge-row { display: grid; grid-template-columns: 74px 1fr auto; gap: 8px; align-items: center; margin-top: 6px; }
 .gauge-label { font-size: 12px; color: var(--faint); }
-.gauge { height: 6px; border-radius: 99px; background: var(--raised); overflow: hidden; display: block; }
+/* Same bar as the skill queue's `.progress` — one progress-bar design across the site. */
+.gauge { height: 10px; border-radius: 3px; background: var(--raised); overflow: hidden; display: block; }
 .gauge-fill { display: block; height: 100%; background: var(--accent); }
 .gauge.over .gauge-fill { background: var(--neg); }
 .gauge-text { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
