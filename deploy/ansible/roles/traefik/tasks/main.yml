@@ -45,6 +45,22 @@
     mode: "0644"
   notify: Restart traefik
 
+# The lan-only allowlist needs Traefik to see the real Tailscale peer address.
+# tailscaled's ts-postrouting chain masquerades any packet it forwarded (fwmark
+# 0x40000) when SNAT of subnet routes is on — the default. When Tailscale's
+# FORWARD jump lands above Docker's (it does after a reboot, because tailscaled
+# configures netfilter after dockerd finishes), every Tailscale request to the
+# published port arrives as 172.18.0.1 and gets a 403. This VM advertises no
+# routes, so SNAT is pointless: keep it off. Persisted in tailscaled's prefs.
+- name: Read Tailscale prefs
+  ansible.builtin.command: tailscale debug prefs
+  register: tailscale_prefs
+  changed_when: false
+
+- name: Disable Tailscale subnet-route SNAT so Traefik sees real peer IPs
+  ansible.builtin.command: tailscale set --snat-subnet-routes=false
+  when: not (tailscale_prefs.stdout | from_json).NoSNAT
+
 - name: Deploy Traefik
   community.docker.docker_compose_v2:
     project_src: "{{ base_dir }}/traefik"
