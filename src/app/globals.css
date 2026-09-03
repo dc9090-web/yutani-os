@@ -318,6 +318,32 @@ body {
 .fit-sheet-banner { margin: 0; }
 .fit-sheet-main, .fit-sheet-side { display: grid; gap: 20px; min-width: 0; }
 @media (max-width: 900px) { .fit-sheet { grid-template-columns: minmax(0, 1fr); } }
+/* Ship stats: the fitting window's right-hand panel — a title + headline per section, label/value
+   rows beneath, and the Defense resist table with one tinted cell per damage type. */
+.ship-stats .card-title { margin-bottom: 6px; }
+.stat-section { padding: 10px 0; border-top: 1px solid var(--hairline); }
+.stat-section:first-of-type { border-top: 0; }
+.stat-section-head { margin: 0 0 6px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: var(--font-poppins), sans-serif; font-size: 13px; font-weight: 600; }
+.stat-headline { font-size: 13px; font-weight: 600; color: var(--text); }
+.stat-rows { margin: 0; display: grid; gap: 4px; }
+/* `.stat-rows .stat-row` outranks the skills page's `.stat-row` (flex-wrap, 18px margin) above. */
+.stat-rows .stat-row { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 12px; margin: 0; font-size: 12px; }
+.stat-rows dt { color: var(--muted); }
+.stat-rows dd { margin: 0; color: var(--text); }
+.stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
+.resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
+.resist-table th { font-weight: 500; text-align: left; padding: 0; }
+.resist-head { text-align: center !important; font-size: 10px; letter-spacing: 0.4px; text-transform: uppercase; }
+.resist-head.em { color: var(--accent); } .resist-head.thermal { color: var(--neg); }
+.resist-head.kinetic { color: var(--muted); } .resist-head.explosive { color: var(--warn); }
+.resist-layer { width: 34%; vertical-align: middle; padding-right: 4px !important; }
+.resist-layer-name { display: block; font-size: 12px; color: var(--text); }
+.resist-hp { display: block; font-size: 11px; color: var(--faint); text-align: left; white-space: nowrap; }
+.resist-cell { position: relative; overflow: hidden; height: 24px; border-radius: 4px; background: var(--raised); text-align: center; vertical-align: middle; padding: 0; }
+.resist-fill { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.32; }
+.resist-cell.em .resist-fill { background: var(--accent); } .resist-cell.thermal .resist-fill { background: var(--neg); }
+.resist-cell.kinetic .resist-fill { background: var(--muted); } .resist-cell.explosive .resist-fill { background: var(--warn); }
+.resist-pct { position: relative; display: block; line-height: 24px; text-align: center; color: var(--text); font-weight: 500; }
 /* Modules: one full-width list per slot kind under a shared column header. */
 .sheet-slot-head, .sheet-slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px 76px 88px; gap: 12px; align-items: center; }
 .sheet-slot-head { padding: 0 6px 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }

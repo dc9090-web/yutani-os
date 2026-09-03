@@ -41,8 +41,18 @@ export const PERF_ATTR = {
   shieldKineticDamageResonance: 273,
   shieldThermalDamageResonance: 274,
   capacitorCapacity: 482,
+  shieldRechargeRate: 479,    // shield recharge time, ms
   signatureRadius: 552,
   scanResolution: 564,
+  scanRadarStrength: 208,
+  scanLadarStrength: 209,
+  scanMagnetometricStrength: 210,
+  scanGravimetricStrength: 211,
+  droneCapacity: 283,         // drone bay, m³
+  droneBandwidth: 1271,       // Mbit/s the hull can control
+  droneBandwidthUsed: 1272,   // Mbit/s one drone takes
+  warpSpeedMultiplier: 600,   // AU/s = baseWarpSpeed x warpSpeedMultiplier
+  baseWarpSpeed: 1281,
   /** The *structure* resonances. The hull layer uses the unprefixed family, not `hull*DamageResonance`
    *  (974-977) — those are the Damage Control's own bonus attributes, which the SDE's effect 2302
    *  applies *to* 109/110/111/113 (verified in the rifter snapshot). Hulls carry an innate 0.67
@@ -53,6 +63,21 @@ export const PERF_ATTR = {
   kineticDamageResonance: 109,
   thermalDamageResonance: 110,
 } as const;
+
+/**
+ * Character-only attributes the committed snapshots do not carry (they hold only what their *types*
+ * need, and the character is synthetic). Read through `attrOr`, so a data set without them yields
+ * `null` rather than a throw.
+ */
+export const CHARACTER_ATTR = {
+  droneControlDistance: 458,  // metres
+} as const;
+
+/** The four sensor types and the attribute that carries each one's strength. */
+const SENSOR_ATTRS: readonly (readonly [string, AttrId])[] = [
+  ["Radar", PERF_ATTR.scanRadarStrength], ["Ladar", PERF_ATTR.scanLadarStrength],
+  ["Magnetometric", PERF_ATTR.scanMagnetometricStrength], ["Gravimetric", PERF_ATTR.scanGravimetricStrength],
+];
 
 /** The four damage types, in the order EVE lists them. */
 const DAMAGE_ATTRS: readonly AttrId[] = [
@@ -97,6 +122,10 @@ export type CapStability =
   | { stable: true; level: number }
   | { stable: false; lastsSeconds: number };
 
+/** One tank layer: raw hit points, its four resistances (em, thermal, kinetic, explosive — as
+ *  fractions, 0.57 for "57 %"), and the layer's own omni effective hit points. */
+export interface LayerPerformance { hp: number; resists: readonly [number, number, number, number]; ehp: number }
+
 export interface FitPerformance {
   /**
    * Turrets + launchers + drones, damage per second. `null` when nothing on the fit deals damage.
@@ -108,8 +137,19 @@ export interface FitPerformance {
   dps: number | null;
   /** One full volley (alpha) — the same weapons, without the cycle division. */
   volley: number | null;
+  /** The turret + launcher share of `dps`, and the drone share. Each `null` when that source is silent. */
+  weaponDps: number | null;
+  droneDps: number | null;
   /** Shield + armour + structure, each divided by its mean resonance (an omni damage profile). */
   ehp: number | null;
+  /** The three layers behind `ehp`; a layer the hull lacks (or with no hit points) is `null`. */
+  shield: LayerPerformance | null;
+  armor: LayerPerformance | null;
+  hull: LayerPerformance | null;
+  /** Seconds for the shield to recharge from empty, and its peak passive recharge in hp/s
+   *  (2.5 x capacity / time, the same curve as the capacitor). */
+  shieldRechargeTime: number | null;
+  shieldRechargeRate: number | null;
   /**
    * m/s — the hull's modified `maxVelocity`, cold.
    *
@@ -127,10 +167,27 @@ export interface FitPerformance {
   /** Seconds. */
   capRechargeTime: number | null;
   capStable: CapStability | null;
+  /** GJ/s: what the fit's active modules draw, the capacitor's peak recharge, and their difference
+   *  (positive when the cap gains). `capDelta` is what the client shows as "Δ". */
+  capUsage: number | null;
+  capPeakRecharge: number | null;
+  capDelta: number | null;
   maxTargets: number | null;
   maxTargetRange: number | null;
   scanResolution: number | null;
   signatureRadius: number | null;
+  /** The hull's strongest sensor and its strength in points. */
+  sensorStrength: { kind: string; points: number } | null;
+  /** kg, and the inertia modifier (`agility`). */
+  mass: number | null;
+  inertia: number | null;
+  /** AU/s. */
+  warpSpeed: number | null;
+  /** Mbit/s the hull can control; m³ of drone bay; metres of control range (a character attribute
+   *  the snapshots lack, so usually `null` in tests). */
+  droneBandwidth: number | null;
+  droneBay: number | null;
+  droneControlRange: number | null;
 }
 
 /**
@@ -146,20 +203,75 @@ export function fitPerformance(fit: Fit): FitPerformance {
   const rechargeMs = shipAttr(fit, PERF_ATTR.rechargeRate);
   const rechargeTime = rechargeMs !== null && rechargeMs > 0 ? rechargeMs / 1000 : null;
 
+  const layers = LAYERS.map((layer) => layerPerformance(fit, layer));
+  const ehpLayers = layers.filter((l): l is LayerPerformance => l !== null);
+  const usage = capacity === null || rechargeTime === null ? null : capacitorUsage(fit);
+  const peak = capacity !== null && rechargeTime !== null && capacity > 0 && rechargeTime > 0
+    ? 2.5 * capacity / rechargeTime : null;
+  const shieldMs = shipAttr(fit, PERF_ATTR.shieldRechargeRate);
+  const shieldTime = shieldMs !== null && shieldMs > 0 ? shieldMs / 1000 : null;
+  const shieldCap = shipAttr(fit, PERF_ATTR.shieldCapacity);
+  const baseWarp = shipAttr(fit, PERF_ATTR.baseWarpSpeed);
+  const warpMult = shipAttr(fit, PERF_ATTR.warpSpeedMultiplier);
+  const droneRange = fit.data.attributes.has(CHARACTER_ATTR.droneControlDistance)
+    ? getAttr(fit, fit.character, CHARACTER_ATTR.droneControlDistance) : null;
+
   return {
     dps: damage?.dps ?? null,
     volley: damage?.volley ?? null,
-    ehp: effectiveHp(fit),
+    weaponDps: damage === null || damage.weaponDps <= 0 ? null : damage.weaponDps,
+    droneDps: damage === null || damage.droneDps <= 0 ? null : damage.droneDps,
+    ehp: ehpLayers.length === 0 ? null : ehpLayers.reduce((sum, l) => sum + l.ehp, 0),
+    shield: layers[0], armor: layers[1], hull: layers[2],
+    shieldRechargeTime: shieldTime,
+    shieldRechargeRate: shieldTime !== null && shieldCap !== null && shieldCap > 0 ? 2.5 * shieldCap / shieldTime : null,
     maxVelocity: shipAttr(fit, PERF_ATTR.maxVelocity),
     alignTime: alignTime(fit),
     capacitorCapacity: capacity,
     capRechargeTime: rechargeTime,
     capStable: capStability(fit, capacity, rechargeTime),
+    capUsage: usage,
+    capPeakRecharge: peak,
+    capDelta: usage === null || peak === null ? null : peak - usage,
     maxTargets: maxTargets(fit),
     maxTargetRange: shipAttr(fit, PERF_ATTR.maxTargetRange),
     scanResolution: shipAttr(fit, PERF_ATTR.scanResolution),
     signatureRadius: shipAttr(fit, PERF_ATTR.signatureRadius),
+    sensorStrength: sensorStrength(fit),
+    mass: shipAttr(fit, ATTR.mass),
+    inertia: shipAttr(fit, PERF_ATTR.agility),
+    warpSpeed: baseWarp === null || warpMult === null ? null : baseWarp * warpMult,
+    droneBandwidth: shipAttr(fit, PERF_ATTR.droneBandwidth),
+    droneBay: shipAttr(fit, PERF_ATTR.droneCapacity),
+    droneControlRange: droneRange !== null && droneRange > 0 ? droneRange : null,
   };
+}
+
+/** The strongest of the four sensor types; `null` when the hull carries none (or all read 0). */
+function sensorStrength(fit: Fit): { kind: string; points: number } | null {
+  let best: { kind: string; points: number } | null = null;
+  for (const [kind, attrId] of SENSOR_ATTRS) {
+    const points = shipAttr(fit, attrId);
+    if (points !== null && points > 0 && (best === null || points > best.points)) best = { kind, points };
+  }
+  return best;
+}
+
+/**
+ * One tank layer against an omni damage profile (25 % of each type): the raw pool, the four
+ * resistances as `1 - resonance`, and the pool divided by the mean resonance — the damage-weighted
+ * mean of an even profile is the plain mean, which is exactly what Pyfa's `DamagePattern.effectivify`
+ * does. A resonance the data set does not define reads as 1 (no resistance), the SDE's default; the
+ * structure layer still starts at the hull's innate 0.67. `null` when the hull has no such layer or
+ * it has no hit points, and the sum of the non-null layers is `ehp`.
+ */
+function layerPerformance(fit: Fit, layer: Layer): LayerPerformance | null {
+  const hp = shipAttr(fit, layer.hp);
+  if (hp === null || hp <= 0) return null;
+  const resonances = layer.resonances.map((r) => attrOr(fit, fit.ship, r, 1)) as [number, number, number, number];
+  const mean = resonances.reduce((sum, r) => sum + r, 0) / resonances.length;
+  if (mean <= 0) return null;
+  return { hp, resists: resonances.map((r) => 1 - r) as [number, number, number, number], ehp: hp / mean };
 }
 
 /**
@@ -183,9 +295,11 @@ export function fitPerformance(fit: Fit): FitPerformance {
  * damage for every fit the app can currently build. Recorded deviation: a drone sitting in the bay
  * still contributes here.
  */
-function weaponDamage(fit: Fit): { dps: number; volley: number } | null {
+function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: number; droneDps: number } | null {
   let dps = 0;
   let volley = 0;
+  let weaponDps = 0;
+  let droneDps = 0;
   let armed = false;
 
   for (const { item } of fit.modules) {
@@ -199,6 +313,7 @@ function weaponDamage(fit: Fit): { dps: number; volley: number } | null {
     armed = true;
     volley += perShot;
     dps += perShot / cycle;
+    weaponDps += perShot / cycle;
   }
 
   for (const drone of fit.drones) {
@@ -208,39 +323,10 @@ function weaponDamage(fit: Fit): { dps: number; volley: number } | null {
     armed = true;
     volley += perShot;
     dps += perShot / cycle;
+    droneDps += perShot / cycle;
   }
 
-  return armed ? { dps, volley } : null;
-}
-
-/**
- * Effective hit points against an omni damage profile (25 % of each type).
- *
- * Per layer: `hp / mean(resonance_em, _thermal, _kinetic, _explosive)` — the damage-weighted mean
- * resonance of an even profile is the plain mean, and dividing the raw pool by it is exactly what
- * Pyfa's `DamagePattern.effectivify` does. A layer with no hit points contributes nothing; a
- * resonance the data set does not define is read as 1 (no resistance), the SDE's own default.
- * The structure layer is not resistance-free on a bare hull, though: every ship has an innate 0.67
- * to all four damage types, a 33 % structure resist before any module is fitted.
- *
- * `null` only when the hull has no layer at all.
- */
-function effectiveHp(fit: Fit): number | null {
-  let total = 0;
-  let found = false;
-
-  for (const layer of LAYERS) {
-    const hp = shipAttr(fit, layer.hp);
-    if (hp === null || hp <= 0) continue;
-    let sum = 0;
-    for (const resonance of layer.resonances) sum += attrOr(fit, fit.ship, resonance, 1);
-    const mean = sum / layer.resonances.length;
-    if (mean <= 0) continue;                     // a 100 % resist would be an infinite pool
-    found = true;
-    total += hp / mean;
-  }
-
-  return found ? total : null;
+  return armed ? { dps, volley, weaponDps, droneDps } : null;
 }
 
 /**

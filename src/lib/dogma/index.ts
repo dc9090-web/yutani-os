@@ -20,7 +20,7 @@ export {
   DogmaCycleError, UnknownAttributeError, clearMemo, explain, getAttr, type AppliedModifier,
 } from "./calc.js";
 export { fitStats, type FitStats, type ModuleStat, type ResourcePool, type SlotUsage } from "./stats.js";
-export { PERF_ATTR, fitPerformance, type CapStability, type FitPerformance } from "./perf.js";
+export { CHARACTER_ATTR, PERF_ATTR, fitPerformance, type CapStability, type FitPerformance, type LayerPerformance } from "./perf.js";
 export {
   itemLabel, missingSkills, validateFit, type MissingSkill, type Problem, type ProblemKind,
 } from "./validate.js";

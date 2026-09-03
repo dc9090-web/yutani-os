@@ -1,9 +1,10 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, itemLabel, round2,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2,
   type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats,
-  type Hardpoint, type Item, type ModuleStat, type Problem, type ProblemKind, type SlotKind,
+  type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem,
+  type ProblemKind, type SlotKind,
 } from "../dogma/index.js";
-import { isk, typeDescription } from "./format.js";
+import { duration, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
 import { bonusLabel, fitValueGroups, gauge, type GaugeView } from "./ships.js";
@@ -96,8 +97,27 @@ export interface EntryView { key: string; typeId: number; name: string; quantity
 export interface BonusView { skill: string | null; level: number | null; text: string }
 export interface ValueLineView { label: string; value: string }
 
+/** One label/value line of a ship-stats section. */
+export interface StatRowView { label: string; value: string }
+/** A tank layer row of the Defense section: pool, an optional note (shield recharge time) and the
+ *  four resistances as whole percents in EVE's order — em, thermal, kinetic, explosive. */
+export interface ResistRowView { layer: string; hp: string; note: string | null; resists: [number, number, number, number] }
+export interface StatSectionView { title: string; headline: string; rows: StatRowView[] }
+
+/** The fitting window's stats panel: six sections plus the two bays, every value pre-formatted. */
+export interface ShipStatsView {
+  capacitor: StatSectionView & { ok: boolean | null };
+  offense: StatSectionView;
+  defense: StatSectionView & { recharge: string | null; layers: ResistRowView[] };
+  targeting: StatSectionView;
+  navigation: StatSectionView;
+  drones: StatSectionView;
+  bays: StatRowView[];
+}
+
 export interface FitSheetView {
   title: string; subtitle: string; typeId: number; typeName: string; renderUrl: string; skillsSynced: boolean;
+  stats: ShipStatsView;
   bonuses: BonusView[]; gauges: GaugeView[]; slots: SlotColumnView[]; counters: CounterView[];
   problems: ProblemView[]; missing: MissingSkillView[];
   cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
@@ -113,8 +133,117 @@ export interface FitSheetInput {
   prices: ReadonlyMap<number, Price>;
   /** Cleaned SDE descriptions keyed by type id — the hover text on every item name. */
   descriptions: ReadonlyMap<number, string>;
+  /** `fitPerformance(built.fit)` — the fitting-window numbers. */
+  perf: FitPerformance;
   skillsSynced: boolean;
 }
+
+const DASH = "—";
+const fmtNum = (value: number | null, decimals: number, unit = ""): string =>
+  value === null ? DASH : `${grouped(value.toFixed(decimals))}${unit}`;
+const whole = (value: number | null, unit = ""): string => value === null ? DASH : `${grouped(Math.round(value))}${unit}`;
+const km = (metres: number | null): string => metres === null ? DASH : `${grouped((metres / 1000).toFixed(1))} km`;
+
+function layerRow(layer: string, perf: LayerPerformance | null, note: string | null = null): ResistRowView | null {
+  if (perf === null) return null;
+  return {
+    layer, hp: whole(perf.hp, " hp"), note,
+    resists: perf.resists.map((r) => Math.round(r * 100)) as [number, number, number, number],
+  };
+}
+
+/** "used / total m³" for a bay: the fit's entries' volumes summed against the hull's modified capacity. */
+function bayRow(label: string, entries: readonly FitEntry[], fit: Fit, capacityAttr: number): StatRowView {
+  let used = 0;
+  for (const entry of entries) used += (fit.data.types.get(entry.typeId)?.attrs.get(ATTR.volume) ?? 0) * entry.quantity;
+  const total = fit.data.attributes.has(capacityAttr) && fit.ship.attrs.has(capacityAttr) ? getAttr(fit, fit.ship, capacityAttr) : null;
+  const fmt = (v: number) => grouped(Number.isInteger(v) ? v : Number(v.toFixed(1)));
+  // A hull with no such bay (a Rifter's drone bay is 0 m³) shows only what is stowed there.
+  return { label, value: total === null || total <= 0 ? `${fmt(used)} m³` : `${fmt(used)} / ${fmt(total)} m³` };
+}
+
+/**
+ * The fitting window's right-hand panel, section by section, formatted the way the client shows
+ * it. A number the engine cannot give (see `FitPerformance`) renders as the dash; a section whose
+ * headline is a dash still lists what it can.
+ */
+export function shipStatsView(perf: FitPerformance, built: BuiltFit): ShipStatsView {
+  const fit = built.fit;
+  const cap = perf.capStable;
+  const capHeadline = cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${duration(cap.lastsSeconds * 1000)}`;
+  const deltaPct = perf.capDelta === null || perf.capPeakRecharge === null || perf.capPeakRecharge <= 0
+    ? null : (perf.capDelta / perf.capPeakRecharge) * 100;
+  const delta = perf.capDelta === null ? DASH
+    : `${perf.capDelta >= 0 ? "+" : "−"}${Math.abs(perf.capDelta).toFixed(1)} GJ/s${deltaPct === null ? "" : ` (${Math.abs(deltaPct).toFixed(1)}%)`}`;
+
+  const layers = [
+    layerRow("Shield", perf.shield, perf.shieldRechargeTime === null ? null : whole(perf.shieldRechargeTime, " s")),
+    layerRow("Armor", perf.armor),
+    layerRow("Hull", perf.hull),
+  ].filter((row): row is ResistRowView => row !== null);
+
+  const droneCount = built.drones.reduce((sum, entry) => sum + entry.quantity, 0);
+  let bandwidthUsed = 0;
+  for (const entry of built.drones) bandwidthUsed += (fit.data.types.get(entry.typeId)?.attrs.get(PERF_ATTR_DRONE_BANDWIDTH_USED) ?? 0) * entry.quantity;
+
+  return {
+    capacitor: {
+      title: "Capacitor", headline: capHeadline, ok: cap === null ? null : cap.stable,
+      rows: [
+        { label: "Capacity", value: perf.capacitorCapacity === null ? DASH : `${whole(perf.capacitorCapacity, " GJ")}${perf.capRechargeTime === null ? "" : ` / ${duration(perf.capRechargeTime * 1000)}`}` },
+        { label: "Recharge", value: fmtNum(perf.capPeakRecharge, 1, " GJ/s peak") },
+        { label: "Δ", value: delta },
+      ],
+    },
+    offense: {
+      title: "Offense", headline: fmtNum(perf.dps, 1, " dps"),
+      rows: [
+        { label: "Weapons", value: fmtNum(perf.weaponDps, 1, " dps") },
+        { label: "Drones", value: fmtNum(perf.droneDps, 1, " dps") },
+        { label: "Volley", value: whole(perf.volley, " HP") },
+      ],
+    },
+    defense: {
+      title: "Defense", headline: whole(perf.ehp, " ehp"),
+      recharge: perf.shieldRechargeRate === null ? null : `${fmtNum(perf.shieldRechargeRate, 1)} hp/s`,
+      layers, rows: [],
+    },
+    targeting: {
+      title: "Targeting", headline: km(perf.maxTargetRange),
+      rows: [
+        { label: "Sensor strength", value: perf.sensorStrength === null ? DASH : `${fmtNum(perf.sensorStrength.points, 1)} points (${perf.sensorStrength.kind})` },
+        { label: "Scan resolution", value: whole(perf.scanResolution, " mm") },
+        { label: "Signature radius", value: whole(perf.signatureRadius, " m") },
+        { label: "Max targets", value: perf.maxTargets === null ? DASH : `${perf.maxTargets}×` },
+      ],
+    },
+    navigation: {
+      title: "Navigation", headline: fmtNum(perf.maxVelocity, 1, " m/s"),
+      rows: [
+        { label: "Mass", value: perf.mass === null ? DASH : `${grouped((perf.mass / 1000).toFixed(1))} t` },
+        { label: "Inertia", value: perf.inertia === null ? DASH : `${perf.inertia.toFixed(4)}×` },
+        { label: "Warp speed", value: fmtNum(perf.warpSpeed, 2, " AU/s") },
+        { label: "Align time", value: fmtNum(perf.alignTime, 2, " s") },
+      ],
+    },
+    drones: {
+      title: "Drones", headline: fmtNum(perf.droneDps, 1, " dps"),
+      rows: [
+        { label: "Bandwidth", value: perf.droneBandwidth === null ? DASH : `${whole(bandwidthUsed)} / ${whole(perf.droneBandwidth)} Mbit/s` },
+        { label: "Control range", value: km(perf.droneControlRange) },
+        { label: "In bay", value: `${droneCount} drone${droneCount === 1 ? "" : "s"}` },
+      ],
+    },
+    bays: [
+      bayRow("Cargo hold", built.cargo, fit, ATTR.capacity),
+      bayRow("Drone bay", built.drones, fit, PERF_ATTR_DRONE_CAPACITY),
+    ],
+  };
+}
+
+// Attribute ids also spelled in dogma/perf.ts's PERF_ATTR; named here so this file needs no import of it.
+const PERF_ATTR_DRONE_BANDWIDTH_USED = 1272;
+const PERF_ATTR_DRONE_CAPACITY = 283;
 
 
 function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number, string>): ModuleRowView {
@@ -224,6 +353,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   return {
     title: input.title, subtitle: input.subtitle, typeId: input.typeId, typeName: input.typeName,
     renderUrl: shipRenderUrl(input.typeId), skillsSynced: input.skillsSynced,
+    stats: shipStatsView(input.perf, built),
     bonuses: input.bonuses.map((b) => ({
       skill: b.skillTypeId === null ? null : input.skillNames.get(b.skillTypeId) ?? `Skill ${b.skillTypeId}`,
       level: b.skillTypeId === null ? null : input.skillLevels.get(b.skillTypeId) ?? 0,

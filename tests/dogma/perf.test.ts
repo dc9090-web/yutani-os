@@ -48,6 +48,16 @@ const PERF_ATTRS: readonly (readonly [AttrId, string, number, boolean, boolean])
   [482, "capacitorCapacity", 0, true, true],
   [552, "signatureRadius", 100, false, false],
   [564, "scanResolution", 0, false, true],
+  [479, "shieldRechargeRate", 0, true, false],
+  [208, "scanRadarStrength", 0, false, true],
+  [209, "scanLadarStrength", 0, false, true],
+  [210, "scanMagnetometricStrength", 0, false, true],
+  [211, "scanGravimetricStrength", 0, false, true],
+  [283, "droneCapacity", 0, true, true],
+  [1271, "droneBandwidth", 0, true, true],
+  [1272, "droneBandwidthUsed", 0, true, true],
+  [600, "warpSpeedMultiplier", 3, false, true],
+  [1281, "baseWarpSpeed", 0, true, true],
 ];
 
 type Attrs = readonly (readonly [AttrId, number])[];
@@ -107,6 +117,13 @@ const HULL: Attrs = [
   [PERF_ATTR.maxTargetRange, 45_000],
   [PERF_ATTR.scanResolution, 480],
   [PERF_ATTR.signatureRadius, 38],
+  [PERF_ATTR.shieldRechargeRate, 1_000_000],   // 1000 s  →  peak 2.5 x 800 / 1000 = 2 hp/s
+  [PERF_ATTR.scanLadarStrength, 8],
+  [PERF_ATTR.scanRadarStrength, 3],
+  [PERF_ATTR.droneBandwidth, 25],
+  [PERF_ATTR.droneCapacity, 40],
+  [PERF_ATTR.warpSpeedMultiplier, 5],
+  [PERF_ATTR.baseWarpSpeed, 1],
 ];
 
 /** 10 em + 20 thermal + 30 kinetic + 40 explosive = 100 damage a shot, before any multiplier. */
@@ -356,10 +373,64 @@ describe("a hull that carries nothing", () => {
     const b = bench();
     const perf = fitPerformance(buildFit(b.data, b.hull([])));
     expect(perf).toEqual({
-      dps: null, volley: null, ehp: null, maxVelocity: null, alignTime: null,
-      capacitorCapacity: null, capRechargeTime: null, capStable: null,
-      maxTargets: null, maxTargetRange: null, scanResolution: null, signatureRadius: null,
+      dps: null, volley: null, weaponDps: null, droneDps: null,
+      ehp: null, shield: null, armor: null, hull: null, shieldRechargeTime: null, shieldRechargeRate: null,
+      maxVelocity: null, alignTime: null,
+      capacitorCapacity: null, capRechargeTime: null, capStable: null, capUsage: null, capPeakRecharge: null, capDelta: null,
+      maxTargets: null, maxTargetRange: null, scanResolution: null, signatureRadius: null, sensorStrength: null,
+      mass: null, inertia: null, warpSpeed: null, droneBandwidth: null, droneBay: null, droneControlRange: null,
     });
+  });
+});
+
+describe("the fitting-window stats", () => {
+  it("reports each tank layer's pool, resistances and omni ehp", () => {
+    const b = bench();
+    const perf = fitPerformance(buildFit(b.data, b.hull(HULL)));
+    const pct = (layer: { resists: readonly number[] } | null) => layer!.resists.map((r) => Math.round(r * 100));
+    expect(perf.shield).toMatchObject({ hp: 800, ehp: 1600 });
+    expect(pct(perf.shield)).toEqual([0, 50, 75, 75]);
+    expect(perf.armor!.hp).toBe(600);
+    expect(perf.armor!.ehp).toBeCloseTo(1000, 9);
+    expect(pct(perf.armor)).toEqual([10, 30, 50, 70]);
+    expect(perf.hull).toEqual({ hp: 500, resists: [0, 0, 0, 0], ehp: 500 });
+    expect(perf.ehp).toBeCloseTo(3100, 9);
+    expect(perf.shieldRechargeTime).toBe(1000);
+    expect(perf.shieldRechargeRate).toBe(2);
+  });
+
+  it("splits dps between weapons and drones", () => {
+    const b = bench();
+    // Turret: 100 x 2 / 5 s = 40 dps. Drone: 100 / 4 s = 25 dps.
+    const gun = b.turret([[PERF_ATTR.damageMultiplier, 2], [PERF_ATTR.speed, 5000]]);
+    const drone = b.drone([...SHELL, [PERF_ATTR.speed, 4000]]);
+    const fit = buildFit(b.data, b.hull(HULL), {
+      modules: [[gun, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]), drones: [drone],
+    });
+    expect(fitPerformance(fit)).toMatchObject({ dps: 65, weaponDps: 40, droneDps: 25 });
+    // Weapons only: the drone share is null, not 0.
+    expect(fitPerformance(buildFit(b.data, b.hull(HULL), {
+      modules: [[gun, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]),
+    }))).toMatchObject({ weaponDps: 40, droneDps: null });
+  });
+
+  it("reports the capacitor's peak recharge, the fit's draw and their difference", () => {
+    const b = bench();
+    // Peak: 2.5 x 1000 GJ / 200 s = 12.5 GJ/s. An active module drawing 50 GJ every 10 s: 5 GJ/s.
+    const idle = fitPerformance(buildFit(b.data, b.hull(HULL)));
+    expect(idle).toMatchObject({ capPeakRecharge: 12.5, capUsage: 0, capDelta: 12.5 });
+    const rep = b.active([[ATTR.capacitorNeed, 50], [PERF_ATTR.duration, 10_000]]);
+    const busy = fitPerformance(buildFit(b.data, b.hull(HULL), { modules: [[rep, "mid", 0]] }));
+    expect(busy).toMatchObject({ capPeakRecharge: 12.5, capUsage: 5, capDelta: 7.5 });
+  });
+
+  it("names the strongest sensor, and reads mass, inertia, warp speed and the drone limits", () => {
+    const b = bench();
+    const perf = fitPerformance(buildFit(b.data, b.hull(HULL)));
+    expect(perf.sensorStrength).toEqual({ kind: "Ladar", points: 8 });   // 8 ladar beats 3 radar
+    expect(perf).toMatchObject({ mass: 2_000_000, inertia: 5, warpSpeed: 5, droneBandwidth: 25, droneBay: 40 });
+    // droneControlDistance is a character attribute the bench (like the snapshots) does not define.
+    expect(perf.droneControlRange).toBeNull();
   });
 });
 

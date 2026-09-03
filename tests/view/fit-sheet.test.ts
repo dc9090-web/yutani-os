@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
-import { CATEGORY, fitFromAssets, fitStats, validateFit } from "../../src/lib/dogma/index.js";
+import { CATEGORY, fitFromAssets, fitPerformance, fitStats, validateFit } from "../../src/lib/dogma/index.js";
 import { buildFitSheet, operatorLabel, problemText, stateLabel, typeDescription } from "../../src/lib/view/fit-sheet.js";
 import { fitValueEntries } from "../../src/lib/view/ships.js";
 import { rollUpValue } from "../../src/lib/view/price.js";
@@ -62,7 +62,7 @@ function sheet(over: Partial<Parameters<typeof buildFitSheet>[0]> = {}) {
   const built = fitFromAssets(SHIP, CHILDREN, ctx);
   return buildFitSheet({
     title: "Scarlet Dart", subtitle: "Jita 4-4", typeId: 587, typeName: "Rifter",
-    built, stats: fitStats(built.fit), problems: validateFit(built.fit),
+    built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit),
     bonuses: BONUSES, skillLevels, skillNames, prices: PRICES, descriptions: DESCRIPTIONS, skillsSynced: true, ...over,
   });
 }
@@ -185,6 +185,25 @@ describe("buildFitSheet", () => {
     expect(view.value.lines.map((l) => l.label)).toEqual(["Hull", "Modules & rigs", "Charges", "Drones", "Cargo"]);
     expect(view.value.lines[0].value).toBe(isk(8_000_000));
     expect(view.value.unpriced).toBe("2 items unpriced");   // both Hobgoblin rows — the roll-up counts asset rows, not merged lines; the Hobgoblin has no price
+  });
+
+  it("formats the fitting-window stats panel from the engine's numbers", () => {
+    const view = sheet();
+    const perf = fitPerformance(fitFromAssets(SHIP, CHILDREN, ctx).fit);
+    // Rifter hull: 450 shield / 450 armour / 350 structure, ladar 8, warp 5 AU/s (1 x 5), mass 1,067 t.
+    expect(view.stats.defense.layers.map((l) => [l.layer, l.hp])).toEqual([["Shield", "450 hp"], ["Armor", "450 hp"], ["Hull", "350 hp"]]);
+    expect(view.stats.defense.layers[0].note).toBe("625 s");
+    expect(view.stats.defense.layers[2].resists).toEqual([33, 33, 33, 33]);   // the innate 0.67 structure resonance
+    expect(view.stats.defense.headline).toBe(`${Math.round(perf.ehp!).toLocaleString("en-US")} ehp`);
+    expect(view.stats.targeting.rows.find((r) => r.label === "Sensor strength")?.value).toBe("8.0 points (Ladar)");
+    expect(view.stats.navigation.rows.map((r) => r.value)).toEqual(["1,067.0 t", "3.2000×", "5.00 AU/s", expect.stringMatching(/ s$/)]);
+    expect(view.stats.capacitor.headline).toMatch(/^Stable \d+%$/);
+    expect(view.stats.capacitor.ok).toBe(true);
+    expect(view.stats.offense.headline).toMatch(/ dps$/);
+    expect(view.stats.offense.rows.find((r) => r.label === "Weapons")?.value).toMatch(/ dps$/);
+    // The bays: 1500 Hail S at 0.0025 m³ = 3.75 m³ of a 140 m³ hold; 6 Hobgoblin II at 5 m³ = 30 m³, and the Rifter has no drone bay (0 m³).
+    expect(view.stats.bays).toEqual([{ label: "Cargo hold", value: "3.8 / 140 m³" }, { label: "Drone bay", value: "30 m³" }]);
+    expect(view.stats.drones.rows.find((r) => r.label === "In bay")?.value).toBe("6 drones");
   });
 
   it("passes the unsynced-skills flag through", () => {

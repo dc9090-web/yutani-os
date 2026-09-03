@@ -1,7 +1,7 @@
 import { getPrices } from "../db/market-prices.js";
 import { getTypeBonuses, getTypes } from "../sde/repo.js";
 import { locationLabels } from "../names/index.js";
-import { CATEGORY, fitFromAssets, fitFromFitting, type BuiltFit } from "../dogma/index.js";
+import { CATEGORY, fitFromAssets, fitFromFitting, fitPerformance, type BuiltFit } from "../dogma/index.js";
 import { buildFitSheet, typeDescription, type FitSheetView } from "../view/fit-sheet.js";
 import {
   SAVED_FIT_LOCATION, assembledShips, computeFit, fitValueEntries, shipLocationLabel,
@@ -55,7 +55,8 @@ async function sheetFor(input: {
     view: buildFitSheet({
       title: input.title, subtitle: input.subtitle, typeId: input.typeId, typeName: input.typeName,
       built, stats, problems, bonuses,
-      skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, skillsSynced: input.data.skillsSynced,
+      skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, perf: fitPerformance(built.fit),
+      skillsSynced: input.data.skillsSynced,
     }),
   };
 }

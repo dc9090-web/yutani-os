@@ -2,6 +2,7 @@ import type { FitSheetView, EntryView } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { AffectedBy } from "./AffectedBy.js";
 import { Gauge } from "./Gauge.js";
+import { ShipStats } from "./ShipStats.js";
 
 /** `icons` is off for the unknown-types list: the image server has nothing for a type the SDE lacks. */
 function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: boolean }) {
@@ -134,6 +135,8 @@ export function FitSheet({ view }: { view: FitSheetView }) {
             ))}
           </div>
         </div>
+
+        <ShipStats stats={view.stats} />
 
         <div className={`card${view.problems.length === 0 ? "" : " card-problems"}`}>
           <h2 className="card-title">Problems</h2>
