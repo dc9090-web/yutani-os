@@ -24,15 +24,14 @@ export interface OverviewCard {
 
 const NOT_SYNCED = <span className="faint">Not synced yet</span>;
 
-/** pvp/miner/scanner tags and main/alt account pills get a coloured variant when the (lower-cased)
- *  name matches one of the design hand-back's known variants; anything else stays a plain `.pill`. */
+/** Main/alt account pills get a coloured variant when the (lower-cased) name matches one of the
+ *  design hand-back's known variants; anything else stays a plain `.pill`. Tags are all `.pill.tag`. */
 function pillClass(name: string, variants: readonly string[]): string {
   const variant = variants.find((v) => v === name.toLowerCase());
   return variant === undefined ? "pill" : `pill ${variant}`;
 }
 
 const ACCOUNT_VARIANTS = ["main", "alt"] as const;
-const TAG_VARIANTS = ["pvp", "miner", "scanner"] as const;
 
 export function CharacterCard({ card }: { card: OverviewCard }) {
   return (
@@ -60,7 +59,7 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
       </div>
       {card.tags.length === 0 ? null : (
         <div className="ov-pills">
-          {card.tags.map((tag) => <span key={tag} className={pillClass(tag, TAG_VARIANTS)}>{tag}</span>)}
+          {card.tags.map((tag) => <span key={tag} className="pill tag">{tag}</span>)}
         </div>
       )}
       <dl className="ov-rows">

@@ -102,21 +102,21 @@ describe("CharacterCard", () => {
     expect(screen.queryByText("Main")).not.toBeInTheDocument();
   });
 
-  it("shows a pill per tag, coloured by variant when the name matches, and no pills row when there are none", () => {
+  it("shows one green tag pill per tag, and no pills row when there are none", () => {
     render(<CharacterCard card={full} />);
     const pillsRow = screen.getByText("Miner").closest<HTMLElement>(".ov-pills");
     expect(pillsRow).not.toBeNull();
-    expect(within(pillsRow!).getByText("Miner")).toHaveClass("pill miner");
-    expect(within(pillsRow!).getByText("Scanner")).toHaveClass("pill scanner");
+    expect(within(pillsRow!).getByText("Miner")).toHaveClass("pill tag");
+    expect(within(pillsRow!).getByText("Scanner")).toHaveClass("pill tag");
 
     const { container } = render(<CharacterCard card={{ ...full, account: null, tags: [] }} />);
     expect(container.querySelector(".ov-pills")).toBeNull();
   });
 
-  it("shows a plain pill for a tag that isn't a known variant", () => {
+  it("gives an unknown tag name the same green tag pill", () => {
     render(<CharacterCard card={{ ...full, tags: ["Hauler"] }} />);
     const pill = screen.getByText("Hauler");
-    expect(pill).toHaveClass("pill");
-    expect(pill.className.trim()).toBe("pill");
+    expect(pill).toHaveClass("pill tag");
+    expect(pill.className.trim()).toBe("pill tag");
   });
 });
