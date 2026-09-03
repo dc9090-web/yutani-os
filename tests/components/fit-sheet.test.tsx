@@ -39,10 +39,10 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: [{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility." }],
-  drones: [{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null, desc: null }],
+  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility." }],
+  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", quantity: 5, value: null, desc: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", name: "Unknown type (99999)", quantity: 1, value: null, desc: null }],
+  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", quantity: 1, value: null, desc: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],
@@ -69,9 +69,9 @@ describe("FitSheet", () => {
   });
 
   it("lists the module with its charge, both resource figures and its state", () => {
-    render(<FitSheet view={view} />);
+    const { container } = render(<FitSheet view={view} />);
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
-    expect(screen.getByText("Hail S")).toBeInTheDocument();         // the charge under its turret
+    expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent("Hail S");   // the charge under its turret
     expect(screen.getByText("12.80")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     // The CPU cell has modifiers, so it is a popover button; powergrid has none, so it is plain text.
@@ -83,8 +83,8 @@ describe("FitSheet", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(container.querySelector(".sheet-mod")).toHaveAttribute("data-desc", "The 200mm is a powerful autocannon.");
     expect(container.querySelector(".sheet-mod-charge")).toHaveAttribute("data-desc", "Hail is an attempt to combine penetration with versatility.");
-    expect(screen.getByText("Hail S ×1000")).toHaveAttribute("data-desc");
-    expect(screen.getByText("Hobgoblin II ×5")).not.toHaveAttribute("data-desc");
+    expect(screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")).toHaveAttribute("data-desc");
+    expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).not.toHaveAttribute("data-desc");
   });
 
   it("shows the slot and hardpoint counters, flagging the over-full one", () => {
@@ -102,11 +102,17 @@ describe("FitSheet", () => {
     expect(screen.getByText("0 → 1")).toBeInTheDocument();
   });
 
-  it("lists cargo, drones, unknown types and the estimated value", () => {
-    render(<FitSheet view={view} />);
-    expect(screen.getByText("Hail S ×1000")).toBeInTheDocument();
-    expect(screen.getByText("Hobgoblin II ×5")).toBeInTheDocument();
-    expect(screen.getByText("Unknown type (99999) ×1")).toBeInTheDocument();
+  it("lists cargo, drones, unknown types and the estimated value, with icons and counts", () => {
+    const { container } = render(<FitSheet view={view} />);
+    const cargo = screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")!;
+    expect(cargo.querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/12608/icon?size=32");
+    expect(cargo).toHaveTextContent("Hail S×1000");
+    expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).toHaveTextContent("×5");
+    // A single item is just its name, and a type the SDE lacks gets no icon.
+    const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;
+    expect(unknown).not.toHaveTextContent("×");
+    expect(unknown.querySelector("img")).toBeNull();
+    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(2);
     expect(screen.getByText("13,100,100.00 ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
   });

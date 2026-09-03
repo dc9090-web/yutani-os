@@ -26,6 +26,10 @@ const CHILDREN: AssetRow[] = [
   asset({ itemId: 1003, typeId: 519, locationFlag: "LoSlot0", isSingleton: true }),
   asset({ itemId: 1004, typeId: 2456, locationFlag: "DroneBay", quantity: 5 }),
   asset({ itemId: 1005, typeId: 12608, locationFlag: "Cargo", quantity: 1000 }),
+  // A second, unmerged stack of the same ammo and a launched-and-recovered (singleton) drone: ESI
+  // reports both as separate rows; the sheet shows one line each.
+  asset({ itemId: 1006, typeId: 12608, locationFlag: "Cargo", quantity: 500 }),
+  asset({ itemId: 1007, typeId: 2456, locationFlag: "DroneBay", quantity: 1, isSingleton: true }),
 ];
 
 const data = fixtureData("rifter");
@@ -165,10 +169,10 @@ describe("buildFitSheet", () => {
     expect(frigate.need).toBeGreaterThanOrEqual(1);
   });
 
-  it("lists cargo and drones with quantities and values", () => {
+  it("lists cargo and drones one line per type, split stacks and singleton drones merged", () => {
     const view = sheet();
-    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: DESCRIPTIONS.get(12608) }]);
-    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null, desc: "Light Scout Drone" }]);
+    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", quantity: 1500, value: "150,000.00 ISK", desc: DESCRIPTIONS.get(12608) }]);
+    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", quantity: 6, value: null, desc: "Light Scout Drone" }]);
     expect(view.unfittable).toEqual([]);
     expect(view.unknown).toEqual([]);
   });
@@ -180,7 +184,7 @@ describe("buildFitSheet", () => {
     expect(view.value.total).toBe(isk(expected.total));
     expect(view.value.lines.map((l) => l.label)).toEqual(["Hull", "Modules & rigs", "Charges", "Drones", "Cargo"]);
     expect(view.value.lines[0].value).toBe(isk(8_000_000));
-    expect(view.value.unpriced).toBe("1 item unpriced");   // the Hobgoblin has no price
+    expect(view.value.unpriced).toBe("2 items unpriced");   // both Hobgoblin rows — the roll-up counts asset rows, not merged lines; the Hobgoblin has no price
   });
 
   it("passes the unsynced-skills flag through", () => {

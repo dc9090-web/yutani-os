@@ -3,12 +3,20 @@ import { roman } from "../../lib/view/format.js";
 import { AffectedBy } from "./AffectedBy.js";
 import { Gauge } from "./Gauge.js";
 
-function EntryList({ entries }: { entries: EntryView[] }) {
+/** `icons` is off for the unknown-types list: the image server has nothing for a type the SDE lacks. */
+function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: boolean }) {
   return (
-    <ul className="entry-list">
+    <ul className="entry-list sheet-entries">
       {entries.map((entry) => (
         <li key={entry.key}>
-          <span data-desc={entry.desc ?? undefined}>{entry.name} ×{entry.quantity}</span>
+          <span className="sheet-entry" data-desc={entry.desc ?? undefined}>
+            {icons ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img className="module-icon" src={`https://images.evetech.net/types/${entry.typeId}/icon?size=32`} alt="" />
+            ) : null}
+            <span className="sheet-entry-name">{entry.name}</span>
+            {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
+          </span>
           <span className="num muted">{entry.value ?? "—"}</span>
         </li>
       ))}
@@ -100,7 +108,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
             <>
               <h3 className="slot-title">Unknown types</h3>
               <p className="faint">The static data does not know these types, so they are excluded from the calculation.</p>
-              <EntryList entries={view.unknown} />
+              <EntryList entries={view.unknown} icons={false} />
             </>
           )}
           {view.unfittable.length === 0 ? null : (

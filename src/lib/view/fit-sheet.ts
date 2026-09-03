@@ -91,7 +91,7 @@ export interface SlotColumnView { slot: SlotKind; title: string; used: number; t
 export interface CounterView { label: string; used: number; total: number; over: boolean }
 export interface ProblemView { kind: ProblemKind; label: string; text: string }
 export interface MissingSkillView { skillTypeId: number; name: string; have: number; need: number }
-export interface EntryView { key: string; name: string; quantity: number; value: string | null; desc: string | null }
+export interface EntryView { key: string; typeId: number; name: string; quantity: number; value: string | null; desc: string | null }
 export interface BonusView { skill: string | null; level: number | null; text: string }
 export interface ValueLineView { label: string; value: string }
 
@@ -150,11 +150,29 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
   };
 }
 
+/**
+ * One line per type (and per custom nickname) with the quantities summed. ESI hands back every
+ * drone that has ever been launched as its own singleton row of quantity 1 — five Wasp IIs arrive
+ * as five rows — and splits cargo stacks the pilot never merged; the in-game inventory shows them
+ * grouped with a count, so the sheet does too.
+ */
+function mergeEntries(entries: FitEntry[]): FitEntry[] {
+  const merged = new Map<string, FitEntry>();
+  for (const entry of entries) {
+    const key = `${entry.flag}:${entry.typeId}:${entry.name ?? ""}`;
+    const seen = merged.get(key);
+    if (seen === undefined) merged.set(key, { ...entry });
+    else seen.quantity += entry.quantity;
+  }
+  return [...merged.values()];
+}
+
 function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>): EntryView[] {
-  return entries.map((entry, index) => {
+  return mergeEntries(entries).map((entry, index) => {
     const unit = priceOf(prices.get(entry.typeId));
     return {
       key: `${entry.flag}:${entry.typeId}:${index}`,
+      typeId: entry.typeId,
       // `entry.name` is the asset's own custom nickname (may be null); fall back to the SDE type name,
       // and to spec §6's "Unknown type (id)" when this SDE build doesn't know the type either.
       name: entry.name ?? data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
