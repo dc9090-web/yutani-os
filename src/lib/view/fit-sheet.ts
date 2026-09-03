@@ -82,6 +82,8 @@ export function problemText(p: Problem): string {
 
 export interface ModuleRowView {
   key: string; name: string; typeId: number; charge: string | null;
+  /** SDE descriptions, plain text — `typeDescription()`; null when the SDE has none. */
+  desc: string | null; chargeDesc: string | null;
   cpu: string; power: string; state: string;
   cpuExplain: ExplainRowView[]; powerExplain: ExplainRowView[];
 }
@@ -89,7 +91,7 @@ export interface SlotColumnView { slot: SlotKind; title: string; used: number; t
 export interface CounterView { label: string; used: number; total: number; over: boolean }
 export interface ProblemView { kind: ProblemKind; label: string; text: string }
 export interface MissingSkillView { skillTypeId: number; name: string; have: number; need: number }
-export interface EntryView { key: string; name: string; quantity: number; value: string | null }
+export interface EntryView { key: string; name: string; quantity: number; value: string | null; desc: string | null }
 export interface BonusView { skill: string | null; level: number | null; text: string }
 export interface ValueLineView { label: string; value: string }
 
@@ -108,15 +110,36 @@ export interface FitSheetInput {
   skillLevels: ReadonlyMap<number, number>;
   skillNames: ReadonlyMap<number, string>;
   prices: ReadonlyMap<number, Price>;
+  /** Cleaned SDE descriptions keyed by type id — the hover text on every item name. */
+  descriptions: ReadonlyMap<number, string>;
   skillsSynced: boolean;
 }
 
-function moduleRow(fit: Fit, stat: ModuleStat): ModuleRowView {
+const DESCRIPTION_MAX = 600;
+
+/**
+ * An SDE type description as hover text: anchors and other client markup stripped, CRLF and runs
+ * of blank lines collapsed to paragraph breaks (rendered with `white-space: pre-line`), and the
+ * rare multi-screen essay cut at a word boundary. Null when the SDE has nothing to say.
+ */
+export function typeDescription(raw: string | null | undefined): string | null {
+  if (raw == null) return null;
+  const text = raw.replace(/<[^>]*>/g, "").replace(/\r\n?/g, "\n").replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n").trim();
+  if (text === "") return null;
+  if (text.length <= DESCRIPTION_MAX) return text;
+  const cut = text.slice(0, DESCRIPTION_MAX);
+  return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), DESCRIPTION_MAX - 40)).trimEnd()}…`;
+}
+
+function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number, string>): ModuleRowView {
   return {
     key: `${stat.slot}:${stat.index}`,
     name: itemLabel(stat.item),
     typeId: stat.item.typeId,
     charge: stat.item.charge === undefined ? null : itemLabel(stat.item.charge),
+    desc: descriptions.get(stat.item.typeId) ?? null,
+    chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
     // Half-even round to 2dp first — same convention as the pool totals in `fitStats` — so a row's
     // own cpu/power always matches what the gauge above it is summing.
     cpu: round2(stat.cpu).toFixed(2),
@@ -127,7 +150,7 @@ function moduleRow(fit: Fit, stat: ModuleStat): ModuleRowView {
   };
 }
 
-function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>): EntryView[] {
+function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>): EntryView[] {
   return entries.map((entry, index) => {
     const unit = priceOf(prices.get(entry.typeId));
     return {
@@ -137,12 +160,13 @@ function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<nu
       name: entry.name ?? data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
       quantity: entry.quantity,
       value: unit === null ? null : isk(unit * entry.quantity),
+      desc: descriptions.get(entry.typeId) ?? null,
     };
   });
 }
 
 export function buildFitSheet(input: FitSheetInput): FitSheetView {
-  const { built, stats, prices } = input;
+  const { built, stats, prices, descriptions } = input;
   const fit = built.fit;
 
   const bySlot = new Map<SlotKind, ModuleStat[]>();
@@ -156,7 +180,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     title: SLOT_TITLES[slot],
     used: stats.slots[slot].used,
     total: stats.slots[slot].total,
-    rows: [...(bySlot.get(slot) ?? [])].sort((a, b) => a.index - b.index).map((stat) => moduleRow(fit, stat)),
+    rows: [...(bySlot.get(slot) ?? [])].sort((a, b) => a.index - b.index).map((stat) => moduleRow(fit, stat, descriptions)),
   }));
 
   const counters: CounterView[] = [
@@ -210,10 +234,10 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     slots, counters,
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
-    cargo: entryViews(built.cargo, fit.data, prices),
-    drones: entryViews(built.drones, fit.data, prices),
-    unfittable: entryViews(built.unfittable, fit.data, prices),
-    unknown: entryViews(built.unknown, fit.data, prices),
+    cargo: entryViews(built.cargo, fit.data, prices, descriptions),
+    drones: entryViews(built.drones, fit.data, prices, descriptions),
+    unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),
+    unknown: entryViews(built.unknown, fit.data, prices, descriptions),
     value: { total: isk(total), lines, unpriced: unpricedNote(unpriced) },
   };
 }

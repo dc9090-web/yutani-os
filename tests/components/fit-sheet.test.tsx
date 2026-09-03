@@ -19,6 +19,7 @@ const view: FitSheetView = {
       slot: "high", title: "High", used: 1, total: 4,
       rows: [{
         key: "high:0", name: "200mm AutoCannon II", typeId: 2889, charge: "Hail S",
+        desc: "The 200mm is a powerful autocannon.", chargeDesc: "Hail is an attempt to combine penetration with versatility.",
         cpu: "6.75", power: "12.80", state: "Active",
         cpuExplain: [{ carrier: "Weapon Upgrades", operator: "%", value: "-25", penalised: false }],
         powerExplain: [],
@@ -38,10 +39,10 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: [{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK" }],
-  drones: [{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null }],
+  cargo: [{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility." }],
+  drones: [{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null, desc: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", name: "Unknown type (99999)", quantity: 1, value: null }],
+  unknown: [{ key: "HiSlot1:99999:0", name: "Unknown type (99999)", quantity: 1, value: null, desc: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],
@@ -76,6 +77,14 @@ describe("FitSheet", () => {
     // The CPU cell has modifiers, so it is a popover button; powergrid has none, so it is plain text.
     fireEvent.click(screen.getByRole("button", { name: /CPU 6.75/ }));
     expect(screen.getByText("Weapon Upgrades")).toBeInTheDocument();
+  });
+
+  it("puts each item's description on the name as hover text, and none when the SDE has none", () => {
+    const { container } = render(<FitSheet view={view} />);
+    expect(container.querySelector(".sheet-mod")).toHaveAttribute("data-desc", "The 200mm is a powerful autocannon.");
+    expect(container.querySelector(".sheet-mod-charge")).toHaveAttribute("data-desc", "Hail is an attempt to combine penetration with versatility.");
+    expect(screen.getByText("Hail S ×1000")).toHaveAttribute("data-desc");
+    expect(screen.getByText("Hobgoblin II ×5")).not.toHaveAttribute("data-desc");
   });
 
   it("shows the slot and hardpoint counters, flagging the over-full one", () => {

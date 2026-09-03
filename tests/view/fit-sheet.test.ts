@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
 import { CATEGORY, fitFromAssets, fitStats, validateFit } from "../../src/lib/dogma/index.js";
-import { buildFitSheet, operatorLabel, problemText, stateLabel } from "../../src/lib/view/fit-sheet.js";
+import { buildFitSheet, operatorLabel, problemText, stateLabel, typeDescription } from "../../src/lib/view/fit-sheet.js";
 import { fitValueEntries } from "../../src/lib/view/ships.js";
 import { rollUpValue } from "../../src/lib/view/price.js";
 import { isk } from "../../src/lib/view/format.js";
@@ -48,14 +48,35 @@ const BONUSES = [
   { skillTypeId: 3329, bonus: 10, unitId: 105, bonusText: "bonus to <a href=showinfo:3302>Small Projectile Turret</a> falloff" },
 ];
 
+const DESCRIPTIONS = new Map<number, string>([
+  [2889, "The 200mm is a powerful autocannon."],
+  [12608, "Hail is an attempt to combine penetration with versatility.\n\n25% reduced falloff."],
+  [2456, "Light Scout Drone"],
+]);
+
 function sheet(over: Partial<Parameters<typeof buildFitSheet>[0]> = {}) {
   const built = fitFromAssets(SHIP, CHILDREN, ctx);
   return buildFitSheet({
     title: "Scarlet Dart", subtitle: "Jita 4-4", typeId: 587, typeName: "Rifter",
     built, stats: fitStats(built.fit), problems: validateFit(built.fit),
-    bonuses: BONUSES, skillLevels, skillNames, prices: PRICES, skillsSynced: true, ...over,
+    bonuses: BONUSES, skillLevels, skillNames, prices: PRICES, descriptions: DESCRIPTIONS, skillsSynced: true, ...over,
   });
 }
+
+describe("typeDescription", () => {
+  it("strips client markup, keeps paragraph breaks and drops empty text", () => {
+    expect(typeDescription("Rig.\r\n\r\n\r\nTrain <a href=showinfo:26254>Astronautics Rigging</a>.  \n"))
+      .toBe("Rig.\n\nTrain Astronautics Rigging.");
+    expect(typeDescription("<b></b>  ")).toBeNull();
+    expect(typeDescription(null)).toBeNull();
+  });
+  it("cuts a multi-screen essay at a word boundary", () => {
+    const essay = Array.from({ length: 200 }, () => "word").join(" ");
+    const cut = typeDescription(essay)!;
+    expect(cut.length).toBeLessThanOrEqual(601);
+    expect(cut.endsWith("word…")).toBe(true);
+  });
+});
 
 describe("label helpers", () => {
   it("names states and operators", () => {
@@ -75,6 +96,15 @@ describe("label helpers", () => {
 });
 
 describe("buildFitSheet", () => {
+  it("carries each item's description for the hover text", () => {
+    const view = sheet();
+    const turret = view.slots.find((c) => c.slot === "high")!.rows[0];
+    expect(turret.desc).toBe("The 200mm is a powerful autocannon.");
+    expect(turret.chargeDesc).toContain("25% reduced falloff.");
+    expect(view.slots.find((c) => c.slot === "low")!.rows[0].desc).toBeNull();   // 519 not described
+    expect(view.drones[0].desc).toBe("Light Scout Drone");
+  });
+
   it("builds the header, the render URL and the hull bonuses at the character's level", () => {
     const view = sheet();
     expect(view.title).toBe("Scarlet Dart");
@@ -137,8 +167,8 @@ describe("buildFitSheet", () => {
 
   it("lists cargo and drones with quantities and values", () => {
     const view = sheet();
-    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK" }]);
-    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null }]);
+    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: DESCRIPTIONS.get(12608) }]);
+    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", name: "Hobgoblin II", quantity: 5, value: null, desc: "Light Scout Drone" }]);
     expect(view.unfittable).toEqual([]);
     expect(view.unknown).toEqual([]);
   });

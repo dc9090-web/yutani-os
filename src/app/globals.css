@@ -390,7 +390,7 @@ li.slot-row, .slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 54
 .card-problems { border-color: rgba(247, 109, 122, 0.45); }
 .card-problems .card-title .neg { font-size: 13px; vertical-align: 2px; margin-left: 4px; }
 [data-desc] { position: relative; }
-[data-desc]:hover::after { content: attr(data-desc); position: absolute; left: 0; top: calc(100% + 6px); z-index: 60; width: 260px; padding: 8px 10px; border-radius: 8px; background: var(--raised); border: 1px solid var(--border-hi); color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.45; text-align: left; white-space: normal; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5); pointer-events: none; }
+[data-desc]:hover::after { content: attr(data-desc); position: absolute; left: 0; top: calc(100% + 6px); z-index: 60; width: min(340px, 80vw); padding: 8px 10px; border-radius: 8px; background: var(--raised); border: 1px solid var(--border-hi); color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.45; text-align: left; white-space: pre-line; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5); pointer-events: none; }
 li.slot-row:last-child { border-bottom: 0; }
 .slot-row.selected { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent); }
 .slot-row.empty .slot-main { color: var(--faint); }

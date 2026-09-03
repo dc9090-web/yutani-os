@@ -2,7 +2,7 @@ import { getPrices } from "../db/market-prices.js";
 import { getTypeBonuses, getTypes } from "../sde/repo.js";
 import { locationLabels } from "../names/index.js";
 import { CATEGORY, fitFromAssets, fitFromFitting, type BuiltFit } from "../dogma/index.js";
-import { buildFitSheet, type FitSheetView } from "../view/fit-sheet.js";
+import { buildFitSheet, typeDescription, type FitSheetView } from "../view/fit-sheet.js";
 import {
   SAVED_FIT_LOCATION, assembledShips, computeFit, fitValueEntries, shipLocationLabel,
 } from "../view/ships.js";
@@ -31,7 +31,16 @@ async function sheetFor(input: {
     ...built.unfittable.map((e) => e.typeId),
     ...built.unknown.map((e) => e.typeId),
   ];
-  const [prices, bonuses] = await Promise.all([getPrices(priceIds), getTypeBonuses(input.typeId)]);
+  // The same id set prices everything and describes everything: one `getTypes` over it is the
+  // hover text for every module, charge, drone and cargo line on the sheet.
+  const [prices, bonuses, itemTypes] = await Promise.all([
+    getPrices(priceIds), getTypeBonuses(input.typeId), getTypes([...new Set(priceIds)]),
+  ]);
+  const descriptions = new Map<number, string>();
+  for (const [id, type] of itemTypes) {
+    const desc = typeDescription(type.description);
+    if (desc !== null) descriptions.set(id, desc);
+  }
   const bonusSkillIds = [...new Set(bonuses.map((b) => b.skillTypeId).filter((id): id is number => id !== null))];
   const bonusTypes = await getTypes(bonusSkillIds);
 
@@ -46,7 +55,7 @@ async function sheetFor(input: {
     view: buildFitSheet({
       title: input.title, subtitle: input.subtitle, typeId: input.typeId, typeName: input.typeName,
       built, stats, problems, bonuses,
-      skillLevels: input.data.ctx.skills, skillNames, prices, skillsSynced: input.data.skillsSynced,
+      skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, skillsSynced: input.data.skillsSynced,
     }),
   };
 }

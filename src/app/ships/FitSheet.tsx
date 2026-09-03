@@ -8,7 +8,7 @@ function EntryList({ entries }: { entries: EntryView[] }) {
     <ul className="entry-list">
       {entries.map((entry) => (
         <li key={entry.key}>
-          <span>{entry.name} ×{entry.quantity}</span>
+          <span data-desc={entry.desc ?? undefined}>{entry.name} ×{entry.quantity}</span>
           <span className="num muted">{entry.value ?? "—"}</span>
         </li>
       ))}
@@ -64,12 +64,12 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                 <ul className="sheet-slot-list">
                   {column.rows.map((row) => (
                     <li key={row.key} className="sheet-slot-row">
-                      <span className="sheet-mod">
+                      <span className="sheet-mod" data-desc={row.desc ?? undefined}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
                         <span className="sheet-mod-text">
                           <span className="sheet-mod-name">{row.name}</span>
-                          {row.charge === null ? null : <span className="sheet-mod-charge">{row.charge}</span>}
+                          {row.charge === null ? null : <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>{row.charge}</span>}
                         </span>
                       </span>
                       <span className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></span>
