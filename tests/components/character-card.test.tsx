@@ -71,8 +71,8 @@ describe("CharacterCard", () => {
       ...full, balance: null, system: null, dockedAt: null, ship: null, online: null,
       training: { active: false, label: "Not synced" }, totalSp: null,
     }} />);
-    expect(screen.getAllByText("Not synced yet")).toHaveLength(2);   // wallet and location
-    expect(screen.getAllByText("—")).toHaveLength(2);                // ship and total SP
+    expect(screen.getAllByText("Not synced yet")).toHaveLength(3);   // wallet, location and ship
+    expect(screen.getAllByText("—")).toHaveLength(1);                // total SP
     expect(screen.getByText("Not synced")).toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
   });

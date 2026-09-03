@@ -23,7 +23,6 @@ export interface OverviewCard {
 }
 
 const NOT_SYNCED = <span className="faint">Not synced yet</span>;
-const DASH = <span className="faint">—</span>;
 
 /** pvp/miner/scanner tags and main/alt account pills get a coloured variant when the (lower-cased)
  *  name matches one of the design hand-back's known variants; anything else stays a plain `.pill`. */
@@ -62,19 +61,19 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
       )}
       <dl className="ov-rows">
         <div className="ov-row"><dt>Wallet</dt><dd className={card.balance === null ? undefined : "dur"}>{card.balance ?? NOT_SYNCED}</dd></div>
-        <div className="ov-row"><dt>Location</dt><dd>
+        <div className="ov-row ov-row-location"><dt>Location</dt><dd>
           {card.system === null ? NOT_SYNCED : (<>
             <span className={card.system.secClass}>{card.system.sec}</span> {card.system.name}
             {card.dockedAt === null ? null : <span className="ov-station"> · {card.dockedAt}</span>}
           </>)}
         </dd></div>
         <div className="ov-row"><dt>Ship</dt><dd>
-          {card.ship === null ? DASH : (<>
+          {card.ship === null ? NOT_SYNCED : (<>
             <span className="ship-type-pills ov-ship-pills">
               {card.ship.groupName === null ? null : <span className="pill">{card.ship.groupName}</span>}
               <span className="pill">{card.ship.typeName}</span>
             </span>
-            {card.ship.customName === null ? null : ` — ${card.ship.customName}`}
+            {card.ship.customName === null ? null : <span className="ov-ship-name">{card.ship.customName}</span>}
           </>)}
         </dd></div>
       </dl>

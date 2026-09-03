@@ -20,8 +20,8 @@ function EntryList({ entries }: { entries: EntryView[] }) {
 export function FitSheet({ view }: { view: FitSheetView }) {
   const holdEmpty = view.cargo.length === 0 && view.drones.length === 0;
   return (
-    <div className="card-stack">
-      <div className="card fit-head">
+    <div className="fit-sheet">
+      <div className="card fit-head fit-sheet-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={view.renderUrl} alt="" className="fit-render" />
         <div>
@@ -41,116 +41,131 @@ export function FitSheet({ view }: { view: FitSheetView }) {
       </div>
 
       {view.skillsSynced ? null : (
-        <p className="card banner">
+        <p className="card banner fit-sheet-banner">
           No skills synced yet — every skill is treated as level 0, so these numbers are worst case.
         </p>
       )}
 
-      <div className="card">
-        <h2 className="card-title">Fitting</h2>
-        {view.gauges.map((gauge) => <Gauge key={gauge.label} view={gauge} />)}
-        <div className="counters">
-          {view.counters.map((counter) => (
-            <span key={counter.label} className={`counter${counter.over ? " over" : ""}`}>
-              <span className="counter-label">{counter.label}</span>
-              <span className="num">{counter.used} / {counter.total}</span>
-            </span>
-          ))}
+      <div className="fit-sheet-main">
+        <div className="card">
+          <h2 className="card-title">Modules</h2>
+          <div className="sheet-slot-head" aria-hidden="true">
+            <span>Module</span><span>CPU</span><span>PG</span><span>State</span>
+          </div>
+          {/* A slot kind the hull doesn't have (subsystems on a frigate) is noise, not information. */}
+          {view.slots.filter((column) => column.total > 0 || column.rows.length > 0).map((column) => {
+            const over = column.used > column.total;
+            const empty = column.total - column.used;
+            return (
+              <section key={column.slot} className="slot-section">
+                <h3 className="slot-section-title">
+                  {column.title} <span className={`slot-count${over ? " over" : ""}`}>{column.used} / {column.total}</span>
+                </h3>
+                <ul className="sheet-slot-list">
+                  {column.rows.map((row) => (
+                    <li key={row.key} className="sheet-slot-row">
+                      <span className="sheet-mod">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
+                        <span className="sheet-mod-text">
+                          <span className="sheet-mod-name">{row.name}</span>
+                          {row.charge === null ? null : <span className="sheet-mod-charge">{row.charge}</span>}
+                        </span>
+                      </span>
+                      <span className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></span>
+                      <span className="num"><AffectedBy label="Powergrid" value={row.power} rows={row.powerExplain} /></span>
+                      <span className={`state-pill ${row.state.toLowerCase()}`}>{row.state}</span>
+                    </li>
+                  ))}
+                  {empty > 0 ? (
+                    <li className="sheet-slot-row sheet-slot-empty">
+                      <span className="faint">{empty} empty slot{empty === 1 ? "" : "s"}</span>
+                    </li>
+                  ) : null}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+
+        <div className="card">
+          <h2 className="card-title">Cargo &amp; drones</h2>
+          {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
+            <>
+              {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}
+              {view.cargo.length === 0 ? null : <><h3 className="slot-title">Cargo</h3><EntryList entries={view.cargo} /></>}
+            </>
+          )}
+          {view.unknown.length === 0 ? null : (
+            <>
+              <h3 className="slot-title">Unknown types</h3>
+              <p className="faint">The static data does not know these types, so they are excluded from the calculation.</p>
+              <EntryList entries={view.unknown} />
+            </>
+          )}
+          {view.unfittable.length === 0 ? null : (
+            <>
+              <h3 className="slot-title">Not fitted</h3>
+              <p className="faint">Saved with no slot, so the fitting window would not place them either.</p>
+              <EntryList entries={view.unfittable} />
+            </>
+          )}
         </div>
       </div>
 
-      <div className="card">
-        <h2 className="card-title">Modules</h2>
-        <div className="slot-cols">
-          {view.slots.map((column) => (
-            <div key={column.slot} className="slot-col">
-              <h3 className="slot-title">{column.title} <span className="faint">{column.used} / {column.total}</span></h3>
-              {column.rows.length === 0 ? <p className="faint">Empty</p> : (
-                <table className="table">
-                  <tbody>
-                    {column.rows.map((row) => (
-                      <tr key={row.key}>
-                        <td>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
-                          {row.name}
-                          {row.charge === null ? null : <span className="charge faint"> · {row.charge}</span>}
-                        </td>
-                        <td className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></td>
-                        <td className="num"><AffectedBy label="Powergrid" value={row.power} rows={row.powerExplain} /></td>
-                        <td className="muted">{row.state}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card">
-        <h2 className="card-title">Problems</h2>
-        {view.problems.length === 0 ? <p className="faint">No problems — this fit is legal.</p> : (
-          <ul className="problem-list">
-            {view.problems.map((problem, index) => (
-              <li key={index}><span className="badge error">{problem.label}</span> {problem.text}</li>
+      <aside className="fit-sheet-side">
+        <div className="card">
+          <h2 className="card-title">Fitting</h2>
+          {view.gauges.map((gauge) => <Gauge key={gauge.label} view={gauge} />)}
+          <div className="counters">
+            {view.counters.map((counter) => (
+              <span key={counter.label} className={`counter${counter.over ? " over" : ""}`}>
+                <span className="counter-label">{counter.label}</span>
+                <span className="num">{counter.used} / {counter.total}</span>
+              </span>
             ))}
-          </ul>
-        )}
-      </div>
+          </div>
+        </div>
 
-      <div className="card">
-        <h2 className="card-title">Missing skills</h2>
-        {view.missing.length === 0 ? <p className="faint">Every skill for this fit is trained.</p> : (
-          <table className="table">
-            <thead><tr><th>Skill</th><th className="num">Have → need</th></tr></thead>
-            <tbody>
-              {view.missing.map((skill) => (
-                <tr key={skill.skillTypeId}>
-                  <td>{skill.name}</td>
-                  <td className="num">{skill.have} → {skill.need}</td>
-                </tr>
+        <div className={`card${view.problems.length === 0 ? "" : " card-problems"}`}>
+          <h2 className="card-title">Problems</h2>
+          {view.problems.length === 0 ? <p className="faint">No problems — this fit is legal.</p> : (
+            <ul className="problem-list">
+              {view.problems.map((problem, index) => (
+                <li key={index}><span className="badge error">{problem.label}</span> {problem.text}</li>
               ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+            </ul>
+          )}
+        </div>
 
-      <div className="card">
-        <h2 className="card-title">Cargo &amp; drones</h2>
-        {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
-          <>
-            {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}
-            {view.cargo.length === 0 ? null : <><h3 className="slot-title">Cargo</h3><EntryList entries={view.cargo} /></>}
-          </>
-        )}
-        {view.unknown.length === 0 ? null : (
-          <>
-            <h3 className="slot-title">Unknown types</h3>
-            <p className="faint">The static data does not know these types, so they are excluded from the calculation.</p>
-            <EntryList entries={view.unknown} />
-          </>
-        )}
-        {view.unfittable.length === 0 ? null : (
-          <>
-            <h3 className="slot-title">Not fitted</h3>
-            <p className="faint">Saved with no slot, so the fitting window would not place them either.</p>
-            <EntryList entries={view.unfittable} />
-          </>
-        )}
-      </div>
+        <div className="card">
+          <h2 className="card-title">Missing skills</h2>
+          {view.missing.length === 0 ? <p className="faint">Every skill for this fit is trained.</p> : (
+            <table className="table">
+              <thead><tr><th>Skill</th><th className="num">Have → need</th></tr></thead>
+              <tbody>
+                {view.missing.map((skill) => (
+                  <tr key={skill.skillTypeId}>
+                    <td>{skill.name}</td>
+                    <td className="num">{skill.have} → {skill.need}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
-      <div className="card">
-        <h2 className="card-title">Estimated value</h2>
-        <ul className="value-list">
-          {view.value.lines.map((line) => (
-            <li key={line.label}><span>{line.label}</span><span className="num">{line.value}</span></li>
-          ))}
-          <li className="value-total"><span>Total</span><span className="num">{view.value.total}</span></li>
-        </ul>
-        {view.value.unpriced === null ? null : <p className="faint">{view.value.unpriced}</p>}
-      </div>
+        <div className="card">
+          <h2 className="card-title">Estimated value</h2>
+          <ul className="value-list">
+            {view.value.lines.map((line) => (
+              <li key={line.label}><span>{line.label}</span><span className="num">{line.value}</span></li>
+            ))}
+            <li className="value-total"><span>Total</span><span className="num">{view.value.total}</span></li>
+          </ul>
+          {view.value.unpriced === null ? null : <p className="faint">{view.value.unpriced}</p>}
+        </div>
+      </aside>
     </div>
   );
 }

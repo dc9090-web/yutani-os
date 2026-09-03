@@ -70,7 +70,7 @@ describe("FitSheet", () => {
   it("lists the module with its charge, both resource figures and its state", () => {
     render(<FitSheet view={view} />);
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
-    expect(screen.getByText(/· Hail S/)).toBeInTheDocument();      // the charge beside its turret
+    expect(screen.getByText("Hail S")).toBeInTheDocument();         // the charge under its turret
     expect(screen.getByText("12.80")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     // The CPU cell has modifiers, so it is a popover button; powergrid has none, so it is plain text.
