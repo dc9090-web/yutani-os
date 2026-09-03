@@ -228,9 +228,9 @@ export function FitEditor({ fit, characters, bonuses, ship }: FitEditorProps) {
             />
             <div className="fit-identity-meta">
               <span className="ship-type-pills">
+                <span className="pill hull">{ship.typeName}</span>
                 {ship.raceName === null ? null : <span className="pill">{ship.raceName}</span>}
                 {ship.groupName === null ? null : <span className="pill">{ship.groupName}</span>}
-                <span className="pill">{ship.typeName}</span>
               </span>
               <span className="meta-divider" aria-hidden="true" />
               <label className="faint" htmlFor="fit-pilot">Pilot</label>

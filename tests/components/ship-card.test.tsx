@@ -17,12 +17,14 @@ describe("ShipCard", () => {
     const { container } = render(<ShipCard card={card} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/ships/asset/1000");
     expect(screen.getByText("Scarlet Dart")).toBeInTheDocument();
-    const pills = container.querySelector(".ship-type-pills");
-    expect(pills).not.toBeNull();
-    expect(pills!.querySelectorAll(".pill")).toHaveLength(3);
+    // Hull chip on its own line first, then race + class on the next.
+    const rows = container.querySelectorAll(".ship-type-pills");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelectorAll(".pill")).toHaveLength(1);
+    expect(rows[1].querySelectorAll(".pill")).toHaveLength(2);
+    expect(screen.getByText("Rifter")).toHaveClass("pill hull");
     expect(screen.getByText("Minmatar")).toHaveClass("pill");
     expect(screen.getByText("Frigate")).toHaveClass("pill");
-    expect(screen.getByText("Rifter")).toHaveClass("pill");
     expect(screen.getByText(/Caldari Navy Assembly Plant/)).toBeInTheDocument();
     expect(screen.getByText("13.1M ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();

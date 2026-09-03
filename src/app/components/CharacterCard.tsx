@@ -71,8 +71,8 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
         <div className="ov-row"><dt>Ship</dt><dd>
           {card.ship === null ? NOT_SYNCED : (<>
             <span className="ship-type-pills ov-ship-pills">
+              <span className="pill hull">{card.ship.typeName}</span>
               {card.ship.groupName === null ? null : <span className="pill">{card.ship.groupName}</span>}
-              <span className="pill">{card.ship.typeName}</span>
             </span>
           </>)}
         </dd></div>
