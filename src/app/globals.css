@@ -190,10 +190,9 @@ body {
 /* Station/structure names run long; a second line beats an ellipsis now the cards are wide. */
 .ov-row-location dd { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.45; }
 .ov-station { color: var(--faint); }
-/* Group + hull pills, then the pilot's own name for the ship as plain text — no separator. */
-.ov-ship-pills { margin-top: 0; display: inline-flex; vertical-align: middle; margin-right: 8px; }
+/* Group + hull pills only; the pilot's own name for the ship stays on the fit sheet. */
+.ov-ship-pills { margin-top: 0; display: inline-flex; vertical-align: middle; }
 .ov-ship-pills .pill { font-size: 12px; padding: 3px 9px; }
-.ov-ship-name { vertical-align: middle; }
 .ov-foot { margin-top: auto; border-top: 1px solid var(--hairline); padding-top: 14px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
 .ov-training { flex: 1; min-width: 0; display: grid; gap: 7px; }
 .ov-training-top { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }

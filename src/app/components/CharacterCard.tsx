@@ -1,7 +1,7 @@
 import { portraitUrl } from "../../lib/view/characters.js";
 import type { OverviewTraining } from "../../lib/view/format.js";
 
-export interface OverviewShip { typeName: string; groupName: string | null; customName: string | null }
+export interface OverviewShip { typeName: string; groupName: string | null }
 
 export interface OverviewCard {
   id: number;
@@ -76,7 +76,6 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
               {card.ship.groupName === null ? null : <span className="pill">{card.ship.groupName}</span>}
               <span className="pill">{card.ship.typeName}</span>
             </span>
-            {card.ship.customName === null ? null : <span className="ov-ship-name">{card.ship.customName}</span>}
           </>)}
         </dd></div>
       </dl>

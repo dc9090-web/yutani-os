@@ -74,7 +74,6 @@ export default async function Overview() {
       ship: shipType?.name == null ? null : {
         typeName: shipType.name,
         groupName: shipType.groupId == null ? null : groups.get(shipType.groupId)?.name ?? null,
-        customName: location?.shipName ?? null,
       },
       online: location?.online ?? null,
       // "Not synced" means the skills job has never written a summary; an empty queue is different.

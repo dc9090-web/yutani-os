@@ -10,7 +10,7 @@ const full: OverviewCard = {
   balance: "1,234,568 ISK",
   system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
   dockedAt: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
-  ship: { typeName: "Rifter", groupName: "Frigate", customName: "Scarlet Dart" },
+  ship: { typeName: "Rifter", groupName: "Frigate" },
   online: true,
   training: { active: true, skill: "Caldari Frigate V", time: "3h 12m", percent: 64 },
   totalSp: "47.4M",
@@ -32,7 +32,8 @@ describe("CharacterCard", () => {
 
     const shipRow = container.querySelectorAll(".ov-row")[2];
     expect(shipRow.querySelector(".ship-type-pills.ov-ship-pills")).not.toBeNull();
-    expect(shipRow.textContent).toContain("Scarlet Dart");
+    expect(shipRow.textContent).toContain("Rifter");
+    expect(shipRow.textContent).not.toContain("Scarlet Dart");   // the pilot's ship name is not shown here
     expect(screen.getByText("Frigate")).toHaveClass("pill");
     expect(screen.getByText("Rifter")).toHaveClass("pill");
 
