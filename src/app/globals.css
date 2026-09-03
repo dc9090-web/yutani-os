@@ -296,6 +296,12 @@ body {
 .ship-name { margin: 9px 0 0; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ship-type { margin: 2px 0 0; font-size: 13px; }
 .ship-loc { font-size: 12px; margin: 8px 0 4px; line-height: 1.45; }
+/* The card's four headline stats as a 2 x 2 of small tiles above the CPU/PG gauges — four across
+   truncates "Lasts 12m 40s" at the grid's 300px minimum. */
+.ship-stat-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0 2px; }
+.ship-stat { min-width: 0; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; }
+.ship-stat dt { font-size: 10px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--faint); }
+.ship-stat dd { margin: 2px 0 0; font-size: 13px; font-weight: 600; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ship-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; }
 .ship-unpriced { margin: 4px 0 0; font-size: 12px; }
 .section-title { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; margin: 28px 0 14px; }

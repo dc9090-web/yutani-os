@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   assembledShips, bonusLabel, errorShipCard, fitValueEntries, gauge, shipLocationLabel,
-  sortShipCards, stripBonusMarkup, toShipCard,
+  shipCardStats, sortShipCards, stripBonusMarkup, toShipCard,
 } from "../../src/lib/view/ships.js";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
 
@@ -136,6 +136,19 @@ describe("toShipCard / errorShipCard / sortShipCards", () => {
     key: "asset:1", href: "/ships/asset/1", name: "Scarlet Dart", typeId: 587, typeName: "Rifter",
     groupName: "Frigate", raceName: "Minmatar", location: "Jita 4-4",
   };
+
+  it("formats the four headline stats, dashes and a null cap colour where the engine can't answer", () => {
+    const perf = {
+      dps: 863.24, ehp: 37444.6, maxVelocity: 289.1, capStable: { stable: true, level: 0.684 },
+    } as unknown as import("../../src/lib/dogma/index.js").FitPerformance;
+    expect(shipCardStats(perf)).toEqual({ dps: "863.2", ehp: "37,445", velocity: "289 m/s", cap: "Stable 68%", capOk: true });
+    const draining = { ...perf, dps: null, capStable: { stable: false, lastsSeconds: 243 } } as unknown as import("../../src/lib/dogma/index.js").FitPerformance;
+    expect(shipCardStats(draining)).toMatchObject({ dps: "—", cap: "Lasts 4m 3s", capOk: false });
+    expect(shipCardStats({ ...perf, capStable: null } as never)).toMatchObject({ cap: "—", capOk: null });
+    // Without a perf the card has no strip at all.
+    expect(toShipCard({ ...base, stats, problems: [], entries: [], prices: new Map() }).stats).toBeNull();
+    expect(toShipCard({ ...base, stats, problems: [], entries: [], prices: new Map(), perf }).stats?.ehp).toBe("37,445");
+  });
 
   it("builds a card with both gauges, the missing-skill count and the value", () => {
     const card = toShipCard({

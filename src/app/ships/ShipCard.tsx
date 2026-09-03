@@ -28,6 +28,14 @@ export function ShipCard({ card }: { card: ShipCardView }) {
       <p className="ship-loc faint">{card.location}</p>
       {computed ? (
         <>
+          {card.stats === null ? null : (
+            <dl className="ship-stat-strip">
+              <div className="ship-stat"><dt>DPS</dt><dd className="num">{card.stats.dps}</dd></div>
+              <div className="ship-stat"><dt>EHP</dt><dd className="num">{card.stats.ehp}</dd></div>
+              <div className="ship-stat"><dt>Speed</dt><dd className="num">{card.stats.velocity}</dd></div>
+              <div className="ship-stat"><dt>Cap</dt><dd className={`num${card.stats.capOk === null ? "" : card.stats.capOk ? " pos" : " warn-text"}`}>{card.stats.cap}</dd></div>
+            </dl>
+          )}
           <Gauge view={card.cpu!} />
           <Gauge view={card.power!} />
           <div className="ship-foot">

@@ -7,8 +7,10 @@ import type { FittingRow } from "../db/character-fittings.js";
 import {
   CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
   type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
+  fitPerformance, type FitPerformance,
 } from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
+import { clock, grouped } from "./format.js";
 
 /** dogmaUnits 105 Percentage, 109 Modifier Percent, 127 Absolute Percent all display as "%". */
 const PERCENT_UNIT_IDS: ReadonlySet<number> = new Set([105, 109, 127]);
@@ -126,9 +128,26 @@ export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
 }
 
 /** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */
+/** The card's headline numbers — the fitting window's four you glance at first. `capOk` colours the
+ *  capacitor tile: green stable, amber draining, null when the engine can't say. */
+export interface ShipCardStats { dps: string; ehp: string; velocity: string; cap: string; capOk: boolean | null }
+
+const DASH = "—";
+export function shipCardStats(perf: FitPerformance): ShipCardStats {
+  const cap = perf.capStable;
+  return {
+    dps: perf.dps === null ? DASH : grouped(perf.dps.toFixed(1)),
+    ehp: perf.ehp === null ? DASH : grouped(Math.round(perf.ehp)),
+    velocity: perf.maxVelocity === null ? DASH : `${grouped(Math.round(perf.maxVelocity))} m/s`,
+    cap: cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${clock(cap.lastsSeconds)}`,
+    capOk: cap === null ? null : cap.stable,
+  };
+}
+
 export interface ShipCardView {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
+  stats: ShipCardStats | null;
   cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
   value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
 }
@@ -137,11 +156,14 @@ export function toShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
   stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
+  /** `fitPerformance(built.fit)`; absent → no stat strip on the card. */
+  perf?: FitPerformance;
 }): ShipCardView {
   const roll = rollUpValue(input.entries, input.prices);
   return {
     key: input.key, href: input.href, name: input.name, typeId: input.typeId,
     typeName: input.typeName, groupName: input.groupName, raceName: input.raceName, location: input.location,
+    stats: input.perf === undefined ? null : shipCardStats(input.perf),
     cpu: gauge("CPU", "tf", input.stats.cpu),
     power: gauge("Powergrid", "MW", input.stats.power),
     missingSkills: input.problems.filter((p) => p.kind === "skill").length,
@@ -158,7 +180,7 @@ export function errorShipCard(input: {
   groupName: string | null; raceName: string | null; location: string;
 }): ShipCardView {
   return {
-    ...input, cpu: null, power: null, missingSkills: 0,
+    ...input, stats: null, cpu: null, power: null, missingSkills: 0,
     value: null, valueRaw: -1, unpriced: null, error: "Could not compute",
   };
 }
@@ -220,7 +242,7 @@ export function assetShipCards(
     if (computed === null) return errorShipCard(base);
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
-      entries: fitValueEntries(computed.built), prices,
+      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
     });
   }));
 }
@@ -245,7 +267,7 @@ export function savedFitCards(
     if (computed === null) return errorShipCard(base);
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
-      entries: fitValueEntries(computed.built), prices,
+      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
     });
   }));
 }

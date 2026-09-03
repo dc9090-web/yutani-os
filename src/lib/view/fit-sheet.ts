@@ -4,7 +4,7 @@ import {
   type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem,
   type ProblemKind, type SlotKind,
 } from "../dogma/index.js";
-import { grouped, isk, typeDescription } from "./format.js";
+import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
 import { bonusLabel, fitValueGroups, gauge, type GaugeView } from "./ships.js";
@@ -151,16 +151,6 @@ export interface FitSheetInput {
 }
 
 const DASH = "—";
-/** "4m 3s" / "45s" / "1h 2m 3s" — the client's capacitor clock, to the second (`duration()` rounds to minutes). */
-function clock(seconds: number): string {
-  const total = Math.round(seconds);
-  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), sec = total % 60;
-  const parts: string[] = [];
-  if (h > 0) parts.push(`${h}h`);
-  if (m > 0) parts.push(`${m}m`);
-  if (sec > 0 || parts.length === 0) parts.push(`${sec}s`);
-  return parts.join(" ");
-}
 const fmtNum = (value: number | null, decimals: number, unit = ""): string =>
   value === null ? DASH : `${grouped(value.toFixed(decimals))}${unit}`;
 const whole = (value: number | null, unit = ""): string => value === null ? DASH : `${grouped(Math.round(value))}${unit}`;

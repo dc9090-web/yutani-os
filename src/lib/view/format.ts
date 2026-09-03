@@ -198,3 +198,14 @@ export function typeDescription(raw: string | null | undefined): string | null {
   const cut = text.slice(0, DESCRIPTION_MAX);
   return `${cut.slice(0, Math.max(cut.lastIndexOf(" "), DESCRIPTION_MAX - 40)).trimEnd()}…`;
 }
+
+/** "4m 3s" / "45s" / "1h 2m 3s" — the client's capacitor clock, to the second (`duration()` rounds to minutes). */
+export function clock(seconds: number): string {
+  const total = Math.round(seconds);
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), sec = total % 60;
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (sec > 0 || parts.length === 0) parts.push(`${sec}s`);
+  return parts.join(" ");
+}
