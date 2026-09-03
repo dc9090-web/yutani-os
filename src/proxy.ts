@@ -3,7 +3,7 @@ import { SESSION_COOKIE, SESSION_MAX_AGE, verifyPayload } from "./lib/auth/sessi
 
 const PUBLIC_EXACT = new Set(["/login", "/api/health"]);
 const PUBLIC_PREFIXES = ["/auth/", "/_next/"];
-const PUBLIC_FILES = new Set(["/favicon.ico", "/eve-mark.svg"]);
+const PUBLIC_FILES = new Set(["/favicon.ico", "/icon.svg", "/eve-mark.svg"]);
 
 export function isPublicPath(pathname: string): boolean {
   const path = pathname.split("?")[0];
