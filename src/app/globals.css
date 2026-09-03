@@ -314,7 +314,11 @@ body {
 /* Fit sheet: the same main + 340px sidebar split as the fitting editor, so the two screens read
    as one system. Header (and the skills banner) span both columns. */
 .fit-sheet { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-.fit-sheet-head, .fit-sheet-banner { grid-column: 1 / -1; }
+.fit-sheet-head, .fit-sheet-banner, .fit-sheet-foot { grid-column: 1 / -1; }
+.fit-head-text { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.fit-head-text .page-title { margin: 0; }
+.fit-head-pills { margin-top: 0; }
+.fit-head-loc { margin: 0; font-size: 14px; color: var(--text); line-height: 1.45; }
 .fit-sheet-banner { margin: 0; }
 .fit-sheet-main, .fit-sheet-side { display: grid; gap: 20px; min-width: 0; }
 @media (max-width: 900px) { .fit-sheet { grid-template-columns: minmax(0, 1fr); } }

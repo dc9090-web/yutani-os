@@ -1,11 +1,11 @@
 import { getPrices } from "../db/market-prices.js";
-import { getTypeBonuses, getTypes } from "../sde/repo.js";
+import { getRaces, getSolarSystems, getTypeBonuses, getTypes } from "../sde/repo.js";
 import { locationLabels } from "../names/index.js";
 import { CATEGORY, fitFromAssets, fitFromFitting, fitPerformance, type BuiltFit } from "../dogma/index.js";
-import { buildFitSheet, typeDescription, type FitSheetView } from "../view/fit-sheet.js";
-import {
-  SAVED_FIT_LOCATION, assembledShips, computeFit, fitValueEntries, shipLocationLabel,
-} from "../view/ships.js";
+import { buildFitSheet, typeDescription, type FitSheetView, type SheetLocationView } from "../view/fit-sheet.js";
+import { SAVED_FIT_LOCATION, assembledShips, computeFit, fitValueEntries } from "../view/ships.js";
+import { secClass, secText } from "../view/format.js";
+import type { AssetRow } from "../db/character-assets.js";
 import { loadFitData, type FitData } from "./load.js";
 
 export type SheetResult =
@@ -19,7 +19,7 @@ export type SheetResult =
  * already lives in `DogmaData`.
  */
 async function sheetFor(input: {
-  data: FitData; key: string; title: string; subtitle: string; typeId: number; typeName: string;
+  data: FitData; key: string; title: string; typeId: number; typeName: string; location: SheetLocationView;
   build: () => BuiltFit;
 }): Promise<SheetResult> {
   const computed = computeFit(input.build, input.key);
@@ -42,7 +42,15 @@ async function sheetFor(input: {
     if (desc !== null) descriptions.set(id, desc);
   }
   const bonusSkillIds = [...new Set(bonuses.map((b) => b.skillTypeId).filter((id): id is number => id !== null))];
-  const bonusTypes = await getTypes(bonusSkillIds);
+  // The hull's own row rides along for its race (DogmaData carries no race); the group is in DogmaData.
+  const [bonusTypes, races] = await Promise.all([getTypes([...bonusSkillIds, input.typeId]), getRaces()]);
+  const hullType = bonusTypes.get(input.typeId);
+  const hullGroupId = input.data.ctx.data.types.get(input.typeId)?.groupId;
+  const ship = {
+    typeName: input.typeName,
+    groupName: hullGroupId === undefined ? null : input.data.ctx.data.groups.get(hullGroupId)?.name ?? null,
+    raceName: hullType?.raceId == null ? null : races.get(hullType.raceId) ?? null,
+  };
 
   const skillNames = new Map<number, string>();
   for (const type of input.data.ctx.data.types.values()) {
@@ -53,7 +61,7 @@ async function sheetFor(input: {
   return {
     kind: "ok",
     view: buildFitSheet({
-      title: input.title, subtitle: input.subtitle, typeId: input.typeId, typeName: input.typeName,
+      title: input.title, typeId: input.typeId, typeName: input.typeName, ship, location: input.location,
       built, stats, problems, bonuses,
       skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, perf: fitPerformance(built.fit),
       skillsSynced: input.data.skillsSynced,
@@ -67,18 +75,42 @@ export async function assetSheet(characterId: number, itemId: number): Promise<S
   const group = assembledShips(data.assets, data.ctx.data).find((g) => g.ship.itemId === itemId);
   if (group === undefined) return { kind: "notFound" };
 
-  const places = await locationLabels(
-    group.ship.locationType === "item" ? [] : [group.ship.locationId]);
   const byItemId = new Map(data.assets.map((a) => [a.itemId, a]));
   const typeName = data.ctx.data.types.get(group.ship.typeId)?.name ?? `Unknown type (${group.ship.typeId})`;
 
   return sheetFor({
     data, key: `asset:${itemId}`,
     title: group.ship.name ?? typeName,
-    subtitle: shipLocationLabel(group.ship, places, byItemId, data.ctx.data),
+    location: await shipLocation(group.ship, byItemId, data),
     typeId: group.ship.typeId, typeName,
     build: () => fitFromAssets(group.ship, group.children, data.ctx),
   });
+}
+
+/**
+ * The header's location: climb out of any containers the ship sits in (a ship maintenance bay, a
+ * can) to the real place, name it, and colour its system's security. Container names become the
+ * note, outermost last — "in Small Standard Container".
+ */
+async function shipLocation(ship: AssetRow, byItemId: ReadonlyMap<number, AssetRow>, data: FitData): Promise<SheetLocationView> {
+  const containers: string[] = [];
+  let holder: AssetRow = ship;
+  while (holder.locationType === "item") {
+    const parent = byItemId.get(holder.locationId);
+    if (parent === undefined) return { system: null, place: `Container ${holder.locationId}`, note: null };
+    containers.push(parent.name ?? data.ctx.data.types.get(parent.typeId)?.name ?? `Container ${parent.itemId}`);
+    holder = parent;
+  }
+  const label = (await locationLabels([holder.locationId])).get(holder.locationId);
+  const note = containers.length === 0 ? null : `in ${containers.join(" · ")}`;
+  if (label === undefined) return { system: null, place: `Unknown location (${holder.locationId})`, note };
+  const solar = label.solarSystemId === null ? null : (await getSolarSystems([label.solarSystemId])).get(label.solarSystemId) ?? null;
+  const systemName = label.kind === "system" ? label.name : solar?.name ?? null;
+  return {
+    system: systemName === null ? null : { name: systemName, sec: secText(solar?.securityStatus ?? null), secClass: secClass(solar?.securityStatus ?? null) },
+    place: label.kind === "system" ? null : label.name,
+    note,
+  };
 }
 
 /** `/ships/fit/[fittingId]` — a saved ESI fitting. */
@@ -92,7 +124,7 @@ export async function fittingSheet(characterId: number, fittingId: number): Prom
     data, key: `fit:${fittingId}`,
     title: fitting.name,
     // Deliberately not the description: it is player-authored HTML from the EVE client.
-    subtitle: SAVED_FIT_LOCATION,
+    location: { system: null, place: null, note: SAVED_FIT_LOCATION },
     typeId: fitting.shipTypeId, typeName,
     build: () => fitFromFitting(fitting, fitting.items, data.ctx),
   });

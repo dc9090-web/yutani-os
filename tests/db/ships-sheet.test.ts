@@ -65,7 +65,7 @@ describe("fittingSheet", () => {
     expect(result.kind).toBe("ok");
     if (result.kind !== "ok") return;
     expect(result.view.title).toBe("Solo Rifter");
-    expect(result.view.subtitle).toBe("Saved fit");
+    expect(result.view.location).toEqual({ system: null, place: null, note: "Saved fit" });
     expect(result.view.slots.find((s) => s.slot === "low")!.rows[0].name).toBe("Gyrostabilizer II");
   });
 

@@ -33,19 +33,24 @@ export function FitSheet({ view }: { view: FitSheetView }) {
       <div className="card fit-head fit-sheet-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={view.renderUrl} alt="" className="fit-render" />
-        <div>
+        <div className="fit-head-text">
           <h1 className="page-title">{view.title}</h1>
-          <p className="page-sub">{view.typeName} · {view.subtitle}</p>
-          <ul className="bonus-list">
-            {view.bonuses.map((bonus, index) => (
-              <li key={index}>
-                {bonus.skill === null ? null : (
-                  <span className="bonus-skill">{bonus.skill} {roman(bonus.level ?? 0)}</span>
-                )}
-                <span>{bonus.text}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="ship-type-pills fit-head-pills">
+            <span className="pill hull">{view.ship.typeName}</span>
+            {view.ship.raceName === null ? null : <span className="pill">{view.ship.raceName}</span>}
+            {view.ship.groupName === null ? null : <span className="pill">{view.ship.groupName}</span>}
+          </div>
+          <p className="fit-head-loc">
+            {view.location.system === null ? null : (<>
+              <span className={view.location.system.secClass}>{view.location.system.sec}</span> {view.location.system.name}
+            </>)}
+            {view.location.place === null ? null : (
+              <span className="ov-station">{view.location.system === null ? "" : " · "}{view.location.place}</span>
+            )}
+            {view.location.note === null ? null : (
+              <span className="faint">{view.location.system === null && view.location.place === null ? "" : " · "}{view.location.note}</span>
+            )}
+          </p>
         </div>
       </div>
 
@@ -177,6 +182,22 @@ export function FitSheet({ view }: { view: FitSheetView }) {
           {view.value.unpriced === null ? null : <p className="faint">{view.value.unpriced}</p>}
         </div>
       </aside>
+
+      <div className="card fit-sheet-foot">
+        <h2 className="card-title">Ship bonuses</h2>
+        {view.bonuses.length === 0 ? <p className="faint">This hull has no listed bonuses.</p> : (
+          <ul className="bonus-list">
+            {view.bonuses.map((bonus, index) => (
+              <li key={index}>
+                {bonus.skill === null ? null : (
+                  <span className="bonus-skill">{bonus.skill} {roman(bonus.level ?? 0)}</span>
+                )}
+                <span>{bonus.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

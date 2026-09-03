@@ -115,8 +115,19 @@ export interface ShipStatsView {
   bays: StatRowView[];
 }
 
+/** The header chips: hull, and its race and class when the SDE names them. */
+export interface SheetShipView { typeName: string; groupName: string | null; raceName: string | null }
+/** Where the ship is, the way the overview card says it: coloured security + system, the station or
+ *  structure, and a note ("in Small Standard Container", "Saved fit"). Any part may be absent. */
+export interface SheetLocationView {
+  system: { name: string; sec: string; secClass: string } | null;
+  place: string | null;
+  note: string | null;
+}
+
 export interface FitSheetView {
-  title: string; subtitle: string; typeId: number; typeName: string; renderUrl: string; skillsSynced: boolean;
+  title: string; typeId: number; typeName: string; renderUrl: string; skillsSynced: boolean;
+  ship: SheetShipView; location: SheetLocationView;
   stats: ShipStatsView;
   bonuses: BonusView[]; gauges: GaugeView[]; slots: SlotColumnView[]; counters: CounterView[];
   problems: ProblemView[]; missing: MissingSkillView[];
@@ -125,7 +136,8 @@ export interface FitSheetView {
 }
 
 export interface FitSheetInput {
-  title: string; subtitle: string; typeId: number; typeName: string;
+  title: string; typeId: number; typeName: string;
+  ship: SheetShipView; location: SheetLocationView;
   built: BuiltFit; stats: FitStats; problems: Problem[];
   bonuses: readonly { skillTypeId: number | null; bonus: number | null; bonusText: string | null; unitId: number | null }[];
   skillLevels: ReadonlyMap<number, number>;
@@ -351,7 +363,8 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   }
 
   return {
-    title: input.title, subtitle: input.subtitle, typeId: input.typeId, typeName: input.typeName,
+    title: input.title, typeId: input.typeId, typeName: input.typeName,
+    ship: input.ship, location: input.location,
     renderUrl: shipRenderUrl(input.typeId), skillsSynced: input.skillsSynced,
     stats: shipStatsView(input.perf, built),
     bonuses: input.bonuses.map((b) => ({

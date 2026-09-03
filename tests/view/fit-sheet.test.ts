@@ -61,7 +61,9 @@ const DESCRIPTIONS = new Map<number, string>([
 function sheet(over: Partial<Parameters<typeof buildFitSheet>[0]> = {}) {
   const built = fitFromAssets(SHIP, CHILDREN, ctx);
   return buildFitSheet({
-    title: "Scarlet Dart", subtitle: "Jita 4-4", typeId: 587, typeName: "Rifter",
+    title: "Scarlet Dart", typeId: 587, typeName: "Rifter",
+    ship: { typeName: "Rifter", groupName: "Frigate", raceName: "Minmatar" },
+    location: { system: { name: "Jita", sec: "0.9", secClass: "sec-high" }, place: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", note: null },
     built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit),
     bonuses: BONUSES, skillLevels, skillNames, prices: PRICES, descriptions: DESCRIPTIONS, skillsSynced: true, ...over,
   });
@@ -112,7 +114,8 @@ describe("buildFitSheet", () => {
   it("builds the header, the render URL and the hull bonuses at the character's level", () => {
     const view = sheet();
     expect(view.title).toBe("Scarlet Dart");
-    expect(view.subtitle).toBe("Jita 4-4");
+    expect(view.ship).toEqual({ typeName: "Rifter", groupName: "Frigate", raceName: "Minmatar" });
+    expect(view.location.system?.secClass).toBe("sec-high");
     expect(view.typeName).toBe("Rifter");
     expect(view.renderUrl).toBe("https://images.evetech.net/types/587/render?size=128");
     expect(view.bonuses).toEqual([

@@ -5,7 +5,9 @@ import { CouldNotCompute } from "../../src/app/ships/CouldNotCompute.js";
 import type { FitSheetView } from "../../src/lib/view/fit-sheet.js";
 
 const view: FitSheetView = {
-  title: "Scarlet Dart", subtitle: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+  title: "Scarlet Dart",
+  ship: { typeName: "Rifter", groupName: "Frigate", raceName: "Minmatar" },
+  location: { system: { name: "Jita", sec: "0.9", secClass: "sec-high" }, place: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", note: "in Small Standard Container" },
   typeId: 587, typeName: "Rifter", renderUrl: "https://images.evetech.net/types/587/render?size=128",
   skillsSynced: true,
   stats: {
@@ -74,6 +76,25 @@ describe("FitSheet", () => {
     expect(container.querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/587/render?size=128");
     expect(screen.getByText(/Minmatar Frigate IV/)).toBeInTheDocument();
     expect(screen.getByText(/7.5% bonus to Small Projectile Turret rate of fire/)).toBeInTheDocument();
+  });
+
+  it("heads the sheet with the hull/race/class chips and the coloured location, bonuses at the foot", () => {
+    const { container } = render(<FitSheet view={view} />);
+    const head = container.querySelector(".fit-sheet-head")!;
+    expect(head.querySelector(".pill.hull")).toHaveTextContent("Rifter");
+    expect(head.querySelectorAll(".pill")).toHaveLength(3);
+    const loc = head.querySelector(".fit-head-loc")!;
+    expect(loc.querySelector(".sec-high")).toHaveTextContent("0.9");
+    expect(loc).toHaveTextContent("0.9 Jita · Jita IV - Moon 4 - Caldari Navy Assembly Plant · in Small Standard Container");
+    const cards = container.querySelectorAll(".fit-sheet > .card");
+    expect(cards[cards.length - 1]).toHaveClass("fit-sheet-foot");
+    expect(cards[cards.length - 1]).toHaveTextContent("Ship bonuses");
+    expect(cards[cards.length - 1]).toHaveTextContent("Minmatar Frigate IV");
+  });
+
+  it("shows a saved fit's location as just the note", () => {
+    const { container } = render(<FitSheet view={{ ...view, location: { system: null, place: null, note: "Saved fit" } }} />);
+    expect(container.querySelector(".fit-head-loc")).toHaveTextContent(/^Saved fit$/);
   });
 
   it("draws three gauges and marks the over-budget one", () => {
