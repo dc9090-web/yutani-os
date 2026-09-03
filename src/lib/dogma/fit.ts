@@ -41,6 +41,8 @@ export interface Item {
   effects: Map<EffectId, boolean>;
   charge?: Item;
   container?: Item;
+  /** A charge the app loaded itself (`assumeCargoAmmo`), not one the pilot fitted. */
+  assumed?: boolean;
   domain: ItemDomain;
   ownerModifiable: boolean;
 }

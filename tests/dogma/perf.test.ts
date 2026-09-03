@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, fitPerformance, type CapStability } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, PROP_EFFECT, fitPerformance, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -58,6 +58,10 @@ const PERF_ATTRS: readonly (readonly [AttrId, string, number, boolean, boolean])
   [1272, "droneBandwidthUsed", 0, true, true],
   [600, "warpSpeedMultiplier", 3, false, true],
   [1281, "baseWarpSpeed", 0, true, true],
+  [20, "speedFactor", 1, false, true],
+  [567, "speedBoostFactor", 0, true, true],
+  [796, "massAddition", 0, true, false],
+  [554, "signatureRadiusBonus", 0, true, false],
 ];
 
 type Attrs = readonly (readonly [AttrId, number])[];
@@ -75,6 +79,9 @@ function bench(omit: readonly AttrId[] = []) {
   w.effect({ id: EFFECT.turretFitted, categoryId: 0, state: State.Offline });
   w.effect({ id: EFFECT.launcherFitted, categoryId: 0, state: State.Offline });
   const fires = w.effect({ categoryId: 2, state: State.Active }).id;
+  // The two propulsion effects, as the SDE has them: active-category, no modifiers.
+  w.effect({ id: PROP_EFFECT.afterburner, categoryId: 1, state: State.Active });
+  w.effect({ id: PROP_EFFECT.microwarpdrive, categoryId: 1, state: State.Active });
 
   const make = (categoryId: number, attrs: Attrs, effects: [number, boolean][] = []): TypeId =>
     w.type({ categoryId, attrs: attrs.map(([a, v]) => [a, v]), effects }).id;
@@ -85,8 +92,10 @@ function bench(omit: readonly AttrId[] = []) {
     /** A turret: hardpoint marker + an active effect, so `makeItem` gives it State.Active. */
     turret: (attrs: Attrs) => make(CATEGORY.module, attrs, [[EFFECT.turretFitted, false], [fires, true]]),
     launcher: (attrs: Attrs) => make(CATEGORY.module, attrs, [[EFFECT.launcherFitted, false], [fires, true]]),
-    /** An active module with no hardpoint — a propulsion module or a repairer. */
+    /** An active module with no hardpoint — a repairer, say. */
     active: (attrs: Attrs) => make(CATEGORY.module, attrs, [[fires, true]]),
+    /** An afterburner or microwarpdrive: its propulsion effect is the default (active) one. */
+    prop: (kind: "afterburner" | "microwarpdrive", attrs: Attrs) => make(CATEGORY.module, attrs, [[PROP_EFFECT[kind], true]]),
     charge: (attrs: Attrs) => make(CATEGORY.charge, attrs),
     drone: (attrs: Attrs) => make(CATEGORY.drone, attrs),
   };
@@ -375,7 +384,7 @@ describe("a hull that carries nothing", () => {
     expect(perf).toEqual({
       dps: null, volley: null, weaponDps: null, droneDps: null,
       ehp: null, shield: null, armor: null, hull: null, shieldRechargeTime: null, shieldRechargeRate: null,
-      maxVelocity: null, alignTime: null,
+      maxVelocity: null, propulsion: null, alignTime: null,
       capacitorCapacity: null, capRechargeTime: null, capStable: null, capUsage: null, capPeakRecharge: null, capDelta: null,
       maxTargets: null, maxTargetRange: null, scanResolution: null, signatureRadius: null, sensorStrength: null,
       mass: null, inertia: null, warpSpeed: null, droneBandwidth: null, droneBay: null, droneControlRange: null,
@@ -422,6 +431,32 @@ describe("the fitting-window stats", () => {
     const rep = b.active([[ATTR.capacitorNeed, 50], [PERF_ATTR.duration, 10_000]]);
     const busy = fitPerformance(buildFit(b.data, b.hull(HULL), { modules: [[rep, "mid", 0]] }));
     expect(busy).toMatchObject({ capPeakRecharge: 12.5, capUsage: 5, capDelta: 7.5 });
+  });
+
+  it("runs an afterburner the way Pyfa does: mass + massAddition, then speedFactor x thrust / mass percent", () => {
+    const b = bench();
+    // 135 x 1,500,000 / (2,000,000 + 500,000) = 81 %  →  320 x 1.81 = 579.2 m/s.
+    // Align with the heavier hull: ln 4 x 2,500,000 x 5 / 1e6 = 6.931 s (cold: 5.545 s).
+    const ab = b.prop("afterburner", [[PERF_ATTR.speedFactor, 135], [PERF_ATTR.speedBoostFactor, 1_500_000], [PERF_ATTR.massAddition, 500_000]]);
+    const perf = fitPerformance(buildFit(b.data, b.hull(HULL), { modules: [[ab, "mid", 0]] }));
+    expect(perf.maxVelocity).toBe(320);                       // the cold figure is untouched
+    expect(perf.propulsion?.kind).toBe("Afterburner");
+    expect(perf.propulsion?.velocity).toBeCloseTo(579.2, 9);
+    expect(perf.propulsion?.alignTime).toBeCloseTo(Math.log(4) * 2_500_000 * 5 / 1e6, 9);
+    expect(perf.propulsion?.signatureRadius).toBe(38);        // an afterburner does not bloom
+    expect(perf.alignTime).toBeCloseTo(Math.log(4) * 2_000_000 * 5 / 1e6, 9);
+  });
+
+  it("blooms the signature for a microwarpdrive and ignores a propulsion module that is not active", () => {
+    const b = bench();
+    const mwd = b.prop("microwarpdrive", [[PERF_ATTR.speedFactor, 500], [PERF_ATTR.speedBoostFactor, 1_500_000], [PERF_ATTR.massAddition, 500_000], [PERF_ATTR.signatureRadiusBonus, 500]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[mwd, "mid", 0]] });
+    // 500 x 1.5e6 / 2.5e6 = 300 %  →  320 x 4 = 1280 m/s; signature 38 x 6 = 228 m.
+    expect(fitPerformance(fit).propulsion).toMatchObject({ kind: "Microwarpdrive", velocity: 1280, signatureRadius: 228 });
+    fit.modules[0].item.state = State.Online;
+    clearMemo(fit);
+    expect(fitPerformance(fit).propulsion).toBeNull();
+    expect(fitPerformance(buildFit(b.data, b.hull(HULL))).propulsion).toBeNull();
   });
 
   it("names the strongest sensor, and reads mass, inertia, warp speed and the drone limits", () => {

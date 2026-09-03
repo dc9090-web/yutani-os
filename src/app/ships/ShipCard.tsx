@@ -32,7 +32,7 @@ export function ShipCard({ card }: { card: ShipCardView }) {
             <dl className="ship-stat-strip">
               <div className="ship-stat"><dt>DPS</dt><dd className="num">{card.stats.dps}</dd></div>
               <div className="ship-stat"><dt>EHP</dt><dd className="num">{card.stats.ehp}</dd></div>
-              <div className="ship-stat"><dt>Speed</dt><dd className="num">{card.stats.velocity}</dd></div>
+              <div className="ship-stat"><dt>Speed{card.stats.propKind === null ? "" : ` · ${card.stats.propKind}`}</dt><dd className="num">{card.stats.velocity}</dd></div>
               <div className="ship-stat"><dt>Cap</dt><dd className={`num${card.stats.capOk === null ? "" : card.stats.capOk ? " pos" : " warn-text"}`}>{card.stats.cap}</dd></div>
             </dl>
           )}

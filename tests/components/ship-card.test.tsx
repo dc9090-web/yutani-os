@@ -7,7 +7,7 @@ const card: ShipCardView = {
   key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeId: 587, typeName: "Rifter",
   groupName: "Frigate", raceName: "Minmatar",
   location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
-  stats: { dps: "863.2", ehp: "37,445", velocity: "289 m/s", cap: "Stable 68%", capOk: true },
+  stats: { dps: "863.2", ehp: "37,445", velocity: "2,147 m/s", cap: "Stable 68%", capOk: true, propKind: "MWD" },
   cpu: { label: "CPU", unit: "tf", used: 121.5, output: 162.5, text: "121.50 / 162.50 tf", percent: 74.8, over: false },
   power: { label: "Powergrid", unit: "MW", used: 60, output: 51.25, text: "60.00 / 51.25 MW", percent: 100, over: true },
   missingSkills: 2, value: "13.1M ISK", valueRaw: 13_100_100, unpriced: "1 item unpriced", error: null,
@@ -30,6 +30,8 @@ describe("ShipCard", () => {
     // The four headline tiles.
     expect(container.querySelectorAll(".ship-stat")).toHaveLength(4);
     expect(screen.getByText("37,445")).toBeInTheDocument();
+    expect(screen.getByText("Speed · MWD")).toBeInTheDocument();
+    expect(screen.getByText("2,147 m/s")).toBeInTheDocument();
     expect(screen.getByText("Stable 68%")).toHaveClass("pos");
     expect(screen.getByText("13.1M ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();

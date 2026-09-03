@@ -7,7 +7,7 @@ import type { FittingRow } from "../db/character-fittings.js";
 import {
   CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
   type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
-  fitPerformance, type FitPerformance,
+  assumeCargoAmmo, fitPerformance, type AssumedAmmo, type FitPerformance,
 } from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 import { clock, grouped } from "./format.js";
@@ -130,7 +130,11 @@ export function fitValueEntries(built: BuiltFit): ValuedEntry[] {
 /** One card in the `/ships` grid. Everything is a string or a number — no engine objects. */
 /** The card's headline numbers — the fitting window's four you glance at first. `capOk` colours the
  *  capacitor tile: green stable, amber draining, null when the engine can't say. */
-export interface ShipCardStats { dps: string; ehp: string; velocity: string; cap: string; capOk: boolean | null }
+export interface ShipCardStats {
+  dps: string; ehp: string; velocity: string; cap: string; capOk: boolean | null;
+  /** "MWD" / "AB" when `velocity` is the running-propulsion figure; null when it is the cold one. */
+  propKind: "MWD" | "AB" | null;
+}
 
 const DASH = "—";
 export function shipCardStats(perf: FitPerformance): ShipCardStats {
@@ -138,9 +142,11 @@ export function shipCardStats(perf: FitPerformance): ShipCardStats {
   return {
     dps: perf.dps === null ? DASH : grouped(perf.dps.toFixed(1)),
     ehp: perf.ehp === null ? DASH : grouped(Math.round(perf.ehp)),
-    velocity: perf.maxVelocity === null ? DASH : `${grouped(Math.round(perf.maxVelocity))} m/s`,
+    velocity: perf.propulsion !== null ? `${grouped(Math.round(perf.propulsion.velocity))} m/s`
+      : perf.maxVelocity === null ? DASH : `${grouped(Math.round(perf.maxVelocity))} m/s`,
     cap: cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${clock(cap.lastsSeconds)}`,
     capOk: cap === null ? null : cap.stable,
+    propKind: perf.propulsion === null ? null : perf.propulsion.kind === "Microwarpdrive" ? "MWD" : "AB",
   };
 }
 
@@ -200,7 +206,7 @@ export function sortShipCards(cards: ShipCardView[]): ShipCardView[] {
 /** A saved fit is not anywhere, so its card's location line says what it is instead. */
 export const SAVED_FIT_LOCATION = "Saved fit";
 
-export interface ComputedFit { built: BuiltFit; stats: FitStats; problems: Problem[] }
+export interface ComputedFit { built: BuiltFit; stats: FitStats; problems: Problem[]; assumedAmmo: AssumedAmmo[] }
 
 /**
  * Spec §6: engine exceptions are caught per fit and logged, and the card says "Could not compute".
@@ -210,7 +216,9 @@ export interface ComputedFit { built: BuiltFit; stats: FitStats; problems: Probl
 export function computeFit(build: () => BuiltFit, what: string): ComputedFit | null {
   try {
     const built = build();
-    return { built, stats: fitStats(built.fit), problems: validateFit(built.fit) };
+    // Before the maths: an unloaded gun shoots the best ammo in the hold (dogma/ammo.ts).
+    const assumedAmmo = assumeCargoAmmo(built);
+    return { built, stats: fitStats(built.fit), problems: validateFit(built.fit), assumedAmmo };
   } catch (e) {
     console.error(`[ships] could not compute ${what}`, e);
     return null;

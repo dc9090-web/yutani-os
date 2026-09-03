@@ -12,7 +12,7 @@ const view: FitSheetView = {
   skillsSynced: true,
   stats: {
     capacitor: { title: "Capacitor", headline: "Stable 68%", ok: true, rows: [{ label: "Capacity", value: "1,687 GJ / 4m 3s" }, { label: "Δ", value: "+0.1 GJ/s (0.3%)" }] },
-    offense: { title: "Offense", headline: "863.2 dps", rows: [{ label: "Weapons", value: "797.1 dps" }, { label: "Volley", value: "1,349 HP" }] },
+    offense: { title: "Offense", headline: "863.2 dps", note: "1 weapon loaded with the best ammo in cargo", rows: [{ label: "Weapons", value: "797.1 dps" }, { label: "Volley", value: "1,349 HP" }] },
     defense: {
       title: "Defense", headline: "37,445 ehp", recharge: "28.0 hp/s", rows: [],
       layers: [
@@ -37,7 +37,7 @@ const view: FitSheetView = {
       slot: "high", title: "High", used: 1, total: 4,
       rows: [{
         key: "high:0", name: "200mm AutoCannon II", typeId: 2889, charge: "Hail S",
-        desc: "The 200mm is a powerful autocannon.", chargeDesc: "Hail is an attempt to combine penetration with versatility.",
+        desc: "The 200mm is a powerful autocannon.", chargeDesc: "Hail is an attempt to combine penetration with versatility.", chargeAssumed: true,
         cpu: "6.75", power: "12.80", state: "Active",
         cpuExplain: [{ carrier: "Weapon Upgrades", operator: "%", value: "-25", penalised: false }],
         powerExplain: [],
@@ -108,7 +108,7 @@ describe("FitSheet", () => {
   it("lists the module with its charge, both resource figures and its state", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
-    expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent("Hail S");   // the charge under its turret
+    expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent("Hail S · from cargo");   // the charge under its turret, app-loaded
     expect(screen.getByText("12.80")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     // The CPU cell has modifiers, so it is a popover button; powergrid has none, so it is plain text.
@@ -139,6 +139,7 @@ describe("FitSheet", () => {
     expect(screen.getByText("1,050 s")).toBeInTheDocument();
     expect(screen.getByText("20.4 points (Ladar)")).toBeInTheDocument();
     expect(screen.getByText("166.5 / 450 m³")).toBeInTheDocument();
+    expect(screen.getByText("1 weapon loaded with the best ammo in cargo")).toHaveClass("stat-note");
   });
 
   it("shows the slot and hardpoint counters, flagging the over-full one", () => {

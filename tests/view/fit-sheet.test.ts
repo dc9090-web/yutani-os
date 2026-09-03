@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
-import { CATEGORY, fitFromAssets, fitPerformance, fitStats, validateFit } from "../../src/lib/dogma/index.js";
+import { CATEGORY, assumeCargoAmmo, fitFromAssets, fitPerformance, fitStats, validateFit } from "../../src/lib/dogma/index.js";
 import { buildFitSheet, operatorLabel, problemText, stateLabel, typeDescription } from "../../src/lib/view/fit-sheet.js";
 import { fitValueEntries } from "../../src/lib/view/ships.js";
 import { rollUpValue } from "../../src/lib/view/price.js";
@@ -208,6 +208,26 @@ describe("buildFitSheet", () => {
     // The bays: 1500 Hail S at 0.0025 m³ = 3.75 m³ of a 140 m³ hold; 6 Hobgoblin II at 5 m³ = 30 m³, and the Rifter has no drone bay (0 m³).
     expect(view.stats.bays).toEqual([{ label: "Cargo hold", value: "3.8 / 140 m³" }, { label: "Drone bay", value: "30 m³" }]);
     expect(view.stats.drones.rows.find((r) => r.label === "In bay")?.value).toBe("6 drones");
+  });
+
+  it("marks a charge the app loaded from cargo, and notes it in Offense", () => {
+    // An unloaded gun (no HiSlot1 charge row) with Hail S in the hold.
+    const built = fitFromAssets(SHIP, [
+      ...CHILDREN, asset({ itemId: 1010, typeId: 2889, locationFlag: "HiSlot1", isSingleton: true }),
+    ], ctx);
+    const loads = assumeCargoAmmo(built);
+    expect(loads).toEqual([{ slot: "high", index: 1, moduleTypeId: 2889, chargeTypeId: 12608 }]);
+    const view = buildFitSheet({
+      title: "Scarlet Dart", typeId: 587, typeName: "Rifter",
+      ship: { typeName: "Rifter", groupName: "Frigate", raceName: "Minmatar" },
+      location: { system: null, place: null, note: null },
+      built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit),
+      bonuses: BONUSES, skillLevels, skillNames, prices: PRICES, descriptions: DESCRIPTIONS, skillsSynced: true,
+    });
+    const high = view.slots.find((c) => c.slot === "high")!;
+    expect(high.rows.map((r) => [r.charge, r.chargeAssumed])).toEqual([["Hail S", false], ["Hail S", true]]);
+    expect(view.stats.offense.note).toBe("1 weapon loaded with the best ammo in cargo");
+    expect(sheet().stats.offense.note).toBeNull();
   });
 
   it("passes the unsynced-skills flag through", () => {

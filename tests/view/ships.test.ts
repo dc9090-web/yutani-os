@@ -139,9 +139,12 @@ describe("toShipCard / errorShipCard / sortShipCards", () => {
 
   it("formats the four headline stats, dashes and a null cap colour where the engine can't answer", () => {
     const perf = {
-      dps: 863.24, ehp: 37444.6, maxVelocity: 289.1, capStable: { stable: true, level: 0.684 },
+      dps: 863.24, ehp: 37444.6, maxVelocity: 289.1, capStable: { stable: true, level: 0.684 }, propulsion: null,
     } as unknown as import("../../src/lib/dogma/index.js").FitPerformance;
-    expect(shipCardStats(perf)).toEqual({ dps: "863.2", ehp: "37,445", velocity: "289 m/s", cap: "Stable 68%", capOk: true });
+    expect(shipCardStats(perf)).toEqual({ dps: "863.2", ehp: "37,445", velocity: "289 m/s", cap: "Stable 68%", capOk: true, propKind: null });
+    // A running prop mod takes over the speed tile and names itself.
+    const mwd = { ...perf, propulsion: { kind: "Microwarpdrive", velocity: 2146.7, alignTime: 8.2, signatureRadius: 218 } } as unknown as import("../../src/lib/dogma/index.js").FitPerformance;
+    expect(shipCardStats(mwd)).toMatchObject({ velocity: "2,147 m/s", propKind: "MWD" });
     const draining = { ...perf, dps: null, capStable: { stable: false, lastsSeconds: 243 } } as unknown as import("../../src/lib/dogma/index.js").FitPerformance;
     expect(shipCardStats(draining)).toMatchObject({ dps: "—", cap: "Lasts 4m 3s", capOk: false });
     expect(shipCardStats({ ...perf, capStable: null } as never)).toMatchObject({ cap: "—", capOk: null });

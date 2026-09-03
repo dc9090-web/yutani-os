@@ -53,6 +53,10 @@ export const PERF_ATTR = {
   droneBandwidthUsed: 1272,   // Mbit/s one drone takes
   warpSpeedMultiplier: 600,   // AU/s = baseWarpSpeed x warpSpeedMultiplier
   baseWarpSpeed: 1281,
+  speedFactor: 20,            // a propulsion module's velocity bonus, %
+  speedBoostFactor: 567,      // its thrust
+  massAddition: 796,          // the mass it adds while running
+  signatureRadiusBonus: 554,  // a microwarpdrive's signature bloom, %
   /** The *structure* resonances. The hull layer uses the unprefixed family, not `hull*DamageResonance`
    *  (974-977) — those are the Damage Control's own bonus attributes, which the SDE's effect 2302
    *  applies *to* 109/110/111/113 (verified in the rifter snapshot). Hulls carry an innate 0.67
@@ -72,6 +76,13 @@ export const PERF_ATTR = {
 export const CHARACTER_ATTR = {
   droneControlDistance: 458,  // metres
 } as const;
+
+/**
+ * The two propulsion effects. Neither carries `modifierInfo` in the SDE — EOS and Pyfa hard-code the
+ * maths, and so does `propulsion()` below. Verified by name against the full SDE
+ * (moduleBonusMicrowarpdrive / moduleBonusAfterburner).
+ */
+export const PROP_EFFECT = { microwarpdrive: 6730, afterburner: 6731 } as const;
 
 /** The four sensor types and the attribute that carries each one's strength. */
 const SENSOR_ATTRS: readonly (readonly [string, AttrId])[] = [
@@ -126,6 +137,17 @@ export type CapStability =
  *  fractions, 0.57 for "57 %"), and the layer's own omni effective hit points. */
 export interface LayerPerformance { hp: number; resists: readonly [number, number, number, number]; ehp: number }
 
+/** What a running afterburner or microwarpdrive does to the hull. */
+export interface Propulsion {
+  kind: "Afterburner" | "Microwarpdrive";
+  /** m/s with the module running. */
+  velocity: number;
+  /** Seconds to align, with the module's `massAddition` on the hull. */
+  alignTime: number | null;
+  /** Metres, after a microwarpdrive's signature bloom; an afterburner leaves it unchanged. */
+  signatureRadius: number | null;
+}
+
 export interface FitPerformance {
   /**
    * Turrets + launchers + drones, damage per second. `null` when nothing on the fit deals damage.
@@ -154,12 +176,14 @@ export interface FitPerformance {
    * m/s — the hull's modified `maxVelocity`, cold.
    *
    * A fitted microwarpdrive or afterburner does **not** raise it: their speed bonus is effect
-   * 6730/6731, which carries no `modifierInfo` in the SDE (EOS and Pyfa hard-code the
-   * speedFactor/speedBoostFactor/massAddition maths), and this engine does not implement it yet.
-   * `alignTime` is cold for the same reason — the module's `massAddition` is not applied either.
-   * What a running MWD *does* change is `capacitorCapacity`, through ordinary SDE modifiers.
+   * 6730/6731, which carries no `modifierInfo` in the SDE, so it never reaches `getAttr`. The
+   * running-module figure is `propulsion`, computed the way Pyfa hard-codes it. `alignTime` is cold
+   * likewise; `propulsion.alignTime` carries the `massAddition`. What a running MWD *does* change
+   * here is `capacitorCapacity`, through ordinary SDE modifiers.
    */
   maxVelocity: number | null;
+  /** The first active afterburner or microwarpdrive, and the hull with it running; `null` without one. */
+  propulsion: Propulsion | null;
   /** Seconds to reach 75 % of top speed — the align time. */
   alignTime: number | null;
   /** GJ. */
@@ -226,6 +250,7 @@ export function fitPerformance(fit: Fit): FitPerformance {
     shieldRechargeTime: shieldTime,
     shieldRechargeRate: shieldTime !== null && shieldCap !== null && shieldCap > 0 ? 2.5 * shieldCap / shieldTime : null,
     maxVelocity: shipAttr(fit, PERF_ATTR.maxVelocity),
+    propulsion: propulsion(fit),
     alignTime: alignTime(fit),
     capacitorCapacity: capacity,
     capRechargeTime: rechargeTime,
@@ -245,6 +270,38 @@ export function fitPerformance(fit: Fit): FitPerformance {
     droneBay: shipAttr(fit, PERF_ATTR.droneCapacity),
     droneControlRange: droneRange !== null && droneRange > 0 ? droneRange : null,
   };
+}
+
+/**
+ * A running afterburner or microwarpdrive — Pyfa's `moduleBonusAfterburner` / `...Microwarpdrive`:
+ * the hull's mass grows by the module's `massAddition`, then `maxVelocity` is boosted by
+ * `speedFactor x speedBoostFactor / mass` percent; a microwarpdrive also blooms the signature by
+ * its `signatureRadiusBonus` percent. All four module attributes are read modified, so Acceleration
+ * Control (which raises `speedFactor`) and the rest of the skill chain count. Only a module in the
+ * Active state runs; the first one found wins, which is what the client does with two fitted.
+ */
+function propulsion(fit: Fit): Propulsion | null {
+  const velocity = shipAttr(fit, PERF_ATTR.maxVelocity);
+  const mass = shipAttr(fit, ATTR.mass);
+  if (velocity === null || mass === null || mass <= 0) return null;
+  for (const { item } of fit.modules) {
+    if (item.state < State.Active) continue;
+    const kind = item.effects.has(PROP_EFFECT.microwarpdrive) ? "Microwarpdrive"
+      : item.effects.has(PROP_EFFECT.afterburner) ? "Afterburner" : null;
+    if (kind === null) continue;
+    const total = mass + attrOr(fit, item, PERF_ATTR.massAddition, 0);
+    const boost = attrOr(fit, item, PERF_ATTR.speedFactor, 0) * attrOr(fit, item, PERF_ATTR.speedBoostFactor, 0) / total;
+    const agility = shipAttr(fit, PERF_ATTR.agility);
+    const sig = shipAttr(fit, PERF_ATTR.signatureRadius);
+    const bloom = kind === "Microwarpdrive" ? attrOr(fit, item, PERF_ATTR.signatureRadiusBonus, 0) : 0;
+    return {
+      kind,
+      velocity: velocity * (1 + boost / 100),
+      alignTime: agility === null || agility <= 0 ? null : -Math.log(0.25) * total * agility / 1_000_000,
+      signatureRadius: sig === null ? null : sig * (1 + bloom / 100),
+    };
+  }
+  return null;
 }
 
 /** The strongest of the four sensor types; `null` when the hull carries none (or all read 0). */

@@ -15,10 +15,8 @@ import {
 export type SlotTotals = Record<SlotKind, number>;
 export interface SlotCell { slot: SlotKind; index: number; item: FitItem | null; over: boolean }
 
-/** chargeGroup1..5 — the groups a module will accept (spec §4). */
-export const CHARGE_GROUP_ATTRS: readonly AttrId[] = [604, 605, 606, 609, 610];
-/** chargeSize — a Small launcher does not take a Medium missile. */
-export const CHARGE_SIZE_ATTR: AttrId = 128;
+/** The charge rule lives with the engine now (dogma/ammo.ts); re-exported so the editor's imports hold. */
+export { CHARGE_GROUP_ATTRS, CHARGE_SIZE_ATTR, chargeFits } from "../dogma/ammo.js";
 
 const SLOT_ATTRS: Record<SlotKind, AttrId> = {
   high: ATTR.hiSlots, mid: ATTR.medSlots, low: ATTR.lowSlots,
@@ -120,21 +118,6 @@ export function setEntryQuantity(doc: FitDoc, flag: string, typeId: number, quan
     ? doc.items.filter((i) => !(i.flag === flag && i.typeId === typeId))
     : doc.items.map((i) => (i.flag === flag && i.typeId === typeId ? { ...i, quantity } : i));
   return { ...doc, items };
-}
-
-/** Spec §4's charge filter: the module's `chargeGroup*` must list the charge's group, and sizes must fit. */
-export function chargeFits(moduleType: DogmaType, chargeType: DogmaType): boolean {
-  const groups: number[] = [];
-  for (const attrId of CHARGE_GROUP_ATTRS) {
-    const value = moduleType.attrs.get(attrId);
-    if (value !== undefined) groups.push(Math.round(value));
-  }
-  if (groups.length === 0) return false;                    // this module takes no charge at all
-  if (!groups.includes(chargeType.groupId)) return false;
-  const max = moduleType.attrs.get(CHARGE_SIZE_ATTR);
-  const size = chargeType.attrs.get(CHARGE_SIZE_ATTR);
-  if (max === undefined || size === undefined) return true; // CCP only sets it where it bites
-  return size <= max;
 }
 
 /**

@@ -83,7 +83,11 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                         <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
                         <span className="sheet-mod-text">
                           <span className="sheet-mod-name">{row.name}</span>
-                          {row.charge === null ? null : <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>{row.charge}</span>}
+                          {row.charge === null ? null : (
+                            <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>
+                              {row.charge}{row.chargeAssumed ? <span className="sheet-mod-assumed"> · from cargo</span> : null}
+                            </span>
+                          )}
                         </span>
                       </span>
                       <span className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></span>

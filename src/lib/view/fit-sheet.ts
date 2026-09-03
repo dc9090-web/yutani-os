@@ -86,6 +86,8 @@ export interface ModuleRowView {
   key: string; name: string; typeId: number; charge: string | null;
   /** SDE descriptions, plain text — `typeDescription()`; null when the SDE has none. */
   desc: string | null; chargeDesc: string | null;
+  /** The charge was loaded by the app from the cargo hold (`assumeCargoAmmo`), not by the pilot. */
+  chargeAssumed: boolean;
   cpu: string; power: string; state: string;
   cpuExplain: ExplainRowView[]; powerExplain: ExplainRowView[];
 }
@@ -102,7 +104,7 @@ export interface StatRowView { label: string; value: string }
 /** A tank layer row of the Defense section: pool, an optional note (shield recharge time) and the
  *  four resistances as whole percents in EVE's order — em, thermal, kinetic, explosive. */
 export interface ResistRowView { layer: string; hp: string; note: string | null; resists: [number, number, number, number] }
-export interface StatSectionView { title: string; headline: string; rows: StatRowView[] }
+export interface StatSectionView { title: string; headline: string; rows: StatRowView[]; note?: string | null }
 
 /** The fitting window's stats panel: six sections plus the two bays, every value pre-formatted. */
 export interface ShipStatsView {
@@ -214,6 +216,7 @@ export function shipStatsView(perf: FitPerformance, built: StatsSource): ShipSta
     },
     offense: {
       title: "Offense", headline: fmtNum(perf.dps, 1, " dps"),
+      note: assumedCount(fit) === 0 ? null : `${assumedCount(fit)} weapon${assumedCount(fit) === 1 ? "" : "s"} loaded with the best ammo in cargo`,
       rows: [
         { label: "Weapons", value: fmtNum(perf.weaponDps, 1, " dps") },
         { label: "Drones", value: fmtNum(perf.droneDps, 1, " dps") },
@@ -230,17 +233,24 @@ export function shipStatsView(perf: FitPerformance, built: StatsSource): ShipSta
       rows: [
         { label: "Sensor strength", value: perf.sensorStrength === null ? DASH : `${fmtNum(perf.sensorStrength.points, 1)} points (${perf.sensorStrength.kind})` },
         { label: "Scan resolution", value: whole(perf.scanResolution, " mm") },
-        { label: "Signature radius", value: whole(perf.signatureRadius, " m") },
+        { label: "Signature radius", value: perf.propulsion?.kind === "Microwarpdrive" && perf.propulsion.signatureRadius !== null
+          ? `${whole(perf.signatureRadius, " m")} · ${whole(perf.propulsion.signatureRadius, " m")} MWD` : whole(perf.signatureRadius, " m") },
         { label: "Max targets", value: perf.maxTargets === null ? DASH : `${perf.maxTargets}×` },
       ],
     },
     navigation: {
       title: "Navigation", headline: fmtNum(perf.maxVelocity, 1, " m/s"),
       rows: [
+        ...(perf.propulsion === null ? [] : [
+          { label: `With ${perf.propulsion.kind === "Microwarpdrive" ? "MWD" : "afterburner"}`, value: fmtNum(perf.propulsion.velocity, 1, " m/s") },
+        ]),
         { label: "Mass", value: perf.mass === null ? DASH : `${grouped((perf.mass / 1000).toFixed(1))} t` },
         { label: "Inertia", value: perf.inertia === null ? DASH : `${perf.inertia.toFixed(4)}×` },
         { label: "Warp speed", value: fmtNum(perf.warpSpeed, 2, " AU/s") },
         { label: "Align time", value: fmtNum(perf.alignTime, 2, " s") },
+        ...(perf.propulsion === null || perf.propulsion.alignTime === null ? [] : [
+          { label: `Align, ${perf.propulsion.kind === "Microwarpdrive" ? "MWD" : "AB"} on`, value: fmtNum(perf.propulsion.alignTime, 2, " s") },
+        ]),
       ],
     },
     drones: {
@@ -258,6 +268,13 @@ export function shipStatsView(perf: FitPerformance, built: StatsSource): ShipSta
   };
 }
 
+/** How many weapons carry an app-loaded charge — the Offense note. */
+function assumedCount(fit: Fit): number {
+  let n = 0;
+  for (const { item } of fit.modules) if (item.charge?.assumed === true) n += 1;
+  return n;
+}
+
 // Attribute ids also spelled in dogma/perf.ts's PERF_ATTR; named here so this file needs no import of it.
 const PERF_ATTR_DRONE_BANDWIDTH_USED = 1272;
 const PERF_ATTR_DRONE_CAPACITY = 283;
@@ -271,6 +288,7 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
     charge: stat.item.charge === undefined ? null : itemLabel(stat.item.charge),
     desc: descriptions.get(stat.item.typeId) ?? null,
     chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
+    chargeAssumed: stat.item.charge?.assumed === true,
     // Half-even round to 2dp first — same convention as the pool totals in `fitStats` — so a row's
     // own cpu/power always matches what the gauge above it is summing.
     cpu: round2(stat.cpu).toFixed(2),

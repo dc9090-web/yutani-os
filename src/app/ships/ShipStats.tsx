@@ -18,6 +18,7 @@ function Section({ section, badge, children }: { section: StatSectionView; badge
         </dl>
       )}
       {children}
+      {section.note ? <p className="stat-note faint">{section.note}</p> : null}
     </section>
   );
 }

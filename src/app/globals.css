@@ -340,6 +340,8 @@ body {
 .stat-rows .stat-row { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 12px; margin: 0; font-size: 12px; }
 .stat-rows dt { color: var(--muted); }
 .stat-rows dd { margin: 0; color: var(--text); }
+.stat-note { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
+.sheet-mod-assumed { color: var(--accent-2); }
 .stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
 .resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
 .resist-table th { font-weight: 500; text-align: left; padding: 0; }
