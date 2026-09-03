@@ -11,13 +11,14 @@ export function ShipCard({ card }: { card: ShipCardView }) {
       <div className="ship-head">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={shipRenderUrl(card.typeId)} alt="" className="ship-render" />
-        <div>
-          <h2 className="ship-name">{card.name ?? card.typeName}</h2>
+        <div className="ship-id">
+          {/* Pills lead: race, group, hull. The pilot's own name for the ship sits under them. */}
           <div className="ship-type-pills">
             {card.raceName === null ? null : <span className="pill">{card.raceName}</span>}
             {card.groupName === null ? null : <span className="pill">{card.groupName}</span>}
             <span className="pill">{card.typeName}</span>
           </div>
+          <h2 className="ship-name">{card.name ?? card.typeName}</h2>
         </div>
       </div>
       <p className="ship-loc faint">{card.location}</p>

@@ -287,7 +287,9 @@ body {
 .ship-card:hover { border-color: var(--border-hi); }
 .ship-head { display: flex; gap: 12px; align-items: center; }
 .ship-render { width: 64px; height: 64px; border-radius: 8px; border: 1px solid var(--divider); background: var(--raised); object-fit: cover; }
-.ship-name { margin: 0; font-family: var(--font-poppins), sans-serif; font-size: 16px; font-weight: 600; }
+.ship-id { min-width: 0; }
+.ship-id .ship-type-pills { margin-top: 0; }
+.ship-name { margin: 6px 0 0; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ship-type { margin: 2px 0 0; font-size: 13px; }
 .ship-loc { font-size: 12px; margin: 6px 0 2px; }
 .ship-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; }
