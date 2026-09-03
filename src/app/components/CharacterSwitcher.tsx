@@ -25,7 +25,11 @@ export function CharacterSwitcher({ groups, activeId, pathname }: { groups: Char
               <form key={c.id} method="post" action="/auth/switch">
                 <input type="hidden" name="characterId" value={c.id} />
                 <input type="hidden" name="next" value={pathname} />
-                <Menu.Item component="button" type="submit"
+                {/* closeMenuOnClick={false}: Mantine closes the dropdown synchronously on click and React
+                    flushes that before the browser runs the button's default action, so a submit button
+                    that has just left the DOM has no form owner and never submits. The 303 from
+                    /auth/switch replaces the page anyway. */}
+                <Menu.Item component="button" type="submit" closeMenuOnClick={false}
                   // eslint-disable-next-line @next/next/no-img-element
                   leftSection={<img src={portraitUrl(c.id)} alt="" className="char-avatar" style={{ width: 24, height: 24 }} />}
                   rightSection={c.tokenStatus === "needs_reauth" ? <span className="neg" title="Re-authorise in Settings"><IconAlertTriangle size={14} /> re-authorise</span> : null}
@@ -43,7 +47,7 @@ export function CharacterSwitcher({ groups, activeId, pathname }: { groups: Char
         <a href="/auth/start" className="menu-link-item"><IconPlus size={16} /> Add character</a>
         <a href="/settings" className="menu-link-item"><IconSettings size={16} /> Settings</a>
         <form method="post" action="/auth/logout">
-          <Menu.Item component="button" type="submit" color="red" leftSection={<IconLogout size={16} />}>Logout</Menu.Item>
+          <Menu.Item component="button" type="submit" color="red" closeMenuOnClick={false} leftSection={<IconLogout size={16} />}>Logout</Menu.Item>
         </form>
       </Menu.Dropdown>
     </Menu>

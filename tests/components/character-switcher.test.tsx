@@ -26,6 +26,17 @@ describe("CharacterSwitcher", () => {
     expect((form.querySelector('input[name="next"]') as HTMLInputElement).value).toBe("/ships");
     expect(screen.getByRole("link", { name: /add character/i })).toHaveAttribute("href", "/auth/start");
   });
+  it("keeps the switch and logout forms mounted through the click so the submit can happen", () => {
+    ui(1);
+    fireEvent.click(screen.getByRole("button", { name: /character menu/i }));
+    const item = screen.getByText("Reacher-9").closest("button")!;
+    fireEvent.click(item);
+    expect(item.isConnected).toBe(true);                       // menu did not close and unmount the form
+    expect(item.closest("form")).not.toBeNull();
+    const logout = screen.getByText("Logout").closest("button")!;
+    fireEvent.click(logout);
+    expect(logout.closest("form")?.getAttribute("action")).toBe("/auth/logout");
+  });
   it("falls back to 'Add character' when nothing is active", () => {
     ui(null);
     expect(screen.getByRole("button", { name: /character menu/i })).toHaveTextContent(/add character/i);
