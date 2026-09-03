@@ -272,8 +272,12 @@ body {
 
 /* ---------- Ships & market (phase 4) ---------- */
 .warn-text { color: var(--warn); }
-.gauge-row { display: grid; grid-template-columns: 74px 1fr auto; gap: 8px; align-items: center; margin-top: 6px; }
-.gauge-label { font-size: 12px; color: var(--faint); }
+/* Label and value on one line, the bar full width beneath — every bar the same length whatever
+   the value text says, the same shape as the overview card's training row. */
+.gauge-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label text" "bar bar"; column-gap: 8px; row-gap: 5px; align-items: center; margin-top: 10px; }
+.gauge-label { grid-area: label; font-size: 12px; color: var(--faint); }
+.gauge { grid-area: bar; }
+.gauge-text { grid-area: text; }
 /* Same bar as the skill queue's `.progress` — one progress-bar design across the site. */
 .gauge { height: 10px; border-radius: 3px; background: var(--raised); overflow: hidden; display: block; }
 .gauge-fill { display: block; height: 100%; background: var(--accent); }
