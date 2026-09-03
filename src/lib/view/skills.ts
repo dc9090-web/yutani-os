@@ -48,6 +48,17 @@ export function queueProgress(entry: { startDate: Date | null; finishDate: Date 
   return Math.min(1, Math.max(0, done));
 }
 
+/**
+ * The queue as it stands now. ESI only advances a character's queue when they log in (a finished
+ * entry stays at the front until then, and Sasha's queue arrives numbered from 6 after ESI trimmed
+ * completed entries without renumbering), but every entry's dates are exact — so drop what has
+ * finished and take the first survivor, in ESI's order, as the head. A paused entry has no finish
+ * date and is never dropped.
+ */
+export function liveQueue<T extends { finishDate: Date | null }>(queue: readonly T[], now: Date): T[] {
+  return queue.filter((q) => q.finishDate === null || q.finishDate.getTime() > now.getTime());
+}
+
 export interface SkillView { skillId: number; name: string; trainedLevel: number; activeLevel: number; skillpoints: number }
 export interface SkillGroupView { groupId: number; name: string; groupSp: number; skills: SkillView[] }
 

@@ -7,6 +7,7 @@ import { getGroups, getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
 import { tagsByCharacter } from "../lib/db/tags.js";
 import { iskWhole, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
+import { liveQueue } from "../lib/view/skills.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
 
@@ -25,7 +26,7 @@ export default async function Overview() {
       getSkillSummary(character.id),
       listSkillQueue(character.id),
     ]);
-    return { character, wallet, location, summary, head: queue[0] ?? null };
+    return { character, wallet, location, summary, head: liveQueue(queue, now)[0] ?? null };
   }));
 
   const typeIds = new Set<number>();

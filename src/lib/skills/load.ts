@@ -14,6 +14,7 @@ import {
 import { buildCatalogue, catalogueFrom, type PlanSkill } from "./catalogue.js";
 import { expandPlan, type ExpandedEntry } from "./expand.js";
 import { currentSpInTraining } from "./sp.js";
+import { liveQueue } from "../view/skills.js";
 import { planTimeline, type Timeline } from "./timeline.js";
 
 /** EVE's displayed baseline: 20 everywhere except charisma at 19. 20*4 + 19 = 99. */
@@ -72,7 +73,7 @@ export async function loadPlanContext(characterId: number): Promise<PlanContext>
   }
   // ESI's /skills is stale until the character logs in, so the head entry's own dates give a
   // fresher SP figure for the skill it is training (EVEMon QueuedSkill.CurrentSP).
-  const head = queue.find((q) => q.queuePosition === 0);
+  const head = liveQueue(queue, now)[0];
   if (head !== undefined) {
     const live = currentSpInTraining(head, now);
     if (live !== null && live > (partialSp.get(head.skillId) ?? 0)) partialSp.set(head.skillId, live);

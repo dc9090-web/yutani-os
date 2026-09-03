@@ -122,3 +122,30 @@ describe("remapAvailability", () => {
     expect(remapAvailability({ bonusRemaps: null, accruedRemapCooldownDate: null }, NOW)).toBeNull();
   });
 });
+
+import { liveQueue } from "../../src/lib/view/skills.js";
+
+describe("liveQueue", () => {
+  const entry = (queuePosition: number, finish: string | null) => ({
+    queuePosition, skillId: 1000 + queuePosition, finishDate: finish === null ? null : new Date(finish),
+  });
+
+  it("drops entries ESI still lists after they finished, so the next one becomes the head", () => {
+    // ESI only advances the queue when the character logs in; the dates it gives are exact.
+    const queue = [entry(0, "2026-09-01T09:00:00Z"), entry(1, "2026-09-01T11:00:00Z"), entry(2, "2026-09-01T15:00:00Z"), entry(3, "2026-09-02T15:00:00Z")];
+    expect(liveQueue(queue, NOW).map((q) => q.queuePosition)).toEqual([2, 3]);
+  });
+
+  it("keeps a paused entry, which has no finish date", () => {
+    expect(liveQueue([entry(0, null), entry(1, null)], NOW).map((q) => q.queuePosition)).toEqual([0, 1]);
+  });
+
+  it("is empty once everything has finished", () => {
+    expect(liveQueue([entry(0, "2026-09-01T09:00:00Z")], NOW)).toEqual([]);
+  });
+
+  it("takes the first entry by order, not the one numbered zero — ESI trims finished entries without renumbering", () => {
+    const queue = [entry(6, "2026-09-01T18:00:00Z"), entry(7, "2026-09-02T18:00:00Z")];
+    expect(liveQueue(queue, NOW)[0]?.queuePosition).toBe(6);
+  });
+});

@@ -7,7 +7,7 @@ import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../l
 import { summarisePlans } from "../../lib/skills/load.js";
 import { pickActive } from "../../lib/view/characters.js";
 import { countdown, duration, relativeTime, sp, stamp } from "../../lib/view/format.js";
-import { attributeViews, groupSkills, queueProgress, remapAvailability } from "../../lib/view/skills.js";
+import { attributeViews, groupSkills, liveQueue, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
 import { QueueCountdown } from "./QueueCountdown.js";
@@ -22,7 +22,7 @@ export default async function SkillsPage() {
   if (character === null) return <NoCharacter title="Skills" />;
 
   const now = new Date();
-  const [summary, attributes, queue, skills, implantIds, storedPlans, templates] = await Promise.all([
+  const [summary, attributes, storedQueue, skills, implantIds, storedPlans, templates] = await Promise.all([
     getSkillSummary(character.id),
     getAttributes(character.id),
     listSkillQueue(character.id),
@@ -31,6 +31,7 @@ export default async function SkillsPage() {
     listPlans(character.id),
     listCareerPlans(),
   ]);
+  const queue = liveQueue(storedQueue, now);
 
   // One types query for every id on the page: sheet skills, queue skills and active implants (for
   // the attribute panel's bonus). Then one groups query and one dogma query per implant (at most ten).
