@@ -22,6 +22,9 @@ function ItemRow({ node, depth, collapsed, onToggle }: {
             {open ? <IconChevronDown size={12} /> : <IconChevronRight size={12} />}
           </button>
         )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="item-icon" src={node.iconUrl} alt="" loading="lazy"
+        onError={(e) => e.currentTarget.classList.add("missing")} />
       <span>{node.typeName}</span>
       {node.name === null ? null : <span className="muted">{node.name}</span>}
       {node.isBlueprintCopy ? <span className="badge bpc">BPC</span> : null}

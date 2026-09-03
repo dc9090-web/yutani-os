@@ -9,17 +9,17 @@ const locations: AssetViewLocation[] = [
     nodes: [
       {
         itemId: 1035000000001, typeName: "Rifter", name: "Scarlet Dart", quantity: 1,
-        flag: "Hangar", isBlueprintCopy: false, volume: 27289,
+        flag: "Hangar", isBlueprintCopy: false, volume: 27289, iconUrl: "https://images.evetech.net/types/587/icon?size=32",
         children: [
-          { itemId: 2001, typeName: "Gyrostabilizer II", name: null, quantity: 1, flag: "Low slot 1", isBlueprintCopy: false, volume: 5, children: [] },
+          { itemId: 2001, typeName: "Gyrostabilizer II", name: null, quantity: 1, flag: "Low slot 1", isBlueprintCopy: false, volume: 5, iconUrl: "https://images.evetech.net/types/519/icon?size=32", children: [] },
         ],
       },
-      { itemId: 2002, typeName: "Rifter Blueprint", name: null, quantity: 1, flag: "Hangar", isBlueprintCopy: true, volume: 0.01, children: [] },
+      { itemId: 2002, typeName: "Rifter Blueprint", name: null, quantity: 1, flag: "Hangar", isBlueprintCopy: true, volume: 0.01, iconUrl: "https://images.evetech.net/types/691/bpc?size=32", children: [] },
     ],
   },
   {
     locationId: 60008494, label: "Amarr VIII - Emperor Family Academy", itemCount: 1, volume: 1.2,
-    nodes: [{ itemId: 3001, typeName: "Tritanium", name: null, quantity: 120, flag: "Hangar", isBlueprintCopy: false, volume: 1.2, children: [] }],
+    nodes: [{ itemId: 3001, typeName: "Tritanium", name: null, quantity: 120, flag: "Hangar", isBlueprintCopy: false, volume: 1.2, iconUrl: "https://images.evetech.net/types/34/icon?size=32", children: [] }],
   },
 ];
 
@@ -41,6 +41,17 @@ describe("AssetsBrowser", () => {
     expect(screen.getByText("Low slot 1")).toBeInTheDocument();
     expect(screen.getByText("BPC")).toHaveClass("bpc");
     expect(screen.queryByText("Tritanium")).toBeNull();
+  });
+
+  it("shows each item's type icon and hides one the image server cannot supply", () => {
+    const { container } = render(<AssetsBrowser locations={locations} />);
+    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
+    const icons = container.querySelectorAll<HTMLImageElement>("img.item-icon");
+    expect(icons).toHaveLength(3);
+    expect(icons[0].src).toBe("https://images.evetech.net/types/587/icon?size=32");
+    expect(icons[2].src).toBe("https://images.evetech.net/types/691/bpc?size=32");
+    fireEvent.error(icons[1]);
+    expect(icons[1]).toHaveClass("missing");
   });
 
   it("collapses a container without losing the rest of the tree", () => {

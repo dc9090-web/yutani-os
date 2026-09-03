@@ -66,11 +66,23 @@ function countNodes(list: AssetNode[]): number {
 }
 
 /** The subset of `SdeType` this module needs; `getTypes()`' map satisfies it structurally. */
-export interface TypeInfo { name: string | null; volume: number | null }
+/** `isBlueprint` picks the image server's bp/bpc variation; every other type has an "icon". */
+export interface TypeInfo { name: string | null; volume: number | null; isBlueprint?: boolean }
+
+const BLUEPRINT_CATEGORY_ID = 9;
+export function isBlueprintCategory(categoryId: number | null | undefined): boolean {
+  return categoryId === BLUEPRINT_CATEGORY_ID;
+}
+
+/** The 32px type image the row shows: blueprints only exist as bp (original) / bpc (copy). */
+export function typeIconUrl(typeId: number, isBlueprint: boolean, isCopy: boolean): string {
+  const variation = isBlueprint ? (isCopy ? "bpc" : "bp") : "icon";
+  return `https://images.evetech.net/types/${typeId}/${variation}?size=32`;
+}
 
 export interface AssetViewNode {
   itemId: number; typeName: string; name: string | null; quantity: number;
-  flag: string; isBlueprintCopy: boolean; volume: number; children: AssetViewNode[];
+  flag: string; isBlueprintCopy: boolean; volume: number; iconUrl: string; children: AssetViewNode[];
 }
 
 export interface AssetViewLocation {
@@ -89,6 +101,7 @@ export function toViewNodes(nodes: AssetNode[], types: ReadonlyMap<number, TypeI
       flag: flagLabel(node.locationFlag),
       isBlueprintCopy: node.isBlueprintCopy,
       volume: (type?.volume ?? 0) * node.quantity,
+      iconUrl: typeIconUrl(node.typeId, type?.isBlueprint ?? false, node.isBlueprintCopy),
       children: toViewNodes(node.children, types),
     };
   });

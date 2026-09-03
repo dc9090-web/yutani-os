@@ -253,7 +253,11 @@ body {
 .loc-toggle:hover { color: var(--accent); }
 .loc-meta { margin-left: auto; font-size: 12px; color: var(--faint); }
 .tree { list-style: none; margin: 0 0 12px; padding: 0; }
-.tree-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; font-size: 13px; }
+.tree-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+/* A type the image server has no picture for (some SKINs, odd categories) keeps its slot so the
+   names stay aligned, but shows nothing. */
+.item-icon { width: 22px; height: 22px; border-radius: 3px; flex: 0 0 auto; background: var(--raised); }
+.item-icon.missing { visibility: hidden; }
 .tree-toggle { width: 14px; padding: 0; background: none; border: 0; color: var(--faint); font: inherit; cursor: pointer; }
 .tree-toggle:hover { color: var(--accent); }
 .tree-flag { margin-left: auto; font-size: 12px; color: var(--faint); }

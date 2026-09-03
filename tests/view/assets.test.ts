@@ -89,6 +89,7 @@ const types = new Map<number, TypeInfo>([
   [519, { name: "Gyrostabilizer II", volume: 5 }],
   [3465, { name: "Small Standard Container", volume: 65 }],
   [34, { name: "Tritanium", volume: 0.01 }],
+  [691, { name: "Rifter Blueprint", volume: 0.01, isBlueprint: true }],
 ]);
 
 describe("toViewNodes", () => {
@@ -104,6 +105,19 @@ describe("toViewNodes", () => {
       row({ itemId: 5001, typeId: 999999, locationId: STATION, locationType: "station", locationFlag: "Hangar", isBlueprintCopy: true }),
     ])[0].nodes, types);
     expect(view[0]).toMatchObject({ typeName: "Type 999999", volume: 0, isBlueprintCopy: true });
+  });
+
+  it("points each row at its type image, using the bp/bpc variation for blueprints", () => {
+    const view = toViewNodes(buildAssetTree([
+      row({ itemId: 6001, typeId: 34, locationId: STATION, locationType: "station", locationFlag: "Hangar", quantity: 5 }),
+      row({ itemId: 6002, typeId: 691, locationId: STATION, locationType: "station", locationFlag: "Hangar", isSingleton: true }),
+      row({ itemId: 6003, typeId: 691, locationId: STATION, locationType: "station", locationFlag: "Hangar", isSingleton: true, isBlueprintCopy: true }),
+    ])[0].nodes, types);
+    expect(view.map((n) => n.iconUrl).sort()).toEqual([
+      "https://images.evetech.net/types/34/icon?size=32",
+      "https://images.evetech.net/types/691/bp?size=32",
+      "https://images.evetech.net/types/691/bpc?size=32",
+    ]);
   });
 });
 
