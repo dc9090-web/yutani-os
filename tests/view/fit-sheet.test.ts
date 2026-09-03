@@ -201,6 +201,7 @@ describe("buildFitSheet", () => {
     expect(view.stats.targeting.rows.find((r) => r.label === "Sensor strength")?.value).toBe("8.0 points (Ladar)");
     expect(view.stats.navigation.rows.map((r) => r.value)).toEqual(["1,067.0 t", "3.2000×", "5.00 AU/s", expect.stringMatching(/ s$/)]);
     expect(view.stats.capacitor.headline).toMatch(/^Stable \d+%$/);
+    expect(view.stats.capacitor.rows[0].value).toMatch(/^[\d,]+ GJ \/ \d+m( \d+s)?$/);   // "250 GJ / 4m 10s"
     expect(view.stats.capacitor.ok).toBe(true);
     expect(view.stats.offense.headline).toMatch(/ dps$/);
     expect(view.stats.offense.rows.find((r) => r.label === "Weapons")?.value).toMatch(/ dps$/);

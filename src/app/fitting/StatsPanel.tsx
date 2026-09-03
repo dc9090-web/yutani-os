@@ -3,15 +3,15 @@ import { roman } from "../../lib/view/format.js";
 import type { BonusView } from "../../lib/view/fit-sheet.js";
 import type { EditorView } from "../../lib/fits/editor-view.js";
 import { Gauge } from "../ships/Gauge.js";
+import { ShipStats } from "../ships/ShipStats.js";
 
 const DASH = "—";
 
 /**
  * Spec §4's stats panel, reordered per the design hand-back (part D): Fitting (gauges, counters, the
  * estimated value merged in, and — Task 5b — a `.badge` in the title reporting capacitor stability) →
- * Ship stats (Task 5b wires `view.perf`'s real numbers into the `.perf-grid` DPS/Volley/EHP tiles and
- * the grouped Navigation/Capacitor/Targeting `.stat-list` rows) → Problems (red-tinted `.card-problems`
- * with the count in the title) → Missing skills → Ship bonuses.
+ * Ship stats (the fitting window's panel, shared with the fit sheet as `ShipStats`) → Problems
+ * (red-tinted `.card-problems` with the count in the title) → Missing skills → Ship bonuses.
  */
 export function StatsPanel({ view, bonuses, skillsSynced }: {
   view: EditorView; bonuses: BonusView[]; skillsSynced: boolean;
@@ -47,39 +47,7 @@ export function StatsPanel({ view, bonuses, skillsSynced }: {
         </div>
       </div>
 
-      <div className="card">
-        <h2 className="card-title">Ship stats</h2>
-        <h3 className="slot-title">Performance</h3>
-        <div className="perf-grid">
-          <div className="attr"><span className="attr-label">DPS</span><span className="attr-total">{view.perf.dps}</span></div>
-          <div className="attr"><span className="attr-label">Volley</span><span className="attr-total">{view.perf.volley}</span></div>
-          <div className="attr"><span className="attr-label">EHP</span><span className="attr-total">{view.perf.ehp}</span></div>
-        </div>
-        <h3 className="slot-title">Navigation</h3>
-        <ul className="value-list stat-list">
-          <li><span className="muted">Max velocity</span><span className="num">{view.perf.maxVelocity}</span></li>
-          <li><span className="muted">Align time</span><span className="num">{view.perf.alignTime}</span></li>
-        </ul>
-        <h3 className="slot-title">Capacitor</h3>
-        <ul className="value-list stat-list">
-          <li><span className="muted">Capacity</span><span className="num">{view.perf.capacitorCapacity}</span></li>
-          <li><span className="muted">Recharge time</span><span className="num">{view.perf.capRechargeTime}</span></li>
-          <li>
-            <span className="muted">Stability</span>
-            <span className={`num${view.perf.capStable === DASH ? "" : view.perf.capStableOk ? " pos" : " warn-text"}`}>
-              {view.perf.capStable}
-            </span>
-          </li>
-        </ul>
-        <h3 className="slot-title">Targeting</h3>
-        <ul className="value-list stat-list">
-          <li><span className="muted">Targeting range</span><span className="num">{view.perf.maxTargetRange}</span></li>
-          <li><span className="muted">Scan resolution</span><span className="num">{view.perf.scanResolution}</span></li>
-          <li><span className="muted">Max locked targets</span><span className="num">{view.perf.maxTargets}</span></li>
-          <li><span className="muted">Signature radius</span><span className="num">{view.perf.signatureRadius}</span></li>
-        </ul>
-        <p className="faint perf-note">Includes drones in bay</p>
-      </div>
+      <ShipStats stats={view.stats} />
 
       <div className={`card${view.problems.length > 0 ? " card-problems" : ""}`}>
         <h2 className="card-title">

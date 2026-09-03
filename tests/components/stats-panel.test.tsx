@@ -35,7 +35,7 @@ describe("StatsPanel", () => {
   it("lists the problems and the missing skills with have → need", () => {
     renderPanel();
     // The only table in the panel is the missing-skill list.
-    const missing = screen.getByRole("table");
+    const missing = within(screen.getByText("Missing skills").closest(".card") as HTMLElement).getByRole("table");
     expect(within(missing).getByText("Minmatar Frigate")).toBeInTheDocument();
     expect(within(missing).getAllByText("0 → 1").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Skill").length).toBeGreaterThan(0);  // the problem badges
@@ -57,21 +57,21 @@ describe("StatsPanel", () => {
     expect(within(fitting).getByText("Estimated value").tagName).toBe("SPAN");
   });
 
-  it("shows the Ship stats card's real perf numbers, dashes where the fit can't answer", () => {
+  it("shows the fitting-window Ship stats card — real numbers, dashes where the fit can't answer", () => {
     renderPanel();
     const shipStats = screen.getByText("Ship stats").closest(".card") as HTMLElement;
-    // The single gun carries no charge, so damage output stays unanswerable.
-    expect(within(shipStats).getAllByText("—").length).toBeGreaterThanOrEqual(2);   // DPS, Volley
-    expect(within(shipStats).getByText("1,810")).toBeInTheDocument();               // EHP
+    // The single gun carries no charge, so damage output stays unanswerable: Offense headline and rows.
+    expect(within(shipStats).getAllByText("—").length).toBeGreaterThanOrEqual(3);
+    expect(within(shipStats).getByText("1,810 ehp")).toBeInTheDocument();
     expect(within(shipStats).getByText("365.0 m/s")).toBeInTheDocument();
     expect(within(shipStats).getByText("4.73 s")).toBeInTheDocument();
-    expect(within(shipStats).getByText("250 GJ")).toBeInTheDocument();
-    expect(within(shipStats).getByText("125 s")).toBeInTheDocument();
-    expect(within(shipStats).getByText("Cap stable · 100%")).toBeInTheDocument();
+    expect(within(shipStats).getByText("250 GJ / 2m 5s")).toBeInTheDocument();
+    expect(within(shipStats).getByText("Stable 100%")).toHaveClass("badge", "ok");
     expect(within(shipStats).getByText("22.5 km")).toBeInTheDocument();
     expect(within(shipStats).getByText("660 mm")).toBeInTheDocument();
     expect(within(shipStats).getByText("35 m")).toBeInTheDocument();
-    expect(within(shipStats).getByText("Includes drones in bay")).toBeInTheDocument();
+    expect(within(shipStats).getByText("8.0 points (Ladar)")).toBeInTheDocument();   // the Rifter's sensor
+    expect(within(shipStats).getAllByRole("row").length).toBeGreaterThanOrEqual(4);   // resist table: header + 3 layers
   });
 
   it("puts a green 'Cap stable' badge in the Fitting card title when the cap holds", () => {

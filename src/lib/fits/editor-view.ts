@@ -18,6 +18,7 @@ import {
   type CounterView, type ExplainRowView, type MissingSkillView, type ProblemView,
 } from "../view/fit-sheet.js";
 import { fitFromDoc, type DocFit, type FitDoc, type FitItem, type FitItemState } from "./doc.js";
+import { shipStatsView, type ShipStatsView } from "../view/fit-sheet.js";
 import { allowedStates, slotGrid, slotTotals, type SlotTotals } from "./slots.js";
 
 export interface EditorSlotRow {
@@ -54,6 +55,8 @@ export interface EditorView {
   drones: EditorEntryRow[]; cargo: EditorEntryRow[]; unknown: EditorEntryRow[];
   value: { total: string; unpriced: string | null };
   perf: EditorPerfView;
+  /** The fitting window's stats panel — the same card the fit sheet shows. */
+  stats: ShipStatsView;
 }
 export type EditorResult =
   | { kind: "ok"; view: EditorView; totals: SlotTotals; built: DocFit }
@@ -247,6 +250,7 @@ export function editorView(input: {
   ];
 
   const roll = rollUpValue(docValueEntries(built), prices);
+  const perf = fitPerformance(built.fit);
 
   return {
     gauges: [
@@ -266,7 +270,8 @@ export function editorView(input: {
     cargo: built.cargo.map((c) => entryRow(c, data, prices)),
     unknown: built.unknown.map((u) => entryRow(u, data, prices)),
     value: { total: iskShort(roll.total), unpriced: unpricedNote(roll.unpriced) },
-    perf: perfView(fitPerformance(built.fit)),
+    perf: perfView(perf),
+    stats: shipStatsView(perf, built),
   };
 }
 

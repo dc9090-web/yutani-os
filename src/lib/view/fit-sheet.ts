@@ -4,7 +4,7 @@ import {
   type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem,
   type ProblemKind, type SlotKind,
 } from "../dogma/index.js";
-import { duration, grouped, isk, typeDescription } from "./format.js";
+import { grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
 import { bonusLabel, fitValueGroups, gauge, type GaugeView } from "./ships.js";
@@ -151,6 +151,16 @@ export interface FitSheetInput {
 }
 
 const DASH = "—";
+/** "4m 3s" / "45s" / "1h 2m 3s" — the client's capacitor clock, to the second (`duration()` rounds to minutes). */
+function clock(seconds: number): string {
+  const total = Math.round(seconds);
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), sec = total % 60;
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (sec > 0 || parts.length === 0) parts.push(`${sec}s`);
+  return parts.join(" ");
+}
 const fmtNum = (value: number | null, decimals: number, unit = ""): string =>
   value === null ? DASH : `${grouped(value.toFixed(decimals))}${unit}`;
 const whole = (value: number | null, unit = ""): string => value === null ? DASH : `${grouped(Math.round(value))}${unit}`;
@@ -164,8 +174,13 @@ function layerRow(layer: string, perf: LayerPerformance | null, note: string | n
   };
 }
 
+/** What the bay and drone maths need of an entry — `FitEntry` (the sheet) and the editor's `FitItem` both fit. */
+export interface StackedEntry { typeId: number; quantity: number }
+/** `BuiltFit` or the editor's `DocFit`: the engine fit plus what sits in the cargo hold and drone bay. */
+export interface StatsSource { fit: Fit; cargo: readonly StackedEntry[]; drones: readonly StackedEntry[] }
+
 /** "used / total m³" for a bay: the fit's entries' volumes summed against the hull's modified capacity. */
-function bayRow(label: string, entries: readonly FitEntry[], fit: Fit, capacityAttr: number): StatRowView {
+function bayRow(label: string, entries: readonly StackedEntry[], fit: Fit, capacityAttr: number): StatRowView {
   let used = 0;
   for (const entry of entries) used += (fit.data.types.get(entry.typeId)?.attrs.get(ATTR.volume) ?? 0) * entry.quantity;
   const total = fit.data.attributes.has(capacityAttr) && fit.ship.attrs.has(capacityAttr) ? getAttr(fit, fit.ship, capacityAttr) : null;
@@ -179,10 +194,10 @@ function bayRow(label: string, entries: readonly FitEntry[], fit: Fit, capacityA
  * it. A number the engine cannot give (see `FitPerformance`) renders as the dash; a section whose
  * headline is a dash still lists what it can.
  */
-export function shipStatsView(perf: FitPerformance, built: BuiltFit): ShipStatsView {
+export function shipStatsView(perf: FitPerformance, built: StatsSource): ShipStatsView {
   const fit = built.fit;
   const cap = perf.capStable;
-  const capHeadline = cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${duration(cap.lastsSeconds * 1000)}`;
+  const capHeadline = cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${clock(cap.lastsSeconds)}`;
   const deltaPct = perf.capDelta === null || perf.capPeakRecharge === null || perf.capPeakRecharge <= 0
     ? null : (perf.capDelta / perf.capPeakRecharge) * 100;
   const delta = perf.capDelta === null ? DASH
@@ -202,7 +217,7 @@ export function shipStatsView(perf: FitPerformance, built: BuiltFit): ShipStatsV
     capacitor: {
       title: "Capacitor", headline: capHeadline, ok: cap === null ? null : cap.stable,
       rows: [
-        { label: "Capacity", value: perf.capacitorCapacity === null ? DASH : `${whole(perf.capacitorCapacity, " GJ")}${perf.capRechargeTime === null ? "" : ` / ${duration(perf.capRechargeTime * 1000)}`}` },
+        { label: "Capacity", value: perf.capacitorCapacity === null ? DASH : `${whole(perf.capacitorCapacity, " GJ")}${perf.capRechargeTime === null ? "" : ` / ${clock(perf.capRechargeTime)}`}` },
         { label: "Recharge", value: fmtNum(perf.capPeakRecharge, 1, " GJ/s peak") },
         { label: "Δ", value: delta },
       ],
