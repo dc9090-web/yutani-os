@@ -4,12 +4,12 @@ export type TokenStatus = "ok" | "needs_reauth";
 export interface Character {
   id: number; name: string; accountId: number | null;
   corporationId: number | null; corporationName: string | null;
-  allianceId: number | null; allianceName: string | null;
+  allianceId: number | null; allianceName: string | null; raceId: number | null;
   refreshTokenEnc: string; scopes: string[]; tokenStatus: TokenStatus; lastLoginAt: Date | null;
 }
 
 const COLS = `id, name, account_id AS "accountId", corporation_id AS "corporationId", corporation_name AS "corporationName",
-  alliance_id AS "allianceId", alliance_name AS "allianceName", refresh_token_enc AS "refreshTokenEnc",
+  alliance_id AS "allianceId", alliance_name AS "allianceName", race_id AS "raceId", refresh_token_enc AS "refreshTokenEnc",
   scopes, token_status AS "tokenStatus", last_login_at AS "lastLoginAt"`;
 
 function fix(r: Character): Character { return { ...r, id: Number(r.id) }; } // bigint comes back as string
@@ -34,10 +34,10 @@ export async function getCharacter(id: number): Promise<Character | null> {
 export async function setCharacterAccount(id: number, accountId: number | null): Promise<void> {
   await getPool().query("UPDATE characters SET account_id = $2, updated_at = now() WHERE id = $1", [id, accountId]);
 }
-export async function updateCharacterInfo(id: number, info: { name: string; corporationId: number; corporationName: string; allianceId: number | null; allianceName: string | null }): Promise<void> {
+export async function updateCharacterInfo(id: number, info: { name: string; corporationId: number; corporationName: string; allianceId: number | null; allianceName: string | null; raceId: number | null }): Promise<void> {
   await getPool().query(
-    `UPDATE characters SET name = $2, corporation_id = $3, corporation_name = $4, alliance_id = $5, alliance_name = $6, updated_at = now() WHERE id = $1`,
-    [id, info.name, info.corporationId, info.corporationName, info.allianceId, info.allianceName]);
+    `UPDATE characters SET name = $2, corporation_id = $3, corporation_name = $4, alliance_id = $5, alliance_name = $6, race_id = $7, updated_at = now() WHERE id = $1`,
+    [id, info.name, info.corporationId, info.corporationName, info.allianceId, info.allianceName, info.raceId]);
 }
 export async function setTokenStatus(id: number, status: TokenStatus): Promise<void> {
   await getPool().query("UPDATE characters SET token_status = $2, updated_at = now() WHERE id = $1", [id, status]);

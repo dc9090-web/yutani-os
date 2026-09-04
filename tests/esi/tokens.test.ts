@@ -7,7 +7,7 @@ import type { updateRefreshToken as updateRefreshTokenFn } from "../../src/lib/d
 
 const config = loadConfig({ NODE_ENV: "test", EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://x/cb", ALLOWED_CHARACTER_IDS: "1", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua", SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x" });
 const metadata = { issuer: "i", authorization_endpoint: "a", token_endpoint: "t", jwks_uri: "j" };
-const character = { id: 1, name: "n", accountId: null, corporationId: null, corporationName: null, allianceId: null, allianceName: null, refreshTokenEnc: encryptSecret("rt-plain", config.sessionSecret), scopes: [], tokenStatus: "ok" as const, lastLoginAt: null };
+const character = { id: 1, name: "n", accountId: null, corporationId: null, corporationName: null, allianceId: null, allianceName: null, raceId: null, refreshTokenEnc: encryptSecret("rt-plain", config.sessionSecret), scopes: [], tokenStatus: "ok" as const, lastLoginAt: null };
 
 function make(refresh = vi.fn<typeof refreshAccessToken>(async () => ({ access_token: "at1", refresh_token: "rt-plain", expires_in: 1199 }))) {
   let t = 1_000_000;

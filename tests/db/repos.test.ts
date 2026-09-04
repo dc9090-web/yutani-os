@@ -54,8 +54,10 @@ describe("characters", () => {
   });
   it("updates public info and deletes", async () => {
     await upsertCharacter(tril);
-    await updateCharacterInfo(tril.id, { name: "TrilliumONE", corporationId: 98000001, corporationName: "Corp", allianceId: null, allianceName: null });
-    expect((await getCharacter(tril.id))!.corporationName).toBe("Corp");
+    await updateCharacterInfo(tril.id, { name: "TrilliumONE", corporationId: 98000001, corporationName: "Corp", allianceId: null, allianceName: null, raceId: 1 });
+    const updated = (await getCharacter(tril.id))!;
+    expect(updated.corporationName).toBe("Corp");
+    expect(updated.raceId).toBe(1);
     await deleteCharacter(tril.id);
     expect(await getCharacter(tril.id)).toBeNull();
   });

@@ -6,6 +6,7 @@ const full: OverviewCard = {
   id: 669539978,
   name: "TrilliumONE",
   corp: "Caldari Navy · Northern Coalition",
+  race: "Caldari",
   needsReauth: false,
   balance: "1,234,568 ISK",
   system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
@@ -23,6 +24,7 @@ describe("CharacterCard", () => {
     const { container } = render(<CharacterCard card={full} />);
     expect(screen.getByRole("heading", { name: /TrilliumONE/ })).toBeInTheDocument();
     expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
+    expect(screen.getByText("Caldari")).toHaveClass("ov-race");
     expect(screen.getByText("1,234,568 ISK")).toBeInTheDocument();
     expect(screen.getByText("0.9")).toHaveClass("sec-high");
 
@@ -41,6 +43,11 @@ describe("CharacterCard", () => {
     expect(screen.getByText("3h 12m")).toHaveClass("dur");
     expect(screen.getByText("47.4M")).toBeInTheDocument();
     expect(screen.getByText("Total SP")).toBeInTheDocument();
+  });
+
+  it("omits the race line until the character-info job has stored one", () => {
+    const { container } = render(<CharacterCard card={{ ...full, race: null }} />);
+    expect(container.querySelector(".ov-race")).toBeNull();
   });
 
   it("shows a mini progress bar sized to the training percent", () => {

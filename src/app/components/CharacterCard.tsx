@@ -7,6 +7,8 @@ export interface OverviewCard {
   id: number;
   name: string;
   corp: string;
+  /** SDE race name (Caldari, Minmatar, …); null until the character-info job has run. */
+  race: string | null;
   needsReauth: boolean;
   /** Whole-ISK, no decimals (`iskWhole`) — the design hand-back's `.ov-rows` Wallet row. */
   balance: string | null;
@@ -45,6 +47,7 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
             {card.online === true ? <span className="online-dot on" title="Online" /> : null}
           </h3>
           <p className="ov-corp">{card.corp}</p>
+          {card.race === null ? null : <p className="ov-race">{card.race}</p>}
         </div>
         {card.account === null && !card.needsReauth ? null : (
           <div className="ov-head-right">

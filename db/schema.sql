@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS characters (
   corporation_name  text,
   alliance_id       int,
   alliance_name     text,
+  race_id           int,                                -- ESI race_id; joins sde_races for the name
   refresh_token_enc text NOT NULL,
   scopes            text[] NOT NULL DEFAULT '{}',
   token_status      text NOT NULL DEFAULT 'ok' CHECK (token_status IN ('ok', 'needs_reauth')),
@@ -33,6 +34,7 @@ CREATE TABLE IF NOT EXISTS esi_cache (
   PRIMARY KEY (character_id, path)
 );
 ALTER TABLE esi_cache ADD COLUMN IF NOT EXISTS last_modified text;
+ALTER TABLE characters ADD COLUMN IF NOT EXISTS race_id int;
 
 CREATE TABLE IF NOT EXISTS sync_runs (
   id            bigserial PRIMARY KEY,

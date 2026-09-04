@@ -3,7 +3,7 @@ import { listCharacters } from "../lib/db/characters.js";
 import { getWallet } from "../lib/db/character-wallet.js";
 import { getLocation } from "../lib/db/character-location.js";
 import { getSkillSummary, listSkillQueue } from "../lib/db/character-skills.js";
-import { getGroups, getSolarSystems, getTypes } from "../lib/sde/repo.js";
+import { getGroups, getRaces, getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
 import { tagsByCharacter } from "../lib/db/tags.js";
 import { iskWhole, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
@@ -40,10 +40,11 @@ export default async function Overview() {
     if (docked !== null) placeIds.add(docked);
     if (row.head !== null) typeIds.add(row.head.skillId);
   }
-  const [types, systems, places] = await Promise.all([
+  const [types, systems, places, races] = await Promise.all([
     getTypes([...typeIds]),
     getSolarSystems([...systemIds]),
     locationLabels([...placeIds]),
+    getRaces(),
   ]);
 
   // The ship's group (its category pill, e.g. "Frigate") lives on sde_groups, keyed by the hull
@@ -64,6 +65,7 @@ export default async function Overview() {
       id: character.id,
       name: character.name,
       corp: `${character.corporationName ?? "—"}${character.allianceName ? ` · ${character.allianceName}` : ""}`,
+      race: character.raceId === null ? null : races.get(character.raceId) ?? null,
       needsReauth: character.tokenStatus === "needs_reauth",
       balance: wallet === null ? null : iskWhole(wallet.balance),
       system: location?.solarSystemId == null ? null : {
