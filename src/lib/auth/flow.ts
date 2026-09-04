@@ -42,7 +42,7 @@ export async function completeLogin(
   let verified;
   try { verified = await deps.verify(tokens.access_token, { jwks: deps.jwks(metadata), clientId: config.eveClientId, issuer: metadata.issuer }); }
   catch (e) { throw new AuthError("jwt", (e as Error).message); }
-  if (!config.allowedCharacterIds.has(verified.characterId)) throw new AuthError("not-allowed", `character ${verified.characterId} is not allow-listed`);
+  if (!config.allowedCharacterIds.has(verified.characterId)) throw new AuthError("not-allowed", `character ${verified.characterId} (${verified.name}) is not allow-listed — add the id to allowed_character_ids in deploy/ansible/group_vars/eve.yml`);
   await deps.upsert({ id: verified.characterId, name: verified.name, refreshTokenEnc: encryptSecret(tokens.refresh_token, config.sessionSecret), scopes: verified.scopes });
   return { characterId: verified.characterId, name: verified.name };
 }
