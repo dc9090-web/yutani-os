@@ -32,6 +32,15 @@ describe("characters", () => {
     expect(again.tokenStatus).toBe("ok");
     expect((await listCharacters()).length).toBe(1);
   });
+  it("lists characters by account, then in the order they were added", async () => {
+    const alt = await createAccount("Alt");
+    await upsertCharacter({ ...tril, id: 2, name: "Sasha" });
+    await upsertCharacter({ ...tril, id: 3, name: "HawkTah" });   // alphabetically first, added last
+    await upsertCharacter({ ...tril, id: 1, name: "Trillium" });
+    await setCharacterAccount(2, alt.id);
+    await setCharacterAccount(3, alt.id);
+    expect((await listCharacters()).map((c) => c.name)).toEqual(["Sasha", "HawkTah", "Trillium"]);
+  });
   it("re-login resets needs_reauth to ok", async () => {
     await upsertCharacter(tril);
     await setTokenStatus(tril.id, "needs_reauth");

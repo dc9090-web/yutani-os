@@ -23,8 +23,10 @@ export async function upsertCharacter(input: { id: number; name: string; refresh
      RETURNING ${COLS}`, [input.id, input.name, input.refreshTokenEnc, input.scopes]);
   return fix(rows[0]);
 }
+/** Grouped by account, then in the order the characters were first added to the site — so a new
+ *  character joins the bottom of its account instead of sorting alphabetically into the middle. */
 export async function listCharacters(): Promise<Character[]> {
-  const { rows } = await getPool().query<Character>(`SELECT ${COLS} FROM characters ORDER BY account_id NULLS LAST, name`);
+  const { rows } = await getPool().query<Character>(`SELECT ${COLS} FROM characters ORDER BY account_id NULLS LAST, created_at, name`);
   return rows.map(fix);
 }
 export async function getCharacter(id: number): Promise<Character | null> {
