@@ -13,4 +13,4 @@ images:
   traefik: "traefik:v3.6"
 esi_compatibility_date: "2026-08-18"
 esi_user_agent: "EVE-Plasma/0.1 (dac9dc@gmail.com)"
-allowed_character_ids: "669539978,2124678472,2124630678,2124676962,2124685484,2124685500"
+allowed_character_ids: "669539978,2124678472,2124630678,2124676962,2124685484,2124685500,2124716065"
