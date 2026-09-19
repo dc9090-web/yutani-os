@@ -6,7 +6,7 @@ import { listPlans } from "../../lib/db/skill-plans.js";
 import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../lib/sde/repo.js";
 import { summarisePlans } from "../../lib/skills/load.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { countdown, duration, relativeTime, sp, stamp } from "../../lib/view/format.js";
+import { countdown, duration, relativeTime, sp, stamp, typeDescription } from "../../lib/view/format.js";
 import { attributeViews, groupSkills, liveQueue, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
@@ -52,6 +52,7 @@ export default async function SkillsPage() {
     return {
       position: q.queuePosition + 1,
       skill: types.get(q.skillId)?.name ?? `Skill ${q.skillId}`,
+      desc: typeDescription(types.get(q.skillId)?.description),
       trainedLevel: Math.max(0, q.finishedLevel - 1),
       targetLevel: q.finishedLevel,
       duration: durationMs === null ? "—" : duration(durationMs),
@@ -68,6 +69,9 @@ export default async function SkillsPage() {
     groupSp: sp(group.groupSp),
     skills: group.skills.map((skill) => ({
       skillId: skill.skillId, name: skill.name,
+      // The SDE's skill blurb carries the per-level bonus ("2% bonus to … per skill level"), so it
+      // is the hover text on both this tab and the queue — the same pattern as the fit sheet.
+      desc: typeDescription(types.get(skill.skillId)?.description),
       trainedLevel: skill.trainedLevel, activeLevel: skill.activeLevel,
     })),
   }));

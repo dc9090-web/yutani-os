@@ -2,7 +2,8 @@ export interface TrainedSkillGroupProps {
   groupId: number;
   name: string;
   groupSp: string;
-  skills: { skillId: number; name: string; trainedLevel: number; activeLevel: number }[];
+  /** `desc` is the skill's SDE description as hover text (`typeDescription()`); null when the SDE has none. */
+  skills: { skillId: number; name: string; desc: string | null; trainedLevel: number; activeLevel: number }[];
 }
 
 /**
@@ -41,7 +42,7 @@ export function TrainedSkills({ groups }: { groups: TrainedSkillGroupProps[] }) 
           <div className="skill-grid">
             {group.skills.map((skill) => (
               <div key={skill.skillId} className="skill-cell">
-                <span>{skill.name}</span>
+                <span data-desc={skill.desc ?? undefined}>{skill.name}</span>
                 <LevelBoxes trained={skill.trainedLevel} active={skill.activeLevel} />
               </div>
             ))}

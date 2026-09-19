@@ -3,8 +3,8 @@ import { render, screen, within } from "@testing-library/react";
 import { QueueTable } from "../../src/app/skills/QueueTable.js";
 
 const entries = [
-  { position: 1, skill: "Caldari Frigate", trainedLevel: 4, targetLevel: 5, duration: "1d 6h 30m", progress: 0.42 },
-  { position: 2, skill: "Gunnery", trainedLevel: 2, targetLevel: 3, duration: "—", progress: null },
+  { position: 1, skill: "Caldari Frigate", desc: "Skill at operating Caldari frigates.", trainedLevel: 4, targetLevel: 5, duration: "1d 6h 30m", progress: 0.42 },
+  { position: 2, skill: "Gunnery", desc: null, trainedLevel: 2, targetLevel: 3, duration: "—", progress: null },
 ];
 
 describe("QueueTable", () => {
@@ -36,6 +36,12 @@ describe("QueueTable", () => {
     const boxes = within(queuedRow).getByLabelText("Trained level 2, level 3 queued");
     expect(boxes.querySelectorAll(".level-box.active")).toHaveLength(2);
     expect(boxes.querySelectorAll(".level-box.training")).toHaveLength(0);
+  });
+
+  it("hangs the SDE description off the skill name as hover text, and no hover at all when there is none", () => {
+    render(<QueueTable entries={entries} />);
+    expect(screen.getByText("Caldari Frigate").getAttribute("data-desc")).toBe("Skill at operating Caldari frigates.");
+    expect(screen.getByText("Gunnery").hasAttribute("data-desc")).toBe(false);
   });
 
   it("shows the empty state when the queue is empty", () => {

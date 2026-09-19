@@ -6,11 +6,11 @@ const groups = [
   {
     groupId: 255, name: "Gunnery", groupSp: "301k SP",
     skills: [
-      { skillId: 3300, name: "Gunnery", trainedLevel: 5, activeLevel: 5 },
-      { skillId: 3301, name: "Small Hybrid Turret", trainedLevel: 4, activeLevel: 3 },
+      { skillId: 3300, name: "Gunnery", desc: "Basic turret operation skill. 2% Bonus to weapon turrets' rate of fire per skill level.", trainedLevel: 5, activeLevel: 5 },
+      { skillId: 3301, name: "Small Hybrid Turret", desc: null, trainedLevel: 4, activeLevel: 3 },
     ],
   },
-  { groupId: 1216, name: "Engineering", groupSp: "256k SP", skills: [{ skillId: 3426, name: "CPU Management", trainedLevel: 5, activeLevel: 5 }] },
+  { groupId: 1216, name: "Engineering", groupSp: "256k SP", skills: [{ skillId: 3426, name: "CPU Management", desc: null, trainedLevel: 5, activeLevel: 5 }] },
 ];
 
 describe("TrainedSkills", () => {
@@ -33,6 +33,13 @@ describe("TrainedSkills", () => {
     const boxes = within(hybridCell).getByLabelText("Trained level 4, active level 3");
     expect(boxes.querySelectorAll(".level-box.active")).toHaveLength(3);
     expect(boxes.querySelectorAll(".level-box.trained")).toHaveLength(1);
+  });
+
+  it("hangs the SDE description off the skill name as hover text, and no hover at all when there is none", () => {
+    render(<TrainedSkills groups={groups} />);
+    const gunnery = screen.getByText("Gunnery", { selector: ".skill-cell span" });
+    expect(gunnery.getAttribute("data-desc")).toBe("Basic turret operation skill. 2% Bonus to weapon turrets' rate of fire per skill level.");
+    expect(screen.getByText("Small Hybrid Turret").hasAttribute("data-desc")).toBe(false);
   });
 
   it("shows the empty state for an unsynced sheet", () => {

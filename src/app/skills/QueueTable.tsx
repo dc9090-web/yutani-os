@@ -1,6 +1,8 @@
 export interface QueueEntryView {
   position: number;
   skill: string;
+  /** The skill's SDE description as hover text (`typeDescription()`); null when the SDE has none. */
+  desc: string | null;
   /** The level already trained going into this entry — `targetLevel - 1` (see the page's derivation). */
   trainedLevel: number;
   /** The level this queue entry finishes at. */
@@ -39,7 +41,7 @@ export function QueueTable({ entries }: { entries: QueueEntryView[] }) {
         {entries.map((e) => (
           <tr key={e.position}>
             <td className="muted">{e.position}</td>
-            <td>{e.skill}</td>
+            <td><span data-desc={e.desc ?? undefined}>{e.skill}</span></td>
             <td><LevelBoxes trainedLevel={e.trainedLevel} targetLevel={e.targetLevel} training={e.progress !== null} /></td>
             <td className="dur">{e.duration}</td>
             <td>
