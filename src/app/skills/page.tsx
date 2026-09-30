@@ -48,14 +48,17 @@ export default async function SkillsPage() {
   // the level it finishes at — true for the head entry currently training and for every level of
   // the same skill queued behind it, without needing the character's (possibly stale) skill sheet.
   const entries: QueueEntryView[] = queue.map((q, index) => {
-    const durationMs = q.startDate !== null && q.finishDate !== null ? q.finishDate.getTime() - q.startDate.getTime() : null;
+    // Time still to train: the head entry counts from now, a queued one from its (future) start.
+    const remainingMs = q.startDate !== null && q.finishDate !== null
+      ? q.finishDate.getTime() - Math.max(q.startDate.getTime(), now.getTime())
+      : null;
     return {
       position: q.queuePosition + 1,
       skill: types.get(q.skillId)?.name ?? `Skill ${q.skillId}`,
       desc: typeDescription(types.get(q.skillId)?.description),
       trainedLevel: Math.max(0, q.finishedLevel - 1),
       targetLevel: q.finishedLevel,
-      duration: durationMs === null ? "—" : duration(durationMs),
+      remaining: remainingMs === null ? "—" : duration(remainingMs),
       progress: index === 0 ? queueProgress(q, now) : null,
     };
   });

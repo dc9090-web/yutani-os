@@ -3,16 +3,17 @@ import { render, screen, within } from "@testing-library/react";
 import { QueueTable } from "../../src/app/skills/QueueTable.js";
 
 const entries = [
-  { position: 1, skill: "Caldari Frigate", desc: "Skill at operating Caldari frigates.", trainedLevel: 4, targetLevel: 5, duration: "1d 6h 30m", progress: 0.42 },
-  { position: 2, skill: "Gunnery", desc: null, trainedLevel: 2, targetLevel: 3, duration: "—", progress: null },
+  { position: 1, skill: "Caldari Frigate", desc: "Skill at operating Caldari frigates.", trainedLevel: 4, targetLevel: 5, remaining: "1d 6h 30m", progress: 0.42 },
+  { position: 2, skill: "Gunnery", desc: null, trainedLevel: 2, targetLevel: 3, remaining: "—", progress: null },
 ];
 
 describe("QueueTable", () => {
-  it("lists the queue with duration and level-box columns, drawing a progress bar on the head entry only", () => {
+  it("lists the queue with time-remaining and level-box columns, drawing a progress bar on the head entry only", () => {
     render(<QueueTable entries={entries} />);
+    expect(screen.getByRole("columnheader", { name: "Time remaining" })).toBeInTheDocument();
     expect(screen.getByText("Caldari Frigate")).toBeInTheDocument();
     expect(screen.getByText("1d 6h 30m")).toBeInTheDocument();
-    expect(screen.getByText("—")).toBeInTheDocument();   // the queued entry's missing duration
+    expect(screen.getByText("—")).toBeInTheDocument();   // the queued entry's missing time remaining
     const bar = screen.getByRole("progressbar");
     expect(bar.querySelector(".progress-fill")?.getAttribute("style")).toContain("42%");
     expect(screen.getByText("42%")).toBeInTheDocument();   // .progress-pct

@@ -7,8 +7,8 @@ export interface QueueEntryView {
   trainedLevel: number;
   /** The level this queue entry finishes at. */
   targetLevel: number;
-  /** Pre-formatted with `duration()`; "—" when the entry has no start/finish dates (a paused queue). */
-  duration: string;
+  /** Time left to train, pre-formatted with `duration()`; "—" when the entry has no start/finish dates (a paused queue). */
+  remaining: string;
   /** Only the head entry gets a bar; every other row is `null`. */
   progress: number | null;
 }
@@ -36,14 +36,14 @@ export function QueueTable({ entries }: { entries: QueueEntryView[] }) {
   if (entries.length === 0) return <p className="faint">Nothing in the training queue.</p>;
   return (
     <table className="table">
-      <thead><tr><th>#</th><th>Skill</th><th>Level</th><th>Duration</th><th>Progress</th></tr></thead>
+      <thead><tr><th>#</th><th>Skill</th><th>Level</th><th>Time remaining</th><th>Progress</th></tr></thead>
       <tbody>
         {entries.map((e) => (
           <tr key={e.position}>
             <td className="muted">{e.position}</td>
             <td><span data-desc={e.desc ?? undefined}>{e.skill}</span></td>
             <td><LevelBoxes trainedLevel={e.trainedLevel} targetLevel={e.targetLevel} training={e.progress !== null} /></td>
-            <td className="dur">{e.duration}</td>
+            <td className="dur">{e.remaining}</td>
             <td>
               {e.progress === null ? null : (
                 <div className="progress-wrap">
