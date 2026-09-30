@@ -142,8 +142,33 @@ export function stamp(date: Date | null): string {
   return date === null ? "—" : date.toISOString().replace("T", " ").slice(0, 16);
 }
 
-export interface QueueHeadView {
-  skillName: string; finishedLevel: number; startDate: Date | null; finishDate: Date | null;
+/** The dates and SP bounds ESI reports for one queue entry; the SP fields are absent on old rows. */
+export interface QueueProgressInput {
+  startDate: Date | null; finishDate: Date | null;
+  levelStartSp?: number | null; levelEndSp?: number | null; trainingStartSp?: number | null;
+}
+
+/**
+ * 0–1 progress of a queue entry through its *level*. The dates alone only cover this stint in the
+ * queue: `startDate` resets whenever the queue is edited or the skill is re-queued, so a level
+ * that was already 93% trained reads as 9% by wall clock with 17 hours to go. ESI's SP bounds fix
+ * that — `trainingStartSp` is what the skill held at `startDate`, and SP accrues linearly from
+ * there to `levelEndSp` at `finishDate`. Without the SP bounds it falls back to the wall clock.
+ * A paused entry has no dates and reads 0.
+ */
+export function queueProgress(entry: QueueProgressInput, now: Date): number {
+  if (entry.startDate === null || entry.finishDate === null) return 0;
+  const window = entry.finishDate.getTime() - entry.startDate.getTime();
+  if (window <= 0) return 1;
+  const stint = Math.min(1, Math.max(0, (now.getTime() - entry.startDate.getTime()) / window));
+  const { levelStartSp, levelEndSp, trainingStartSp } = entry;
+  if (levelStartSp == null || levelEndSp == null || trainingStartSp == null || levelEndSp <= levelStartSp) return stint;
+  const sp = trainingStartSp + stint * (levelEndSp - trainingStartSp);
+  return Math.min(1, Math.max(0, (sp - levelStartSp) / (levelEndSp - levelStartSp)));
+}
+
+export interface QueueHeadView extends QueueProgressInput {
+  skillName: string; finishedLevel: number;
 }
 
 /** The Overview footer's `.ov-training` block (design hand-back): a skill name, its `.dur` remaining
@@ -153,8 +178,8 @@ export type OverviewTraining =
   | { active: false; label: string };
 
 /**
- * Skill name + level, a `duration()` remaining-time string, and a 0–100 fill percent derived from
- * the queue head's start/finish bounds against `now`. A stale head — its finishDate already passed —
+ * Skill name + level, a `duration()` remaining-time string, and a 0–100 fill percent of the level
+ * being trained (`queueProgress`). A stale head — its finishDate already passed —
  * means the sync just hasn't caught up with ESI yet, not that the skill is still finishing "3h ago";
  * render it as 100% complete instead of a confusing past tense. A paused queue comes back from ESI
  * with no dates at all (phase 3a stores them as NULL): the remaining time cannot be known, so `time`
@@ -166,8 +191,7 @@ export function overviewTraining(head: QueueHeadView | null, now: Date = new Dat
   if (head.finishDate === null) return { active: true, skill, time: "paused", percent: 0 };
   const remaining = head.finishDate.getTime() - now.getTime();
   if (remaining <= 0) return { active: true, skill, time: duration(0), percent: 100 };
-  const percent = head.startDate === null ? 0 : Math.max(0, Math.min(100, Math.round(
-    ((now.getTime() - head.startDate.getTime()) / (head.finishDate.getTime() - head.startDate.getTime())) * 100)));
+  const percent = Math.round(queueProgress(head, now) * 100);
   return { active: true, skill, time: duration(remaining), percent };
 }
 

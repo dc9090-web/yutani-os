@@ -38,6 +38,14 @@ describe("queueProgress", () => {
     expect(queueProgress({ startDate: start, finishDate: finish }, new Date("2026-08-31T00:00:00Z"))).toBeCloseTo(0.5, 6);
   });
 
+  it("counts SP banked before this stint when ESI gives the level's SP bounds", () => {
+    const sp = { levelStartSp: 0, levelEndSp: 1000, trainingStartSp: 600 };
+    expect(queueProgress({ startDate: start, finishDate: finish, ...sp }, start)).toBeCloseTo(0.6, 6);
+    expect(queueProgress({ startDate: start, finishDate: finish, ...sp }, new Date("2026-08-31T00:00:00Z"))).toBeCloseTo(0.8, 6);
+    expect(queueProgress({ startDate: start, finishDate: finish, levelStartSp: null, levelEndSp: null, trainingStartSp: null },
+      new Date("2026-08-31T00:00:00Z"))).toBeCloseTo(0.5, 6);
+  });
+
   it("clamps outside the window", () => {
     expect(queueProgress({ startDate: start, finishDate: finish }, new Date("2026-08-29T00:00:00Z"))).toBe(0);
     expect(queueProgress({ startDate: start, finishDate: finish }, new Date("2026-09-05T00:00:00Z"))).toBe(1);

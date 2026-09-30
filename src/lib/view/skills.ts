@@ -36,17 +36,7 @@ export function attributeViews(
   });
 }
 
-/**
- * 0–1 progress of a queue entry by wall clock. SP-based progress would need the character's live SP,
- * which ESI only refreshes on login; the dates are exact. A paused entry has no dates and reads 0.
- */
-export function queueProgress(entry: { startDate: Date | null; finishDate: Date | null }, now: Date): number {
-  if (entry.startDate === null || entry.finishDate === null) return 0;
-  const window = entry.finishDate.getTime() - entry.startDate.getTime();
-  if (window <= 0) return 1;
-  const done = (now.getTime() - entry.startDate.getTime()) / window;
-  return Math.min(1, Math.max(0, done));
-}
+export { queueProgress } from "./format.js";
 
 /**
  * The queue as it stands now. ESI only advances a character's queue when they log in (a finished

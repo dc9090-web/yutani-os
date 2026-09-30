@@ -82,7 +82,7 @@ export default async function Overview() {
       // "Not synced" means the skills job has never written a summary; an empty queue is different.
       training: summary === null ? { active: false, label: "Not synced" }
         : overviewTraining(head === null || headName === null ? null
-          : { skillName: headName, finishedLevel: head.finishedLevel, startDate: head.startDate, finishDate: head.finishDate }, now),
+          : { ...head, skillName: headName }, now),
       totalSp: summary === null ? null : sp(summary.totalSp, false),
       account: character.accountId == null ? null : accountNames.get(character.accountId) ?? null,
       tags: tagsByChar.get(character.id) ?? [],

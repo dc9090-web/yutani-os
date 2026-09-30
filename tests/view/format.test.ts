@@ -121,6 +121,14 @@ describe("overviewTraining", () => {
       startDate: new Date("2026-09-01T09:12:00Z"), finishDate: new Date("2026-09-01T15:12:00Z"),
     }, NOW)).toEqual({ active: true, skill: "Caldari Frigate V", time: "3h 12m", percent: 47 });
   });
+  it("measures the level by SP, so a level mostly trained before this stint started is not shown as barely begun", () => {
+    // TrilliumONE's head: 93% of the level's SP already banked when the queue restarted 1h43m ago.
+    expect(overviewTraining({
+      skillName: "Caldari Frigate", finishedLevel: 5,
+      startDate: new Date("2026-09-30T14:51:47Z"), finishDate: new Date("2026-10-01T10:11:30Z"),
+      levelStartSp: 226275, levelEndSp: 1280000, trainingStartSp: 1206938,
+    }, new Date("2026-09-30T16:34:31Z"))).toEqual({ active: true, skill: "Caldari Frigate V", time: "17h 37m", percent: 94 });
+  });
   it("reports 0% when the head carries no start date", () => {
     expect(overviewTraining({
       skillName: "Caldari Frigate", finishedLevel: 5, startDate: null,
