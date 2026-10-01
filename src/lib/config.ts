@@ -1,6 +1,8 @@
 export interface AppConfig {
   eveClientId: string; eveClientSecret: string; eveCallbackUrl: string;
   allowedCharacterIds: Set<number>;
+  /** Characters the Overview page and the Skills training overview show; empty = every authorised character. */
+  overviewCharacterIds: Set<number>;
   esiBaseUrl: string; esiCompatibilityDate: string; esiUserAgent: string;
   sessionSecret: string; databaseUrl: string;
   /** Public origin (from EVE_CALLBACK_URL). Route handlers behind Traefik see the container origin, so redirects use this. */
@@ -25,6 +27,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     eveClientId: env.EVE_CLIENT_ID!, eveClientSecret: env.EVE_CLIENT_SECRET!, eveCallbackUrl: env.EVE_CALLBACK_URL!,
     allowedCharacterIds: parseAllowedCharacterIds(env.ALLOWED_CHARACTER_IDS),
+    overviewCharacterIds: parseAllowedCharacterIds(env.OVERVIEW_CHARACTER_IDS),
     esiBaseUrl: env.ESI_BASE_URL ?? "https://esi.evetech.net",
     esiCompatibilityDate: env.ESI_COMPATIBILITY_DATE!, esiUserAgent: env.ESI_USER_AGENT!,
     sessionSecret: env.SESSION_SECRET!, databaseUrl: env.DATABASE_URL!,

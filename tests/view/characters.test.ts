@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { groupByAccount, portraitUrl, toCharacterView, pickActive } from "../../src/lib/view/characters.js";
+import { groupByAccount, portraitUrl, toCharacterView, pickActive, overviewCharacters } from "../../src/lib/view/characters.js";
 
 const c = (id: number, accountId: number | null) => ({ id, name: `c${id}`, accountId, corporationName: null, allianceName: null, tokenStatus: "ok" as const });
 
@@ -53,5 +53,14 @@ describe("pickActive", () => {
   });
   it("returns null when there are no characters at all", () => {
     expect(pickActive([], 2)).toBeNull();
+  });
+});
+
+describe("overviewCharacters", () => {
+  it("keeps only the configured ids, in stored order", () => {
+    expect(overviewCharacters([c(1, null), c(2, null), c(3, null)], new Set([3, 1])).map((x) => x.id)).toEqual([1, 3]);
+  });
+  it("shows everyone when no list is configured", () => {
+    expect(overviewCharacters([c(1, null), c(2, null)], new Set()).map((x) => x.id)).toEqual([1, 2]);
   });
 });

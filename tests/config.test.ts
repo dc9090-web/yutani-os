@@ -16,6 +16,8 @@ describe("config", () => {
   it("loads a full env", () => {
     const c = loadConfig(full);
     expect(c.allowedCharacterIds.has(2)).toBe(true);
+    expect(c.overviewCharacterIds.size).toBe(0);   // optional: unset means every character
+    expect([...loadConfig({ ...full, OVERVIEW_CHARACTER_IDS: "3,1" }).overviewCharacterIds]).toEqual([3, 1]);
     expect(c.esiBaseUrl).toBe("https://esi.evetech.net");
   });
   it("derives siteOrigin from the callback URL (route handlers behind Traefik see localhost)", () => {

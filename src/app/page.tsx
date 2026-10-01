@@ -8,11 +8,14 @@ import { locationLabels } from "../lib/names/index.js";
 import { tagsByCharacter } from "../lib/db/tags.js";
 import { iskWhole, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
 import { liveQueue } from "../lib/view/skills.js";
+import { getConfig } from "../lib/config.js";
+import { overviewCharacters } from "../lib/view/characters.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
 
 export default async function Overview() {
-  const [characters, accounts, tagsByChar] = await Promise.all([listCharacters(), listAccounts(), tagsByCharacter()]);
+  const [allCharacters, accounts, tagsByChar] = await Promise.all([listCharacters(), listAccounts(), tagsByCharacter()]);
+  const characters = overviewCharacters(allCharacters, getConfig().overviewCharacterIds);
   if (characters.length === 0) return <NoCharacter title="Overview" />;
   const now = new Date();
   const accountNames = new Map(accounts.map((a) => [a.id, a.name]));

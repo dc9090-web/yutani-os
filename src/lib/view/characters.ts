@@ -29,3 +29,12 @@ export function pickActive<T extends { id: number }>(characters: T[], activeId: 
   if (characters.length === 0) return null;
   return characters.find((c) => c.id === activeId) ?? characters[0];
 }
+
+/**
+ * The characters the Overview page and the Skills training overview show: those in
+ * OVERVIEW_CHARACTER_IDS, in their stored order — or everyone when the list is empty, so a fresh
+ * install with no list configured still shows something.
+ */
+export function overviewCharacters<T extends { id: number }>(characters: readonly T[], ids: ReadonlySet<number>): T[] {
+  return ids.size === 0 ? [...characters] : characters.filter((c) => ids.has(c.id));
+}

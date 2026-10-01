@@ -5,7 +5,8 @@ import { listImplants } from "../../lib/db/character-clones.js";
 import { listPlans } from "../../lib/db/skill-plans.js";
 import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../lib/sde/repo.js";
 import { summarisePlans } from "../../lib/skills/load.js";
-import { pickActive } from "../../lib/view/characters.js";
+import { overviewCharacters, pickActive } from "../../lib/view/characters.js";
+import { getConfig } from "../../lib/config.js";
 import { countdown, duration, relativeTime, sp, stamp, typeDescription } from "../../lib/view/format.js";
 import { attributeViews, groupSkills, liveQueue, queueProgress, remapAvailability } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
@@ -36,9 +37,9 @@ export default async function SkillsPage() {
   ]);
   const queue = liveQueue(storedQueue, now);
 
-  // The Training overview reads every character's queue, summary (synced or not) and online flag —
-  // three repo reads per character, all in flight together, like the Overview page does.
-  const others = await Promise.all(characters.map(async (c) => {
+  // The Training overview reads each configured character's queue, summary (synced or not) and
+  // online flag — three repo reads per character, all in flight together, like the Overview page.
+  const others = await Promise.all(overviewCharacters(characters, getConfig().overviewCharacterIds).map(async (c) => {
     const [otherQueue, otherSummary, location] = c.id === character.id
       ? [storedQueue, summary, await getLocation(c.id)]
       : await Promise.all([listSkillQueue(c.id), getSkillSummary(c.id), getLocation(c.id)]);
