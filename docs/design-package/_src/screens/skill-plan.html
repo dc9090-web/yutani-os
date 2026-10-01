@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill plan — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link" data-active aria-current="page">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- src/app/skills/plans/[id]/page.tsx → PlanEditor.tsx (client). Plan "Vargur ready" for TrilliumONE; now = 2026-10-01 12:00 UTC.
+     "After current queue" is ticked, so the timeline starts at the queue's end (2026-10-31 04:11). -->
+<h1 class="page-title">Skill plan</h1>
+<div class="plan-editor">
+  <div class="plan-editor-main">
+    <div class="plan-toolbar">
+      <input class="fit-name-input" aria-label="Plan name" value="Vargur ready" maxlength="60">
+      <span class="muted">TrilliumONE</span>
+      <button type="button" class="fit-btn">
+        <!-- Tabler IconDeviceFloppy -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="2"/><path d="M14 4v4H8V4"/></svg> Save
+      </button>
+      <button type="button" class="fit-btn">
+        <!-- Tabler IconFileExport -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M11.5 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v5"/><path d="M13.5 18h7m-3-3l3 3-3 3"/></svg> Export
+      </button>
+      <!-- SAVE_LABELS: "" (idle) / "Saving…" / "Saved" / "Could not save — retrying on the next change" (+ .error) -->
+      <span class="save-state ">Saved</span>
+    </div>
+
+    <!-- accountBlock !== null: another character on the account is training (one Omega queue per account). -->
+    <p class="banner">
+      TrilliumTWO is training until 2026-10-03 04:02 — this plan
+      can’t start before then.
+    </p>
+
+    <div class="card">
+      <!-- planView().totals: entries = all rows incl. inserted prereqs; remaining = rows with status "planned" -->
+      <div class="stat-row">
+        <div><span class="stat-label">Entries</span><span class="stat-value">10</span></div>
+        <div><span class="stat-label">Remaining</span><span class="stat-value">6</span></div>
+        <div><span class="stat-label">SP</span><span class="stat-value">7.4M SP</span></div>
+        <div><span class="stat-label">Time</span><span class="stat-value">41d 6h 12m</span></div>
+        <div><span class="stat-label">Done</span><span class="stat-value">2026-12-11 10:23</span></div>
+      </div>
+      <label class="check-row">
+        <input type="checkbox" aria-label="After current queue" checked>
+        After current queue
+      </label>
+      <!-- only when accountBlock !== null -->
+      <label class="check-row">
+        <input type="checkbox" aria-label="Start when the account is free">
+        Start when the account is free
+      </label>
+      <!-- only when unknownCount > 0 ("entry" / "entries") -->
+      <p class="faint">1 entry references a skill this SDE build does not have.</p>
+
+      <!-- PlanTable.tsx. Status badges: done "Done" / queued "In queue" / planned "Planned". Time, Total and Done are "—" unless the
+           row is planned with ms > 0. `tr.prereq` + "prereq" badge = a row the expansion inserted (entryIndex null → NO action
+           buttons). "alpha" badge = level within the skill's alpha cap. Actions: Lower disabled at I, Raise disabled at V,
+           Move up disabled on the first stored entry, Move down on the last stored entry. -->
+      <table class="table plan-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Skill</th><th>Level</th><th>Rank</th><th>SP</th>
+            <th>Time</th><th>Total</th><th>Done</th><th>Status</th><th aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- done, stored entry 0: Move up disabled, Raise disabled (V) -->
+          <tr>
+            <td class="muted">1</td>
+            <td>
+              <span>Gunnery</span><span class="faint"> · Gunnery</span>
+            </td>
+            <td>V</td>
+            <td class="num">×1</td>
+            <td class="num">256k SP</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">—</td>
+            <td><span class="badge done">Done</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Gunnery V"><!-- Tabler IconMinus --><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Gunnery V" disabled><!-- Tabler IconPlus --><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Gunnery V up" disabled><!-- Tabler IconArrowUp --><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Gunnery V down"><!-- Tabler IconArrowDown --><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Gunnery V"><!-- Tabler IconTrash --><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <!-- queued (in the character's live training queue) -->
+          <tr>
+            <td class="muted">2</td>
+            <td>
+              <span>Large Projectile Turret</span><span class="faint"> · Gunnery</span>
+            </td>
+            <td>V</td>
+            <td class="num">×5</td>
+            <td class="num">1.2M SP</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">—</td>
+            <td><span class="badge queued">In queue</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Large Projectile Turret V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Large Projectile Turret V" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Large Projectile Turret V up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Large Projectile Turret V down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Large Projectile Turret V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">3</td>
+            <td>
+              <span>Surgical Strike</span><span class="faint"> · Gunnery</span>
+            </td>
+            <td>V</td>
+            <td class="num">×4</td>
+            <td class="num">1.0M SP</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">—</td>
+            <td><span class="badge queued">In queue</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Surgical Strike V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Surgical Strike V" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Surgical Strike V up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Surgical Strike V down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Surgical Strike V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <!-- inserted prerequisite (of Advanced Weapon Upgrades): indented via tr.prereq, prereq badge, no actions -->
+          <tr class="prereq">
+            <td class="muted">4</td>
+            <td>
+              <span>Weapon Upgrades</span><span class="faint"> · Gunnery</span>
+              <span class="badge prereq-badge">prereq</span>
+            </td>
+            <td>V</td>
+            <td class="num">×2</td>
+            <td class="num">512k SP</td>
+            <td class="num">4d 2h 30m</td>
+            <td class="num">4d 2h 30m</td>
+            <td class="muted">2026-11-04 06:41</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions"></td>
+          </tr>
+          <!-- planned, with a note -->
+          <tr>
+            <td class="muted">5</td>
+            <td>
+              <span>Advanced Weapon Upgrades</span><span class="faint"> · Gunnery</span>
+              <div class="faint">needed for the 800mm Vargur fit</div>
+            </td>
+            <td>V</td>
+            <td class="num">×6</td>
+            <td class="num">1.5M SP</td>
+            <td class="num">12d 7h 18m</td>
+            <td class="num">16d 9h 48m</td>
+            <td class="muted">2026-11-16 13:59</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Advanced Weapon Upgrades V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Advanced Weapon Upgrades V" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Advanced Weapon Upgrades V up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Advanced Weapon Upgrades V down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Advanced Weapon Upgrades V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <!-- planned, within the alpha cap → alpha badge -->
+          <tr>
+            <td class="muted">6</td>
+            <td>
+              <span>Rapid Firing</span><span class="faint"> · Gunnery</span>
+              <span class="badge alpha">alpha</span>
+            </td>
+            <td>IV</td>
+            <td class="num">×2</td>
+            <td class="num">90k SP</td>
+            <td class="num">17h 36m</td>
+            <td class="num">17d 3h 24m</td>
+            <td class="muted">2026-11-17 07:35</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Rapid Firing IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Rapid Firing IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Rapid Firing IV up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Rapid Firing IV down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Rapid Firing IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">7</td>
+            <td>
+              <span>Minmatar Battleship</span><span class="faint"> · Spaceship Command</span>
+            </td>
+            <td>IV</td>
+            <td class="num">×8</td>
+            <td class="num">362k SP</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">—</td>
+            <td><span class="badge queued">In queue</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Minmatar Battleship IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Minmatar Battleship IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Minmatar Battleship IV up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Minmatar Battleship IV down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Minmatar Battleship IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">8</td>
+            <td>
+              <span>Minmatar Battleship</span><span class="faint"> · Spaceship Command</span>
+            </td>
+            <td>V</td>
+            <td class="num">×8</td>
+            <td class="num">2.0M SP</td>
+            <td class="num">16d 8h 02m</td>
+            <td class="num">33d 11h 26m</td>
+            <td class="muted">2026-12-03 15:37</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Minmatar Battleship V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Minmatar Battleship V" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Minmatar Battleship V up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Minmatar Battleship V down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Minmatar Battleship V"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">9</td>
+            <td>
+              <span>Marauders</span><span class="faint"> · Spaceship Command</span>
+            </td>
+            <td>IV</td>
+            <td class="num">×10</td>
+            <td class="num">452k SP</td>
+            <td class="num">7d 18h 46m</td>
+            <td class="num">41d 6h 12m</td>
+            <td class="muted">2026-12-11 10:23</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Marauders IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Marauders IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Marauders IV up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Marauders IV down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Marauders IV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+          <!-- a stored skill id this SDE build no longer has: skillLabel() → "Unknown skill (id)", no group, rank "—", sp "—";
+               last stored entry → Move down disabled; level I → Lower disabled -->
+          <tr>
+            <td class="muted">10</td>
+            <td>
+              <span>Unknown skill (3380)</span>
+            </td>
+            <td>I</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">—</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Unknown skill (3380) I" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Raise Unknown skill (3380) I"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Unknown skill (3380) I up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 11l-6-6-6 6"/></svg></button>
+              <button type="button" class="icon-btn" aria-label="Move Unknown skill (3380) I down" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M18 13l-6 6-6-6"/></svg></button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Unknown skill (3380) I"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Skill picker: results (max 30) appear as soon as the query is non-empty; each row offers I–V add buttons followed by a bare
+         IconPlus glyph (not a button). The "Plan is full" warn-text only shows at MAX_PLAN_ENTRIES (500). -->
+    <div class="card skill-picker">
+      <h2 class="card-title">Add skill</h2>
+      <input class="filter-input" aria-label="Search skills" value="proj" placeholder="Search skills">
+      <ul class="skill-picker-results">
+        <li class="skill-picker-row">
+          <span>Large Projectile Turret<span class="faint"> · Gunnery</span></span>
+          <span class="faint num">×5</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Large Projectile Turret I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Large Projectile Turret II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Large Projectile Turret III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Large Projectile Turret IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Large Projectile Turret V">V</button>
+            <!-- Tabler IconPlus -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </li>
+        <li class="skill-picker-row">
+          <span>Medium Projectile Turret<span class="faint"> · Gunnery</span></span>
+          <span class="faint num">×3</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Medium Projectile Turret I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Medium Projectile Turret II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Medium Projectile Turret III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Medium Projectile Turret IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Medium Projectile Turret V">V</button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </li>
+        <li class="skill-picker-row">
+          <span>Small Projectile Turret<span class="faint"> · Gunnery</span></span>
+          <span class="faint num">×1</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Small Projectile Turret I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Small Projectile Turret II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Small Projectile Turret III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Small Projectile Turret IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Small Projectile Turret V">V</button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </li>
+        <li class="skill-picker-row">
+          <span>Projectile Weapon Rigging<span class="faint"> · Rigging</span></span>
+          <span class="faint num">×3</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Projectile Weapon Rigging I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Weapon Rigging II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Weapon Rigging III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Weapon Rigging IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Weapon Rigging V">V</button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </li>
+        <!-- a skill with no group in the SDE → " · —" -->
+        <li class="skill-picker-row">
+          <span>Projectile Ammunition Research<span class="faint"> · —</span></span>
+          <span class="faint num">×2</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Projectile Ammunition Research I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Ammunition Research II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Ammunition Research III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Ammunition Research IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Projectile Ammunition Research V">V</button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AttributesPanel.tsx — attributePanel() rows in ATTRIBUTE_KEYS order (Charisma, Intelligence, Memory, Perception, Willpower):
+       total = (remap ?? base) + implant bonus, with the base shown faint. Training rate = one row per primary/secondary pair the
+       REMAINING (planned) work uses, in first-appearance order, "N SP/h" via grouped(). Remap suggestion shown after "Find optimal
+       remap" returned: deltas in the same attribute order, then the three totals, then the opt-in checkbox (usingRemap false). -->
+  <div class="card">
+    <h2 class="card-title">Attributes</h2>
+    <div class="attr-grid">
+      <div class="attr"><span class="attr-label">Charisma</span><div><span class="attr-total">17</span></div><span class="faint">17 base</span></div>
+      <div class="attr"><span class="attr-label">Intelligence</span><div><span class="attr-total">20</span></div><span class="faint">20 base</span></div>
+      <div class="attr"><span class="attr-label">Memory</span><div><span class="attr-total">20</span></div><span class="faint">20 base</span></div>
+      <div class="attr"><span class="attr-label">Perception</span><div><span class="attr-total">24</span><span class="attr-bonus">+3</span></div><span class="faint">21 base</span></div>
+      <div class="attr"><span class="attr-label">Willpower</span><div><span class="attr-total">24</span><span class="attr-bonus">+3</span></div><span class="faint">21 base</span></div>
+    </div>
+    <p class="faint">2 bonus remaps · next remap in 323 days</p>
+
+    <h3 class="section-title">Training rate</h3>
+    <ul class="value-list">
+      <li><span>Intelligence / Memory</span><span class="num">1,800 SP/h</span><span class="faint">2 entries</span></li>
+      <li><span>Perception / Willpower</span><span class="num">2,160 SP/h</span><span class="faint">3 entries</span></li>
+    </ul>
+
+    <h3 class="section-title">Optimal remap</h3>
+    <button type="button" class="fit-btn">
+      <!-- Tabler IconWand -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l15-15-3-3L3 18l3 3"/><path d="M15 6l3 3"/><path d="M9 3l1 2M3 9l2 1M19 13l2 1M13 19l1 2"/></svg> Find optimal remap
+    </button>
+    <ul class="remap-list">
+      <li><span>Charisma</span><span class="num">17 → 17</span><span class="num remap-delta">0</span></li>
+      <li><span>Intelligence</span><span class="num">20 → 17</span><span class="num remap-delta">-3</span></li>
+      <li><span>Memory</span><span class="num">20 → 17</span><span class="num remap-delta">-3</span></li>
+      <li><span>Perception</span><span class="num">21 → 27</span><span class="num remap-delta">+6</span></li>
+      <li><span>Willpower</span><span class="num">21 → 21</span><span class="num remap-delta">0</span></li>
+    </ul>
+    <ul class="value-list">
+      <li><span>With this remap</span><span class="num">37d 2h 50m</span></li>
+      <li><span>As you are</span><span class="num">41d 6h 12m</span></li>
+      <li class="value-total"><span>Saved</span><span class="num pos">4d 3h 22m</span></li>
+    </ul>
+    <label class="check-row">
+      <input type="checkbox" aria-label="Plan with this remap">
+      Plan with this remap
+    </label>
+  </div>
+
+  <section class="pkg-states"><p class="pkg-states-label">Other states — reference only, never shown here in the live app</p><!-- ======================= OTHER STATES (for the designer) ======================= -->
+  <!-- These are the editor's alternative renderings, stacked in a third column cell of .plan-editor so they do not disturb the live
+       layout above. In the app each one replaces the element it is annotated with. -->
+  <div class="plan-editor-main">
+    <!-- toolbar save-state variants -->
+    <div class="plan-toolbar">
+      <span class="save-state ">Saving…</span>
+      <span class="save-state error">Could not save — retrying on the next change</span>
+    </div>
+    <!-- context.synced === false -->
+    <p class="banner">No skills synced yet for TrilliumONE — this plan is computed from level 0.</p>
+    <!-- PlanTable with no rows -->
+    <div class="card">
+      <p class="faint">No entries yet — add a skill to start planning.</p>
+    </div>
+    <!-- skill picker at MAX_PLAN_ENTRIES, empty query (no results) -->
+    <div class="card skill-picker">
+      <h2 class="card-title">Add skill</h2>
+      <p class="warn-text">Plan is full — 500 entries is the maximum.</p>
+      <input class="filter-input" aria-label="Search skills" value="" placeholder="Search skills">
+      <ul class="skill-picker-results"></ul>
+    </div>
+    <!-- AttributesPanel: insane attributes banner, nothing left to train, optimise in flight, already optimal -->
+    <div class="card">
+      <h2 class="card-title">Attributes</h2>
+      <p class="banner">
+        These attributes cannot be a legal remap (they must be five values of 17–27 totalling 99)
+        — they may already include implant bonuses.
+      </p>
+      <h3 class="section-title">Training rate</h3>
+      <p class="faint">Nothing left to train.</p>
+      <h3 class="section-title">Optimal remap</h3>
+      <button type="button" class="fit-btn" disabled>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l15-15-3-3L3 18l3 3"/><path d="M15 6l3 3"/><path d="M9 3l1 2M3 9l2 1M19 13l2 1M13 19l1 2"/></svg> Optimising…
+      </button>
+      <p class="faint">Already optimal for this plan.</p>
+    </div>
+  </div>
+  <!-- Export modal (exportText !== null). It is a fixed full-screen overlay (.modal-backdrop) that would cover this whole page, so its
+       markup is left inside this comment rather than rendered:
+
+  <div class="modal-backdrop" role="dialog" aria-label="Export plan">
+    <div class="card modal">
+      <h2 class="card-title">Export plan</h2>
+      <div class="plan-toolbar">
+        <button type="button" class="fit-btn" disabled>EVEMon (Roman)</button>
+        <button type="button" class="fit-btn">In-game (Arabic)</button>
+        <button type="button" class="fit-btn">Copy</button>
+        <button type="button" class="fit-btn">Close</button>
+      </div>
+      <textarea class="eft-text" aria-label="Plan text" readonly>Gunnery V
+Large Projectile Turret V
+Surgical Strike V
+Weapon Upgrades V
+Advanced Weapon Upgrades V
+Rapid Firing IV
+Minmatar Battleship IV
+Minmatar Battleship V
+Marauders IV</textarea>
+      (on failure the textarea is replaced by: <p class="warn-text">Could not export — try again.</p>)
+    </div>
+  </div>
+  -->
+  <!-- ======================= END OTHER STATES ======================= --></section>
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

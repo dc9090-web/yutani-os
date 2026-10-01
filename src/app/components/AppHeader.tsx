@@ -10,10 +10,11 @@ export function AppHeader({ groups, activeId }: { groups: CharacterGroup[]; acti
   return (
     <header className="app-header">
       <div className="app-bar-inner">
-        <Link href="/" className="logo-lockup" aria-label="EVE — home">
-          <span className="logo-text">EVE</span>
+        <Link href="/" className="logo-lockup" aria-label="Yutani OS — home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/yutani/wordmark-white.png" alt="Yutani" className="logo-img" />
           <span className="logo-divider" aria-hidden="true" />
-          <span className="wordmark">Plasma</span>
+          <span className="logo-os">OS</span>
         </Link>
         <TopNav />
         <CharacterSwitcher groups={groups} activeId={activeId} pathname={pathname} />

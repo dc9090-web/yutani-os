@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill plan — Small gang PvP — EVE Plasma (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="EVE — home">
+      <span class="logo-text">EVE</span>
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="wordmark">Plasma</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+          <a href="overview.html" class="nav-link">Overview</a>
+          <a href="skills.html" class="nav-link" data-active aria-current="page">Skills</a>
+          <a href="ships.html" class="nav-link">Ships</a>
+          <a href="fitting-editor.html" class="nav-link">Fitting</a>
+          <a href="#" class="nav-link">Assets</a>
+          <a href="#" class="nav-link">Wallet</a>
+          <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <!-- eslint-disable-next-line @next/next/no-img-element -->
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<main class="app-main">
+<h1 class="page-title">Skill plan</h1>
+<div class="plan-editor">
+  <div class="plan-editor-main">
+    <div class="plan-toolbar">
+      <input class="fit-name-input" aria-label="Plan name" value="Small gang PvP" maxlength="60">
+      <span class="muted">TrilliumONE</span>
+      <button type="button" class="fit-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l4 4v12a2 2 0 0 1-2 2z"/><path d="M7 21v-8h10v8M7 3v5h8"/></svg>
+        Save
+      </button>
+      <button type="button" class="fit-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
+        Export
+      </button>
+      <span class="save-state">Saved</span>
+    </div>
+
+    <p class="banner">Main is training until 2026-09-03 04:02 — this plan can't start before then.</p>
+
+    <div class="card">
+      <div class="stat-row">
+        <div><span class="stat-label">Entries</span><span class="stat-value">14</span></div>
+        <div><span class="stat-label">Remaining</span><span class="stat-value">9</span></div>
+        <div><span class="stat-label">SP</span><span class="stat-value">12.4M SP</span></div>
+        <div><span class="stat-label">Time</span><span class="stat-value">6 d 4 h</span></div>
+        <div><span class="stat-label">Done</span><span class="stat-value">2026-09-08 02:00</span></div>
+      </div>
+      <label class="check-row">
+        <input type="checkbox" aria-label="After current queue" checked>
+        After current queue
+      </label>
+      <label class="check-row">
+        <input type="checkbox" aria-label="Start when the account is free">
+        Start when the account is free
+      </label>
+      <p class="faint">1 entry references a skill this SDE build does not have.</p>
+
+      <table class="table plan-table">
+        <thead>
+          <tr><th>#</th><th>Skill</th><th>Level</th><th>Rank</th><th>SP</th><th>Time</th><th>Total</th><th>Done</th><th>Status</th><th aria-label="Actions"></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="muted">1</td>
+            <td><span>Gunnery</span><span class="faint"> · Gunnery</span></td>
+            <td>V</td>
+            <td class="num">1</td>
+            <td class="num">256,000</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+            <td class="muted">2026-08-25</td>
+            <td><span class="badge done">Done</span></td>
+            <td class="plan-actions"></td>
+          </tr>
+          <tr>
+            <td class="muted">2</td>
+            <td><span>Small Projectile Turret</span><span class="faint"> · Gunnery</span></td>
+            <td>IV</td>
+            <td class="num">1</td>
+            <td class="num">90,510</td>
+            <td class="num">14 h 10 m</td>
+            <td class="num">14 h 10 m</td>
+            <td class="muted">2026-09-01 21:26</td>
+            <td><span class="badge queued">Queued</span></td>
+            <td class="plan-actions"></td>
+          </tr>
+          <tr class="prereq">
+            <td class="muted">3</td>
+            <td>
+              <span>Motion Prediction</span><span class="faint"> · Gunnery</span>
+              <span class="badge prereq-badge">prereq</span>
+            </td>
+            <td>V</td>
+            <td class="num">2</td>
+            <td class="num">720,000</td>
+            <td class="num">1 d 6 h</td>
+            <td class="num">1 d 20 h</td>
+            <td class="muted">2026-09-03 04:02</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Motion Prediction V">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Raise Motion Prediction V">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Move Motion Prediction V up">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Move Motion Prediction V down">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              </button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Motion Prediction V">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">4</td>
+            <td>
+              <span>Infomorph Psychology</span><span class="faint"> · Neural Enhancement</span>
+              <span class="badge alpha">alpha</span>
+            </td>
+            <td>III</td>
+            <td class="num">3</td>
+            <td class="num">960,000</td>
+            <td class="num">1 d 18 h</td>
+            <td class="num">3 d 14 h</td>
+            <td class="muted">2026-09-05 22:00</td>
+            <td><span class="badge planned">Planned</span></td>
+            <td class="plan-actions">
+              <button type="button" class="icon-btn" aria-label="Lower Infomorph Psychology III">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Raise Infomorph Psychology III">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Move Infomorph Psychology III up">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+              <button type="button" class="icon-btn" aria-label="Move Infomorph Psychology III down">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+              </button>
+              <button type="button" class="icon-btn danger" aria-label="Remove Infomorph Psychology III">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card skill-picker">
+      <h2 class="card-title">Add skill</h2>
+      <input class="filter-input" aria-label="Search skills" placeholder="Search skills" value="target">
+      <ul class="skill-picker-results">
+        <li class="skill-picker-row">
+          <span>Target Navigation Prediction<span class="faint"> · Gunnery</span></span>
+          <span class="faint num">×3</span>
+          <span class="plan-actions">
+            <button type="button" class="icon-btn" aria-label="Add Target Navigation Prediction I">I</button>
+            <button type="button" class="icon-btn" aria-label="Add Target Navigation Prediction II">II</button>
+            <button type="button" class="icon-btn" aria-label="Add Target Navigation Prediction III">III</button>
+            <button type="button" class="icon-btn" aria-label="Add Target Navigation Prediction IV">IV</button>
+            <button type="button" class="icon-btn" aria-label="Add Target Navigation Prediction V">V</button>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">Attributes</h2>
+    <div class="attr-grid">
+      <div class="attr"><span class="attr-label">Perception</span><div><span class="attr-total">21</span><span class="attr-bonus">+3</span></div><span class="faint">18 base</span></div>
+      <div class="attr"><span class="attr-label">Memory</span><div><span class="attr-total">19</span></div><span class="faint">19 base</span></div>
+      <div class="attr"><span class="attr-label">Willpower</span><div><span class="attr-total">23</span><span class="attr-bonus">+3</span></div><span class="faint">20 base</span></div>
+      <div class="attr"><span class="attr-label">Intelligence</span><div><span class="attr-total">19</span></div><span class="faint">19 base</span></div>
+      <div class="attr"><span class="attr-label">Charisma</span><div><span class="attr-total">17</span></div><span class="faint">17 base</span></div>
+    </div>
+    <p class="faint">2 bonus remaps · next remap in 12 days</p>
+
+    <h3 class="section-title">Training rate</h3>
+    <ul class="value-list">
+      <li><span>Perception / Willpower</span><span class="num">44 SP/min</span><span class="faint">10 entries</span></li>
+      <li><span>Memory / Willpower</span><span class="num">39 SP/min</span><span class="faint">4 entries</span></li>
+    </ul>
+
+    <h3 class="section-title">Optimal remap</h3>
+    <button type="button" class="fit-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21l9-9"/><path d="M15 4l1.5 1.5M19 8l1.5 1.5M11 4l.5 1.5M4 11l1.5.5"/></svg>
+      Find optimal remap
+    </button>
+    <ul class="remap-list">
+      <li><span>Perception</span><span class="num">20 → 27</span><span class="num remap-delta">+7</span></li>
+      <li><span>Willpower</span><span class="num">20 → 27</span><span class="num remap-delta">+7</span></li>
+      <li><span>Memory</span><span class="num">19 → 17</span><span class="num remap-delta">-2</span></li>
+      <li><span>Intelligence</span><span class="num">19 → 17</span><span class="num remap-delta">-2</span></li>
+      <li><span>Charisma</span><span class="num">17 → 17</span><span class="num remap-delta">0</span></li>
+    </ul>
+    <ul class="value-list">
+      <li><span>With this remap</span><span class="num">5 d 9 h</span></li>
+      <li><span>As you are</span><span class="num">6 d 4 h</span></li>
+      <li class="value-total"><span>Saved</span><span class="num pos">19 h</span></li>
+    </ul>
+    <label class="check-row">
+      <input type="checkbox" aria-label="Plan with this remap">
+      Plan with this remap
+    </label>
+  </div>
+</div>
+</main>
+<footer class="app-footer">
+  <!-- eslint-disable-next-line @next/next/no-img-element -->
+  <img src="../assets/eve-mark.svg" alt="" class="footer-mark">
+  <span class="footer-copy">EVE Online and the EVE logo are trademarks of CCP hf. This is a personal tool.</span>
+</footer>
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

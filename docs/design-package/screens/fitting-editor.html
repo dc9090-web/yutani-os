@@ -3,179 +3,1173 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fitting — PvE Rifter — EVE Plasma (design package)</title>
-<link rel="stylesheet" href="../css/fonts.css">
-<link rel="stylesheet" href="../css/globals.css">
+<title>Fitting editor — Yutani OS (design package)</title>
+<style>
+/*
+ * Design-package equivalent of src/app/fonts.ts — Yutani OS type system.
+ *
+ * The app self-hosts fonts through next/font/google; this file loads the same families from
+ * Google Fonts and declares the custom properties the stylesheet uses. Three families:
+ *   Michroma        — panel labels, nav, buttons, tiny tracked caps (one weight)
+ *   Chakra Petch    — page titles, names, values, sub-section heads (400/500/600/700)
+ *   JetBrains Mono  — body copy and every table / readout (400/500/600)
+ * The old token names (--font-inter / --font-poppins / --font-grotesk) are kept as aliases so
+ * every existing rule picks up the new families without edits. In the repo: swap the families
+ * in fonts.ts and point the three legacy variables at the new ones in layout.tsx.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Michroma&family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  --font-label: "Michroma", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Chakra Petch", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* legacy names, still referenced throughout globals.css */
+  --font-inter: var(--font-body);
+  --font-poppins: var(--font-display);
+  --font-grotesk: var(--font-label);
+}
+
+:root {
+  --bg: #0a0806;
+  --bg-2: #0f0c08;
+  --card: #14110b;
+  --raised: #1c1811;
+  --border: #2d2616;
+  --border-hi: #4a3d1f;
+  --divider: #3d321a;
+  --hairline: #1d1810;
+  --text: #f4ecd9;
+  --text-2: #e8dfc8;
+  --muted: #b7a37c;
+  --faint: #8d7d5e;
+  --dim: #6a5d45;
+  --accent: #f5a623;
+  --accent-2: #5fd3e8;
+  --pos: #43d9a0;
+  --neg: #ff5c6c;
+  --warn: #ff7f50;
+  --aurora: linear-gradient(90deg, #f5a623, #ffd27a, #ff7f50, #f5a623, #5fd3e8, #f5a623);
+  --col: 1123px;
+  /* Yutani OS additions */
+  --accent-rgb: 245, 166, 35;
+  --glow: 0 0 12px rgba(245, 166, 35, .45);
+  --card-glass: rgba(20, 17, 11, .80);
+  --grid: rgba(245, 166, 35, .035);
+  --bracket: rgba(245, 166, 35, .5);
+  --ruler: repeating-linear-gradient(90deg, var(--border-hi) 0 1px, transparent 1px 8px) left top / 100% 4px no-repeat, repeating-linear-gradient(90deg, rgba(245, 166, 35, .55) 0 1px, transparent 1px 40px) left top / 100% 6px no-repeat, linear-gradient(var(--border-hi), var(--border-hi)) left top / 100% 1px no-repeat;
+}
+
+* { box-sizing: border-box; }
+html, body { padding: 0; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ---------- header (sticky, frosted, 80px) ---------- */
+.app-header {
+  position: sticky; top: 0; z-index: 100; height: 80px;
+  /* Lift into the View Transitions top layer so the Overview sort's card snapshots
+     (also in that layer) don't paint over the header — see the ::view-transition rule below. */
+  view-transition-name: app-header;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10, 8, 6, 0.72);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+.app-bar-inner {
+  max-width: var(--col); height: 100%; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; gap: 30px;
+}
+.logo-lockup { display: flex; align-items: center; gap: 14px; text-decoration: none; flex: 0 0 auto; }
+.logo-divider { width: 1px; height: 22px; background: var(--divider); display: block; }
+.wordmark {
+  font-family: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600; font-size: 14px; letter-spacing: 3px; text-transform: uppercase;
+  background: var(--aurora); background-size: 200% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: gradFlow 6s linear infinite;
+}
+
+.top-nav { flex: 1; display: flex; align-items: center; justify-content: center; gap: 18px; white-space: nowrap; }
+.nav-link {
+  font-size: 14px; font-weight: 500; color: var(--text); text-decoration: none;
+  transition: color 150ms ease; line-height: 1.2;
+  /* Mirror the bottom underline space on top so the link text stays vertically
+     centered (otherwise it rides ~4px high vs the INTELLIGENCE wordmark). */
+  padding: 2px 0; border-top: 2px solid transparent; border-bottom: 2px solid transparent;
+}
+.nav-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-link[data-active] { color: var(--accent); }
+
+.user-menu { margin-left: auto; display: flex; align-items: center; gap: 9px; flex: 0 0 auto; cursor: pointer; background: none; border: none; padding: 0; font: inherit; color: inherit; }
+.user-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--raised); border: 1px solid var(--divider);
+  display: grid; place-items: center; flex: 0 0 auto;
+}
+.user-name { font-size: 14px; font-weight: 500; color: var(--text); transition: color 150ms ease; }
+.user-caret {
+  width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent;
+  border-top: 5px solid var(--faint);
+}
+.user-menu:hover .user-name { color: var(--accent); }
+
+/* ---------- main + footer ---------- */
+.app-main { max-width: var(--col); margin: 0 auto; padding: 32px 24px 80px; }
+.app-footer {
+  max-width: var(--col); margin: 48px auto 0; padding: 28px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; gap: 11px; text-align: center;
+}
+.footer-mark { height: 30px; opacity: 0.85; }
+.footer-lockup { display: flex; align-items: center; gap: 10px; }
+.footer-icon { color: var(--accent); display: block; }
+.footer-copy { font-size: 12px; color: var(--faint); }
+
+/* ---------- mobile bottom tab bar (≤760px only) ---------- */
+.bottom-bar { display: none; }
+
+@keyframes gradFlow { from { background-position: 0% center; } to { background-position: 200% center; } }
+
+@media (max-width: 760px) {
+  .top-nav { display: none; }
+  .user-name, .user-caret { display: none; }
+  .app-main { padding: 18px 14px 24px; }
+  /* Clear the fixed 62px bottom tab bar (+ iOS home-indicator safe area) so the
+     footer mark/copyright aren't hidden behind it when scrolled to the bottom. */
+  .app-footer { margin-top: 32px; padding: 24px 14px calc(62px + env(safe-area-inset-bottom, 0px) + 24px); }
+  .bottom-bar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 200; height: 62px;
+    /* Same reason as .app-header: keep the fixed tab bar above the sort's card snapshots. */
+    view-transition-name: bottom-bar;
+    border-top: 1px solid var(--border);
+    background: rgba(10, 8, 6, 0.94);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    padding: 0 4px; justify-content: space-between;
+  }
+  .bottom-item {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; color: var(--faint); text-decoration: none;
+  }
+  .bottom-item span { font-size: 9px; font-weight: 500; letter-spacing: 0.2px; }
+  .bottom-item[data-active] { color: var(--accent); }
+}
+
+/* ---------- Login ---------- */
+.login-page { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow: hidden; background: var(--bg); }
+.login-canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
+.login-logo { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 26px; }
+.login-logo-img { width: 172px; height: auto; }
+.login-wordmark { font-family: var(--font-grotesk), sans-serif; font-weight: 600; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; background: var(--aurora); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gradFlow 6s linear infinite; }
+.login-card { position: relative; z-index: 1; width: 100%; max-width: 400px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 34px 32px; box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); }
+.login-h1 { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 22px; margin: 0 0 4px; color: var(--text); }
+.login-sub { margin: 0 0 20px; font-size: 13px; color: var(--faint); }
+.login-msg { font-size: 13px; color: var(--neg); }
+.login-copy { position: relative; z-index: 1; margin-top: 24px; font-size: 12px; color: var(--dim); }
+.login-sent-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(245, 166, 35, 0.14); color: var(--accent); display: grid; place-items: center; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+/* ---------- EVE additions ---------- */
+.logo-text { font-family: var(--font-poppins), sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 1px; color: var(--text); }
+.char-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--divider); object-fit: cover; background: var(--raised); }
+.char-avatar.warn { border-color: var(--neg); }
+.char-group-label { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); padding: 6px 12px 2px; }
+.menu-link-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; font-size: 14px; color: var(--text); text-decoration: none; border-radius: 6px; }
+.menu-link-item:hover { background: var(--raised); color: var(--accent); }
+.page-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 32px; line-height: 1.1; margin: 0 0 8px; color: var(--text); }
+.page-sub { margin: 0 0 24px; font-size: 13px; color: var(--faint); }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+.card-title { font-family: var(--font-poppins), sans-serif; font-weight: 600; font-size: 16px; color: var(--text); margin: 0 0 14px; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.muted { color: var(--muted); } .faint { color: var(--faint); } .pos { color: var(--pos); } .neg { color: var(--neg); }
+.coming-soon { text-align: center; padding: 64px 24px; color: var(--faint); }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { text-align: left; font-weight: 500; color: var(--faint); padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.table td { padding: 10px; border-bottom: 1px solid var(--hairline); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+.badge.ok { background: rgba(67, 217, 160,.14); color: var(--pos); }
+.badge.error, .badge.needs_reauth { background: rgba(255, 92, 108,.14); color: var(--neg); }
+.badge.running { background: rgba(245, 166, 35,.14); color: var(--accent); }
+.badge.warn { background: rgba(255, 127, 80,.14); color: var(--warn); }
+.sso-btn { display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; }
+.sso-btn:hover { background: var(--accent-2); }
+
+/* ---------- Overview cards (phase 3) ---------- */
+/* Two fixed columns: at the 1123px column that gives each card ~525px, enough for the station
+   name and the ship pills + custom name to sit on one line without truncating. */
+.card-grid.overview { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+@media (max-width: 860px) { .card-grid.overview { grid-template-columns: minmax(0, 1fr); } }
+.ov-card { display: flex; flex-direction: column; gap: 16px; padding: 26px 28px; }
+.ov-head { display: flex; gap: 14px; align-items: center; }
+.ov-id { min-width: 0; }
+.ov-portrait { width: 64px; height: 64px; border-radius: 12px; border: 1px solid var(--divider); }
+.ov-name { margin: 0; display: flex; align-items: center; gap: 8px; font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-corp { margin: 2px 0 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-race { margin: 2px 0 0; font-size: 12px; color: var(--faint); }
+/* Account pill (and the re-authorise badge when needed) sit top-right of the card. */
+.ov-head-right { margin-left: auto; align-self: flex-start; flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ov-status { flex: 0 0 auto; }
+.ov-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; background: var(--raised); border: 1px solid var(--border); color: var(--muted); }
+.ship-type-pills { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 5px; line-height: 1.3; }
+.pill.main { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+.pill.alt { background: var(--accent-2); border-color: var(--accent-2); color: var(--bg); font-weight: 600; }
+.pill.tag { border-color: var(--pos); color: var(--pos); }
+/* The hull chip: the one to read first, so accent-tinted and a step larger than its class chips. */
+.pill.hull { background: rgba(245, 166, 35, 0.14); border-color: var(--accent); color: var(--accent); font-weight: 600; font-size: 12px; padding: 3px 10px; }
+.ov-pills .pill { font-size: 12px; padding: 3px 10px; }
+.ov-rows { margin: 0; display: grid; gap: 10px; }
+.ov-row { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: baseline; }
+.ov-row dt { font-size: 13px; color: var(--faint); }
+.ov-row dd { margin: 0; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Station/structure names run long; a second line beats an ellipsis now the cards are wide. */
+.ov-row-location dd { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.45; }
+.ov-station { color: var(--faint); }
+/* Group + hull pills only; the pilot's own name for the ship stays on the fit sheet. */
+.ov-ship-pills { margin-top: 0; display: inline-flex; vertical-align: middle; }
+.ov-ship-pills .pill { font-size: 12px; padding: 3px 9px; }
+.ov-foot { margin-top: auto; border-top: 1px solid var(--hairline); padding-top: 14px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+.ov-training { flex: 1; min-width: 0; display: grid; gap: 7px; }
+.ov-training-top { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; }
+.ov-training-top span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-training .progress { min-width: 0; }
+.ov-sp { text-align: right; flex: 0 0 auto; display: grid; gap: 0; }
+.ov-sp-label { font-size: 12px; color: var(--faint); }
+.ov-sp-val { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
+
+/* Shared by every phase-3 page. */
+/* Only ever shown for a character who is online; offline and unknown show nothing. */
+.online-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.online-dot.on { background: var(--pos); box-shadow: 0 0 6px rgba(67, 217, 160, 0.6); }
+.sec-high { color: var(--pos); }
+.sec-low { color: var(--warn); }
+.sec-null { color: var(--neg); }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.dur { font-variant-numeric: tabular-nums; }
+.queue-countdown { margin: 0 0 14px; font-size: 13px; display: flex; align-items: baseline; gap: 8px; }
+.queue-countdown strong { font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif; font-size: 18px; font-weight: 600; color: var(--accent); }
+.card-stack { display: grid; gap: 20px; }
+
+/* ---------- Skills (phase 3) ---------- */
+.stat-row { display: flex; flex-wrap: wrap; gap: 32px; margin-bottom: 18px; }
+.stat-label { display: block; font-size: 12px; color: var(--faint); }
+.stat-value { font-family: var(--font-poppins), sans-serif; font-size: 20px; font-weight: 600; color: var(--text); }
+.attr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.attr { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.attr-label { display: block; font-size: 12px; color: var(--faint); }
+.attr-total { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
+.attr-bonus { margin-left: 6px; font-size: 12px; color: var(--accent); }
+.progress { height: 10px; min-width: 80px; border-radius: 3px; background: var(--raised); overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); }
+.progress-wrap { display: flex; align-items: center; gap: 10px; }
+.progress-wrap .progress { flex: 1; }
+.progress-pct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.skill-group { border-top: 1px solid var(--hairline); }
+.skill-group:first-child { border-top: 0; }
+.group-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 0; background: none; border: 0; color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.group-toggle:hover { color: var(--accent); }
+.group-sp { margin-left: auto; font-size: 12px; color: var(--faint); }
+.level-boxes { display: inline-flex; gap: 3px; }
+.level-box { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--border-hi); }
+.level-box.trained { background: rgba(245, 166, 35, 0.32); border-color: var(--accent); }
+.level-box.active { background: var(--accent); border-color: var(--accent); }
+.level-box.training { border-color: var(--accent); animation: levelBlink 1.1s ease-in-out infinite; }
+@keyframes levelBlink { 0%, 100% { background: rgba(245, 166, 35, 0.10); } 50% { background: var(--accent); } }
+.skill-group-list { display: grid; gap: 22px; }
+.skill-group-flat .group-head { display: flex; align-items: baseline; gap: 10px; font-size: 14px; font-weight: 600; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+.skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0 28px; }
+.skill-cell { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; padding: 7px 0; border-bottom: 1px solid var(--hairline); }
+.clone-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.clone-list li { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+
+/* ---------- Assets (phase 3) ---------- */
+.filter-input { display: block; width: 100%; max-width: 320px; margin: 6px 0 16px; padding: 8px 10px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font: inherit; }
+.filter-input:focus { outline: none; border-color: var(--accent); }
+.loc-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 0; background: none; border: 0; border-top: 1px solid var(--hairline); color: var(--text); font: inherit; cursor: pointer; text-align: left; }
+.loc-toggle:hover { color: var(--accent); }
+.loc-meta { margin-left: auto; font-size: 12px; color: var(--faint); }
+.tree { list-style: none; margin: 0 0 12px; padding: 0; }
+.tree-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+/* A type the image server has no picture for (some SKINs, odd categories) keeps its slot so the
+   names stay aligned, but shows nothing. */
+.tree-item { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.item-icon { width: 22px; height: 22px; border-radius: 3px; flex: 0 0 auto; background: var(--raised); }
+.item-icon.missing { visibility: hidden; }
+.tree-toggle { width: 14px; padding: 0; background: none; border: 0; color: var(--faint); font: inherit; cursor: pointer; }
+.tree-toggle:hover { color: var(--accent); }
+.tree-flag { margin-left: auto; font-size: 12px; color: var(--faint); }
+.badge.bpc { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
+
+/* ---------- Wallet (phase 3) ---------- */
+.show-more { margin-top: 12px; padding: 8px 16px; background: var(--raised); border: 1px solid var(--border-hi); border-radius: 8px; color: var(--text); font: inherit; cursor: pointer; }
+.show-more:hover { border-color: var(--accent); color: var(--accent); }
+.show-more[disabled] { opacity: 0.6; cursor: default; }
+
+/* ---------- Ships & market (phase 4) ---------- */
+.warn-text { color: var(--warn); }
+/* Label and value on one line, the bar full width beneath — every bar the same length whatever
+   the value text says, the same shape as the overview card's training row. */
+.gauge-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label text" "bar bar"; column-gap: 8px; row-gap: 5px; align-items: center; margin-top: 10px; }
+.gauge-label { grid-area: label; font-size: 12px; color: var(--faint); }
+.gauge { grid-area: bar; }
+.gauge-text { grid-area: text; }
+/* Same bar as the skill queue's `.progress` — one progress-bar design across the site. */
+.gauge { height: 10px; border-radius: 3px; background: var(--raised); overflow: hidden; display: block; }
+.gauge-fill { display: block; height: 100%; background: var(--accent); }
+.gauge.over .gauge-fill { background: var(--neg); }
+.gauge-text { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ship-card { display: flex; flex-direction: column; gap: 4px; padding: 24px 24px 22px; text-decoration: none; color: inherit; }
+.ship-card:hover { border-color: var(--border-hi); }
+.ship-head { display: flex; gap: 16px; align-items: center; margin-bottom: 6px; }
+.ship-render { width: 84px; height: 84px; border-radius: 10px; border: 1px solid var(--divider); background: var(--raised); object-fit: cover; }
+.ship-id { min-width: 0; }
+.ship-id .ship-type-pills { margin-top: 0; }
+/* Beats `.ship-id .ship-type-pills` above: the class row keeps its gap under the hull chip. */
+.ship-id .ship-class-pills { margin-top: 8px; }
+.ship-name { margin: 9px 0 0; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ship-type { margin: 2px 0 0; font-size: 13px; }
+.ship-loc { font-size: 12px; margin: 8px 0 4px; line-height: 1.45; }
+/* The card's four headline stats as a 2 x 2 of small tiles above the CPU/PG gauges — four across
+   truncates "Lasts 12m 40s" at the grid's 300px minimum. */
+.ship-stat-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0 2px; }
+.ship-stat { min-width: 0; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; }
+.ship-stat dt { font-size: 10px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--faint); }
+.ship-stat dd { margin: 2px 0 0; font-size: 13px; font-weight: 600; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ship-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; }
+.ship-unpriced { margin: 4px 0 0; font-size: 12px; }
+.section-title { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; margin: 28px 0 14px; }
+.card-grid.ships { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.banner { border-color: var(--warn); color: var(--warn); font-size: 13px; padding: 14px 18px; margin: 0 0 8px; }
+.fit-head { display: flex; gap: 20px; align-items: flex-start; }
+.fit-render { width: 128px; height: 128px; border-radius: 12px; border: 1px solid var(--divider); background: var(--raised); }
+.fit-head .page-title { font-size: 26px; }
+.fit-head .page-sub { margin-bottom: 12px; }
+.bonus-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+.bonus-skill { color: var(--accent); margin-right: 8px; }
+.counters { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.counter { display: flex; gap: 8px; align-items: baseline; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 12px; }
+.counter.over { border-color: var(--neg); color: var(--neg); }
+.counter-label { color: var(--faint); }
+/* Fit sheet: the same main + 340px sidebar split as the fitting editor, so the two screens read
+   as one system. Header (and the skills banner) span both columns. */
+.fit-sheet { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.fit-sheet-head, .fit-sheet-banner, .fit-sheet-foot { grid-column: 1 / -1; }
+.fit-head-text { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.fit-head-text .page-title { margin: 0; }
+.fit-head-pills { margin-top: 0; }
+.fit-head-loc { margin: 0; font-size: 14px; color: var(--text); line-height: 1.45; }
+.fit-sheet-banner { margin: 0; }
+.fit-sheet-main, .fit-sheet-side { display: grid; gap: 20px; min-width: 0; }
+@media (max-width: 900px) { .fit-sheet { grid-template-columns: minmax(0, 1fr); } }
+/* Ship stats: the fitting window's right-hand panel — a title + headline per section, label/value
+   rows beneath, and the Defense resist table with one tinted cell per damage type. */
+.ship-stats .card-title { margin-bottom: 6px; }
+.stat-section { padding: 10px 0; border-top: 1px solid var(--hairline); }
+.stat-section:first-of-type { border-top: 0; }
+.stat-section-head { margin: 0 0 6px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-family: var(--font-poppins), sans-serif; font-size: 13px; font-weight: 600; }
+.stat-headline { font-size: 13px; font-weight: 600; color: var(--text); }
+.stat-rows { margin: 0; display: grid; gap: 4px; }
+/* `.stat-rows .stat-row` outranks the skills page's `.stat-row` (flex-wrap, 18px margin) above. */
+.stat-rows .stat-row { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 12px; margin: 0; font-size: 12px; }
+.stat-rows dt { color: var(--muted); }
+.stat-rows dd { margin: 0; color: var(--text); }
+.stat-note { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
+.sheet-mod-assumed { color: var(--accent-2); }
+.stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
+.resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
+.resist-table th { font-weight: 500; text-align: left; padding: 0; }
+.resist-head { text-align: center !important; font-size: 10px; letter-spacing: 0.4px; text-transform: uppercase; }
+.resist-head.em { color: var(--accent); } .resist-head.thermal { color: var(--neg); }
+.resist-head.kinetic { color: var(--muted); } .resist-head.explosive { color: var(--warn); }
+.resist-layer { width: 34%; vertical-align: middle; padding-right: 4px !important; }
+.resist-layer-name { display: block; font-size: 12px; color: var(--text); }
+.resist-hp { display: block; font-size: 11px; color: var(--faint); text-align: left; white-space: nowrap; }
+.resist-cell { position: relative; overflow: hidden; height: 24px; border-radius: 4px; background: var(--raised); text-align: center; vertical-align: middle; padding: 0; }
+.resist-fill { position: absolute; left: 0; top: 0; bottom: 0; opacity: 0.32; }
+.resist-cell.em .resist-fill { background: var(--accent); } .resist-cell.thermal .resist-fill { background: var(--neg); }
+.resist-cell.kinetic .resist-fill { background: var(--muted); } .resist-cell.explosive .resist-fill { background: var(--warn); }
+.resist-pct { position: relative; display: block; line-height: 24px; text-align: center; color: var(--text); font-weight: 500; }
+/* Modules: one full-width list per slot kind under a shared column header. */
+.sheet-slot-head, .sheet-slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px 76px 88px; gap: 12px; align-items: center; }
+.sheet-slot-head { padding: 0 6px 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.sheet-slot-head span:not(:first-child) { text-align: right; }
+.sheet-slot-head + .slot-section { margin-top: 14px; }
+.fit-sheet .slot-section-title { padding-left: 6px; }
+.sheet-slot-list { list-style: none; margin: 0; padding: 0; }
+.sheet-slot-row { padding: 7px 6px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+.sheet-slot-row:last-child { border-bottom: 0; }
+.sheet-slot-empty { grid-template-columns: 1fr; font-size: 12px; }
+.sheet-mod { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.sheet-mod .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
+.sheet-mod-text { display: grid; min-width: 0; line-height: 1.3; }
+.sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-mod-charge { font-size: 12px; color: var(--faint); }
+.sheet-entries li { align-items: center; padding: 4px 0; }
+.sheet-entry { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.sheet-entry .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
+.sheet-entry-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-entry-qty { color: var(--muted); font-variant-numeric: tabular-nums; }
+.state-pill { justify-self: end; display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: var(--raised); border: 1px solid var(--border); color: var(--muted); }
+.state-pill.active { background: rgba(245, 166, 35,.14); border-color: transparent; color: var(--accent); }
+.state-pill.overload { background: rgba(255, 127, 80,.14); border-color: transparent; color: var(--warn); }
+.state-pill.offline { color: var(--faint); border-style: dashed; }
+@media (max-width: 480px) {
+  .sheet-slot-head, .sheet-slot-row { grid-template-columns: minmax(0, 1fr) 50px 50px 66px; gap: 6px; }
+  /* Names get the width back by wrapping rather than clipping at two words. */
+  .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
+  .sheet-mod .module-icon { width: 22px; height: 22px; }
+  .state-pill { padding: 2px 6px; font-size: 10px; }
+  .fit-sheet .fit-head { flex-direction: column; gap: 14px; }
+  .fit-sheet .fit-render { width: 96px; height: 96px; }
+}
+.module-icon { width: 20px; height: 20px; vertical-align: middle; margin-right: 6px; border-radius: 3px; }
+.slot-title { font-family: var(--font-poppins), sans-serif; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+.charge { font-size: 12px; }
+.affected { position: relative; display: inline-block; }
+.affected-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 0; color: var(--text); font: inherit; cursor: pointer; }
+.affected-btn:hover { color: var(--accent); }
+.popover { position: absolute; right: 0; top: 100%; z-index: 50; width: 260px; display: block; background: var(--raised); border: 1px solid var(--border-hi); border-radius: 10px; padding: 10px 12px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); }
+.popover-title { display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; }
+.popover-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12px; }
+.popover-list li { display: flex; justify-content: space-between; gap: 10px; }
+.problem-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; }
+.entry-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.entry-list li, .value-list li { display: flex; justify-content: space-between; gap: 12px; }
+.value-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.value-total { border-top: 1px solid var(--hairline); padding-top: 6px; font-weight: 600; }
+
+/* ---------- phase 5: fitting designer ---------- */
+.fit-editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.fit-editor-main { display: grid; gap: 20px; }
+.fit-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin-bottom: 18px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+.fit-identity { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1 1 380px; }
+.fit-identity-text { display: grid; gap: 6px; min-width: 0; flex: 1; }
+.fit-identity-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12px; }
+.meta-divider { width: 1px; height: 16px; background: var(--divider); }
+.fit-identity-meta .ship-type-pills { margin-top: 0; }
+.fit-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.fit-actions .save-state { margin-right: 6px; }
+.fit-name-input { max-width: 340px; padding: 4px 8px; margin-left: -8px; background: transparent; border: 1px solid transparent; border-radius: 8px; color: var(--text); font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; }
+.fit-name-input:hover { border-color: var(--border); background: var(--raised); }
+.fit-name-input:focus { background: var(--raised); }
+.fit-name-input:focus, .fit-select:focus, .qty-input:focus, .eft-text:focus { outline: none; border-color: var(--accent); }
+.fit-select { padding: 6px 8px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font: inherit; font-size: 12px; }
+.fit-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 7px 12px; background: var(--raised); border: 1px solid var(--border-hi); border-radius: 8px; color: var(--text); font: inherit; cursor: pointer; }
+.fit-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fit-btn.danger:hover { border-color: var(--neg); color: var(--neg); }
+.fit-btn[disabled] { opacity: 0.6; cursor: default; }
+.save-state { font-size: 12px; color: var(--faint); }
+.save-state.error { color: var(--neg); }
+li.slot-row, .slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 54px 54px 92px 22px 22px; gap: 8px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+.slot-row .fit-select { width: 92px; }
+.slot-head { display: grid; grid-template-columns: minmax(0, 1fr) 54px 54px 92px 22px 22px; gap: 8px; padding: 0 0 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.slot-head span:first-child { padding-left: 6px; }
+.slot-head span:nth-child(4) { padding-left: 9px; }
+.slot-section + .slot-section { margin-top: 18px; }
+.slot-section-title { font-family: var(--font-poppins), sans-serif; font-size: 13px; font-weight: 600; margin: 0 0 4px; display: flex; align-items: baseline; gap: 8px; }
+.slot-count { font-size: 12px; font-weight: 500; color: var(--faint); }
+.slot-count.over { color: var(--neg); }
+.fit-hull-render { width: 52px; height: 52px; border-radius: 8px; border: 1px solid var(--divider); background: var(--raised); }
+.toolbar-state { margin-left: auto; }
+.fit-lower { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 700px) { .fit-lower { grid-template-columns: 1fr; } }
+.cargo-row { align-items: center; }
+.cargo-controls { display: flex; align-items: center; gap: 10px; }
+.fit-value { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--hairline); display: grid; gap: 2px; font-size: 12px; }
+.stat-list { margin-bottom: 14px; }
+.stat-list:last-child { margin-bottom: 0; }
+.perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.perf-note { margin: 12px 0 0; font-size: 12px; }
+.card-problems { border-color: rgba(255, 92, 108, 0.45); }
+.card-problems .card-title .neg { font-size: 13px; vertical-align: 2px; margin-left: 4px; }
+[data-desc] { position: relative; }
+[data-desc]:hover::after { content: attr(data-desc); position: absolute; left: 0; top: calc(100% + 6px); z-index: 60; width: min(340px, 80vw); padding: 8px 10px; border-radius: 8px; background: var(--raised); border: 1px solid var(--border-hi); color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.45; text-align: left; white-space: pre-line; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); pointer-events: none; }
+li.slot-row:last-child { border-bottom: 0; }
+.slot-row.selected { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent); }
+.slot-row.empty .slot-main { color: var(--faint); }
+.slot-row.over .slot-main { color: var(--neg); }
+.slot-main { display: flex; align-items: center; gap: 8px; min-width: 0; background: none; border: 0; padding: 4px 6px; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 6px; }
+.slot-main:hover { color: var(--accent); }
+.slot-charge { font-size: 12px; color: var(--accent-2); }
+.icon-btn { background: none; border: 0; padding: 2px; line-height: 0; color: var(--faint); cursor: pointer; }
+.icon-btn:hover { color: var(--accent); }
+.icon-btn.danger:hover { color: var(--neg); }
+.qty-input { width: 76px; padding: 3px 6px; background: var(--raised); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font: inherit; text-align: right; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.72); display: grid; place-items: center; padding: 24px; }
+.modal { width: 100%; max-width: 660px; max-height: 80vh; overflow: auto; }
+.eft-text { width: 100%; min-height: 260px; padding: 10px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.browser-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 440px; overflow: auto; }
+.browser-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
+.browser-row:hover { background: var(--raised); }
+.browser-results [data-desc]:hover::after { position: fixed; left: auto; top: auto; margin-top: 6px; }
+.browser-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 8px; }
+.crumb { background: none; border: 0; padding: 0; color: var(--accent); font: inherit; cursor: pointer; }
+.badge.meta { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
+.fit-list-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 140px 110px auto; gap: 12px; align-items: center; font-size: 13px; }
+.check-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+@media (max-width: 900px) { .fit-editor { grid-template-columns: 1fr; } }
+
+/* ---------- phase 6: skill planner ---------- */
+.plan-table td { vertical-align: top; }
+.plan-table tr.prereq td:nth-child(2) { padding-left: 18px; }
+.badge.prereq-badge { margin-left: 6px; background: rgba(148, 163, 184, 0.14); color: var(--muted); }
+.badge.alpha { margin-left: 6px; background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
+.badge.done { background: rgba(148, 163, 184, 0.14); color: var(--muted); }
+.badge.queued { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
+.badge.planned { background: rgba(125, 211, 160, 0.14); color: var(--pos); }
+.plan-actions { display: flex; gap: 2px; align-items: center; white-space: nowrap; }
+.plan-editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.plan-editor-main { display: grid; gap: 20px; }
+.plan-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 18px; }
+.remap-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 2px; font-size: 12px; }
+.remap-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; gap: 8px; }
+.remap-delta { color: var(--accent); }
+.plan-list-row { display: grid; grid-template-columns: minmax(0, 1fr) 90px 130px 150px auto; gap: 12px; align-items: center; font-size: 13px; }
+.skill-picker { display: grid; gap: 8px; }
+.skill-picker-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 320px; overflow: auto; }
+.skill-picker-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
+.skill-picker-row:hover { background: var(--raised); }
+@media (max-width: 900px) { .plan-editor { grid-template-columns: 1fr; } }
+
+/* ---------- Combat (phase 7) ---------- */
+.badge.kill { background: rgba(67, 217, 160,.14); color: var(--pos); }
+.badge.loss { background: rgba(255, 92, 108,.14); color: var(--neg); }
+.km-ship { display: inline-flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; }
+.km-ship:hover { color: var(--accent-2); }
+.km-corp { display: block; font-size: 11px; }
+.combat-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 20px; }
+.combat-tabs { display: inline-flex; gap: 4px; }
+.combat-tab {
+  padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border);
+  background: var(--card); color: var(--muted); font-size: 13px; text-decoration: none;
+}
+.combat-tab:hover { border-color: var(--border-hi); color: var(--text); }
+.combat-tab[data-active] { background: var(--raised); border-color: var(--accent); color: var(--text); }
+.skill-tabs .combat-tab { border-radius: 6px; }
+.card-grid.stat-tiles { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); margin-bottom: 20px; }
+.card-grid.top-lists { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.month-strip { display: flex; gap: 6px; align-items: stretch; height: 160px; }
+.month-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.month-half { flex: 1; width: 100%; display: flex; }
+.month-half.up { align-items: flex-end; }
+.month-half.down { align-items: flex-start; }
+.month-bar { width: 100%; border-radius: 3px; min-height: 1px; }
+.month-bar.kill { background: var(--pos); }
+.month-bar.loss { background: var(--neg); }
+.month-label { font-size: 11px; color: var(--faint); }
+.month-legend { margin: 10px 0 0; font-size: 12px; }
+.top-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13px; }
+.top-list li { display: flex; justify-content: space-between; gap: 12px; }
+.km-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.km-head-meta { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.km-victim { display: flex; align-items: center; gap: 20px; }
+.km-victim .fit-render { margin-left: auto; }
+.km-slot + .km-slot { margin-top: 18px; }
+
+/* =====================================================================================
+   Yutani OS layer (2026-10-01) — appended override block.
+   Blade Runner / Prometheus console: amber phosphor on warm black, Michroma labels,
+   Chakra Petch display, JetBrains Mono body. Everything here overrides the rules above.
+   ===================================================================================== */
+
+/* ---------- base ---------- */
+body { font-size: 13px; background: radial-gradient(1100px 480px at 50% -10%, rgba(245, 166, 35, .10), transparent 60%), linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 48px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 48px 100%, var(--bg); background-attachment: fixed; }
+a:not([class]) { color: var(--accent-2); }
+
+/* ---------- header: console strip ---------- */
+.app-header { height: 60px; background: rgba(10, 8, 6, .84); border-bottom-color: rgba(245, 166, 35, .25); }
+.app-bar-inner { gap: 24px; }
+.logo-lockup { gap: 12px; padding: 8px 14px 8px 12px; border: 1px solid var(--border-hi); border-left: 3px solid var(--accent); background: rgba(245, 166, 35, .05); }
+.logo-img { height: 13px; width: auto; display: block; opacity: .95; }
+.logo-divider { height: 16px; }
+.logo-os { font-family: var(--font-label); font-size: 11px; letter-spacing: 3px; color: var(--accent-2); line-height: 1; }
+.top-nav { gap: 4px; }
+.nav-link { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); padding: 8px 12px; border: 0; background: rgba(245, 166, 35, .04); }
+.nav-link:hover { color: var(--text); background: rgba(245, 166, 35, .09); }
+.nav-link[data-active] { color: var(--accent); background: rgba(245, 166, 35, .14); box-shadow: inset 0 -2px 0 var(--accent); text-shadow: var(--glow); }
+.user-menu { padding: 5px 10px 5px 5px; border: 1px solid var(--border-hi); }
+.user-name { font-size: 12px; }
+.char-avatar, .user-avatar { border-radius: 2px; }
+@media (max-width: 1040px) { .top-nav { gap: 2px; } .nav-link { letter-spacing: 1px; padding: 8px 7px; } .user-name { display: none; } }
+
+/* system status strip under the header (new element: .sys-strip) */
+.sys-strip { max-width: var(--col); margin: 0 auto; padding: 7px 24px; display: flex; align-items: center; gap: 24px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--hairline); }
+.sys-item { display: inline-flex; align-items: center; white-space: nowrap; }
+.sys-right { margin-left: auto; }
+.sys-dot { width: 6px; height: 6px; margin-right: 8px; background: var(--pos); box-shadow: 0 0 6px var(--pos); }
+@media (max-width: 760px) { .sys-strip { display: none; } }
+
+/* ---------- page head ---------- */
+.page-title { font-size: 30px; line-height: 1; text-transform: uppercase; letter-spacing: 1px; padding-left: 14px; border-left: 3px solid var(--accent); margin-bottom: 10px; }
+.page-sub { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; font-family: var(--font-label); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.page-sub::before { content: ""; width: 5px; height: 11px; border-radius: 0 5px 5px 0; background: var(--accent-2); box-shadow: 0 0 10px rgba(95, 211, 232, .5); flex: 0 0 auto; }
+.page-sub::after { content: ""; flex: 1; max-width: 220px; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
+
+/* ---------- panels: glass, lit top edge, corner brackets ---------- */
+.card, .fit-toolbar, .login-card {
+  border-radius: 0; border: 1px solid var(--border); border-top-color: rgba(245, 166, 35, .30);
+  background:
+    linear-gradient(var(--bracket), var(--bracket)) left 8px top 8px / 12px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) left 8px top 8px / 1px 12px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) right 8px top 8px / 12px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) right 8px top 8px / 1px 12px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) left 8px bottom 8px / 12px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) left 8px bottom 8px / 1px 12px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) right 8px bottom 8px / 12px 1px no-repeat,
+    linear-gradient(var(--bracket), var(--bracket)) right 8px bottom 8px / 1px 12px no-repeat,
+    linear-gradient(180deg, rgba(245, 166, 35, .07), transparent 40%),
+    var(--card-glass);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.card-problems { border-color: rgba(255, 92, 108, .5); }
+.banner { border-color: var(--warn); }
+.ship-card:hover { border-color: var(--border-hi); border-top-color: rgba(245, 166, 35, .6); }
+.card-title, .section-title { display: flex; align-items: center; gap: 10px; font-family: var(--font-label); font-weight: 400; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text); }
+.card-title::before, .section-title::before { content: ""; width: 5px; height: 11px; border-radius: 0 5px 5px 0; background: var(--accent); box-shadow: var(--glow); flex: 0 0 auto; }
+.card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
+.card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
+.slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
+.pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
+.ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }
+[data-desc]:hover::after { border-radius: 2px; background: var(--card-glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.slot-row.selected { background: rgba(245, 166, 35, .06); }
+
+/* ---------- overview ---------- */
+.ov-card { gap: 18px; }
+.ov-name { font-size: 19px; letter-spacing: .3px; }
+.ov-race { margin-top: 6px; }
+.ov-row { grid-template-columns: 104px 1fr; }
+.ov-row dt { display: flex; align-items: center; gap: 8px; color: var(--faint); }
+.ov-row dt::before { content: ""; width: 4px; height: 4px; background: var(--accent-2); flex: 0 0 auto; }
+.ov-sp-label { color: var(--muted); }
+.ov-sp-val { font-size: 22px; color: var(--accent); text-shadow: var(--glow); }
+.ov-foot, .fit-value, .stat-bays { border-top: 0; padding-top: 16px; background: var(--ruler); }
+
+/* ---------- pills, badges, dots ---------- */
+.pill { font-size: 10px; letter-spacing: .6px; text-transform: uppercase; }
+.ov-pills .pill, .ov-ship-pills .pill, .ship-type-pills .pill { font-size: 10px; }
+.pill.hull { font-size: 11px; }
+.badge, .state-pill { font-size: 10px; letter-spacing: .4px; text-transform: uppercase; }
+.online-dot { width: 7px; height: 7px; border-radius: 1px; }
+.online-dot.on { box-shadow: 0 0 8px var(--pos); }
+
+/* ---------- bars ---------- */
+.progress, .gauge { height: 8px; border-radius: 0; background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--border-hi) calc(10% - 1px) 10%), var(--raised); }
+.progress-fill, .gauge-fill { box-shadow: 0 0 10px rgba(245, 166, 35, .45); }
+.gauge.over .gauge-fill { box-shadow: 0 0 10px rgba(255, 92, 108, .45); }
+.progress-pct, .gauge-text { font-size: 11px; color: var(--accent); }
+.resist-head.em { color: var(--accent-2); } .resist-cell.em .resist-fill { background: var(--accent-2); }
+.month-bar { border-radius: 0; }
+.queue-countdown strong { text-shadow: var(--glow); }
+
+/* ---------- buttons, tabs, inputs ---------- */
+.fit-btn, .show-more, .sso-btn, .combat-tab, .skill-tabs .combat-tab { border-radius: 2px; font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.fit-btn { padding: 9px 12px; }
+.show-more { padding: 9px 16px; }
+.combat-tab { padding: 8px 14px; }
+.combat-tab[data-active] { background: rgba(245, 166, 35, .14); color: var(--accent); }
+.sso-btn { padding: 13px 20px; color: var(--bg); box-shadow: var(--glow); }
+.sso-btn:hover { background: #ffd27a; }
+
+/* ---------- login ---------- */
+.login-card { padding: 34px 32px; box-shadow: 0 18px 50px rgba(0, 0, 0, .55); }
+.login-logo { gap: 10px; margin-bottom: 30px; }
+.login-logo-img { width: 220px; height: auto; display: block; opacity: .95; }
+.login-wordmark { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--accent-2); animation: none; font-family: var(--font-label); font-size: 11px; letter-spacing: 5px; }
+.login-kana { height: 9px; width: auto; display: block; opacity: .5; margin-top: 4px; }
+.login-h1 { text-transform: uppercase; letter-spacing: 1px; }
+
+/* ---------- footer + bottom bar ---------- */
+.app-footer { border-top: 0; padding-top: 30px; gap: 10px; background: var(--ruler); }
+.footer-lockup { flex-direction: column; gap: 9px; padding: 12px 22px; border: 1px solid var(--border-hi); }
+.footer-wordmark { height: 12px; width: auto; display: block; opacity: .9; }
+.footer-kana { height: 8px; width: auto; display: block; opacity: .5; }
+.bottom-bar { border-top-color: rgba(245, 166, 35, .25); }
+.bottom-item span { font-family: var(--font-label); font-size: 8px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* trained skills: each group is its own framed block — label tab on top, raised fill, tick ruler */
+.skill-group-list { gap: 14px; }
+.skill-group-flat { position: relative; padding: 14px 16px 10px; background: rgba(245, 166, 35, .03); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+.skill-group-flat .group-head { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; padding-bottom: 10px; border-bottom: 0; background: var(--ruler); background-position: left bottom, left bottom, left bottom; font-family: var(--font-label); font-size: 10px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); text-shadow: var(--glow); }
+.skill-group-flat .group-head::before { content: ""; width: 5px; height: 11px; border-radius: 0 5px 5px 0; background: var(--accent); box-shadow: var(--glow); flex: 0 0 auto; }
+.skill-group-flat .group-sp { font-family: var(--font-body); letter-spacing: 0; text-transform: none; text-shadow: none; color: var(--muted); }
+.skill-cell { border-bottom-color: var(--hairline); }
+
+/* training overview: four queues side by side, 20 entries each */
+.tq-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1000px) { .tq-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .tq-grid { grid-template-columns: minmax(0, 1fr); } }
+.tq-card { min-width: 0; display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 10px; background: rgba(245, 166, 35, .03); border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+.tq-head { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; background: var(--ruler); background-position: left bottom, left bottom, left bottom; }
+.tq-portrait { width: 36px; height: 36px; border: 1px solid var(--border-hi); flex: 0 0 auto; }
+.tq-id { min-width: 0; display: grid; gap: 3px; }
+.tq-name { display: flex; align-items: center; gap: 7px; font-family: var(--font-display); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tq-total { font-size: 11px; white-space: nowrap; }
+.tq-total strong { color: var(--accent); text-shadow: var(--glow); font-weight: 500; }
+.tq-count { margin-left: auto; align-self: flex-start; font-family: var(--font-label); font-size: 10px; letter-spacing: 1px; color: var(--muted); padding: 3px 7px; border: 1px solid var(--border-hi); }
+.tq-progress { min-width: 0; }
+.tq-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.tq-row { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; grid-template-areas: "n skill skill" "n time boxes"; column-gap: 8px; row-gap: 3px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--hairline); font-size: 12px; }
+.tq-row:last-child { border-bottom: 0; }
+.tq-n { grid-area: n; font-size: 10px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.tq-skill { grid-area: skill; min-width: 0; line-height: 1.3; }
+.tq-n { align-self: start; padding-top: 2px; }
+.tq-row .level-boxes { grid-area: boxes; gap: 2px; }
+.tq-row .level-box { width: 8px; height: 8px; }
+.tq-time { grid-area: time; font-size: 11px; color: var(--muted); }
+.tq-empty { margin: 6px 0; font-size: 12px; }
+.tq-more { margin: 4px 0 0; font-size: 11px; color: var(--faint); }
+.tq-more a { color: var(--accent-2); }
+
+/* ---- design-package only: not part of the app's stylesheet ---- */
+.pkg-states { margin-top: 40px; padding-top: 18px; border-top: 2px dashed var(--border-hi); }
+.pkg-states-label { margin: 0 0 16px; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--warn); }
+
+</style>
 </head>
 <body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
 <header class="app-header">
   <div class="app-bar-inner">
-    <a href="overview.html" class="logo-lockup" aria-label="EVE — home">
-      <span class="logo-text">EVE</span>
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
       <span class="logo-divider" aria-hidden="true"></span>
-      <span class="wordmark">Plasma</span>
+      <span class="logo-os">OS</span>
     </a>
     <nav class="top-nav" aria-label="Primary">
-          <a href="overview.html" class="nav-link">Overview</a>
-          <a href="skills.html" class="nav-link">Skills</a>
-          <a href="ships.html" class="nav-link">Ships</a>
-          <a href="fitting-editor.html" class="nav-link" data-active aria-current="page">Fitting</a>
-          <a href="#" class="nav-link">Assets</a>
-          <a href="#" class="nav-link">Wallet</a>
-          <a href="combat.html" class="nav-link">Combat</a>
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link" data-active aria-current="page">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
     </nav>
     <button type="button" class="user-menu" aria-label="Character menu">
-      <!-- eslint-disable-next-line @next/next/no-img-element -->
       <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
       <span class="user-name">TrilliumONE</span>
       <span class="user-caret" aria-hidden="true"></span>
     </button>
   </div>
 </header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
 <main class="app-main">
+<!-- Route /fitting/[id]: src/app/fitting/[id]/page.tsx -> FitEditor.tsx (toolbar, layout, EFT modal) + SlotLayout.tsx + CargoCard.tsx + ItemBrowser.tsx + StatsPanel.tsx (+ ships/Gauge.tsx, ships/ShipStats.tsx, ships/AffectedBy.tsx). Data shape: src/lib/fits/editor-view.ts. -->
 <div class="fit-toolbar">
-  <input class="fit-name-input" value="PvE Rifter" aria-label="Fit name" maxlength="60">
-  <label class="faint" for="fit-pilot">Pilot</label>
-  <select id="fit-pilot" class="fit-select" aria-label="Pilot">
-    <option>All skills V</option>
-    <option selected>TrilliumONE</option>
-    <option>Sasha-9999</option>
-  </select>
-  <button type="button" class="fit-btn" disabled>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l4 4v12a2 2 0 0 1-2 2z"/><path d="M7 21v-8h10v8M7 3v5h8"/></svg>
-    Save
-  </button>
-  <button type="button" class="fit-btn">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>
-    Export EFT
-  </button>
-  <button type="button" class="fit-btn">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    Clone
-  </button>
-  <button type="button" class="fit-btn danger">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
-    Delete
-  </button>
-  <span class="save-state">Saved</span>
+  <div class="fit-identity">
+    <img class="fit-hull-render" src="https://images.evetech.net/types/587/render?size=128" alt="Rifter" data-desc="Rifter — Frigate">
+    <div class="fit-identity-text">
+      <input class="fit-name-input" value="Rifter — Dual Rep Brawler" aria-label="Fit name" maxlength="60">
+      <div class="fit-identity-meta">
+        <span class="ship-type-pills">
+          <span class="pill hull">Rifter</span>
+          <span class="pill">Minmatar</span>
+          <span class="pill">Frigate</span>
+        </span>
+        <span class="meta-divider" aria-hidden="true"></span>
+        <label class="faint" for="fit-pilot">Pilot</label>
+        <select id="fit-pilot" class="fit-select" aria-label="Pilot">
+          <option value="all-v">All skills V</option>
+          <option value="2114794365" selected>TrilliumONE</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="fit-actions">
+    <!-- saveState === "error" -->
+    <span class="save-state error">Could not save — retrying on the next change</span>
+    <!-- disabled: nothing dirty (or a save in flight) -->
+    <button type="button" class="fit-btn" disabled>
+      <!-- Tabler IconDeviceFloppy size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/><circle cx="12" cy="14" r="2"/><path d="M14 4v4H8V4"/></svg> Save
+    </button>
+    <button type="button" class="fit-btn">
+      <!-- Tabler IconFileExport size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M11.5 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v5"/><path d="M15 19h6m-3-3l3 3-3 3"/></svg> Export EFT
+    </button>
+    <button type="button" class="fit-btn">
+      <!-- Tabler IconCopy size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg> Clone
+    </button>
+    <button type="button" class="fit-btn danger">
+      <!-- Tabler IconTrash size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg> Delete
+    </button>
+  </div>
 </div>
 
 <div class="fit-editor">
   <div class="fit-editor-main">
+    <!-- SlotLayout.tsx -->
+    <div class="card fit-modules">
+      <h2 class="card-title">Modules</h2>
+      <div class="slot-head" aria-hidden="true">
+        <span>Module</span>
+        <span class="num">CPU tf</span>
+        <span class="num">PG MW</span>
+        <span>State</span>
+        <span></span>
+        <span></span>
+      </div>
 
-    <div class="card-stack">
-
-      <div class="card">
-        <h2 class="card-title">High <span class="faint">3 / 4</span></h2>
+      <!-- High 4 / 4 -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          High <span class="slot-count">4 / 4</span>
+        </h3>
         <ul class="entry-list">
+          <!-- SELECTED row, with a loaded charge (unload button) and an open AffectedBy popover on CPU -->
           <li class="slot-row selected">
-            <button type="button" class="slot-main" aria-pressed="true" aria-label="Select 150mm Light AutoCannon II in High slot 1">
-              <img class="module-icon" src="https://images.evetech.net/types/2873/icon?size=32" alt="">
-              <span>150mm Light AutoCannon II</span>
+            <button type="button" class="slot-main" aria-pressed="true" aria-label="Select 200mm AutoCannon II in High slot 1" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
               <span class="slot-charge"> · Republic Fleet EMP S</span>
             </button>
-            <span class="num">18.75</span>
-            <span class="num">7.25</span>
-            <select class="fit-select" aria-label="150mm Light AutoCannon II state">
-              <option selected>Active</option>
-              <option>Online</option>
-              <option>Offline</option>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="true" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+              <span class="popover" role="dialog" aria-label="Affected by — CPU">
+                <span class="popover-title">Affected by</span>
+                <ul class="popover-list">
+                  <li><span>Weapon Upgrades V</span><span class="num">% -25</span></li>
+                </ul>
+              </span>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
             </select>
             <button type="button" class="icon-btn" aria-label="Unload Republic Fleet EMP S">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-            <button type="button" class="icon-btn danger" aria-label="Remove 150mm Light AutoCannon II">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
             </button>
           </li>
           <li class="slot-row">
-            <button type="button" class="slot-main" aria-label="Select 150mm Light AutoCannon II in High slot 2">
-              <img class="module-icon" src="https://images.evetech.net/types/2873/icon?size=32" alt="">
-              <span>150mm Light AutoCannon II</span>
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 200mm AutoCannon II in High slot 2" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
               <span class="slot-charge"> · Republic Fleet EMP S</span>
             </button>
-            <span class="num">18.75</span>
-            <span class="num">7.25</span>
-            <select class="fit-select" aria-label="150mm Light AutoCannon II state">
-              <option selected>Active</option>
-              <option>Online</option>
-              <option>Offline</option>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
             </select>
             <button type="button" class="icon-btn" aria-label="Unload Republic Fleet EMP S">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-            <button type="button" class="icon-btn danger" aria-label="Remove 150mm Light AutoCannon II">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
             </button>
           </li>
-          <li class="slot-row empty">
-            <button type="button" class="slot-main" aria-label="Select empty High slot 4">
-              <span class="module-icon" aria-hidden="true"></span>
-              <span>Empty</span>
+          <!-- Unloaded gun: no charge -> empty <span /> in the unload column -->
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 200mm AutoCannon II in High slot 3" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
             </button>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+              <option value="active">Active</option>
+              <option value="overload">Overload</option>
+            </select>
             <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Energy Nosferatu II in High slot 4" data-desc="Small Energy Nosferatu II — Energy Nosferatu">
+              <img class="module-icon" src="https://images.evetech.net/types/530/icon?size=32" alt="">
+              <span>Small Energy Nosferatu II</span>
+            </button>
+            <span class="num">18.00</span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="Small Energy Nosferatu II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
             <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Energy Nosferatu II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
           </li>
         </ul>
       </div>
 
-      <div class="card">
-        <h2 class="card-title">Mid <span class="faint">3 / 3</span></h2>
+      <!-- Mid 3 / 3 -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Mid <span class="slot-count">3 / 3</span>
+        </h3>
         <ul class="entry-list">
           <li class="slot-row">
-            <button type="button" class="slot-main" aria-label="Select 1MN Afterburner II in Mid slot 1">
-              <img class="module-icon" src="https://images.evetech.net/types/5973/icon?size=32" alt="">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 1MN Afterburner II in Mid slot 1" data-desc="1MN Afterburner II — Propulsion Module">
+              <img class="module-icon" src="https://images.evetech.net/types/438/icon?size=32" alt="">
               <span>1MN Afterburner II</span>
             </button>
-            <span class="num">18.00</span>
-            <span class="num">2.50</span>
+            <span class="num">15.00</span>
+            <span class="num">12.00</span>
             <select class="fit-select" aria-label="1MN Afterburner II state">
-              <option selected>Active</option>
-              <option>Online</option>
-              <option>Offline</option>
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active">Active</option>
+              <option value="overload" selected>Overload</option>
             </select>
             <span></span>
             <button type="button" class="icon-btn danger" aria-label="Remove 1MN Afterburner II">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Warp Scrambler II in Mid slot 2" data-desc="Warp Scrambler II — Warp Scrambler">
+              <img class="module-icon" src="https://images.evetech.net/types/447/icon?size=32" alt="">
+              <span>Warp Scrambler II</span>
+            </button>
+            <span class="num">30.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Warp Scrambler II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Warp Scrambler II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Capacitor Booster II in Mid slot 3" data-desc="Small Capacitor Booster II — Capacitor Booster">
+              <img class="module-icon" src="https://images.evetech.net/types/3554/icon?size=32" alt="">
+              <span>Small Capacitor Booster II</span>
+              <span class="slot-charge"> · Navy Cap Booster 200</span>
+            </button>
+            <span class="num">18.00</span>
+            <span class="num">8.00</span>
+            <select class="fit-select" aria-label="Small Capacitor Booster II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Navy Cap Booster 200">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Capacitor Booster II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
             </button>
           </li>
         </ul>
       </div>
 
-      <div class="card">
-        <h2 class="card-title">Low <span class="faint">4 / 3</span></h2>
+      <!-- Low 4 / 3 — over: the 4th row is .over (red) -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Low <span class="slot-count over">4 / 3</span>
+        </h3>
         <ul class="entry-list">
-          <li class="slot-row over">
-            <button type="button" class="slot-main" aria-label="Select Damage Control II in Low slot 4">
-              <img class="module-icon" src="https://images.evetech.net/types/9944/icon?size=32" alt="">
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Ancillary Armor Repairer in Low slot 1" data-desc="Small Ancillary Armor Repairer — Ancillary Armor Repairer">
+              <img class="module-icon" src="https://images.evetech.net/types/33076/icon?size=32" alt="">
+              <span>Small Ancillary Armor Repairer</span>
+              <span class="slot-charge"> · Nanite Repair Paste</span>
+            </button>
+            <span class="num">6.00</span>
+            <span class="num">5.00</span>
+            <select class="fit-select" aria-label="Small Ancillary Armor Repairer state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Nanite Repair Paste">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Ancillary Armor Repairer">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Damage Control II in Low slot 2" data-desc="Damage Control II — Damage Control">
+              <img class="module-icon" src="https://images.evetech.net/types/2048/icon?size=32" alt="">
               <span>Damage Control II</span>
             </button>
-            <span class="num">0.00</span>
+            <span class="num">30.00</span>
             <span class="num">1.00</span>
-            <span></span>
+            <select class="fit-select" aria-label="Damage Control II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+            </select>
             <span></span>
             <button type="button" class="icon-btn danger" aria-label="Remove Damage Control II">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <!-- Passive module: only offline/online allowed -->
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Gyrostabilizer II in Low slot 3" data-desc="Gyrostabilizer II — Gyrostabilizer">
+              <img class="module-icon" src="https://images.evetech.net/types/519/icon?size=32" alt="">
+              <span>Gyrostabilizer II</span>
+            </button>
+            <span class="num">27.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Gyrostabilizer II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Gyrostabilizer II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <!-- OVER row: fitted beyond the hull's slot count -->
+          <li class="slot-row over">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Multispectrum Energized Membrane II in Low slot 4" data-desc="Multispectrum Energized Membrane II — Armor Resistance Coating">
+              <img class="module-icon" src="https://images.evetech.net/types/11269/icon?size=32" alt="">
+              <span>Multispectrum Energized Membrane II</span>
+            </button>
+            <span class="num">30.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Multispectrum Energized Membrane II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Multispectrum Energized Membrane II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
             </button>
           </li>
         </ul>
       </div>
 
+      <!-- Rigs 2 / 3 with an EMPTY row (placeholder icon span, dashes, state null -> <span />, no buttons) -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Rigs <span class="slot-count">2 / 3</span>
+        </h3>
+        <ul class="entry-list">
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Trimark Armor Pump I in Rigs slot 1" data-desc="Small Trimark Armor Pump I — Rig Armor">
+              <img class="module-icon" src="https://images.evetech.net/types/31059/icon?size=32" alt="">
+              <span>Small Trimark Armor Pump I</span>
+            </button>
+            <span class="num">0.00</span>
+            <span class="num">0.00</span>
+            <span></span>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Trimark Armor Pump I">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Anti-Explosive Pump I in Rigs slot 2" data-desc="Small Anti-Explosive Pump I — Rig Armor">
+              <img class="module-icon" src="https://images.evetech.net/types/30987/icon?size=32" alt="">
+              <span>Small Anti-Explosive Pump I</span>
+            </button>
+            <span class="num">0.00</span>
+            <span class="num">0.00</span>
+            <span></span>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Anti-Explosive Pump I">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row empty">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Empty in Rigs slot 3">
+              <span class="module-icon" aria-hidden="true"></span>
+              <span>Empty</span>
+            </button>
+            <span class="num">—</span>
+            <span class="num">—</span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </li>
+        </ul>
+      </div>
+      <!-- A Rifter has no Subsystems block at all -->
+    </div>
+
+    <div class="fit-lower">
+      <!-- CargoCard.tsx -->
       <div class="card">
         <h2 class="card-title">Drone bay &amp; cargo</h2>
         <div role="group" aria-label="Drone bay">
           <h3 class="slot-title">Drone bay</h3>
           <ul class="entry-list">
-            <li>
-              <span>Warrior II</span>
-              <span>
+            <li class="cargo-row">
+              <span data-desc="Warrior II — Combat Drone">Warrior II</span>
+              <span class="cargo-controls">
                 <input class="qty-input" type="number" min="1" value="2" aria-label="Warrior II quantity">
-                <span class="num muted"> 1,240,000 ISK</span>
+                <span class="num muted">685,000.00 ISK</span>
                 <button type="button" class="icon-btn danger" aria-label="Remove Warrior II">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
                 </button>
               </span>
             </li>
@@ -184,91 +1178,331 @@
         <div role="group" aria-label="Cargo">
           <h3 class="slot-title">Cargo</h3>
           <ul class="entry-list">
-            <li>
-              <span>Republic Fleet EMP S</span>
-              <span>
-                <input class="qty-input" type="number" min="1" value="200" aria-label="Republic Fleet EMP S quantity">
-                <span class="num muted"> 460,000 ISK</span>
+            <li class="cargo-row">
+              <span data-desc="Republic Fleet EMP S — Projectile Ammo">Republic Fleet EMP S</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="1000" aria-label="Republic Fleet EMP S quantity">
+                <span class="num muted">1,240,000.00 ISK</span>
                 <button type="button" class="icon-btn danger" aria-label="Remove Republic Fleet EMP S">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><path d="M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
                 </button>
+              </span>
+            </li>
+            <li class="cargo-row">
+              <span data-desc="Nanite Repair Paste — Nanite Repair Paste">Nanite Repair Paste</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="64" aria-label="Nanite Repair Paste quantity">
+                <span class="num muted">1,433,600.00 ISK</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Nanite Repair Paste">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+            <!-- Unpriced entry -->
+            <li class="cargo-row">
+              <span data-desc="Navy Cap Booster 200 — Capacitor Booster Charge">Navy Cap Booster 200</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="12" aria-label="Navy Cap Booster 200 quantity">
+                <span class="num muted">—</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Navy Cap Booster 200">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <p class="faint">
+          The static data does not know these types, so they are excluded from the calculation.
+        </p>
+        <!-- editable=false: read-only quantity, no remove button -->
+        <div role="group" aria-label="Unknown types">
+          <h3 class="slot-title">Unknown types</h3>
+          <ul class="entry-list">
+            <li class="cargo-row">
+              <span data-desc="Unknown type (87432)">Unknown type (87432)</span>
+              <span class="cargo-controls">
+                <span class="num muted">×3</span>
+                <span class="num muted">—</span>
               </span>
             </li>
           </ul>
         </div>
       </div>
 
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">Items</h2>
-      <label class="faint" for="item-search">Search items</label>
-      <input id="item-search" class="filter-input" type="search" placeholder="Gyrostabilizer, Hail S, Warrior II, …" aria-label="Search items">
-      <label class="check-row">
-        <input type="checkbox" checked>
-        Fits this hull
-      </label>
-      <div class="browser-crumbs">
-        <button type="button" class="crumb">Market</button>
-        <span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
-          <button type="button" class="crumb">Ammunition &amp; Charges</button>
-        </span>
+      <!-- ItemBrowser.tsx (chargeMode === null) -->
+      <div class="card">
+        <h2 class="card-title">Add items</h2>
+        <input id="item-search" class="filter-input" type="search" value="gyro" placeholder="Search: Gyrostabilizer, Hail S, Warrior II, …" aria-label="Search items">
+        <label class="check-row">
+          <input type="checkbox" checked>
+          Fits this hull
+        </label>
+        <div class="browser-crumbs">
+          <button type="button" class="crumb">Market</button>
+          <span>
+            <!-- Tabler IconChevronRight size=11 -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Ship Equipment</button>
+          </span>
+          <span>
+            <!-- Tabler IconChevronRight size=11 -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Turrets &amp; Launchers</button>
+          </span>
+        </div>
+        <!-- Child market groups of the current crumb -->
+        <ul class="browser-results">
+          <li class="browser-row">
+            <!-- Tabler IconChevronRight size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Projectile Turrets</button>
+            <span></span><span></span>
+          </li>
+          <li class="browser-row">
+            <!-- Tabler IconChevronRight size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Weapon Upgrades</button>
+            <span></span><span></span>
+          </li>
+        </ul>
+        <!-- Type results: icon, name (data-desc), meta badge or empty span, fit button -->
+        <ul class="browser-results">
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/518/icon?size=32" alt="">
+            <span data-desc="Gyrostabilizer I — Gyrostabilizer">Gyrostabilizer I</span>
+            <span></span>
+            <button type="button" class="icon-btn" aria-label="Fit Gyrostabilizer I">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/519/icon?size=32" alt="">
+            <span data-desc="Gyrostabilizer II — Gyrostabilizer">Gyrostabilizer II</span>
+            <span class="badge meta">Tech II</span>
+            <button type="button" class="icon-btn" aria-label="Fit Gyrostabilizer II">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/5933/icon?size=32" alt="">
+            <span data-desc="Counterbalanced Compact Gyrostabilizer — Gyrostabilizer">Counterbalanced Compact Gyrostabilizer</span>
+            <span class="badge meta">Tech I</span>
+            <button type="button" class="icon-btn" aria-label="Fit Counterbalanced Compact Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/15806/icon?size=32" alt="">
+            <span data-desc="Republic Fleet Gyrostabilizer — Gyrostabilizer">Republic Fleet Gyrostabilizer</span>
+            <span class="badge meta">Faction</span>
+            <button type="button" class="icon-btn" aria-label="Fit Republic Fleet Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/13939/icon?size=32" alt="">
+            <span data-desc="Domination Gyrostabilizer — Gyrostabilizer">Domination Gyrostabilizer</span>
+            <span class="badge meta">Faction</span>
+            <button type="button" class="icon-btn" aria-label="Fit Domination Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/14536/icon?size=32" alt="">
+            <span data-desc="Tobias' Modified Gyrostabilizer — Gyrostabilizer">Tobias' Modified Gyrostabilizer</span>
+            <span class="badge meta">Officer</span>
+            <button type="button" class="icon-btn" aria-label="Fit Tobias' Modified Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+        </ul>
       </div>
-      <ul class="browser-results">
-        <li class="browser-row">
-          <img class="module-icon" src="https://images.evetech.net/types/12608/icon?size=32" alt="">
-          <span>Republic Fleet EMP S</span>
-          <span class="badge meta">Faction</span>
-          <button type="button" class="icon-btn" aria-label="Load Republic Fleet EMP S">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-        </li>
-        <li class="browser-row">
-          <img class="module-icon" src="https://images.evetech.net/types/12625/icon?size=32" alt="">
-          <span>EMP S</span>
-          <span></span>
-          <button type="button" class="icon-btn" aria-label="Load EMP S">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-        </li>
-        <li class="browser-row">
-          <img class="module-icon" src="https://images.evetech.net/types/12595/icon?size=32" alt="">
-          <span>Hail S</span>
-          <span class="badge meta">Faction</span>
-          <button type="button" class="icon-btn" aria-label="Load Hail S">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </button>
-        </li>
-      </ul>
     </div>
   </div>
 
+  <!-- StatsPanel.tsx -->
   <div class="card-stack">
+    <!-- skillsSynced === false -->
+    <p class="card banner">
+      No skills synced yet — every skill is treated as level 0, so these numbers are worst case.
+    </p>
+
     <div class="card">
-      <h2 class="card-title">Fitting</h2>
+      <!-- inline style is in the JSX itself -->
+      <h2 class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+        Fitting
+        <span class="badge warn">Lasts 2m 10s</span>
+      </h2>
       <div class="gauge-row">
         <span class="gauge-label">CPU</span>
-        <span class="gauge"><span class="gauge-fill" style="width: 55%"></span></span>
-        <span class="gauge-text num">27.5 / 50 tf</span>
+        <span class="gauge"><span class="gauge-fill" style="width: 98.4%"></span></span>
+        <span class="gauge-text num">123.00 / 125.00 tf</span>
       </div>
       <div class="gauge-row">
         <span class="gauge-label">Powergrid</span>
         <span class="gauge over"><span class="gauge-fill" style="width: 100%"></span></span>
-        <span class="gauge-text num">39.2 / 35 MW</span>
+        <span class="gauge-text num">41.75 / 37.50 MW</span>
       </div>
+      <!-- editor's Calibration gauge keeps the default 2 digits -->
+      <div class="gauge-row">
+        <span class="gauge-label">Calibration</span>
+        <span class="gauge"><span class="gauge-fill" style="width: 100%"></span></span>
+        <span class="gauge-text num">400.00 / 400.00</span>
+      </div>
+      <!-- Counters: only slot kinds the hull has (no Subsystems on a Rifter), then hardpoints -->
       <div class="counters">
-        <span class="counter"><span class="counter-label">High</span><span class="num">3 / 4</span></span>
+        <span class="counter"><span class="counter-label">High</span><span class="num">4 / 4</span></span>
         <span class="counter"><span class="counter-label">Mid</span><span class="num">3 / 3</span></span>
         <span class="counter over"><span class="counter-label">Low</span><span class="num">4 / 3</span></span>
+        <span class="counter"><span class="counter-label">Rigs</span><span class="num">2 / 3</span></span>
+        <span class="counter"><span class="counter-label">Turrets</span><span class="num">3 / 3</span></span>
+        <span class="counter"><span class="counter-label">Launchers</span><span class="num">0 / 2</span></span>
+      </div>
+      <div class="fit-value">
+        <span class="stat-label">Estimated value</span>
+        <span class="stat-value">9.8M ISK</span>
+        <span class="faint">1 item unpriced</span>
       </div>
     </div>
 
-    <div class="card">
-      <h2 class="card-title">Problems</h2>
+    <!-- ships/ShipStats.tsx -->
+    <div class="card ship-stats">
+      <h2 class="card-title">Ship stats</h2>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Capacitor</span>
+          <span class="badge warn">Lasts 2m 10s</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Capacity</dt><dd class="num">250 GJ / 2m 5s</dd></div>
+          <div class="stat-row"><dt>Recharge</dt><dd class="num">5.0 GJ/s peak</dd></div>
+          <div class="stat-row"><dt>Δ</dt><dd class="num">−1.9 GJ/s (38.0%)</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Offense</span>
+          <span class="num stat-headline">124.9 dps</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Weapons</dt><dd class="num">98.3 dps</dd></div>
+          <div class="stat-row"><dt>Drones</dt><dd class="num">26.6 dps</dd></div>
+          <div class="stat-row"><dt>Volley</dt><dd class="num">312 HP</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Defense</span>
+          <span class="num stat-headline">5,120 ehp</span>
+        </h3>
+        <dl class="stat-rows"><div class="stat-row"><dt>Shield recharge</dt><dd class="num">0.7 hp/s</dd></div></dl>
+        <table class="resist-table">
+          <thead>
+            <tr>
+              <th scope="col" class="resist-layer-head" aria-label="Layer"></th>
+              <th scope="col" class="resist-head em">EM</th>
+              <th scope="col" class="resist-head thermal">Th</th>
+              <th scope="col" class="resist-head kinetic">Kin</th>
+              <th scope="col" class="resist-head explosive">Exp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Shield</span>
+                <span class="num resist-hp">438 hp</span>
+                <span class="num resist-hp">625 s</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 13%"></span><span class="num resist-pct">13%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 30%"></span><span class="num resist-pct">30%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 48%"></span><span class="num resist-pct">48%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 56%"></span><span class="num resist-pct">56%</span></td>
+            </tr>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Armor</span>
+                <span class="num resist-hp">1,462 hp</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 72%"></span><span class="num resist-pct">72%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 64%"></span><span class="num resist-pct">64%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 59%"></span><span class="num resist-pct">59%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+            </tr>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Hull</span>
+                <span class="num resist-hp">438 hp</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Targeting</span>
+          <span class="num stat-headline">22.5 km</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Sensor strength</dt><dd class="num">8.0 points (Ladar)</dd></div>
+          <div class="stat-row"><dt>Scan resolution</dt><dd class="num">660 mm</dd></div>
+          <div class="stat-row"><dt>Signature radius</dt><dd class="num">35 m</dd></div>
+          <div class="stat-row"><dt>Max targets</dt><dd class="num">4×</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Navigation</span>
+          <span class="num stat-headline">365.0 m/s</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>With afterburner</dt><dd class="num">1,210.4 m/s</dd></div>
+          <div class="stat-row"><dt>Mass</dt><dd class="num">1,167.0 t</dd></div>
+          <div class="stat-row"><dt>Inertia</dt><dd class="num">3.0190×</dd></div>
+          <div class="stat-row"><dt>Warp speed</dt><dd class="num">5.00 AU/s</dd></div>
+          <div class="stat-row"><dt>Align time</dt><dd class="num">4.88 s</dd></div>
+          <div class="stat-row"><dt>Align, AB on</dt><dd class="num">4.88 s</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Drones</span>
+          <span class="num stat-headline">26.6 dps</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Bandwidth</dt><dd class="num">—</dd></div>
+          <div class="stat-row"><dt>Control range</dt><dd class="num">20.0 km</dd></div>
+          <div class="stat-row"><dt>In bay</dt><dd class="num">2 drones</dd></div>
+        </dl>
+      </section>
+      <dl class="stat-rows stat-bays">
+        <div class="stat-row"><dt>Cargo hold</dt><dd class="num">38.7 / 140 m³</dd></div>
+        <!-- A hull with no drone bay shows only what is stowed -->
+        <div class="stat-row"><dt>Drone bay</dt><dd class="num">10 m³</dd></div>
+      </dl>
+    </div>
+
+    <div class="card card-problems">
+      <h2 class="card-title">
+        Problems<span class="neg"> 4</span>
+      </h2>
       <ul class="problem-list">
-        <li><span class="badge error">Powergrid</span> Not enough powergrid by 4.2 MW.</li>
-        <li><span class="badge error">Slots</span> One too many Low slot modules fitted (4 / 3).</li>
+        <li><span class="badge error">Slots</span> Multispectrum Energized Membrane II — 4 low-slot modules fitted, the hull has 3</li>
+        <li><span class="badge error">Powergrid</span> 41.75 MW used of 37.50 MW</li>
+        <li><span class="badge error">Skill</span> Small Ancillary Armor Repairer — needs Repair Systems III, have II</li>
+        <li><span class="badge error">Ship restriction</span> Warrior II — drone bay too small for 2 drones</li>
       </ul>
     </div>
 
@@ -277,41 +1511,84 @@
       <table class="table">
         <thead><tr><th>Skill</th><th class="num">Have → need</th></tr></thead>
         <tbody>
-          <tr><td>Small Projectile Turret</td><td class="num">III → IV</td></tr>
-          <tr><td>Gunnery</td><td class="num">IV → V</td></tr>
+          <tr>
+            <td>Repair Systems</td>
+            <td class="num">2 → 3</td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <div class="card">
-      <h2 class="card-title">Estimated value</h2>
-      <p class="stat-value">8,450,000 ISK</p>
-      <p class="faint">1 item unpriced, excluded from the total</p>
-    </div>
-
-    <div class="card">
       <h2 class="card-title">Ship bonuses</h2>
+      <!-- Editor bonuses carry level === null, so roman(0) renders "" after the skill name -->
       <ul class="bonus-list">
-        <li><span class="bonus-skill">Minmatar Frigate V</span><span>5% bonus to Small Projectile Turret damage per level</span></li>
-        <li><span class="bonus-skill">Minmatar Frigate V</span><span>7.5% bonus to Small Projectile Turret falloff per level</span></li>
-        <li><span>+2 High slots, +2 Mid slots, +2 Low slots</span></li>
+        <li>
+          <span class="bonus-skill">Minmatar Frigate </span>
+          <span>5% bonus to Small Projectile Turret damage</span>
+        </li>
+        <li>
+          <span class="bonus-skill">Minmatar Frigate </span>
+          <span>7.5% bonus to Small Projectile Turret tracking speed</span>
+        </li>
       </ul>
     </div>
   </div>
 </div>
+
+<!-- showExport === true: the EFT export modal -->
+<div class="modal-backdrop" role="dialog" aria-label="Export EFT">
+  <div class="card modal">
+    <h2 class="card-title">Export EFT</h2>
+    <textarea class="eft-text" aria-label="EFT text" readonly>[Rifter, Rifter — Dual Rep Brawler]
+Small Ancillary Armor Repairer, Nanite Repair Paste
+Damage Control II
+Gyrostabilizer II
+Multispectrum Energized Membrane II
+
+1MN Afterburner II
+Warp Scrambler II
+Small Capacitor Booster II, Navy Cap Booster 200
+
+200mm AutoCannon II, Republic Fleet EMP S
+200mm AutoCannon II, Republic Fleet EMP S
+200mm AutoCannon II
+Small Energy Nosferatu II
+
+Small Trimark Armor Pump I
+Small Anti-Explosive Pump I
+[Empty Rig slot]
+
+
+Warrior II x2
+
+
+Republic Fleet EMP S x1000
+Nanite Repair Paste x64
+Navy Cap Booster 200 x12
+</textarea>
+    <div class="fit-actions">
+      <button type="button" class="fit-btn">Copy</button>
+      <button type="button" class="fit-btn">Close</button>
+    </div>
+  </div>
+</div>
 </main>
+<!-- src/app/components/AppFooter.tsx -->
 <footer class="app-footer">
-  <!-- eslint-disable-next-line @next/next/no-img-element -->
-  <img src="../assets/eve-mark.svg" alt="" class="footer-mark">
-  <span class="footer-copy">EVE Online and the EVE logo are trademarks of CCP hf. This is a personal tool.</span>
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
 </footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
 <nav class="bottom-bar" aria-label="Primary (mobile)">
   <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
   <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
   <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
   <a href="fitting-editor.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
-  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
-  <a href="#" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
   <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
 </nav>
 </body>

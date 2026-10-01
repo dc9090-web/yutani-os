@@ -18,7 +18,7 @@ export interface QueueEntryView {
  * (`training`) — a blinking box (`.level-box.training`, `@keyframes levelBlink`) at the level being
  * trained towards. Queued-but-not-yet-training entries just show the gap as empty boxes.
  */
-function LevelBoxes({ trainedLevel, targetLevel, training }: { trainedLevel: number; targetLevel: number; training: boolean }) {
+export function LevelBoxes({ trainedLevel, targetLevel, training }: { trainedLevel: number; targetLevel: number; training: boolean }) {
   const label = training
     ? `Trained level ${trainedLevel}, training level ${targetLevel}`
     : `Trained level ${trainedLevel}, level ${targetLevel} queued`;

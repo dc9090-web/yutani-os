@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- src/app/login/page.tsx -> src/app/login/LoginCard.tsx: bare route, no app shell. Shown with ?error=not-allowed so the .login-msg state is visible. -->
+<div class="login-page">
+  <div class="login-logo"><img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="login-logo-img"><span class="login-wordmark">OS</span><img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="login-kana"></div>
+  <div class="login-card">
+    <h1 class="login-h1">Sign in</h1>
+    <p class="login-sub">Authorise one of your characters with EVE Online SSO.</p>
+    <p class="login-msg" role="alert">That character is not on the allow-list for this site.</p>
+    <a class="sso-btn" href="/auth/start">Log in with EVE Online</a>
+  </div>
+  <p class="login-copy">Private tool · only allow-listed characters can sign in.</p>
+</div>
+</body>
+</html>

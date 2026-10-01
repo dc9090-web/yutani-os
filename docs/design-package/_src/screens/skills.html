@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skills — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link" data-active aria-current="page">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- src/app/skills/page.tsx (server component). Data: TrilliumONE, now = 2026-10-01 12:00 UTC. -->
+<h1 class="page-title">Skills</h1>
+<p class="page-sub">TrilliumONE</p>
+<div class="card-stack">
+
+  <!-- SkillSummaryCard.tsx — attributes come from attributeViews() in ESI order: Charisma, Intelligence, Memory, Perception, Willpower.
+       Total = base + implant bonus; .attr-bonus only renders when bonus > 0 (here Ocular Filter +3 Perception, Neural Boost +3 Willpower).
+       Remap line = [bonus remaps, last remap, next remap] joined with " · "; every part is optional. -->
+  <div class="card">
+    <h2 class="card-title">Summary</h2>
+    <div class="stat-row">
+      <div><span class="stat-label">Total SP</span><span class="stat-value">34.2M SP</span></div>
+      <div><span class="stat-label">Unallocated SP</span><span class="stat-value">125k SP</span></div>
+    </div>
+    <div class="attr-grid">
+      <div class="attr"><span class="attr-label">Charisma</span><div><span class="attr-total">17</span></div></div>
+      <div class="attr"><span class="attr-label">Intelligence</span><div><span class="attr-total">20</span></div></div>
+      <div class="attr"><span class="attr-label">Memory</span><div><span class="attr-total">20</span></div></div>
+      <div class="attr"><span class="attr-label">Perception</span><div><span class="attr-total">24</span><span class="attr-bonus">+3</span></div></div>
+      <div class="attr"><span class="attr-label">Willpower</span><div><span class="attr-total">24</span><span class="attr-bonus">+3</span></div></div>
+    </div>
+    <p class="faint" style="margin-bottom: 0">2 bonus remaps · last remap 42 days ago · next remap in 323 days</p>
+  </div>
+
+
+  <!-- new: TrainingOverview.tsx — every authorised character's queue side by side, first 20 entries each (liveQueue(), same shaping as QueueTable) -->
+  <div class="card">
+    <h2 class="card-title">Training overview</h2>
+    <div class="tq-grid">
+      <div class="tq-card">
+        <div class="tq-head">
+          <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="tq-portrait">
+          <div class="tq-id"><span class="tq-name">TrilliumONE<span class="online-dot on" title="Online"></span></span><span class="tq-total"><span class="faint">done in</span> <strong class="dur">29d 16h 11m</strong></span></div>
+          <span class="tq-count">20</span>
+        </div>
+        <div class="progress tq-progress" role="progressbar" aria-valuenow="37" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width: 37%"></div></div>
+        <ol class="tq-list">
+          <li class="tq-row"><span class="tq-n">1</span><span class="tq-skill">Large Projectile Turret</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box training"></span></span><span class="tq-time dur">9d 4h 12m</span></li>
+          <li class="tq-row"><span class="tq-n">2</span><span class="tq-skill">Surgical Strike</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">6d 2h 40m</span></li>
+          <li class="tq-row"><span class="tq-n">3</span><span class="tq-skill">Trajectory Analysis</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">1d 11h 30m</span></li>
+          <li class="tq-row"><span class="tq-n">4</span><span class="tq-skill">Minmatar Battleship</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 18h 05m</span></li>
+          <li class="tq-row"><span class="tq-n">5</span><span class="tq-skill">Rapid Firing</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">10d 3h 44m</span></li>
+          <li class="tq-row"><span class="tq-n">6</span><span class="tq-skill">Capital Ships</span><span class="level-boxes"><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">4h 09m</span></li>
+          <li class="tq-row"><span class="tq-n">7</span><span class="tq-skill">Weapon Upgrades</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">4d 2h 30m</span></li>
+          <li class="tq-row"><span class="tq-n">8</span><span class="tq-skill">Advanced Weapon Upgrades</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">12d 7h 18m</span></li>
+          <li class="tq-row"><span class="tq-n">9</span><span class="tq-skill">Marauders</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">7d 18h 46m</span></li>
+          <li class="tq-row"><span class="tq-n">10</span><span class="tq-skill">Gunnery</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 1h 02m</span></li>
+          <li class="tq-row"><span class="tq-n">11</span><span class="tq-skill">Motion Prediction</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 12h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">12</span><span class="tq-skill">Sharpshooter</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 12h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">13</span><span class="tq-skill">Controlled Bursts</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 12h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">14</span><span class="tq-skill">Thermodynamics</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 4h 11m</span></li>
+          <li class="tq-row"><span class="tq-n">15</span><span class="tq-skill">Hull Upgrades</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">4d 9h 51m</span></li>
+          <li class="tq-row"><span class="tq-n">16</span><span class="tq-skill">Mechanics</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">1d 2h 20m</span></li>
+          <li class="tq-row"><span class="tq-n">17</span><span class="tq-skill">Shield Management</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 0h 44m</span></li>
+          <li class="tq-row"><span class="tq-n">18</span><span class="tq-skill">Shield Operation</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">1d 8h 31m</span></li>
+          <li class="tq-row"><span class="tq-n">19</span><span class="tq-skill">Tactical Shield Manipulation</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">3d 3h 03m</span></li>
+          <li class="tq-row"><span class="tq-n">20</span><span class="tq-skill">Capacitor Management</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 20h 17m</span></li>
+        </ol>
+        <p class="tq-more">Showing first 20 · <a href="skills.html">full queue</a></p>
+      </div>
+      <div class="tq-card">
+        <div class="tq-head">
+          <img src="https://images.evetech.net/characters/2118141166/portrait?size=64" alt="" class="tq-portrait">
+          <div class="tq-id"><span class="tq-name">Reacher-9</span><span class="tq-total warn-text">Paused</span></div>
+          <span class="tq-count">6</span>
+        </div>
+        
+        <ol class="tq-list">
+          <li class="tq-row"><span class="tq-n">1</span><span class="tq-skill">Caldari Battlecruiser</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">4d 1h 20m</span></li>
+          <li class="tq-row"><span class="tq-n">2</span><span class="tq-skill">Heavy Missiles</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">5d 12h 02m</span></li>
+          <li class="tq-row"><span class="tq-n">3</span><span class="tq-skill">Missile Launcher Operation</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">2d 8h 40m</span></li>
+          <li class="tq-row"><span class="tq-n">4</span><span class="tq-skill">Shield Upgrades</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">3d 6h 15m</span></li>
+          <li class="tq-row"><span class="tq-n">5</span><span class="tq-skill">Drones</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">2d 1h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">6</span><span class="tq-skill">Light Drone Operation</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">1d 5h 30m</span></li>
+        </ol>
+        
+      </div>
+      <div class="tq-card">
+        <div class="tq-head">
+          <img src="https://images.evetech.net/characters/2116628746/portrait?size=64" alt="" class="tq-portrait">
+          <div class="tq-id"><span class="tq-name">Sasha-9999<span class="online-dot on" title="Online"></span></span><span class="tq-total"><span class="faint">done in</span> <strong class="dur">11d 2h 48m</strong></span></div>
+          <span class="tq-count">12</span>
+        </div>
+        <div class="progress tq-progress" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"><div class="progress-fill" style="width: 72%"></div></div>
+        <ol class="tq-list">
+          <li class="tq-row"><span class="tq-n">1</span><span class="tq-skill">Astrometrics</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box training"></span></span><span class="tq-time dur">3d 0h 12m</span></li>
+          <li class="tq-row"><span class="tq-n">2</span><span class="tq-skill">Astrometric Rangefinding</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 10h 06m</span></li>
+          <li class="tq-row"><span class="tq-n">3</span><span class="tq-skill">Astrometric Pinpointing</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 10h 06m</span></li>
+          <li class="tq-row"><span class="tq-n">4</span><span class="tq-skill">Astrometric Acquisition</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">2d 10h 06m</span></li>
+          <li class="tq-row"><span class="tq-n">5</span><span class="tq-skill">Covert Ops</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">20h 14m</span></li>
+          <li class="tq-row"><span class="tq-n">6</span><span class="tq-skill">Cloaking</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">1d 2h 50m</span></li>
+          <li class="tq-row"><span class="tq-n">7</span><span class="tq-skill">Hacking</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">1d 1h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">8</span><span class="tq-skill">Archaeology</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">1d 1h 00m</span></li>
+          <li class="tq-row"><span class="tq-n">9</span><span class="tq-skill">Mining</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">1d 3h 02m</span></li>
+          <li class="tq-row"><span class="tq-n">10</span><span class="tq-skill">Mining Frigate</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">8h 20m</span></li>
+          <li class="tq-row"><span class="tq-n">11</span><span class="tq-skill">Gas Cloud Harvesting</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span></span><span class="tq-time dur">10h 44m</span></li>
+          <li class="tq-row"><span class="tq-n">12</span><span class="tq-skill">Scanner Probe Operation</span><span class="level-boxes"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span><span class="tq-time dur">1d 0h 15m</span></li>
+        </ol>
+        
+      </div>
+      <div class="tq-card">
+        <div class="tq-head">
+          <img src="https://images.evetech.net/characters/2117838135/portrait?size=64" alt="" class="tq-portrait">
+          <div class="tq-id"><span class="tq-name">Lana C</span><span class="tq-total faint">Not synced</span></div>
+          <span class="tq-count">0</span>
+        </div>
+        
+        <p class="tq-empty faint">No skills in queue</p>
+        
+      </div>
+    </div>
+  </div>
+  <!-- SkillTabs.tsx (client state; both panels are server-rendered, the inactive one gets `hidden`). Queue tab active. -->
+  <div class="card">
+    <div class="combat-tabs skill-tabs" role="tablist" style="margin-bottom: 16px">
+      <button type="button" class="combat-tab" data-tab="queue" role="tab" data-active aria-selected="true">Training queue</button>
+      <button type="button" class="combat-tab" data-tab="trained" role="tab" aria-selected="false">Trained skills</button>
+    </div>
+
+    <div id="tab-queue" role="tabpanel">
+      <!-- QueueCountdown.tsx — live 1 s tick of countdown(finalFinish - now): "Dd Hh Mm Ss", no zero padding; "Queue complete" once ms <= 0.
+           Only rendered when the queue has entries. -->
+      <p class="queue-countdown">
+        <span class="faint">All skills trained in</span> <strong class="dur">29d 16h 11m 37s</strong>
+      </p>
+      <!-- QueueTable.tsx — liveQueue() has already dropped entries whose finishDate passed, so no finished row is ever listed.
+           Level boxes: solid `.active` for levels already trained; the head entry (the only one with a progress bar) gets a blinking
+           `.level-box.training` at its target level; queued entries just show the gap. `remaining` is duration(): "9d 4h 12m" / "4h 09m".
+           Progress is queueProgress(): SP-based (trainingStartSp → levelEndSp), falling back to wall clock. Skill names carry the SDE
+           blurb in data-desc (CSS hover tooltip, [data-desc]:hover::after). -->
+      <table class="table">
+        <thead><tr><th>#</th><th>Skill</th><th>Level</th><th>Time remaining</th><th>Progress</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="muted">1</td>
+            <td><span data-desc="Operation of large projectile turrets. 5% bonus to damage of large projectile turrets per skill level.">Large Projectile Turret</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 4, training level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box training"></span></span></td>
+            <td class="dur">9d 4h 12m</td>
+            <td>
+              <div class="progress-wrap">
+                <div class="progress" role="progressbar" aria-valuenow="37" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-fill" style="width: 37%"></div>
+                </div>
+                <span class="progress-pct">37%</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="muted">2</td>
+            <td><span data-desc="Knowledge of weak points in ship armor and structure. 3% bonus to the damage of all turrets per skill level.">Surgical Strike</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 4, level 5 queued"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></td>
+            <td class="dur">6d 2h 40m</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="muted">3</td>
+            <td><span data-desc="Advanced understanding of projectile ballistics. 5% bonus to turret falloff per skill level.">Trajectory Analysis</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 3, level 4 queued"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span></td>
+            <td class="dur">1d 11h 30m</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="muted">4</td>
+            <td><span data-desc="Skill at operating Minmatar battleships.">Minmatar Battleship</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 3, level 4 queued"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span></td>
+            <td class="dur">2d 18h 05m</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="muted">5</td>
+            <td><span data-desc="Improved turret firing techniques. 4% bonus to all turret rate of fire per skill level.">Rapid Firing</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 4, level 5 queued"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></td>
+            <td class="dur">10d 3h 44m</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="muted">6</td>
+            <td><span>Capital Ships</span></td>
+            <td><span class="level-boxes" aria-label="Trained level 0, level 1 queued"><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span><span class="level-box"></span></span></td>
+            <td class="dur">4h 09m</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <section class="pkg-states"><p class="pkg-states-label">Other states — reference only, never shown here in the live app</p><!-- ======================= OTHER TAB STATES (for the designer) ======================= -->
+    <!-- In the app this panel is `<div id="tab-trained" role="tabpanel" hidden>` while the queue tab is active, and the tab
+         buttons swap data-active / aria-selected. Shown here without `hidden` so both panels are visible on one page. -->
+
+    <!-- TrainedSkills.tsx — every group always expanded; groups and skills sorted by name (groupSkills()). Level boxes: `.active`
+         up to the active level, dim `.trained` for levels trained but not active (alpha downgrade / expired Expert System).
+         aria-label collapses to "Level N" when trained === active. -->
+    <div id="tab-trained" role="tabpanel">
+      <div class="skill-group-list">
+        <div class="skill-group-flat">
+          <div class="group-head">
+            <span>Armor</span>
+            <span class="group-sp">5 skills · 1.4M SP</span>
+          </div>
+          <div class="skill-grid">
+            <div class="skill-cell"><span data-desc="Skill at using Armor Repair Systems. 5% reduction in repair systems duration per skill level.">Repair Systems</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at maintaining armor plating. 5% bonus to armor hit points per skill level.">Hull Upgrades</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at mechanical repair. 5% bonus to structure hit points per skill level.">Mechanics</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at using Remote Armor Repair Systems. 5% reduced capacitor need for remote armor repair system modules per skill level.">Remote Armor Repair Systems</span><span class="level-boxes" aria-label="Level 3"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at using Armor Hardeners. 3% bonus to armor resistances per skill level.">Armor Layering</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+          </div>
+        </div>
+        <div class="skill-group-flat">
+          <div class="group-head">
+            <span>Gunnery</span>
+            <span class="group-sp">10 skills · 6.1M SP</span>
+          </div>
+          <div class="skill-grid">
+            <div class="skill-cell"><span data-desc="Allows for better control of turret firing. 5% reduction in turret capacitor need per skill level.">Controlled Bursts</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Basic turret operation skill. 2% bonus to weapon turrets' rate of fire per skill level.">Gunnery</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Operation of large projectile turrets. 5% bonus to damage of large projectile turrets per skill level.">Large Projectile Turret</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Operation of medium projectile turrets. 5% bonus to damage of medium projectile turrets per skill level.">Medium Projectile Turret</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Improved ability at predicting target motion. 5% bonus to weapon turret tracking speeds per skill level.">Motion Prediction</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Improved turret firing techniques. 4% bonus to all turret rate of fire per skill level.">Rapid Firing</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Advanced understanding of turret optics. 5% bonus to weapon turret optimal range per skill level.">Sharpshooter</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Operation of small projectile turrets. 5% bonus to damage of small projectile turrets per skill level.">Small Projectile Turret</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Knowledge of weak points in ship armor and structure. 3% bonus to the damage of all turrets per skill level.">Surgical Strike</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Advanced understanding of projectile ballistics. 5% bonus to turret falloff per skill level.">Trajectory Analysis</span><span class="level-boxes" aria-label="Level 3"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span></div>
+          </div>
+        </div>
+        <div class="skill-group-flat">
+          <div class="group-head">
+            <span>Navigation</span>
+            <span class="group-sp">6 skills · 2.3M SP</span>
+          </div>
+          <div class="skill-grid">
+            <div class="skill-cell"><span data-desc="Skill at efficiently using afterburners and microwarpdrives. 5% bonus to acceleration from afterburners and microwarpdrives per skill level.">Acceleration Control</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at using afterburners. 10% bonus to afterburner duration per skill level.">Afterburner</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Improved skill at efficiently turning and stopping ships. 5% improved ship agility per skill level.">Evasive Maneuvering</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at using microwarpdrives. 5% reduction in microwarpdrive capacitor usage per skill level.">High Speed Maneuvering</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at regulating a ship's velocity. 5% bonus to sub-warp ship velocity per skill level.">Navigation</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at using warp drives. 10% reduction in capacitor need of initiating warp per skill level.">Warp Drive Operation</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+          </div>
+        </div>
+        <div class="skill-group-flat">
+          <div class="group-head">
+            <span>Spaceship Command</span>
+            <span class="group-sp">7 skills · 8.4M SP</span>
+          </div>
+          <div class="skill-grid">
+            <div class="skill-cell"><span data-desc="Skill at operating Assault Frigates.">Assault Frigates</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <!-- trained !== active: dim `.trained` box for level 4, fuller aria-label -->
+            <div class="skill-cell"><span data-desc="Skill at operating Heavy Assault Cruisers.">Heavy Assault Cruisers</span><span class="level-boxes" aria-label="Trained level 4, active level 3"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box trained"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at operating Minmatar battleships.">Minmatar Battleship</span><span class="level-boxes" aria-label="Level 3"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at operating Minmatar cruisers.">Minmatar Cruiser</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at operating Minmatar destroyers.">Minmatar Destroyer</span><span class="level-boxes" aria-label="Level 4"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box"></span></span></div>
+            <div class="skill-cell"><span data-desc="Skill at operating Minmatar frigates.">Minmatar Frigate</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+            <!-- no SDE description → no data-desc -->
+            <div class="skill-cell"><span>Spaceship Command</span><span class="level-boxes" aria-label="Level 5"><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span><span class="level-box active"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================= END OTHER TAB STATES ======================= --></section>
+  </div>
+
+  <!-- PlansCard.tsx (client). Default state: panel "none" — only the toolbar and the plan list. "From template" is disabled only when
+       there are no career-plan templates. Rows: name link → /skills/plans/[id], entry count, duration(totalMs), stamp(doneAt), delete. -->
+  <div class="card">
+    <h2 class="card-title">Plans</h2>
+    <div class="plan-toolbar">
+      <button type="button" class="fit-btn">
+        <!-- Tabler IconPlus -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg> New plan
+      </button>
+      <button type="button" class="fit-btn">
+        <!-- Tabler IconTemplate -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="4" rx="1"/><rect x="4" y="12" width="6" height="8" rx="1"/><path d="M14 12h6M14 16h6M14 20h6"/></svg> From template
+      </button>
+      <button type="button" class="fit-btn">
+        <!-- Tabler IconFileImport -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 13V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2H9"/><path d="M3 18h7m-3-3l3 3-3 3"/></svg> Import
+      </button>
+    </div>
+
+    <ul class="entry-list">
+      <li class="plan-list-row">
+        <a href="skill-plan.html">Vargur ready</a>
+        <span class="muted num">23</span>
+        <span class="num">41d 6h 12m</span>
+        <span class="muted">2026-11-11 18:23</span>
+        <button type="button" class="icon-btn danger" aria-label="Delete Vargur ready">
+          <!-- Tabler IconTrash -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </li>
+      <li class="plan-list-row">
+        <a href="skill-plan.html">Minmatar Battleship V</a>
+        <span class="muted num">4</span>
+        <span class="num">18d 2h 40m</span>
+        <span class="muted">2026-10-19 14:51</span>
+        <button type="button" class="icon-btn danger" aria-label="Delete Minmatar Battleship V">
+          <!-- Tabler IconTrash -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </li>
+      <li class="plan-list-row">
+        <a href="skill-plan.html">Cyno &amp; jump clones</a>
+        <span class="muted num">6</span>
+        <span class="num">3d 14h 05m</span>
+        <span class="muted">2026-10-05 02:17</span>
+        <button type="button" class="icon-btn danger" aria-label="Delete Cyno &amp; jump clones">
+          <!-- Tabler IconTrash -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </li>
+      <!-- an empty plan (0 entries): duration(0) → "0m", stamp(null) → "—" -->
+      <li class="plan-list-row">
+        <a href="skill-plan.html">Scratch</a>
+        <span class="muted num">0</span>
+        <span class="num">0m</span>
+        <span class="muted">—</span>
+        <button type="button" class="icon-btn danger" aria-label="Delete Scratch">
+          <!-- Tabler IconTrash -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <section class="pkg-states"><p class="pkg-states-label">Other states — reference only, never shown here in the live app</p><!-- ======================= OTHER STATES: PlansCard panels (for the designer) ======================= -->
+  <!-- In the app exactly one `.skill-picker` panel sits between the toolbar and the list, toggled by the toolbar button; the three
+       variants are stacked here in their own cards so each can be seen. -->
+  <div class="card">
+    <h2 class="card-title">Plans</h2>
+    <!-- panel === "new" -->
+    <div class="skill-picker">
+      <input class="filter-input" aria-label="Plan name" value="" placeholder="Plan name" maxlength="60">
+      <button type="button" class="fit-btn" disabled>Create</button>
+    </div>
+    <!-- panel === "template" (the <select> is a plain element, not Mantine) -->
+    <div class="skill-picker">
+      <select class="fit-select" aria-label="Template">
+        <option value="1" selected>Enforcer</option>
+        <option value="2">Explorer</option>
+        <option value="3">Industrialist</option>
+        <option value="4">Soldier of Fortune</option>
+      </select>
+      <button type="button" class="fit-btn">Create from template</button>
+    </div>
+    <!-- panel === "import", after a POST that created the plan but reported unresolved lines (spec §7: reported, not fatal) -->
+    <div class="skill-picker">
+      <input class="filter-input" aria-label="Plan name" value="Pasted from EVEMon" placeholder="Plan name" maxlength="60">
+      <textarea class="eft-text" aria-label="Plan text" placeholder="Gunnery V">Gunnery V
+Large Projectile Turret V
+Surgicl Strike V
+Minmatar Battleship IV
+Marauders IV</textarea>
+      <button type="button" class="fit-btn" disabled>Import plan</button>
+      <p class="warn-text">These lines did not resolve to a skill:</p>
+      <ul class="problem-list">
+        <li>Surgicl Strike V</li>
+      </ul>
+      <button type="button" class="fit-btn">Open plan</button>
+      <p class="warn-text">Could not reach the server — try again.</p>
+    </div>
+    <!-- plans.length === 0 -->
+    <p class="faint">No plans yet — start one with “New plan”.</p>
+  </div>
+  <!-- ======================= END OTHER STATES ======================= --></section>
+
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

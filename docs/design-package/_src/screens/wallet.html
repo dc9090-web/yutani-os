@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wallet — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link" data-active aria-current="page">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- src/app/wallet/page.tsx + src/app/wallet/WalletTables.tsx -->
+<h1 class="page-title">Wallet</h1>
+<p class="page-sub">TrilliumONE</p>
+<div class="card-stack">
+  <div class="card">
+    <h2 class="card-title">Balance</h2>
+    <span class="stat-value">128,450,032.10 ISK</span>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Journal</h2>
+    <!-- JournalTable (client component): first page of 100 rows, truncated here -->
+    <table class="table">
+      <thead><tr><th>Date</th><th>Type</th><th>From</th><th>To</th><th class="num">Amount</th><th class="num">Balance</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="muted">2026-09-30 21:14</td>
+          <td>Bounty prizes</td>
+          <td>CONCORD</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">2,418,955.00 ISK</span></td>
+          <td class="num muted">128,450,032.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 19:02</td>
+          <td>Market transaction</td>
+          <td>TrilliumONE</td>
+          <td>Caldari Navy</td>
+          <td class="num"><span class="neg">-54,900,000.00 ISK</span></td>
+          <td class="num muted">126,031,077.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 19:02</td>
+          <td>Brokers fee</td>
+          <td>TrilliumONE</td>
+          <td>Caldari Navy</td>
+          <td class="num"><span class="neg">-1,647,000.00 ISK</span></td>
+          <td class="num muted">180,931,077.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 17:45</td>
+          <td>Transaction tax</td>
+          <td>TrilliumONE</td>
+          <td>Secure Commerce Commission</td>
+          <td class="num"><span class="neg">-312,480.00 ISK</span></td>
+          <td class="num muted">182,578,077.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 17:45</td>
+          <td>Market transaction</td>
+          <td>Lana C</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">8,680,000.00 ISK</span></td>
+          <td class="num muted">182,890,557.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 23:10</td>
+          <td>Player donation</td>
+          <td>TrilliumONE</td>
+          <td>Sasha-9999</td>
+          <td class="num"><span class="neg">-25,000,000.00 ISK</span></td>
+          <td class="num muted">174,210,557.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 20:33</td>
+          <td>Insurance</td>
+          <td>Secure Commerce Commission</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">11,257,320.00 ISK</span></td>
+          <td class="num muted">199,210,557.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 20:31</td>
+          <td>Insurance</td>
+          <td>TrilliumONE</td>
+          <td>Secure Commerce Commission</td>
+          <td class="num"><span class="neg">-3,377,196.00 ISK</span></td>
+          <td class="num muted">187,953,237.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 14:08</td>
+          <td>Agent mission reward</td>
+          <td>Aursa Kunivuri</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">1,086,000.00 ISK</span></td>
+          <td class="num muted">191,330,433.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 14:08</td>
+          <td>Agent mission time bonus reward</td>
+          <td>Aursa Kunivuri</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">842,000.00 ISK</span></td>
+          <td class="num muted">190,244,433.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-28 09:52</td>
+          <td>Contract price</td>
+          <td>TrilliumONE</td>
+          <td>Reacher-9</td>
+          <td class="num"><span class="neg">-140,000,000.00 ISK</span></td>
+          <td class="num muted">189,402,433.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-28 09:52</td>
+          <td>Contract brokers fee</td>
+          <td>TrilliumONE</td>
+          <td>Boundless Creation</td>
+          <td class="num"><span class="neg">-10,000.00 ISK</span></td>
+          <td class="num muted">329,402,433.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-27 22:40</td>
+          <td>Market escrow</td>
+          <td>TrilliumONE</td>
+          <td>—</td>
+          <td class="num"><span class="neg">-6,500,000.00 ISK</span></td>
+          <td class="num muted">329,412,433.10 ISK</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-27 22:38</td>
+          <td>Corporation account withdrawal</td>
+          <td>Republic Fleet Reserves</td>
+          <td>TrilliumONE</td>
+          <td class="num"><span class="pos">50,000,000.00 ISK</span></td>
+          <td class="num muted">335,912,433.10 ISK</td>
+        </tr>
+        <!-- ESI row with no amount: both amount and balance fall back to the dash, sign "" -->
+        <tr>
+          <td class="muted">2026-09-27 12:00</td>
+          <td>Skill purchase</td>
+          <td>TrilliumONE</td>
+          <td>—</td>
+          <td class="num">—</td>
+          <td class="num muted">—</td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- ShowMore: rendered while the last page was full (100 rows). Error state `<p class="neg">` only appears after a failed fetch. -->
+    <button type="button" class="show-more">Show more</button>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Transactions</h2>
+    <!-- TransactionsTable: fewer than 100 rows came back, so no "Show more" -->
+    <table class="table">
+      <thead><tr><th>Date</th><th>Side</th><th>Item</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Total</th><th>Location</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="muted">2026-09-30 19:02</td>
+          <td class="neg">Buy</td>
+          <td>Loki</td>
+          <td class="num">1</td>
+          <td class="num">54,900,000.00 ISK</td>
+          <td class="num">54,900,000.00 ISK</td>
+          <td class="muted">Jita IV - Moon 4 - Caldari Navy Assembly Plant</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 17:45</td>
+          <td class="pos">Sell</td>
+          <td>Tritanium</td>
+          <td class="num">2,170,000</td>
+          <td class="num">4.00 ISK</td>
+          <td class="num">8,680,000.00 ISK</td>
+          <td class="muted">Jita IV - Moon 4 - Caldari Navy Assembly Plant</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 11:21</td>
+          <td class="neg">Buy</td>
+          <td>Gyrostabilizer II</td>
+          <td class="num">3</td>
+          <td class="num">1,245,000.00 ISK</td>
+          <td class="num">3,735,000.00 ISK</td>
+          <td class="muted">Jita IV - Moon 4 - Caldari Navy Assembly Plant</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-30 11:19</td>
+          <td class="neg">Buy</td>
+          <td>Republic Fleet EMP M</td>
+          <td class="num">5,000</td>
+          <td class="num">612.50 ISK</td>
+          <td class="num">3,062,500.00 ISK</td>
+          <td class="muted">Jita IV - Moon 4 - Caldari Navy Assembly Plant</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-29 08:14</td>
+          <td class="pos">Sell</td>
+          <td>Veldspar</td>
+          <td class="num">480,000</td>
+          <td class="num">17.80 ISK</td>
+          <td class="num">8,544,000.00 ISK</td>
+          <td class="muted">Hek VIII - Moon 12 - Boundless Creation Factory</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-28 20:05</td>
+          <td class="pos">Sell</td>
+          <td>Rifter</td>
+          <td class="num">2</td>
+          <td class="num">690,000.00 ISK</td>
+          <td class="num">1,380,000.00 ISK</td>
+          <td class="muted">Amarr VIII (Oris) - Emperor Family Academy</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-27 16:48</td>
+          <td class="neg">Buy</td>
+          <td>Warrior II</td>
+          <td class="num">10</td>
+          <td class="num">398,000.00 ISK</td>
+          <td class="num">3,980,000.00 ISK</td>
+          <td class="muted">Rens VI - Moon 8 - Brutor Tribe Treasury</td>
+        </tr>
+        <tr>
+          <td class="muted">2026-09-26 13:30</td>
+          <td class="neg">Buy</td>
+          <td>Nanite Repair Paste</td>
+          <td class="num">200</td>
+          <td class="num">24,850.00 ISK</td>
+          <td class="num">4,970,000.00 ISK</td>
+          <td class="muted">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

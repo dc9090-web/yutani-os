@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- src/app/settings/page.tsx — route /settings (no nav item). The three editable panels use Mantine (Button, TextInput, Group, NativeSelect); they are approximated below with plain elements and the nearest Midnight classes. -->
+<h1 class="page-title">Settings</h1>
+<p class="page-sub">Accounts, characters, static data and sync status.</p>
+<div class="card-grid" style="grid-template-columns: 1fr 2fr; margin-bottom: 20px;">
+  <!-- src/app/settings/AccountsPanel.tsx -->
+  <div class="card">
+    <h2 class="card-title">Accounts</h2>
+    <!-- Mantine Group justify="space-between" mb="xs" approximation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Main</span>
+      <!-- Mantine Group gap="xs" approximation -->
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Mantine Button size="xs" variant="subtle" approximation -->
+        <button type="button" class="fit-btn">Rename</button>
+        <!-- Mantine Button size="xs" variant="subtle" color="red" approximation -->
+        <button type="button" class="fit-btn danger">Delete</button>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Alt</span>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" class="fit-btn">Rename</button>
+        <button type="button" class="fit-btn danger">Delete</button>
+      </div>
+    </div>
+    <!-- Mantine Group mt="md" approximation -->
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
+      <!-- Mantine TextInput size="sm" approximation -->
+      <input class="filter-input" type="text" placeholder="New account name (e.g. Main)" value="">
+      <!-- Mantine Button size="sm" approximation; disabled while the input is empty -->
+      <button type="button" class="fit-btn" disabled>Add</button>
+    </div>
+  </div>
+
+  <!-- src/app/settings/CharactersPanel.tsx — one .char-row per character in listCharacters() order; empty -> <p class="faint">No characters yet.</p> -->
+  <div class="card">
+    <h2 class="card-title">Characters</h2>
+    <div class="char-row" style="margin-bottom: 12px;">
+      <!-- Mantine Group justify="space-between" wrap="nowrap" approximation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
+        <!-- Mantine Group gap="sm" wrap="nowrap" approximation -->
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
+          <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+          <div><div>TrilliumONE</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
+        </div>
+        <!-- Mantine Group gap="xs" wrap="nowrap" approximation -->
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
+          <!-- Mantine NativeSelect size="xs" approximation -->
+          <select class="fit-select" aria-label="Account">
+            <option value="">Unassigned</option>
+            <option value="1" selected>Main</option>
+            <option value="2">Alt</option>
+          </select>
+          <!-- Mantine Button size="xs" variant="subtle" component="a" approximation -->
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <!-- Mantine Button size="xs" variant="subtle" color="red" approximation -->
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <!-- Mantine Group gap="xs" mt={6} approximation; .tag-chip / .tag-chip.on (no rule in globals.css) -->
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <button type="button" class="tag-chip on" aria-pressed="true">PvP</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Miner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Scanner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Industry</button>
+      </div>
+    </div>
+
+    <div class="char-row" style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
+          <img src="https://images.evetech.net/characters/2118141166/portrait?size=64" alt="" class="char-avatar">
+          <div><div>Reacher-9</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
+        </div>
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
+          <select class="fit-select" aria-label="Account">
+            <option value="">Unassigned</option>
+            <option value="1" selected>Main</option>
+            <option value="2">Alt</option>
+          </select>
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <button type="button" class="tag-chip on" aria-pressed="true">PvP</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Miner</button>
+        <button type="button" class="tag-chip on" aria-pressed="true">Scanner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Industry</button>
+      </div>
+    </div>
+
+    <div class="char-row" style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
+          <img src="https://images.evetech.net/characters/2116628746/portrait?size=64" alt="" class="char-avatar">
+          <div><div>Sasha-9999</div><div class="faint" style="font-size: 12px;">Brutor Tribe</div></div>
+        </div>
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
+          <select class="fit-select" aria-label="Account">
+            <option value="">Unassigned</option>
+            <option value="1">Main</option>
+            <option value="2" selected>Alt</option>
+          </select>
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <button type="button" class="tag-chip" aria-pressed="false">PvP</button>
+        <button type="button" class="tag-chip on" aria-pressed="true">Miner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Scanner</button>
+        <button type="button" class="tag-chip on" aria-pressed="true">Industry</button>
+      </div>
+    </div>
+
+    <!-- tokenStatus === "needs_reauth": .char-avatar.warn + badge.needs_reauth after the corporation name -->
+    <div class="char-row" style="margin-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
+          <img src="https://images.evetech.net/characters/2117838135/portrait?size=64" alt="" class="char-avatar warn">
+          <div><div>Lana C</div><div class="faint" style="font-size: 12px;">—<span class="badge needs_reauth" style="margin-left: 8px;">needs re-authorisation</span></div></div>
+        </div>
+        <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
+          <select class="fit-select" aria-label="Account">
+            <option value="">Unassigned</option>
+            <option value="1">Main</option>
+            <option value="2" selected>Alt</option>
+          </select>
+          <a class="fit-btn" href="#">Re-authorise</a>
+          <button type="button" class="fit-btn danger">Remove</button>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px; margin-top: 6px;">
+        <button type="button" class="tag-chip" aria-pressed="false">PvP</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Miner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Scanner</button>
+        <button type="button" class="tag-chip" aria-pressed="false">Industry</button>
+      </div>
+    </div>
+    <!-- Mantine Button mt="md" size="sm" component="a" approximation -->
+    <a class="fit-btn" href="#" style="margin-top: 16px;">Add character</a>
+  </div>
+</div>
+
+<div class="card-grid" style="grid-template-columns: 1fr 2fr; margin-bottom: 20px;">
+  <!-- src/app/settings/TagsPanel.tsx -->
+  <div class="card">
+    <h2 class="card-title">Tags</h2>
+    <!-- Mantine Group justify="space-between" mb="xs" approximation -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>PvP</span>
+      <!-- Mantine Button size="xs" variant="subtle" color="red" approximation -->
+      <button type="button" class="fit-btn danger" aria-label="Delete PvP">Delete</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Miner</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete Miner">Delete</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Scanner</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete Scanner">Delete</button>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <span>Industry</span>
+      <button type="button" class="fit-btn danger" aria-label="Delete Industry">Delete</button>
+    </div>
+    <!-- Mantine Group mt="md" approximation -->
+    <div style="display: flex; align-items: center; gap: 16px; margin-top: 16px;">
+      <!-- Mantine TextInput size="sm" approximation -->
+      <input class="filter-input" type="text" placeholder="New tag name (e.g. Miner)" value="">
+      <!-- Mantine Button size="sm" approximation; disabled while the input is empty -->
+      <button type="button" class="fit-btn" disabled>Add</button>
+    </div>
+  </div>
+
+  <!-- src/app/settings/StaticDataPanel.tsx — meta === null renders <p class="faint">Not imported yet — the worker imports the SDE on its next run.</p> -->
+  <div class="card">
+    <h2 class="card-title">Static data</h2>
+    <table class="table">
+      <tbody>
+        <tr><th>SDE build</th><td>3113402</td></tr>
+        <tr><th>Released</th><td class="muted">2026-09-23 11:02</td></tr>
+        <tr><th>Imported</th><td class="muted">2026-09-23 14:30</td></tr>
+        <tr><th>Types</th><td>51,332</td></tr>
+        <tr><th>Dogma attributes</th><td>3,601</td></tr>
+        <tr><th>Dogma effects</th><td>9,414</td></tr>
+        <tr><th>Solar systems</th><td>8,437</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- src/app/settings/SyncStatus.tsx — latestRuns(): one row per (job, character); status badge is ok / running / error; a "warn: " prefixed error (WARN_PREFIX) is shown in .warn-text, any other error in .neg. Empty -> <p class="faint">No sync runs yet — the worker runs its first jobs within a minute of starting.</p> -->
+<div class="card"><h2 class="card-title">Sync status</h2><table class="table">
+  <thead><tr><th>Job</th><th>Character</th><th>Started</th><th>Status</th><th>Rows</th><th>Error</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>assets</td>
+      <td>TrilliumONE</td>
+      <td class="muted">2026-10-01 06:10</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>4,812</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>assets</td>
+      <td>Lana C</td>
+      <td class="muted">2026-10-01 06:10</td>
+      <td><span class="badge error">error</span></td>
+      <td>—</td>
+      <td class="neg">ESI 401 — token rejected, re-authorisation required</td>
+    </tr>
+    <tr>
+      <td>character-info</td>
+      <td>Sasha-9999</td>
+      <td class="muted">2026-10-01 06:00</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>1</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>killmail-backfill</td>
+      <td>TrilliumONE</td>
+      <td class="muted">2026-10-01 06:15</td>
+      <td><span class="badge running">running</span></td>
+      <td>—</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>killmails</td>
+      <td>Reacher-9</td>
+      <td class="muted">2026-10-01 06:00</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>12</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>market-prices</td>
+      <td>—</td>
+      <td class="muted">2026-10-01 05:30</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>14,206</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>sde-update</td>
+      <td>—</td>
+      <td class="muted">2026-09-23 14:30</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>51,332</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>skills</td>
+      <td>TrilliumONE</td>
+      <td class="muted">2026-10-01 06:00</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>318</td>
+      <td class="neg"></td>
+    </tr>
+    <tr>
+      <td>wallet</td>
+      <td>Reacher-9</td>
+      <td class="muted">2026-10-01 06:05</td>
+      <td><span class="badge ok">ok</span></td>
+      <td>1,000</td>
+      <td class="warn-text">warn: journal page 3 of 4 timed out — partial import</td>
+    </tr>
+    <tr>
+      <td>wallet</td>
+      <td>2119001122</td>
+      <td class="muted">2026-09-28 09:45</td>
+      <td><span class="badge error">error</span></td>
+      <td>—</td>
+      <td class="neg">character removed before the run finished</td>
+    </tr>
+  </tbody>
+</table></div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

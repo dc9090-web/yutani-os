@@ -8,7 +8,13 @@ const MESSAGES: Record<string, string> = {
 export function LoginCard({ error }: { error: string | null }) {
   return (
     <div className="login-page">
-      <div className="login-logo"><span className="logo-text">EVE</span><span className="login-wordmark">Plasma</span></div>
+      <div className="login-logo">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/yutani/wordmark-white.png" alt="Yutani" className="login-logo-img" />
+        <span className="login-wordmark">OS</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/yutani/kana-white.png" alt="ユタニ重工" className="login-kana" />
+      </div>
       <div className="login-card">
         <h1 className="login-h1">Sign in</h1>
         <p className="login-sub">Authorise one of your characters with EVE Online SSO.</p>

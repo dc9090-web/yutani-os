@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assets — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link" data-active aria-current="page">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- src/app/assets/page.tsx + src/app/assets/AssetsBrowser.tsx (client component, shape from src/lib/view/assets.ts) -->
+<h1 class="page-title">Assets</h1>
+<p class="page-sub">TrilliumONE · 212 items in 3 locations</p>
+<div class="card">
+  <div>
+    <label class="faint" for="asset-filter">Filter by name</label>
+    <input id="asset-filter" class="filter-input" type="search" value="" placeholder="Gyrostabilizer, Tritanium, …">
+
+    <!-- Location 1: open (aria-expanded) — biggest hangar first -->
+    <div>
+      <button type="button" class="loc-toggle" aria-expanded="true">
+        <!-- Tabler IconChevronDown size=14 -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        <span>Jita IV - Moon 4 - Caldari Navy Assembly Plant</span>
+        <span class="loc-meta">184 items · 27,294 m³</span>
+      </button>
+      <ul class="tree">
+        <!-- assembled ship with a custom name, expanded (default) -->
+        <li class="tree-row" style="padding-left: 0">
+          <button type="button" class="tree-toggle" aria-label="collapse Loki">
+            <!-- Tabler IconChevronDown size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <span class="tree-item" data-desc="The Loki is a Minmatar strategic cruiser. Its subsystems can be reconfigured to suit a wide range of roles.">
+            <img class="item-icon" src="https://images.evetech.net/types/29990/icon?size=32" alt="" loading="lazy">
+            <span>Loki</span>
+          </span>
+          <span class="muted">Wormhole Loki</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/28668/icon?size=32" alt="" loading="lazy">
+            <span>Nanite Repair Paste</span>
+          </span>
+          <span class="muted">×200</span>
+          <span class="tree-flag">Cargo hold</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/33474/icon?size=32" alt="" loading="lazy">
+            <span>Mobile Depot</span>
+          </span>
+          <span class="tree-flag">Cargo hold</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/2488/icon?size=32" alt="" loading="lazy">
+            <span>Warrior II</span>
+          </span>
+          <span class="muted">×5</span>
+          <span class="tree-flag">Drone bay</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="" loading="lazy">
+            <span>220mm Vulcan AutoCannon II</span>
+          </span>
+          <span class="tree-flag">High slot 1</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="" loading="lazy">
+            <span>220mm Vulcan AutoCannon II</span>
+          </span>
+          <span class="tree-flag">High slot 2</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item" data-desc="Improves the rate of fire and damage of turrets.">
+            <img class="item-icon" src="https://images.evetech.net/types/519/icon?size=32" alt="" loading="lazy">
+            <span>Gyrostabilizer II</span>
+          </span>
+          <span class="tree-flag">Low slot 1</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/2048/icon?size=32" alt="" loading="lazy">
+            <span>Damage Control II</span>
+          </span>
+          <span class="tree-flag">Low slot 2</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/12058/icon?size=32" alt="" loading="lazy">
+            <span>10MN Afterburner II</span>
+          </span>
+          <span class="tree-flag">Mid slot 1</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/3841/icon?size=32" alt="" loading="lazy">
+            <span>Large Shield Extender II</span>
+          </span>
+          <span class="tree-flag">Mid slot 2</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/31790/icon?size=32" alt="" loading="lazy">
+            <span>Medium Core Defense Field Extender I</span>
+          </span>
+          <span class="tree-flag">Rig slot 1</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/45626/icon?size=32" alt="" loading="lazy">
+            <span>Loki Core - Augmented Nuclear Reactor</span>
+          </span>
+          <span class="tree-flag">Subsystem slot 1</span>
+        </li>
+
+        <!-- assembled ship the user collapsed: chevron-right, children not rendered -->
+        <li class="tree-row" style="padding-left: 0">
+          <button type="button" class="tree-toggle" aria-label="expand Rifter">
+            <!-- Tabler IconChevronRight size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/587/icon?size=32" alt="" loading="lazy">
+            <span>Rifter</span>
+          </span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+
+        <!-- station container with a nested container inside it -->
+        <li class="tree-row" style="padding-left: 0">
+          <button type="button" class="tree-toggle" aria-label="collapse Station Vault Container">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/17366/icon?size=32" alt="" loading="lazy">
+            <span>Station Vault Container</span>
+          </span>
+          <span class="muted">Ammo &amp; drones</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <button type="button" class="tree-toggle" aria-label="collapse Small Standard Container">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/3296/icon?size=32" alt="" loading="lazy">
+            <span>Small Standard Container</span>
+          </span>
+          <span class="muted">Scripts</span>
+          <span class="tree-flag">Unlocked</span>
+        </li>
+        <li class="tree-row" style="padding-left: 36px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/29011/icon?size=32" alt="" loading="lazy">
+            <span>Optimal Range Script</span>
+          </span>
+          <span class="muted">×4</span>
+          <span class="tree-flag">Unlocked</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/21924/icon?size=32" alt="" loading="lazy">
+            <span>Republic Fleet EMP M</span>
+          </span>
+          <span class="muted">×5,000</span>
+          <span class="tree-flag">Unlocked</span>
+        </li>
+        <li class="tree-row" style="padding-left: 18px">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/2488/icon?size=32" alt="" loading="lazy">
+            <span>Warrior II</span>
+          </span>
+          <span class="muted">×10</span>
+          <span class="tree-flag">Unlocked</span>
+        </li>
+
+        <!-- blueprint original: image variation "bp", no badge -->
+        <li class="tree-row" style="padding-left: 0">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/787/bp?size=32" alt="" loading="lazy">
+            <span>Rifter Blueprint</span>
+          </span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <!-- blueprint copy: image variation "bpc" + .badge.bpc -->
+        <li class="tree-row" style="padding-left: 0">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/24699/bpc?size=32" alt="" loading="lazy">
+            <span>Drake Blueprint</span>
+          </span>
+          <span class="badge bpc">BPC</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <!-- loose mineral stacks: quantity > 1 shows ×grouped -->
+        <li class="tree-row" style="padding-left: 0">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item" data-desc="The most common ore type in the known universe, Tritanium is still one of the most valuable.">
+            <img class="item-icon" src="https://images.evetech.net/types/34/icon?size=32" alt="" loading="lazy">
+            <span>Tritanium</span>
+          </span>
+          <span class="muted">×1,250,000</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <li class="tree-row" style="padding-left: 0">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/35/icon?size=32" alt="" loading="lazy">
+            <span>Pyerite</span>
+          </span>
+          <span class="muted">×312,400</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+        <li class="tree-row" style="padding-left: 0">
+          <span class="tree-toggle" aria-hidden="true"></span>
+          <span class="tree-item">
+            <img class="item-icon" src="https://images.evetech.net/types/36/icon?size=32" alt="" loading="lazy">
+            <span>Mexallon</span>
+          </span>
+          <span class="muted">×88,000</span>
+          <span class="tree-flag">Hangar</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Location 2: collapsed player structure -->
+    <div>
+      <button type="button" class="loc-toggle" aria-expanded="false">
+        <!-- Tabler IconChevronRight size=14 -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        <span>Hek - Boundless Trade Hub</span>
+        <span class="loc-meta">26 items · 3,410 m³</span>
+      </button>
+    </div>
+
+    <!-- Location 3: collapsed, in space (solar system root), tiny volume -->
+    <div>
+      <button type="button" class="loc-toggle" aria-expanded="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        <span>Amamake</span>
+        <span class="loc-meta">2 items · 1.2 m³</span>
+      </button>
+    </div>
+  </div>
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

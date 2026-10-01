@@ -1,211 +1,144 @@
-# EVE Plasma — design package
+# Yutani OS (formerly EVE Plasma) — design package
 
-## Purpose
+> **2026-10-01 iteration applied — read `CHANGES.md` first.** The screens, `css/globals.css`, `css/fonts.css`,
+> `tokens.css`, `_src/` and `previews/*.png` in this folder carry the Yutani OS redesign, and the app implements it
+> (stylesheet copied over, `fonts.ts` / `theme.ts` / shell / login updated, `SystemStrip.tsx` and `TrainingOverview.tsx` added).
 
-This is a standalone, static snapshot of EVE Plasma's nine key screens, built from the app's real
-JSX markup and real CSS class names, with no Next.js, no database, and no JavaScript required to
-render. It exists so the visual design (the "Midnight" system) can be iterated on in an external
-tool — paste a screen into claude.ai or any other design assistant, edit `css/globals.css` and/or
-the screen markup, and hand the result back. Because the class names and DOM structure mirror the
-real components 1:1, those edits diff cleanly against the committed baseline and port straight back
-into `src/app/**` without needing to be "translated."
+A snapshot of EVE Plasma's UI **as it is built today** (repo `Plasma/EVE`, commit `f6f2589`,
+2026-10-01, live at https://eve.plasma66.com), packaged so it can be loaded into Claude Design and
+changed there.
 
-## The Midnight system
+EVE Plasma is a private, self-hosted command centre for a handful of EVE Online characters: an
+overview of every character, skills and skill plans, clones, ships with fit sheets, a fitting
+editor, assets, wallet, and combat (killmail) history. It is a **Next.js 16 / React 19** app with
+one hand-written stylesheet (`css/globals.css`, the "Midnight" system), Mantine only for the
+character menu and the settings forms, and Tabler icons. The site sits behind EVE SSO, so only
+the login page is reachable without an allow-listed character — everything else in this package
+is rebuilt from the source.
 
-### Design tokens
+## Changes wanted
 
-Every colour in the app is a CSS custom property declared once on `:root` in `globals.css`. Nothing
-in the component CSS uses a raw hex value — **tokens only, no inline colours**. If you need a new
-colour, add a token and reference it; don't hardcode a hex or rgba() in a rule.
+> Done in this iteration (see CHANGES.md):
+> - Rename to **Yutani OS**, Yutani wordmark + katakana sub-mark in header, footer and login
+> - Blade Runner / Prometheus console look: amber-on-warm-black tokens, Michroma / Chakra Petch / JetBrains Mono, glass panels with corner brackets, tick rulers, grid field, system status strip
+> - Skills: framed trained-skill groups; new four-character Training overview (20 entries each)
 
-| Token | Value | Role |
+## What is in this package
+
+| Path | What it is |
+|---|---|
+| `screens/*.html` | One self-contained HTML file per screen (14), built from the real JSX with the real class names and the real stylesheet inlined. Open in a browser; no server, fonts load from Google Fonts. |
+| `tokens.css` | The `:root` colour tokens and the three font variables, on their own |
+| `css/globals.css` | The whole stylesheet, verbatim from `src/app/globals.css` — the thing to edit |
+| `css/fonts.css` | Package substitute for the app's self-hosted `next/font` setup (same three families and weights) |
+| `previews/*.png` | A rendered image of every screen at 1280 px wide, two at phone width (overview, ships), and the fitting editor both with and without its export modal |
+| `assets/yutani/` | Yutani wordmark, katakana sub-mark, full logos and app icon (see CHANGES.md) |
+| `assets/icon.svg` | The favicon: the Yutani tray glyph (`assets/yutani/tray-symbolic.svg`, from the `dc9090-web/yutani` repo) filled with the amber accent |
+| `assets/eve-mark.svg` | The older footer image, no longer used in the app; kept for reference |
+| `assets/screenshots/live-login-2026-10-01.png` | The live login page, as served |
+| `assets/screenshots/ingame-fitting-window.png` | The EVE client's fitting window — the reference the Ship stats card was designed from |
+| `reference/previous-package-README.md`, `reference/screens-2026-09-02/` | The last package (2026-09-02) and its screens, so the two can be diffed |
+| `reference/changes-since-2026-09-02.md` | What changed in the UI between that package and this one |
+| `reference/source/` | `globals.css`, `theme.ts` (Mantine theme), `fonts.ts`, `nav.ts` as they are in the repo |
+| `_src/` | Sources for `screens/` (`python3 _src/build.py` inlines the CSS); not needed in Claude Design |
+
+### Screens
+
+| File | Route | What it shows |
 |---|---|---|
-| `--bg` | `#070d1c` | Page background |
-| `--bg-2` | `#0a1326` | Secondary background (unused directly by name in v1, reserved) |
-| `--card` | `#0e1830` | Card / panel surface |
-| `--raised` | `#13203a` | Raised surface — inputs, pills, hover backgrounds |
-| `--border` | `#1d2c4a` | Default border |
-| `--border-hi` | `#2c4068` | Emphasised border (hover, focus-adjacent) |
-| `--divider` | `#27406a` | Thin structural dividers (avatar rings, header divider) |
-| `--hairline` | `#16233e` | Very faint row/section separators |
-| `--text` | `#e9f0ff` | Primary text |
-| `--text-2` | `#dfe7f5` | Secondary text (reserved; body copy mostly uses `--text`) |
-| `--muted` | `#8aa0c6` | De-emphasised text |
-| `--faint` | `#76849f` | Lowest-emphasis text (labels, captions, "not synced yet") |
-| `--dim` | `#5b6b86` | Dimmest text / inactive indicators |
-| `--accent` | `#4d8dff` | Brand accent — links, active nav, primary actions |
-| `--accent-2` | `#5eb0ff` | Secondary accent — charge names, meta badges |
-| `--pos` | `#34d399` | Positive / success (green) |
-| `--neg` | `#f76d7a` | Negative / error / loss (red) |
-| `--warn` | `#f2b03d` | Warning (amber) |
-| `--aurora` | gradient (`#a5b4fc → #4d8dff → #22d3ee → #5eead4 → #4d8dff → #a5b4fc`) | Animated wordmark gradient |
-| `--col` | `1123px` | Max content column width (header bar, main, footer) |
+| `login.html` | `/login` | Bare page, no shell: lockup, sign-in card, SSO button, the not-allowed error line |
+| `overview.html` | `/` | Four character cards, two-up: online dot, race, main/alt pill, re-authorise badge, tags, location, ship pills, training foot with progress, Total SP |
+| `skills.html` | `/skills` | Summary + attributes, Training queue / Trained skills tabs, live countdown, queue with time remaining and SP progress, trained skills flat grid with level boxes, plans card |
+| `skill-plan.html` | `/skills/plans/[id]` | Plan editor: toolbar stats, plan table with done / queued / planned / prereq / alpha rows, skill picker open, attributes panel with a remap suggestion |
+| `clones.html` | `/clones` | Home station, active implants with bonuses, jump clones |
+| `ships.html` | `/ships` | Ship cards: render, hull / race / class pills, name, location, DPS / EHP / speed / capacitor tiles, CPU and powergrid gauges, value; skills-not-synced banner |
+| `fit-sheet.html` | `/ships/asset/[itemId]`, `/ships/fit/[fittingId]` | Read-only fit: header chips, Ship stats card (capacitor, offense, defense resist table, targeting, navigation, drones), slot lists with state pills, bays, affected-by popover, problems, bonuses, value |
+| `fitting-list.html` | `/fitting` | Saved fits list: toolbar, pick-a-hull card open, fits table |
+| `fitting-editor.html` | `/fitting/[id]` | Editor: toolbar, slot rows (selected / empty / over), stats and problems sidebar, item browser, cargo, fit value, EFT export modal open (delete the `.modal-backdrop` element to see the page under it) |
+| `assets.html` | `/assets` | Locations with item counts and volume, expandable tree, type icons, bp / bpc badges |
+| `wallet.html` | `/wallet` | Balance, journal, transactions, show-more |
+| `combat.html` | `/combat` | Filters, stat tiles, monthly kill / loss strip, top lists, killmail table |
+| `killmail.html` | `/combat/[id]` | One killmail: header, victim, fitted slots, attackers, open-in-designer |
+| `settings.html` | `/settings` | Accounts, characters ordered by account (one needing re-authorisation), tags, static data, sync status with ok / running / error rows and an amber warning message |
 
-### Fonts
+Every screen except login carries the same shell (sticky frosted header with the EVE · Plasma
+lockup, eight-item nav, character menu button; footer lockup; the seven-item mobile bottom bar
+under 760 px), reproduced verbatim so the shell can be restyled once and checked everywhere.
 
-Three families, set as CSS variables and consumed the same way throughout `globals.css`:
+## How to use it in Claude Design
 
-- **Inter** (`--font-inter`) — body text, default `font-family` on `<body>`.
-- **Poppins**, weights 500/600/700 (`--font-poppins`) — headings, card titles, stat values, page
-  titles: anything that reads as a "number" or a heading.
-- **Space Grotesk**, weights 500/600/700 (`--font-grotesk`) — the "Plasma" wordmark only.
+1. Start a project and upload this folder (or `eve-design-package.zip`).
+2. Paste the prompt below, with your changes filled in.
 
-In the real app these are loaded via `next/font/google` in `src/app/fonts.ts`, which **self-hosts**
-the font files at build time (downloaded once, served from the app's own origin, no runtime call to
-Google) and exposes them as `--font-inter` / `--font-poppins` / `--font-grotesk` on the `<html>`
-element's `className`. This package can't do that without a build step, so `css/fonts.css`
-substitutes a Google Fonts CDN `@import` for the same three families/weights and re-declares the
-same three custom properties — `globals.css` itself is untouched and doesn't know the difference.
+```
+This is the current UI of EVE Plasma, a Next.js web app with one hand-written stylesheet.
+The files in screens/ are the real markup with the real stylesheet inlined; css/globals.css
+is that stylesheet on its own and tokens.css holds the tokens. README.md explains the
+constraints; reference/ holds the previous package and what changed since. Treat screens/
+as the starting point, not as a draft to restyle from scratch.
 
-### Spacing & radius conventions
+I want to change:
+- <change 1>
+- <change 2>
 
-- Cards: `border-radius: 14px`, `padding: 24px`, `background: var(--card)`, `border: 1px solid var(--border)`.
-- Smaller controls (inputs, pills, badges, gauges): `border-radius: 6–10px`, or `99px` for fully
-  round pills/badges/progress bars.
-- Grids (`.card-grid`, `.card-stack`) use `gap: 20px` by default; tighter internal lists
-  (`.entry-list`, `.value-list`, `.remap-list`) use `gap: 6–8px`.
-- The whole page column is capped at `var(--col)` (1123px) and centred — see `.app-bar-inner`,
-  `.app-main`, `.app-footer`.
-- Typography sizes are mostly hand-tuned per class rather than a scale (13px body, 16px card
-  titles, 18–32px headings) — see the relevant class in the inventory below rather than a single
-  type-scale table.
+Keep everything else as it is. When we are done, give me: the updated css/globals.css,
+the updated screens, and a short CHANGES.md listing every class added, renamed or removed
+and every new token, so the result can be diffed against this package and ported back.
+```
 
-## Screens
+3. Bring the bundle back to the repo. `globals.css` is copied over `src/app/globals.css`
+   directly; markup changes are ported into the matching component (every class in the screens
+   is named after its source file in an HTML comment).
 
-| File | Represents (real route) | Key components transcribed |
-|---|---|---|
-| `screens/overview.html` | `/` | `Shell`, `AppHeader`, `CharacterCard` ×4 |
-| `screens/ships.html` | `/ships` | `ShipsPage`, `ShipCard`, `Gauge` |
-| `screens/fit-sheet.html` | `/ships/fit/[id]` (a ship's read-only sheet) | `FitSheet`, `Gauge`, `AffectedBy` (one open) |
-| `screens/fitting-editor.html` | `/fitting/[id]` | `FitEditor` toolbar, `SlotLayout`, `StatsPanel`, `ItemBrowser` |
-| `screens/skills.html` | `/skills` | `SkillSummaryCard`, `QueueTable`, `PlansCard`, `SkillGroups`, `ClonesCard` |
-| `screens/skill-plan.html` | `/skills/plans/[id]` | `PlanEditor` toolbar, `PlanTable` (done/queued/planned/prereq/alpha rows), `AttributesPanel` (with a remap suggestion) |
-| `screens/combat.html` | `/combat` | `CombatFilters`, stat tiles, monthly bar chart, top lists, `KillmailTable` |
-| `screens/killmail.html` | `/combat/[killmailId]` | Killmail detail page: header, victim, fit slots, attackers |
-| `screens/settings.html` | `/settings` | `AccountsPanel`, `CharactersPanel`, `TagsPanel`, `StaticDataPanel`, `SyncStatus` |
+## The screens were built from the code, not from screenshots
 
-Every screen shares the same header/footer shell (`AppHeader` + `TopNav` + a static, closed
-`CharacterSwitcher` button + `AppFooter` + the mobile `BottomBar`), reproduced verbatim in each
-file so the shell can be restyled once and checked for consistency across all nine.
+Each screen mirrors the JSX of its route one to one — same elements, class names, nesting and
+strings — and is styled by the unmodified stylesheet, so what you see is what the browser
+renders, with these approximations:
 
-## Component / class inventory
+- **Sample data.** Names, ISK, systems, fits, skills and dates are placeholder; the four
+  characters are the ones on the allow-list.
+- **Fonts.** The app self-hosts Inter, Poppins and Space Grotesk through `next/font`; the package
+  loads the same families from Google Fonts instead.
+- **Icons.** The app uses Tabler icons as inline React SVGs. The package uses hand-drawn
+  placeholders of the same size (`stroke="currentColor"`) with a comment naming the real glyph.
+- **Mantine.** The character dropdown, the settings forms (buttons, inputs, selects) and the
+  dropdown menu are Mantine components whose stylesheet is not bundled; they are drawn with
+  plain elements and the nearest Midnight class and flagged in a comment, so on `settings.html` the tag chips, the Re-authorise / Add character links and the account select look rawer than they do live. Restyling those means
+  changing `theme.ts` or component props, not just `globals.css`.
+- **Interactive-only states** (open character menu, item-browser typing, hover tooltips) are
+  shown once in a fixed state or not at all; `data-desc` tooltips do work on hover.
+- Images (portraits, ship renders, type icons) come from `images.evetech.net` live.
+- **"Other states" blocks.** `skills.html` and `skill-plan.html` append, under a dashed amber-labelled
+  divider, states the live page shows one at a time (the inactive tab, the plan-creation panels,
+  save errors, empty tables). The divider and label are package-only CSS, not app classes.
 
-Grouped by area; "source" is the file the class name is drawn from directly.
+Two things the screens expose that are true of the live app as well, not transcription errors:
+the plan names in the Plans card are plain anchors with no rule in `globals.css` (browser-default
+link colour), and `.tag-chip` on the settings page has no rule either.
 
-### Shell (every screen)
-| Class | Source |
-|---|---|
-| `.app-header`, `.app-bar-inner`, `.logo-lockup`, `.logo-text`, `.logo-divider`, `.wordmark` | `src/app/components/AppHeader.tsx` |
-| `.top-nav`, `.nav-link` | `src/app/components/TopNav.tsx` |
-| `.user-menu`, `.user-avatar`, `.user-name`, `.user-caret`, `.char-avatar` | `src/app/components/CharacterSwitcher.tsx` |
-| `.char-group-label`, `.menu-link-item` | `src/app/components/CharacterSwitcher.tsx` (dropdown contents; not rendered open in this package) |
-| `.app-main` | `src/app/components/Shell.tsx` |
-| `.app-footer`, `.footer-mark`, `.footer-copy` | `src/app/components/AppFooter.tsx` |
-| `.bottom-bar`, `.bottom-item` | `src/app/components/BottomBar.tsx` |
+## Constraints a new design has to live within
 
-### Page chrome (shared across pages)
-| Class | Source |
-|---|---|
-| `.page-title`, `.page-sub` | used by every page (e.g. `src/app/ships/page.tsx`, `src/app/skills/page.tsx`) |
-| `.card`, `.card-title`, `.card-grid`, `.card-stack` | `globals.css`, used throughout |
-| `.muted`, `.faint`, `.pos`, `.neg`, `.warn-text` | `globals.css` text-tone helpers |
-| `.badge` + `.ok` / `.error` / `.needs_reauth` / `.running` / `.bpc` / `.meta` / `.kill` / `.loss` / `.done` / `.queued` / `.planned` / `.prereq-badge` / `.alpha` | badge variants, various view files |
-| `.table`, `.num` | shared table styling |
-| `.banner` | e.g. `src/app/ships/page.tsx` (skills-not-synced), `src/app/skills/plans/[id]/page.tsx` (account block) |
-| `.online-dot` + `.on` | `src/app/components/CharacterCard.tsx` |
-| `.sec-high` / `.sec-low` / `.sec-null` | `src/lib/view/format.ts` `secClass()` |
-| `.coming-soon` | `src/app/ships/CouldNotCompute.tsx` and others |
-| `.show-more` | `src/app/combat/KillmailTable.tsx` |
-
-### Overview / `CharacterCard`
-`.card-grid.overview`, `.ov-card`, `.ov-head`, `.ov-portrait`, `.ov-name`, `.ov-corp`, `.ov-pills`,
-`.pill`, `.tag-chip` (+ `.on`), `.ov-rows`, `.ov-row` — all `src/app/components/CharacterCard.tsx`.
-Note: the current `CharacterCard` markup has **no "last sync" row** — only Wallet, Location, Ship,
-Training, Total SP.
-
-### Ships / fit sheet
-| Class | Source |
-|---|---|
-| `.card-grid.ships`, `.ship-card`, `.ship-head`, `.ship-render`, `.ship-name`, `.ship-type`, `.ship-loc`, `.ship-foot`, `.ship-unpriced` | `src/app/ships/ShipCard.tsx` |
-| `.gauge-row`, `.gauge-label`, `.gauge` (+ `.over`), `.gauge-fill`, `.gauge-text` | `src/app/ships/Gauge.tsx` |
-| `.section-title` | `src/app/ships/page.tsx` |
-| `.fit-head`, `.fit-render`, `.bonus-list`, `.bonus-skill` | `src/app/ships/FitSheet.tsx` |
-| `.counters`, `.counter` (+ `.over`), `.counter-label` | `src/app/ships/FitSheet.tsx` / `StatsPanel.tsx` |
-| `.slot-cols`, `.slot-col`, `.slot-title`, `.module-icon`, `.charge` | `src/app/ships/FitSheet.tsx` |
-| `.affected`, `.affected-btn`, `.popover`, `.popover-title`, `.popover-list` | `src/app/ships/AffectedBy.tsx` |
-| `.problem-list` | `src/app/ships/FitSheet.tsx` |
-| `.entry-list`, `.value-list`, `.value-total` | `src/app/ships/FitSheet.tsx` |
-
-### Fitting editor
-| Class | Source |
-|---|---|
-| `.fit-editor`, `.fit-editor-main`, `.fit-toolbar`, `.fit-name-input`, `.fit-select`, `.fit-btn` (+ `.danger`, `[disabled]`), `.save-state` (+ `.error`) | `src/app/fitting/FitEditor.tsx` |
-| `.slot-row` (+ `.selected`, `.empty`, `.over`), `.slot-main`, `.slot-charge`, `.icon-btn` (+ `.danger`), `.qty-input` | `src/app/fitting/SlotLayout.tsx` |
-| `.modal-backdrop`, `.modal`, `.eft-text` | `src/app/fitting/FitEditor.tsx` (export modal) |
-| `.browser-results`, `.browser-row`, `.browser-crumbs`, `.crumb`, `.check-row` | `src/app/fitting/ItemBrowser.tsx` |
-| `.badge.meta` | `src/app/fitting/ItemBrowser.tsx` |
-| `.fit-list-row` | `src/app/fitting/FitList.tsx` |
-
-### Skills / skill plan
-| Class | Source |
-|---|---|
-| `.stat-row`, `.stat-label`, `.stat-value` | `src/app/skills/SkillSummaryCard.tsx`, `PlanEditor.tsx` |
-| `.attr-grid`, `.attr`, `.attr-label`, `.attr-total`, `.attr-bonus` | `src/app/skills/SkillSummaryCard.tsx`, `AttributesPanel.tsx` |
-| `.progress`, `.progress-fill` | `src/app/skills/QueueTable.tsx` |
-| `.skill-group`, `.group-toggle`, `.group-sp`, `.level-boxes`, `.level-box` (+ `.trained`, `.active`) | `src/app/skills/SkillGroups.tsx` |
-| `.clone-list` | `src/app/skills/ClonesCard.tsx` |
-| `.plan-toolbar`, `.plan-editor`, `.plan-editor-main` | `src/app/skills/PlanEditor.tsx` |
-| `.plan-table`, `tr.prereq`, `.badge.prereq-badge`, `.badge.alpha`, `.badge.done`, `.badge.queued`, `.badge.planned`, `.plan-actions` | `src/app/skills/PlanTable.tsx` |
-| `.remap-list`, `.remap-delta` | `src/app/skills/AttributesPanel.tsx` |
-| `.plan-list-row` | `src/app/skills/PlansCard.tsx` |
-| `.skill-picker`, `.skill-picker-results`, `.skill-picker-row` | `src/app/skills/PlanEditor.tsx` |
-
-### Combat / killmail
-| Class | Source |
-|---|---|
-| `.combat-filters`, `.combat-tabs`, `.combat-tab` (+ `[data-active]`) | `src/app/combat/CombatFilters.tsx` |
-| `.card-grid.stat-tiles`, `.card-grid.top-lists`, `.top-list` | `src/app/combat/page.tsx` |
-| `.month-strip`, `.month-col`, `.month-half` (+ `.up`, `.down`), `.month-bar` (+ `.kill`, `.loss`), `.month-label`, `.month-legend` | `src/app/combat/page.tsx` |
-| `.badge.kill`, `.badge.loss`, `.km-ship`, `.km-corp` | `src/app/combat/KillmailTable.tsx` |
-| `.killmail-table` | `src/app/combat/KillmailTable.tsx` — **unstyled hook**: present in the JSX (`className="table killmail-table"`) but has no rule of its own in `globals.css`; it inherits from `.table`. Left in place for exact markup fidelity. |
-| `.km-head`, `.km-head-meta`, `.km-victim`, `.km-slot` | `src/app/combat/[killmailId]/page.tsx` |
-
-### Settings
-`.card-grid` (inline `style="grid-template-columns: 1fr 2fr"`), `.char-avatar` (+ `.warn`),
-`.tag-chip` (+ `.on`), `.badge.needs_reauth` — all from `src/app/settings/*.tsx`. **Approximation
-note:** the real `AccountsPanel`, `CharactersPanel` and `TagsPanel` are built with Mantine
-components (`Button`, `TextInput`, `Group`, `NativeSelect`) rather than the hand-rolled Midnight
-classes used everywhere else, and Mantine's stylesheet isn't bundled in this static package. The
-buttons/inputs in `screens/settings.html` are approximated with plain `<button>`/`<input>` and the
-closest Midnight classes (`.fit-btn`, `.filter-input`, `.fit-select`) so the panel is visually
-usable to restyle; porting changes back for these three panels means restyling the underlying
-Mantine components (via `theme.ts` / Mantine props), not just editing class rules in `globals.css`.
-
-## Icons
-
-The real app uses `@tabler/icons-react` (inline SVG React components) throughout — save, trash,
-plus, chevrons, etc. That package isn't available as static markup without a build step, so every
-icon in this package is a small hand-drawn placeholder SVG of the same pixel size (14/16/18/20px,
-`stroke="currentColor"`) in roughly the right shape. They are not pixel-accurate reproductions of
-the real Tabler glyphs — treat them as position/size placeholders, not final icon art.
-
-## The hand-back contract
-
-Edit `css/globals.css` and/or the screens' markup freely. Keep class names stable where possible;
-if you rename or restructure, note it in `CHANGES.md`. Hand back the whole folder (or a zip); the
-changes will be diffed against the committed baseline and ported into the real components.
-
-## Out of scope
-
-This package is for **visual design only**. The following are not represented and are not what
-this package is for:
-
-- Data wiring — every value on every screen is hand-typed static sample data, not live from the
-  database, ESI, or the SDE. There is no API, no auth, no session.
-- Routing / interactivity — links between screens point at the other static files for navigation
-  convenience, but nothing here is a working Next.js route; forms don't submit; buttons don't do
-  anything (no JavaScript is loaded).
-- The character-switcher dropdown, item-browser search, and other interactive-only states are
-  shown once in their default/closed state, not as live widgets.
-- Business logic (fitting calculations, skill queue math, killmail parsing, etc.) — the numbers
-  shown are illustrative, not computed.
+- **Tokens only.** Every colour is a custom property on `:root`; component rules reference tokens
+  (or an alpha of one, as the badges do). A new colour means a new token.
+- **One stylesheet, hand-written, flat.** No preprocessor, no CSS modules, no utility framework.
+  Class names are stable identifiers shared with the components — rename with care and record it.
+- **Dark only.** `forceColorScheme="dark"`; there is no light theme and no theme switch.
+- **Type:** Inter for body (13–14 px), Poppins 500/600/700 for headings, titles, values and
+  anything numeric, Space Grotesk 600 for the "Plasma" wordmark only. Tabular numerals on
+  numbers (`.num`, `.dur`).
+- **Layout:** content column capped at `--col` (1123 px), centred, 24 px side padding; cards
+  are `--card` on `--border`, radius 14, padding 24; smaller controls radius 6–10; badges and
+  pills radius 5 (combat tabs 99). Sidebars (fit sheet, fitting editor, plan editor) are 340 px
+  and collapse under 900 px; overview goes single-column under 860 px.
+- **Header** is 80 px, sticky, frosted (`backdrop-filter: blur(18px)`), with a
+  `view-transition-name`. **Bottom bar** replaces the top nav under 760 px.
+- **Shadows and blur** appear only on the header, the login card, popovers and tooltips. Cards
+  are flat.
+- **Motion:** the aurora wordmark gradient (6 s loop) and the blinking "training" level box, both
+  switched off under `prefers-reduced-motion`.
+- **Status colours** are fixed in meaning: `--pos` green = ok / kill / high-sec / tag,
+  `--neg` red = error / loss / null-sec / over capacity, `--warn` amber = warning / low-sec,
+  `--accent` blue = active / links / primary / running, `--accent-2` = charges, meta, alt.
+- **No JavaScript in the design.** Tooltips, hover states and tab styling are CSS; anything
+  needing script is a component change.

@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ships — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link" data-active aria-current="page">Ships</a>
+      <a href="fitting-editor.html" class="nav-link">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- Route /ships: src/app/ships/page.tsx. Cards: ShipCard.tsx + Gauge.tsx (data: src/lib/view/ships.ts). The whole card is the <Link>. -->
+<h1 class="page-title">Ships</h1>
+<p class="page-sub">TrilliumONE</p>
+<!-- skillsSynced === false -->
+<p class="card banner">
+  No skills synced yet — every skill is treated as level 0, so fitting numbers and missing-skill
+  counts are worst case. The skills job runs hourly.
+</p>
+<h2 class="section-title">Fitted ships</h2>
+<div class="card-grid ships">
+
+  <!-- 1: Loki asset — all four tiles, AB prop, cap stable (pos), unpriced note -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/29990/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Loki</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Minmatar</span>
+          <span class="pill">Strategic Cruiser</span>
+        </div>
+        <h2 class="ship-name">Nightjar</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Amamake VI - Moon 3 - Republic Fleet Assembly Plant</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">486.2</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">48,930</dd></div>
+      <div class="ship-stat"><dt>Speed · AB</dt><dd class="num">1,120 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num pos">Stable 41%</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 75%"></span></span>
+      <span class="gauge-text num">412.30 / 550.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 70.9%"></span></span>
+      <span class="gauge-text num">986.00 / 1390.00 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="faint">All skills trained</span>
+      <span class="num">612.3M ISK</span>
+    </div>
+    <p class="faint ship-unpriced">3 items unpriced</p>
+  </a>
+
+  <!-- 2: Gila asset — Could not compute (errorShipCard: no tiles, no gauges) -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/17715/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Gila</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Caldari</span>
+          <span class="pill">Cruiser</span>
+        </div>
+        <h2 class="ship-name">Blue Thunder</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Perimeter - Tranquility Trading Tower</p>
+    <p class="neg">Could not compute</p>
+  </a>
+
+  <!-- 3: Drake asset — no custom name (falls back to the type name), MWD prop, cap draining (warn-text), 1 missing skill -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/24698/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Drake</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Caldari</span>
+          <span class="pill">Combat Battlecruiser</span>
+        </div>
+        <h2 class="ship-name">Drake</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Hek VIII - Moon 12 - Boundless Creation Factory</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">312.8</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">61,240</dd></div>
+      <div class="ship-stat"><dt>Speed · MWD</dt><dd class="num">1,290 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num warn-text">Lasts 4m 12s</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 97.2%"></span></span>
+      <span class="gauge-text num">388.75 / 400.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 69.9%"></span></span>
+      <span class="gauge-text num">612.00 / 875.00 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="badge error">1 missing skill</span>
+      <span class="num">74.6M ISK</span>
+    </div>
+  </a>
+
+  <!-- 4: Rifter asset — powergrid OVER capacity (gauge.over, bar clamped to 100%), 2 missing skills -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/587/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Rifter</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Minmatar</span>
+          <span class="pill">Frigate</span>
+        </div>
+        <h2 class="ship-name">Rusty Dagger</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Jita IV - Moon 4 - Caldari Navy Assembly Plant</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">112.4</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">4,210</dd></div>
+      <div class="ship-stat"><dt>Speed · MWD</dt><dd class="num">2,450 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num warn-text">Lasts 1m 42s</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 94.8%"></span></span>
+      <span class="gauge-text num">118.50 / 125.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge over"><span class="gauge-fill" style="width: 100%"></span></span>
+      <span class="gauge-text num">44.20 / 37.50 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="badge error">2 missing skills</span>
+      <span class="num">8.4M ISK</span>
+    </div>
+  </a>
+
+  <!-- 5: Venture asset — parked inside another item (location is the parent's nickname), no prop mod (cold speed), cap unknown (dash, no colour), DPS dash -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/32880/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Venture</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">ORE</span>
+          <span class="pill">Mining Frigate</span>
+        </div>
+        <h2 class="ship-name">Rock Licker</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Deep Core Hauler</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">—</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">2,870</dd></div>
+      <div class="ship-stat"><dt>Speed</dt><dd class="num">1,034 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num">—</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 76%"></span></span>
+      <span class="gauge-text num">95.00 / 125.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 57.1%"></span></span>
+      <span class="gauge-text num">20.00 / 35.00 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="faint">All skills trained</span>
+      <span class="num">1.2M ISK</span>
+    </div>
+    <p class="faint ship-unpriced">1 item unpriced</p>
+  </a>
+
+  <!-- 6: Unknown hull type — SDE knows neither race nor group, so the second chip row is omitted entirely -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/593/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Tristan</span>
+        </div>
+        <h2 class="ship-name">Tristan</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Unknown location (1042567890123)</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">98.6</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">3,980</dd></div>
+      <div class="ship-stat"><dt>Speed · AB</dt><dd class="num">1,180 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num pos">Stable 58%</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 88%"></span></span>
+      <span class="gauge-text num">110.00 / 125.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 82.2%"></span></span>
+      <span class="gauge-text num">30.00 / 36.50 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="faint">All skills trained</span>
+      <span class="num">6.1M ISK</span>
+    </div>
+  </a>
+</div>
+
+<h2 class="section-title">Saved fits</h2>
+<div class="card-grid ships">
+
+  <!-- Saved fit: location line is always "Saved fit" (SAVED_FIT_LOCATION) -->
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/29990/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Loki</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Minmatar</span>
+          <span class="pill">Strategic Cruiser</span>
+        </div>
+        <h2 class="ship-name">Loki — 10MN Autocannon Brawler</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Saved fit</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">512.7</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">52,110</dd></div>
+      <div class="ship-stat"><dt>Speed · AB</dt><dd class="num">1,146 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num pos">Stable 36%</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 79.5%"></span></span>
+      <span class="gauge-text num">437.25 / 550.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 74.4%"></span></span>
+      <span class="gauge-text num">1034.00 / 1390.00 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="faint">All skills trained</span>
+      <span class="num">648.9M ISK</span>
+    </div>
+  </a>
+
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/24698/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Drake</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Caldari</span>
+          <span class="pill">Combat Battlecruiser</span>
+        </div>
+        <h2 class="ship-name">Drake — PvE Heavy Missiles</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Saved fit</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">341.0</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">58,720</dd></div>
+      <div class="ship-stat"><dt>Speed · AB</dt><dd class="num">412 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num pos">Stable 71%</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 91.3%"></span></span>
+      <span class="gauge-text num">365.20 / 400.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 62.4%"></span></span>
+      <span class="gauge-text num">546.00 / 875.00 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="badge error">3 missing skills</span>
+      <span class="num">61.2M ISK</span>
+    </div>
+    <p class="faint ship-unpriced">2 items unpriced</p>
+  </a>
+
+  <a href="fit-sheet.html" class="card ship-card">
+    <div class="ship-head">
+      <img src="https://images.evetech.net/types/587/render?size=128" alt="" class="ship-render">
+      <div class="ship-id">
+        <div class="ship-type-pills">
+          <span class="pill hull">Rifter</span>
+        </div>
+        <div class="ship-type-pills ship-class-pills">
+          <span class="pill">Minmatar</span>
+          <span class="pill">Frigate</span>
+        </div>
+        <h2 class="ship-name">Rifter — Dual Rep Brawler</h2>
+      </div>
+    </div>
+    <p class="ship-loc faint">Saved fit</p>
+    <dl class="ship-stat-strip">
+      <div class="ship-stat"><dt>DPS</dt><dd class="num">124.9</dd></div>
+      <div class="ship-stat"><dt>EHP</dt><dd class="num">5,120</dd></div>
+      <div class="ship-stat"><dt>Speed · AB</dt><dd class="num">1,210 m/s</dd></div>
+      <div class="ship-stat"><dt>Cap</dt><dd class="num warn-text">Lasts 2m 10s</dd></div>
+    </dl>
+    <div class="gauge-row">
+      <span class="gauge-label">CPU</span>
+      <span class="gauge"><span class="gauge-fill" style="width: 98.4%"></span></span>
+      <span class="gauge-text num">123.00 / 125.00 tf</span>
+    </div>
+    <div class="gauge-row">
+      <span class="gauge-label">Powergrid</span>
+      <span class="gauge over"><span class="gauge-fill" style="width: 100%"></span></span>
+      <span class="gauge-text num">41.75 / 37.50 MW</span>
+    </div>
+    <div class="ship-foot">
+      <span class="badge error">1 missing skill</span>
+      <span class="num">9.8M ISK</span>
+    </div>
+  </a>
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>

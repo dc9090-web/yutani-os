@@ -15,6 +15,9 @@ import { QueueTable, type QueueEntryView } from "./QueueTable.js";
 import { SkillTabs } from "./SkillTabs.js";
 import { TrainedSkills, type TrainedSkillGroupProps } from "./TrainedSkills.js";
 import { PlansCard, type PlanListRow } from "./PlansCard.js";
+import { TrainingOverview } from "./TrainingOverview.js";
+import { getLocation } from "../../lib/db/character-location.js";
+import { trainingQueueView } from "../../lib/view/training-overview.js";
 
 export default async function SkillsPage() {
   const [session, characters] = await Promise.all([readSession(), listCharacters()]);
@@ -33,11 +36,23 @@ export default async function SkillsPage() {
   ]);
   const queue = liveQueue(storedQueue, now);
 
-  // One types query for every id on the page: sheet skills, queue skills and active implants (for
-  // the attribute panel's bonus). Then one groups query and one dogma query per implant (at most ten).
+  // The Training overview reads every character's queue, summary (synced or not) and online flag —
+  // three repo reads per character, all in flight together, like the Overview page does.
+  const others = await Promise.all(characters.map(async (c) => {
+    const [otherQueue, otherSummary, location] = c.id === character.id
+      ? [storedQueue, summary, await getLocation(c.id)]
+      : await Promise.all([listSkillQueue(c.id), getSkillSummary(c.id), getLocation(c.id)]);
+    return { id: c.id, name: c.name, online: location?.online ?? null, synced: otherSummary !== null, queue: liveQueue(otherQueue, now) };
+  }));
+
+  // One types query for every id on the page: sheet skills, every character's queue skills and the
+  // active implants (for the attribute panel's bonus). Then one groups query and one dogma query
+  // per implant (at most ten).
   const types = await getTypes([...new Set([
-    ...skills.map((s) => s.skillId), ...queue.map((q) => q.skillId), ...implantIds,
+    ...skills.map((s) => s.skillId), ...others.flatMap((o) => o.queue.map((q) => q.skillId)), ...implantIds,
   ])]);
+  const skillNames = new Map([...types].map(([id, t]) => [id, t.name ?? `Skill ${id}`]));
+  const overview = others.map((o) => trainingQueueView(o, skillNames, now));
   const groupIds = [...new Set([...types.values()].map((t) => t.groupId).filter((id): id is number => id !== null))];
   const [groups, implantAttributes] = await Promise.all([
     getGroups(groupIds),
@@ -99,6 +114,7 @@ export default async function SkillsPage() {
         lastRemap={attributes?.lastRemapDate == null ? null : relativeTime(attributes.lastRemapDate, now)}
         remapAvailable={attributes === null ? null : remapAvailability(attributes, now)}
       />
+      <TrainingOverview characters={overview} />
       <div className="card">
         <SkillTabs
           queue={<>

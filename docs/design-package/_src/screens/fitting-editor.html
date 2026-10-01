@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitting editor — Yutani OS (design package)</title>
+<link rel="stylesheet" href="../css/fonts.css">
+<link rel="stylesheet" href="../css/globals.css">
+</head>
+<body>
+<!-- Shell: src/app/components/AppHeader.tsx + TopNav.tsx (src/config/nav.ts, 8 items) + CharacterSwitcher.tsx (closed) -->
+<header class="app-header">
+  <div class="app-bar-inner">
+    <a href="overview.html" class="logo-lockup" aria-label="Yutani OS — home">
+      <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="logo-img">
+      <span class="logo-divider" aria-hidden="true"></span>
+      <span class="logo-os">OS</span>
+    </a>
+    <nav class="top-nav" aria-label="Primary">
+      <!-- put data-active aria-current="page" on the current page's link -->
+      <a href="overview.html" class="nav-link">Overview</a>
+      <a href="skills.html" class="nav-link">Skills</a>
+      <a href="clones.html" class="nav-link">Clones</a>
+      <a href="ships.html" class="nav-link">Ships</a>
+      <a href="fitting-editor.html" class="nav-link" data-active aria-current="page">Fitting</a>
+      <a href="assets.html" class="nav-link">Assets</a>
+      <a href="wallet.html" class="nav-link">Wallet</a>
+      <a href="combat.html" class="nav-link">Combat</a>
+    </nav>
+    <button type="button" class="user-menu" aria-label="Character menu">
+      <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
+      <span class="user-name">TrilliumONE</span>
+      <span class="user-caret" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+<!-- new: src/app/components/SystemStrip.tsx — sync + SDE state from the settings data -->
+<div class="sys-strip">
+  <span class="sys-item"><span class="sys-dot"></span>Sys online</span>
+  <span class="sys-item">ESI · ok</span>
+  <span class="sys-item">SDE 3113402</span>
+  <span class="sys-item">4 characters</span>
+  <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
+</div>
+<main class="app-main">
+<!-- Route /fitting/[id]: src/app/fitting/[id]/page.tsx -> FitEditor.tsx (toolbar, layout, EFT modal) + SlotLayout.tsx + CargoCard.tsx + ItemBrowser.tsx + StatsPanel.tsx (+ ships/Gauge.tsx, ships/ShipStats.tsx, ships/AffectedBy.tsx). Data shape: src/lib/fits/editor-view.ts. -->
+<div class="fit-toolbar">
+  <div class="fit-identity">
+    <img class="fit-hull-render" src="https://images.evetech.net/types/587/render?size=128" alt="Rifter" data-desc="Rifter — Frigate">
+    <div class="fit-identity-text">
+      <input class="fit-name-input" value="Rifter — Dual Rep Brawler" aria-label="Fit name" maxlength="60">
+      <div class="fit-identity-meta">
+        <span class="ship-type-pills">
+          <span class="pill hull">Rifter</span>
+          <span class="pill">Minmatar</span>
+          <span class="pill">Frigate</span>
+        </span>
+        <span class="meta-divider" aria-hidden="true"></span>
+        <label class="faint" for="fit-pilot">Pilot</label>
+        <select id="fit-pilot" class="fit-select" aria-label="Pilot">
+          <option value="all-v">All skills V</option>
+          <option value="2114794365" selected>TrilliumONE</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="fit-actions">
+    <!-- saveState === "error" -->
+    <span class="save-state error">Could not save — retrying on the next change</span>
+    <!-- disabled: nothing dirty (or a save in flight) -->
+    <button type="button" class="fit-btn" disabled>
+      <!-- Tabler IconDeviceFloppy size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2"/><circle cx="12" cy="14" r="2"/><path d="M14 4v4H8V4"/></svg> Save
+    </button>
+    <button type="button" class="fit-btn">
+      <!-- Tabler IconFileExport size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M11.5 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v5"/><path d="M15 19h6m-3-3l3 3-3 3"/></svg> Export EFT
+    </button>
+    <button type="button" class="fit-btn">
+      <!-- Tabler IconCopy size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg> Clone
+    </button>
+    <button type="button" class="fit-btn danger">
+      <!-- Tabler IconTrash size=14 -->
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg> Delete
+    </button>
+  </div>
+</div>
+
+<div class="fit-editor">
+  <div class="fit-editor-main">
+    <!-- SlotLayout.tsx -->
+    <div class="card fit-modules">
+      <h2 class="card-title">Modules</h2>
+      <div class="slot-head" aria-hidden="true">
+        <span>Module</span>
+        <span class="num">CPU tf</span>
+        <span class="num">PG MW</span>
+        <span>State</span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <!-- High 4 / 4 -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          High <span class="slot-count">4 / 4</span>
+        </h3>
+        <ul class="entry-list">
+          <!-- SELECTED row, with a loaded charge (unload button) and an open AffectedBy popover on CPU -->
+          <li class="slot-row selected">
+            <button type="button" class="slot-main" aria-pressed="true" aria-label="Select 200mm AutoCannon II in High slot 1" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
+              <span class="slot-charge"> · Republic Fleet EMP S</span>
+            </button>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="true" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+              <span class="popover" role="dialog" aria-label="Affected by — CPU">
+                <span class="popover-title">Affected by</span>
+                <ul class="popover-list">
+                  <li><span>Weapon Upgrades V</span><span class="num">% -25</span></li>
+                </ul>
+              </span>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Republic Fleet EMP S">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 200mm AutoCannon II in High slot 2" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
+              <span class="slot-charge"> · Republic Fleet EMP S</span>
+            </button>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Republic Fleet EMP S">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <!-- Unloaded gun: no charge -> empty <span /> in the unload column -->
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 200mm AutoCannon II in High slot 3" data-desc="200mm AutoCannon II — Projectile Weapon">
+              <img class="module-icon" src="https://images.evetech.net/types/2889/icon?size=32" alt="">
+              <span>200mm AutoCannon II</span>
+            </button>
+            <span class="affected">
+              <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 7.88, affected by 1 modifier">
+                7.88
+                <!-- Tabler IconInfoCircle size=12 -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+              </button>
+            </span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="200mm AutoCannon II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+              <option value="active">Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove 200mm AutoCannon II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Energy Nosferatu II in High slot 4" data-desc="Small Energy Nosferatu II — Energy Nosferatu">
+              <img class="module-icon" src="https://images.evetech.net/types/530/icon?size=32" alt="">
+              <span>Small Energy Nosferatu II</span>
+            </button>
+            <span class="num">18.00</span>
+            <span class="num">6.00</span>
+            <select class="fit-select" aria-label="Small Energy Nosferatu II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Energy Nosferatu II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Mid 3 / 3 -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Mid <span class="slot-count">3 / 3</span>
+        </h3>
+        <ul class="entry-list">
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select 1MN Afterburner II in Mid slot 1" data-desc="1MN Afterburner II — Propulsion Module">
+              <img class="module-icon" src="https://images.evetech.net/types/438/icon?size=32" alt="">
+              <span>1MN Afterburner II</span>
+            </button>
+            <span class="num">15.00</span>
+            <span class="num">12.00</span>
+            <select class="fit-select" aria-label="1MN Afterburner II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active">Active</option>
+              <option value="overload" selected>Overload</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove 1MN Afterburner II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Warp Scrambler II in Mid slot 2" data-desc="Warp Scrambler II — Warp Scrambler">
+              <img class="module-icon" src="https://images.evetech.net/types/447/icon?size=32" alt="">
+              <span>Warp Scrambler II</span>
+            </button>
+            <span class="num">30.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Warp Scrambler II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Warp Scrambler II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Capacitor Booster II in Mid slot 3" data-desc="Small Capacitor Booster II — Capacitor Booster">
+              <img class="module-icon" src="https://images.evetech.net/types/3554/icon?size=32" alt="">
+              <span>Small Capacitor Booster II</span>
+              <span class="slot-charge"> · Navy Cap Booster 200</span>
+            </button>
+            <span class="num">18.00</span>
+            <span class="num">8.00</span>
+            <select class="fit-select" aria-label="Small Capacitor Booster II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Navy Cap Booster 200">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Capacitor Booster II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Low 4 / 3 — over: the 4th row is .over (red) -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Low <span class="slot-count over">4 / 3</span>
+        </h3>
+        <ul class="entry-list">
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Ancillary Armor Repairer in Low slot 1" data-desc="Small Ancillary Armor Repairer — Ancillary Armor Repairer">
+              <img class="module-icon" src="https://images.evetech.net/types/33076/icon?size=32" alt="">
+              <span>Small Ancillary Armor Repairer</span>
+              <span class="slot-charge"> · Nanite Repair Paste</span>
+            </button>
+            <span class="num">6.00</span>
+            <span class="num">5.00</span>
+            <select class="fit-select" aria-label="Small Ancillary Armor Repairer state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+              <option value="overload">Overload</option>
+            </select>
+            <button type="button" class="icon-btn" aria-label="Unload Nanite Repair Paste">
+              <!-- Tabler IconX size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Ancillary Armor Repairer">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Damage Control II in Low slot 2" data-desc="Damage Control II — Damage Control">
+              <img class="module-icon" src="https://images.evetech.net/types/2048/icon?size=32" alt="">
+              <span>Damage Control II</span>
+            </button>
+            <span class="num">30.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Damage Control II state">
+              <option value="offline">Offline</option>
+              <option value="online">Online</option>
+              <option value="active" selected>Active</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Damage Control II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <!-- Passive module: only offline/online allowed -->
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Gyrostabilizer II in Low slot 3" data-desc="Gyrostabilizer II — Gyrostabilizer">
+              <img class="module-icon" src="https://images.evetech.net/types/519/icon?size=32" alt="">
+              <span>Gyrostabilizer II</span>
+            </button>
+            <span class="num">27.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Gyrostabilizer II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Gyrostabilizer II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <!-- OVER row: fitted beyond the hull's slot count -->
+          <li class="slot-row over">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Multispectrum Energized Membrane II in Low slot 4" data-desc="Multispectrum Energized Membrane II — Armor Resistance Coating">
+              <img class="module-icon" src="https://images.evetech.net/types/11269/icon?size=32" alt="">
+              <span>Multispectrum Energized Membrane II</span>
+            </button>
+            <span class="num">30.00</span>
+            <span class="num">1.00</span>
+            <select class="fit-select" aria-label="Multispectrum Energized Membrane II state">
+              <option value="offline">Offline</option>
+              <option value="online" selected>Online</option>
+            </select>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Multispectrum Energized Membrane II">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Rigs 2 / 3 with an EMPTY row (placeholder icon span, dashes, state null -> <span />, no buttons) -->
+      <div class="slot-section">
+        <h3 class="slot-section-title">
+          Rigs <span class="slot-count">2 / 3</span>
+        </h3>
+        <ul class="entry-list">
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Trimark Armor Pump I in Rigs slot 1" data-desc="Small Trimark Armor Pump I — Rig Armor">
+              <img class="module-icon" src="https://images.evetech.net/types/31059/icon?size=32" alt="">
+              <span>Small Trimark Armor Pump I</span>
+            </button>
+            <span class="num">0.00</span>
+            <span class="num">0.00</span>
+            <span></span>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Trimark Armor Pump I">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Small Anti-Explosive Pump I in Rigs slot 2" data-desc="Small Anti-Explosive Pump I — Rig Armor">
+              <img class="module-icon" src="https://images.evetech.net/types/30987/icon?size=32" alt="">
+              <span>Small Anti-Explosive Pump I</span>
+            </button>
+            <span class="num">0.00</span>
+            <span class="num">0.00</span>
+            <span></span>
+            <span></span>
+            <button type="button" class="icon-btn danger" aria-label="Remove Small Anti-Explosive Pump I">
+              <!-- Tabler IconTrash size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+            </button>
+          </li>
+          <li class="slot-row empty">
+            <button type="button" class="slot-main" aria-pressed="false" aria-label="Select Empty in Rigs slot 3">
+              <span class="module-icon" aria-hidden="true"></span>
+              <span>Empty</span>
+            </button>
+            <span class="num">—</span>
+            <span class="num">—</span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </li>
+        </ul>
+      </div>
+      <!-- A Rifter has no Subsystems block at all -->
+    </div>
+
+    <div class="fit-lower">
+      <!-- CargoCard.tsx -->
+      <div class="card">
+        <h2 class="card-title">Drone bay &amp; cargo</h2>
+        <div role="group" aria-label="Drone bay">
+          <h3 class="slot-title">Drone bay</h3>
+          <ul class="entry-list">
+            <li class="cargo-row">
+              <span data-desc="Warrior II — Combat Drone">Warrior II</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="2" aria-label="Warrior II quantity">
+                <span class="num muted">685,000.00 ISK</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Warrior II">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div role="group" aria-label="Cargo">
+          <h3 class="slot-title">Cargo</h3>
+          <ul class="entry-list">
+            <li class="cargo-row">
+              <span data-desc="Republic Fleet EMP S — Projectile Ammo">Republic Fleet EMP S</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="1000" aria-label="Republic Fleet EMP S quantity">
+                <span class="num muted">1,240,000.00 ISK</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Republic Fleet EMP S">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+            <li class="cargo-row">
+              <span data-desc="Nanite Repair Paste — Nanite Repair Paste">Nanite Repair Paste</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="64" aria-label="Nanite Repair Paste quantity">
+                <span class="num muted">1,433,600.00 ISK</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Nanite Repair Paste">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+            <!-- Unpriced entry -->
+            <li class="cargo-row">
+              <span data-desc="Navy Cap Booster 200 — Capacitor Booster Charge">Navy Cap Booster 200</span>
+              <span class="cargo-controls">
+                <input class="qty-input" type="number" min="1" value="12" aria-label="Navy Cap Booster 200 quantity">
+                <span class="num muted">—</span>
+                <button type="button" class="icon-btn danger" aria-label="Remove Navy Cap Booster 200">
+                  <!-- Tabler IconTrash size=14 -->
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+                </button>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <p class="faint">
+          The static data does not know these types, so they are excluded from the calculation.
+        </p>
+        <!-- editable=false: read-only quantity, no remove button -->
+        <div role="group" aria-label="Unknown types">
+          <h3 class="slot-title">Unknown types</h3>
+          <ul class="entry-list">
+            <li class="cargo-row">
+              <span data-desc="Unknown type (87432)">Unknown type (87432)</span>
+              <span class="cargo-controls">
+                <span class="num muted">×3</span>
+                <span class="num muted">—</span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ItemBrowser.tsx (chargeMode === null) -->
+      <div class="card">
+        <h2 class="card-title">Add items</h2>
+        <input id="item-search" class="filter-input" type="search" value="gyro" placeholder="Search: Gyrostabilizer, Hail S, Warrior II, …" aria-label="Search items">
+        <label class="check-row">
+          <input type="checkbox" checked>
+          Fits this hull
+        </label>
+        <div class="browser-crumbs">
+          <button type="button" class="crumb">Market</button>
+          <span>
+            <!-- Tabler IconChevronRight size=11 -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Ship Equipment</button>
+          </span>
+          <span>
+            <!-- Tabler IconChevronRight size=11 -->
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Turrets &amp; Launchers</button>
+          </span>
+        </div>
+        <!-- Child market groups of the current crumb -->
+        <ul class="browser-results">
+          <li class="browser-row">
+            <!-- Tabler IconChevronRight size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Projectile Turrets</button>
+            <span></span><span></span>
+          </li>
+          <li class="browser-row">
+            <!-- Tabler IconChevronRight size=12 -->
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            <button type="button" class="crumb">Weapon Upgrades</button>
+            <span></span><span></span>
+          </li>
+        </ul>
+        <!-- Type results: icon, name (data-desc), meta badge or empty span, fit button -->
+        <ul class="browser-results">
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/518/icon?size=32" alt="">
+            <span data-desc="Gyrostabilizer I — Gyrostabilizer">Gyrostabilizer I</span>
+            <span></span>
+            <button type="button" class="icon-btn" aria-label="Fit Gyrostabilizer I">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/519/icon?size=32" alt="">
+            <span data-desc="Gyrostabilizer II — Gyrostabilizer">Gyrostabilizer II</span>
+            <span class="badge meta">Tech II</span>
+            <button type="button" class="icon-btn" aria-label="Fit Gyrostabilizer II">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/5933/icon?size=32" alt="">
+            <span data-desc="Counterbalanced Compact Gyrostabilizer — Gyrostabilizer">Counterbalanced Compact Gyrostabilizer</span>
+            <span class="badge meta">Tech I</span>
+            <button type="button" class="icon-btn" aria-label="Fit Counterbalanced Compact Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/15806/icon?size=32" alt="">
+            <span data-desc="Republic Fleet Gyrostabilizer — Gyrostabilizer">Republic Fleet Gyrostabilizer</span>
+            <span class="badge meta">Faction</span>
+            <button type="button" class="icon-btn" aria-label="Fit Republic Fleet Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/13939/icon?size=32" alt="">
+            <span data-desc="Domination Gyrostabilizer — Gyrostabilizer">Domination Gyrostabilizer</span>
+            <span class="badge meta">Faction</span>
+            <button type="button" class="icon-btn" aria-label="Fit Domination Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+          <li class="browser-row">
+            <img class="module-icon" src="https://images.evetech.net/types/14536/icon?size=32" alt="">
+            <span data-desc="Tobias' Modified Gyrostabilizer — Gyrostabilizer">Tobias' Modified Gyrostabilizer</span>
+            <span class="badge meta">Officer</span>
+            <button type="button" class="icon-btn" aria-label="Fit Tobias' Modified Gyrostabilizer">
+              <!-- Tabler IconPlus size=14 -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- StatsPanel.tsx -->
+  <div class="card-stack">
+    <!-- skillsSynced === false -->
+    <p class="card banner">
+      No skills synced yet — every skill is treated as level 0, so these numbers are worst case.
+    </p>
+
+    <div class="card">
+      <!-- inline style is in the JSX itself -->
+      <h2 class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+        Fitting
+        <span class="badge warn">Lasts 2m 10s</span>
+      </h2>
+      <div class="gauge-row">
+        <span class="gauge-label">CPU</span>
+        <span class="gauge"><span class="gauge-fill" style="width: 98.4%"></span></span>
+        <span class="gauge-text num">123.00 / 125.00 tf</span>
+      </div>
+      <div class="gauge-row">
+        <span class="gauge-label">Powergrid</span>
+        <span class="gauge over"><span class="gauge-fill" style="width: 100%"></span></span>
+        <span class="gauge-text num">41.75 / 37.50 MW</span>
+      </div>
+      <!-- editor's Calibration gauge keeps the default 2 digits -->
+      <div class="gauge-row">
+        <span class="gauge-label">Calibration</span>
+        <span class="gauge"><span class="gauge-fill" style="width: 100%"></span></span>
+        <span class="gauge-text num">400.00 / 400.00</span>
+      </div>
+      <!-- Counters: only slot kinds the hull has (no Subsystems on a Rifter), then hardpoints -->
+      <div class="counters">
+        <span class="counter"><span class="counter-label">High</span><span class="num">4 / 4</span></span>
+        <span class="counter"><span class="counter-label">Mid</span><span class="num">3 / 3</span></span>
+        <span class="counter over"><span class="counter-label">Low</span><span class="num">4 / 3</span></span>
+        <span class="counter"><span class="counter-label">Rigs</span><span class="num">2 / 3</span></span>
+        <span class="counter"><span class="counter-label">Turrets</span><span class="num">3 / 3</span></span>
+        <span class="counter"><span class="counter-label">Launchers</span><span class="num">0 / 2</span></span>
+      </div>
+      <div class="fit-value">
+        <span class="stat-label">Estimated value</span>
+        <span class="stat-value">9.8M ISK</span>
+        <span class="faint">1 item unpriced</span>
+      </div>
+    </div>
+
+    <!-- ships/ShipStats.tsx -->
+    <div class="card ship-stats">
+      <h2 class="card-title">Ship stats</h2>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Capacitor</span>
+          <span class="badge warn">Lasts 2m 10s</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Capacity</dt><dd class="num">250 GJ / 2m 5s</dd></div>
+          <div class="stat-row"><dt>Recharge</dt><dd class="num">5.0 GJ/s peak</dd></div>
+          <div class="stat-row"><dt>Δ</dt><dd class="num">−1.9 GJ/s (38.0%)</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Offense</span>
+          <span class="num stat-headline">124.9 dps</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Weapons</dt><dd class="num">98.3 dps</dd></div>
+          <div class="stat-row"><dt>Drones</dt><dd class="num">26.6 dps</dd></div>
+          <div class="stat-row"><dt>Volley</dt><dd class="num">312 HP</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Defense</span>
+          <span class="num stat-headline">5,120 ehp</span>
+        </h3>
+        <dl class="stat-rows"><div class="stat-row"><dt>Shield recharge</dt><dd class="num">0.7 hp/s</dd></div></dl>
+        <table class="resist-table">
+          <thead>
+            <tr>
+              <th scope="col" class="resist-layer-head" aria-label="Layer"></th>
+              <th scope="col" class="resist-head em">EM</th>
+              <th scope="col" class="resist-head thermal">Th</th>
+              <th scope="col" class="resist-head kinetic">Kin</th>
+              <th scope="col" class="resist-head explosive">Exp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Shield</span>
+                <span class="num resist-hp">438 hp</span>
+                <span class="num resist-hp">625 s</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 13%"></span><span class="num resist-pct">13%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 30%"></span><span class="num resist-pct">30%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 48%"></span><span class="num resist-pct">48%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 56%"></span><span class="num resist-pct">56%</span></td>
+            </tr>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Armor</span>
+                <span class="num resist-hp">1,462 hp</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 72%"></span><span class="num resist-pct">72%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 64%"></span><span class="num resist-pct">64%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 59%"></span><span class="num resist-pct">59%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+            </tr>
+            <tr>
+              <th scope="row" class="resist-layer">
+                <span class="resist-layer-name">Hull</span>
+                <span class="num resist-hp">438 hp</span>
+              </th>
+              <td class="resist-cell em"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell thermal"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell kinetic"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+              <td class="resist-cell explosive"><span class="resist-fill" style="width: 60%"></span><span class="num resist-pct">60%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Targeting</span>
+          <span class="num stat-headline">22.5 km</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Sensor strength</dt><dd class="num">8.0 points (Ladar)</dd></div>
+          <div class="stat-row"><dt>Scan resolution</dt><dd class="num">660 mm</dd></div>
+          <div class="stat-row"><dt>Signature radius</dt><dd class="num">35 m</dd></div>
+          <div class="stat-row"><dt>Max targets</dt><dd class="num">4×</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Navigation</span>
+          <span class="num stat-headline">365.0 m/s</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>With afterburner</dt><dd class="num">1,210.4 m/s</dd></div>
+          <div class="stat-row"><dt>Mass</dt><dd class="num">1,167.0 t</dd></div>
+          <div class="stat-row"><dt>Inertia</dt><dd class="num">3.0190×</dd></div>
+          <div class="stat-row"><dt>Warp speed</dt><dd class="num">5.00 AU/s</dd></div>
+          <div class="stat-row"><dt>Align time</dt><dd class="num">4.88 s</dd></div>
+          <div class="stat-row"><dt>Align, AB on</dt><dd class="num">4.88 s</dd></div>
+        </dl>
+      </section>
+      <section class="stat-section">
+        <h3 class="stat-section-head">
+          <span>Drones</span>
+          <span class="num stat-headline">26.6 dps</span>
+        </h3>
+        <dl class="stat-rows">
+          <div class="stat-row"><dt>Bandwidth</dt><dd class="num">—</dd></div>
+          <div class="stat-row"><dt>Control range</dt><dd class="num">20.0 km</dd></div>
+          <div class="stat-row"><dt>In bay</dt><dd class="num">2 drones</dd></div>
+        </dl>
+      </section>
+      <dl class="stat-rows stat-bays">
+        <div class="stat-row"><dt>Cargo hold</dt><dd class="num">38.7 / 140 m³</dd></div>
+        <!-- A hull with no drone bay shows only what is stowed -->
+        <div class="stat-row"><dt>Drone bay</dt><dd class="num">10 m³</dd></div>
+      </dl>
+    </div>
+
+    <div class="card card-problems">
+      <h2 class="card-title">
+        Problems<span class="neg"> 4</span>
+      </h2>
+      <ul class="problem-list">
+        <li><span class="badge error">Slots</span> Multispectrum Energized Membrane II — 4 low-slot modules fitted, the hull has 3</li>
+        <li><span class="badge error">Powergrid</span> 41.75 MW used of 37.50 MW</li>
+        <li><span class="badge error">Skill</span> Small Ancillary Armor Repairer — needs Repair Systems III, have II</li>
+        <li><span class="badge error">Ship restriction</span> Warrior II — drone bay too small for 2 drones</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Missing skills</h2>
+      <table class="table">
+        <thead><tr><th>Skill</th><th class="num">Have → need</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Repair Systems</td>
+            <td class="num">2 → 3</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Ship bonuses</h2>
+      <!-- Editor bonuses carry level === null, so roman(0) renders "" after the skill name -->
+      <ul class="bonus-list">
+        <li>
+          <span class="bonus-skill">Minmatar Frigate </span>
+          <span>5% bonus to Small Projectile Turret damage</span>
+        </li>
+        <li>
+          <span class="bonus-skill">Minmatar Frigate </span>
+          <span>7.5% bonus to Small Projectile Turret tracking speed</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- showExport === true: the EFT export modal -->
+<div class="modal-backdrop" role="dialog" aria-label="Export EFT">
+  <div class="card modal">
+    <h2 class="card-title">Export EFT</h2>
+    <textarea class="eft-text" aria-label="EFT text" readonly>[Rifter, Rifter — Dual Rep Brawler]
+Small Ancillary Armor Repairer, Nanite Repair Paste
+Damage Control II
+Gyrostabilizer II
+Multispectrum Energized Membrane II
+
+1MN Afterburner II
+Warp Scrambler II
+Small Capacitor Booster II, Navy Cap Booster 200
+
+200mm AutoCannon II, Republic Fleet EMP S
+200mm AutoCannon II, Republic Fleet EMP S
+200mm AutoCannon II
+Small Energy Nosferatu II
+
+Small Trimark Armor Pump I
+Small Anti-Explosive Pump I
+[Empty Rig slot]
+
+
+Warrior II x2
+
+
+Republic Fleet EMP S x1000
+Nanite Repair Paste x64
+Navy Cap Booster 200 x12
+</textarea>
+    <div class="fit-actions">
+      <button type="button" class="fit-btn">Copy</button>
+      <button type="button" class="fit-btn">Close</button>
+    </div>
+  </div>
+</div>
+</main>
+<!-- src/app/components/AppFooter.tsx -->
+<footer class="app-footer">
+  <span class="footer-lockup">
+    <img src="../assets/yutani/wordmark-white.png" alt="Yutani" class="footer-wordmark">
+    <img src="../assets/yutani/kana-white.png" alt="ユタニ重工" class="footer-kana">
+  </span>
+</footer>
+<!-- src/app/components/BottomBar.tsx: 7 fixed destinations (no Clones). Icons are placeholders for Tabler's Home/Brain/Rocket/Tool/Box/Wallet/Swords. -->
+<nav class="bottom-bar" aria-label="Primary (mobile)">
+  <a href="overview.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a>
+  <a href="skills.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 3 3"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-3 3"/><path d="M12 4v16"/></svg><span>Skills</span></a>
+  <a href="ships.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10 0 2-1 4-2 5l-3 3-3-3c-1-1-2-3-2-5 0-4 2-8 5-10z"/><circle cx="12" cy="10" r="1.5"/></svg><span>Ships</span></a>
+  <a href="fitting-editor.html" class="bottom-item" data-active><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 7l3 3-8 8-3-3 8-8z"/><path d="M17 4l3 3-2 2-3-3z"/></svg><span>Fit</span></a>
+  <a href="assets.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="1"/><path d="M4 8l8-5 8 5"/></svg><span>Assets</span></a>
+  <a href="wallet.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M16 12h3"/></svg><span>Wallet</span></a>
+  <a href="combat.html" class="bottom-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="20" y2="4"/><line x1="20" y1="20" x2="4" y2="4"/></svg><span>Combat</span></a>
+</nav>
+</body>
+</html>
