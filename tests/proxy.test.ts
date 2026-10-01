@@ -5,10 +5,10 @@ import { SESSION_COOKIE, signPayload } from "../src/lib/auth/session.js";
 
 describe("isPublicPath", () => {
   it("allows login, auth, health, static", () => {
-    for (const p of ["/login", "/auth/start", "/auth/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/eve-mark.svg"]) expect(isPublicPath(p)).toBe(true);
+    for (const p of ["/login", "/auth/start", "/auth/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/icon.svg", "/eve-mark.svg", "/yutani/wordmark-white.png", "/yutani/kana-white.png"]) expect(isPublicPath(p)).toBe(true);
   });
   it("guards everything else", () => {
-    for (const p of ["/", "/settings", "/api/accounts", "/ships/1", "/login-history", "/api/healthz"]) expect(isPublicPath(p)).toBe(false);
+    for (const p of ["/", "/settings", "/yutani", "/yutanix/x.png", "/api/accounts", "/ships/1", "/login-history", "/api/healthz"]) expect(isPublicPath(p)).toBe(false);
   });
 
   it("guards the wallet JSON route like every other API route", () => {
