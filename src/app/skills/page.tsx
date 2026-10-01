@@ -7,8 +7,8 @@ import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../l
 import { summarisePlans } from "../../lib/skills/load.js";
 import { overviewCharacters, pickActive } from "../../lib/view/characters.js";
 import { getConfig } from "../../lib/config.js";
-import { countdown, duration, relativeTime, sp, stamp, typeDescription } from "../../lib/view/format.js";
-import { attributeViews, groupSkills, liveQueue, queueProgress, remapAvailability } from "../../lib/view/skills.js";
+import { countdown, duration, sp, stamp, typeDescription } from "../../lib/view/format.js";
+import { attributeViews, groupSkills, liveQueue, queueProgress } from "../../lib/view/skills.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { SkillSummaryCard } from "./SkillSummaryCard.js";
 import { QueueCountdown } from "./QueueCountdown.js";
@@ -111,9 +111,6 @@ export default async function SkillsPage() {
         totalSp={summary === null ? null : sp(summary.totalSp)}
         unallocatedSp={summary?.unallocatedSp == null ? null : sp(summary.unallocatedSp)}
         attributes={attributes === null ? [] : attributeViews(attributes, implantAttributes)}
-        bonusRemaps={attributes?.bonusRemaps ?? null}
-        lastRemap={attributes?.lastRemapDate == null ? null : relativeTime(attributes.lastRemapDate, now)}
-        remapAvailable={attributes === null ? null : remapAvailability(attributes, now)}
       />
       <TrainingOverview characters={overview} />
       <div className="card">

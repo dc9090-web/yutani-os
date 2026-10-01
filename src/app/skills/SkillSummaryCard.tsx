@@ -4,12 +4,11 @@ export interface SkillSummaryProps {
   totalSp: string | null;
   unallocatedSp: string | null;
   attributes: AttributeView[];
-  bonusRemaps: number | null;
-  lastRemap: string | null;
-  remapAvailable: string | null;
 }
 
-export function SkillSummaryCard({ totalSp, unallocatedSp, attributes, bonusRemaps, lastRemap, remapAvailable }: SkillSummaryProps) {
+// The remap line (bonus remaps · last remap · next remap) was dropped from this card on
+// 2026-10-02; the plan editor's AttributesPanel still shows remap state where it matters.
+export function SkillSummaryCard({ totalSp, unallocatedSp, attributes }: SkillSummaryProps) {
   if (totalSp === null && attributes.length === 0) {
     return (
       <div className="card">
@@ -18,11 +17,6 @@ export function SkillSummaryCard({ totalSp, unallocatedSp, attributes, bonusRema
       </div>
     );
   }
-  const remap = [
-    bonusRemaps === null ? null : `${bonusRemaps} bonus remap${bonusRemaps === 1 ? "" : "s"}`,
-    lastRemap === null ? null : `last remap ${lastRemap}`,
-    remapAvailable === null ? null : `next remap ${remapAvailable}`,
-  ].filter((part): part is string => part !== null);
   return (
     <div className="card">
       <h2 className="card-title">Summary</h2>
@@ -41,7 +35,6 @@ export function SkillSummaryCard({ totalSp, unallocatedSp, attributes, bonusRema
           </div>
         ))}
       </div>
-      {remap.length > 0 ? <p className="faint" style={{ marginBottom: 0 }}>{remap.join(" · ")}</p> : null}
     </div>
   );
 }

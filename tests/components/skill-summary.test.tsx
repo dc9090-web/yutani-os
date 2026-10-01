@@ -12,8 +12,7 @@ const attributes = [
 
 describe("SkillSummaryCard", () => {
   it("shows the totals, every attribute and the implant bonuses", () => {
-    render(<SkillSummaryCard totalSp="47.4M SP" unallocatedSp="210k SP" attributes={attributes}
-      bonusRemaps={2} lastRemap="9 months ago" remapAvailable="in 45 days" />);
+    render(<SkillSummaryCard totalSp="47.4M SP" unallocatedSp="210k SP" attributes={attributes} />);
     expect(screen.getByText("47.4M SP")).toBeInTheDocument();
     expect(screen.getByText("210k SP")).toBeInTheDocument();
     expect(screen.getByText("Intelligence")).toBeInTheDocument();
@@ -21,14 +20,11 @@ describe("SkillSummaryCard", () => {
     expect(screen.getByText("+5")).toHaveClass("attr-bonus");
     expect(screen.getByText("+3")).toHaveClass("attr-bonus");
     expect(screen.queryByText("+0")).toBeNull();          // no bonus, no clutter
-    expect(screen.getByText(/2 bonus remaps/)).toBeInTheDocument();
-    expect(screen.getByText(/last remap 9 months ago/i)).toBeInTheDocument();
-    expect(screen.getByText(/next remap in 45 days/i)).toBeInTheDocument();
+    expect(screen.queryByText(/remap/i)).toBeNull();   // the remap line is gone from this card
   });
 
   it("degrades before the first sync", () => {
-    render(<SkillSummaryCard totalSp={null} unallocatedSp={null} attributes={[]}
-      bonusRemaps={null} lastRemap={null} remapAvailable={null} />);
+    render(<SkillSummaryCard totalSp={null} unallocatedSp={null} attributes={[]} />);
     expect(screen.getByText(/not synced yet/i)).toBeInTheDocument();
     expect(screen.queryByText("Intelligence")).toBeNull();
   });
