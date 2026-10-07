@@ -3,7 +3,7 @@
 The previous package (`reference/previous-package-README.md`, screens in
 `reference/screens-2026-09-02/`) was cut at commit `8dd95df`. Forty-odd commits landed between
 then and `f6f2589` (2026-10-01), most of them a design refresh carried out on 2026-09-02/03.
-Everything below is already built and live at eve.plasma66.com; the screens in `screens/` show it.
+Everything below is already built and live at eve.example.com; the screens in `screens/` show it.
 
 ## Shell
 - **Clones** is a top-nav entry (8 items: Overview, Skills, Clones, Ships, Fitting, Assets, Wallet,

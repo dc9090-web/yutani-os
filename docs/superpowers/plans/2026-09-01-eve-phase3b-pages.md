@@ -30,7 +30,7 @@
 - Tests live in `tests/**` mirroring `src/**`. `npm test` = `vitest run` with `fileParallelism: false`; the environment is happy-dom with `tests/setup.ts`. DB tests use `tests/db/helpers.ts` (`resetDb`, `resetSde`) against `eve_test` on the local compose Postgres (`postgres://eve:eve@127.0.0.1:5432/eve_test`; start it with `docker compose -f compose.dev.yml up -d`).
 - **No network in tests.** The wallet "Show more" test mocks `globalThis.fetch`; the route-handler test mocks the repo modules.
 - Work happens on branch `feature/phase3-character-sync`. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`.
 
 ## File Structure
 
@@ -3301,7 +3301,7 @@ const { GET } = await import("../../src/app/api/characters/[id]/wallet/route.js"
 
 const CID = 90000101;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const request = (query: string) => new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/wallet${query}`);
+const request = (query: string) => new NextRequest(`https://eve.example.com/api/characters/${CID}/wallet${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -3860,7 +3860,7 @@ correct behaviour, not a failure (spec §3, §9).
 
 **Interfaces:**
 - Consumes: Tasks 1–11 of this plan and Tasks 1–18 of the 3a plan, all committed on `feature/phase3-character-sync`.
-- Produces: `https://eve.plasma66.com` serving the four phase-3 pages from live data, and `ok` rows in `sync_runs` for all seven character jobs.
+- Produces: `https://eve.example.com` serving the four phase-3 pages from live data, and `ok` rows in `sync_runs` for all seven character jobs.
 
 - [ ] **Step 1: Confirm the branch is clean and green**
 
@@ -3884,9 +3884,9 @@ non-blocking stdio.)
 - [ ] **Step 3: Confirm the containers came back and the site is healthy**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-ssh daniel@10.5.5.150 'docker logs --tail 60 eve-worker'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+ssh <user>@<host> 'docker logs --tail 60 eve-worker'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; the worker log shows
 `[worker] started` and the first character jobs beginning; health returns `{"ok":true,"db":true}`.
@@ -3899,7 +3899,7 @@ this roughly once a minute (the Monitor tool with an until-condition is the tidy
 prints **nothing**:
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select c.name, j.job, coalesce(r.status, 'missing')
   from characters c
   cross join (values ('character-info'),('skills'),('clones'),('fittings'),('assets'),('wallet'),('location')) as j(job)
@@ -3915,14 +3915,14 @@ Expected eventually: **empty output** — every character × every job has a lat
 While it is still working you will see `missing` and `running` rows. If a row settles on `error`,
 read the message and the worker log:
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"select job, character_id, error from sync_runs where status='error' order by started_at desc limit 10\""
-ssh daniel@10.5.5.150 'docker logs --tail 200 eve-worker'
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"select job, character_id, error from sync_runs where status='error' order by started_at desc limit 10\""
+ssh <user>@<host> 'docker logs --tail 200 eve-worker'
 ```
 
 - [ ] **Step 5: Spot-check the tables the pages read**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select character_id, count(*) from character_skills group by 1 order by 1;
   select character_id, total_sp, unallocated_sp from character_skill_summary order by 1;
   select character_id, balance from character_wallet order by 1;
@@ -3940,28 +3940,28 @@ populated with the party and station names the wallet and assets jobs resolved.
 - [ ] **Step 6: Verify the wallet JSON route is session-guarded and works**
 
 ```bash
-curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' 'https://eve.plasma66.com/api/characters/1/wallet?kind=journal'
+curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' 'https://eve.example.com/api/characters/1/wallet?kind=journal'
 ```
-Expected: `307 https://eve.plasma66.com/login` — the proxy redirects an unauthenticated request, exactly
+Expected: `307 https://eve.example.com/login` — the proxy redirects an unauthenticated request, exactly
 like `/settings`. (The authenticated path is exercised by the browser check in Step 7.)
 
 - [ ] **Step 7: Verify the UI (Daniel, in a browser on the tailnet)**
 
-1. `https://eve.plasma66.com/` — every character card shows a wallet balance, a solar system with a
+1. `https://eve.example.com/` — every character card shows a wallet balance, a solar system with a
    security number in the right colour, a docked-at label or nothing when in space, ship type — ship
    name, the training head (`Skill V · finishes in …`) or `Queue empty`, total SP, and a last-sync
    time from the last few minutes. No card says "not synced yet" for wallet or location.
-2. `https://eve.plasma66.com/skills` — the summary card's total SP matches the in-game skill sheet
+2. `https://eve.example.com/skills` — the summary card's total SP matches the in-game skill sheet
    for that character; attributes show the implant bonuses; the queue's head row has a progress bar;
    expanding a skill group shows five level boxes per skill; the clones card names the home station.
-3. `https://eve.plasma66.com/assets` — locations are sorted by item count; expanding the location the
+3. `https://eve.example.com/assets` — locations are sorted by item count; expanding the location the
    character is docked in shows the current ship with its **fitted modules nested underneath it**;
    the filter box narrows to a matching module and keeps its ship as the parent; a BPC shows the badge.
-4. `https://eve.plasma66.com/wallet` — the balance matches the Overview; the journal shows recent
+4. `https://eve.example.com/wallet` — the balance matches the Overview; the journal shows recent
    entries with humanised ref types, both party names, and green/red amounts; the transactions table
    shows type, quantity, unit price, total and a location; if there are more than 100 rows, **Show
    more** appends the next 100 without a page reload.
-5. `https://eve.plasma66.com/settings` — the Sync status table lists all seven character jobs plus
+5. `https://eve.example.com/settings` — the Sync status table lists all seven character jobs plus
    `sde-update`, every one `ok`.
 
 Record the outcome (pass, or exactly what failed) in this task's commit message.
@@ -3975,7 +3975,7 @@ Record the outcome (pass, or exactly what failed) in this task's commit message.
 2. In Settings, use each character's re-authorise link and complete the SSO flow. Four characters.
 3. Wait one `location` tick (15 min) and one `assets` tick (1 h), then re-check:
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"select character_id, online from character_location order by 1; select id, name, forbidden from structures order by id limit 10\""
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"select character_id, online from character_location order by 1; select id, name, forbidden from structures order by id limit 10\""
 ```
 Expected: `online` is now `t`/`f` rather than empty, and `structures` has named rows (a `forbidden`
 row is legitimate — the character is not on that citadel's ACL). The Overview then shows the online

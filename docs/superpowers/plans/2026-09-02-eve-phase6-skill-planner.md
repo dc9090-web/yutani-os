@@ -31,7 +31,7 @@
 - **Pristine test output.** A test that exercises a caught-and-logged failure must stub `console.error` (`vi.spyOn(console, "error").mockImplementation(() => {})`) so the run stays clean.
 - **Never log tokens; never print `.env`.** No new secret is introduced by this phase.
 - Work happens on branch **`feature/phase6-skill-planner`**, created from `main`. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
 
 ## Decisions taken once, for the whole plan
 
@@ -3833,9 +3833,9 @@ const PLAN = {
 };
 const TIMELINE = { entries: [], totalSp: 8000, totalMs: 15_000_000, doneAt: new Date("2026-09-01T04:10:00Z"), unknownSkillIds: [] };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const get = (url: string) => new NextRequest(`https://eve.plasma66.com${url}`);
+const get = (url: string) => new NextRequest(`https://eve.example.com${url}`);
 const body = (url: string, method: string, value: unknown) =>
-  new NextRequest(`https://eve.plasma66.com${url}`,
+  new NextRequest(`https://eve.example.com${url}`,
     { method, body: JSON.stringify(value), headers: { "content-type": "application/json" } });
 
 beforeEach(() => {
@@ -4215,9 +4215,9 @@ const CONTEXT = {
 };
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const get = (url: string) => new NextRequest(`https://eve.plasma66.com${url}`);
+const get = (url: string) => new NextRequest(`https://eve.example.com${url}`);
 const post = (url: string, value: unknown) =>
-  new NextRequest(`https://eve.plasma66.com${url}`,
+  new NextRequest(`https://eve.example.com${url}`,
     { method: "POST", body: JSON.stringify(value), headers: { "content-type": "application/json" } });
 
 beforeEach(() => {
@@ -6419,7 +6419,7 @@ them. A forced `npm run sde:import` is therefore **mandatory** on this deploy (s
 
 **Interfaces:**
 - Consumes: Tasks 1–16, all committed on `feature/phase6-skill-planner`.
-- Produces: `https://eve.plasma66.com/skills` with a live Plans section, `/skills/plans/[id]` serving
+- Produces: `https://eve.example.com/skills` with a live Plans section, `/skills/plans/[id]` serving
   the editor, and populated `sde_alpha_skills` / `sde_skill_plans` / `skill_plans` tables in the
   production database.
 
@@ -6486,8 +6486,8 @@ non-blocking stdio.)
 - [ ] **Step 4: Confirm the containers came back and the site is healthy**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health returns
 `{"ok":true,"db":true}`.
@@ -6495,10 +6495,10 @@ Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health re
 - [ ] **Step 5: Confirm the migration created the two plan tables**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select table_name from information_schema.tables
   where table_schema='public' and table_name like 'skill_plan%' order by table_name\""
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select conname, confdeltype from pg_constraint
   where conrelid in ('skill_plans'::regclass,'skill_plan_entries'::regclass) and contype='f'\""
 ```
@@ -6508,7 +6508,7 @@ Expected: `skill_plan_entries` and `skill_plans`; two foreign keys, both with `c
 - [ ] **Step 6: Force the SDE re-import so the two new reference tables fill**
 
 ```bash
-ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
+ssh <user>@<host> 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
 ```
 Expected: the importer downloads the current archive (~95 MB), logs
 `cloneGrades.jsonl → sde_alpha_skills=175` and `skillPlans.jsonl → sde_skill_plans=40` among the
@@ -6519,7 +6519,7 @@ loses its Alpha badge and "From template" offers nothing.
 - [ ] **Step 7: Verify the new reference data landed**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select (select count(*) from sde_alpha_skills), (select count(*) from sde_skill_plans),
          (select max_level from sde_alpha_skills where skill_id = 3300),
          (select name from sde_skill_plans order by id limit 1)\""
@@ -6530,7 +6530,7 @@ Expected: `175|40|5|Minmatar Militia Fighter`.
 
 Work through this list and record the result of each item.
 
-1. `https://eve.plasma66.com/skills` loads with the nav item **Skills** highlighted, and a **Plans**
+1. `https://eve.example.com/skills` loads with the nav item **Skills** highlighted, and a **Plans**
    card sits between the training queue and the skill sheet reading
    "No plans yet — start one with 'New plan'."
 2. **New plan** → name it "Gunnery test" → the editor opens at `/skills/plans/<id>` with the nav

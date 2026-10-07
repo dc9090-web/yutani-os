@@ -1016,7 +1016,7 @@ but identifying yourself is cheap insurance:
 Format, narrow→broad, per CCP's own examples:
 
 ```
-User-Agent: PlasmaSDEImporter/0.1.0 (dac9dc@gmail.com; +https://github.com/<you>/<repo>)
+User-Agent: PlasmaSDEImporter/0.1.0 (you@example.com; +https://github.com/<you>/<repo>)
 ```
 
 Browser contexts should use `X-User-Agent`, or the `user_agent` query parameter if headers are

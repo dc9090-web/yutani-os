@@ -5,7 +5,7 @@
 > (stylesheet copied over, `fonts.ts` / `theme.ts` / shell / login updated, `SystemStrip.tsx` and `TrainingOverview.tsx` added).
 
 A snapshot of EVE Plasma's UI **as it is built today** (repo `Plasma/EVE`, commit `f6f2589`,
-2026-10-01, live at https://eve.plasma66.com), packaged so it can be loaded into Claude Design and
+2026-10-01, live at https://eve.example.com), packaged so it can be loaded into Claude Design and
 changed there.
 
 EVE Plasma is a private, self-hosted command centre for a handful of EVE Online characters: an

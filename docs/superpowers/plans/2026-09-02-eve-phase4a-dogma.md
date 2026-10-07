@@ -30,7 +30,7 @@
   `toBeCloseTo(value, 10)` against the research §3.6 numbers.
 - Work happens on branch `feature/phase4-ships`, branched from `main`. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - **No UI, no market prices, no schema for `market_prices`.** Those are phase 4b.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`. Nothing is deployed in this phase.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`. Nothing is deployed in this phase.
 
 ## File Structure
 

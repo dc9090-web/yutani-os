@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** A deployed Midnight-themed Next.js site at `https://eve.plasma66.com` where Daniel logs in with EVE SSO for each of four characters, sees them on an Overview page, manages accounts/characters in Settings, and a worker keeps their corp/alliance info fresh via ESI.
+**Goal:** A deployed Midnight-themed Next.js site at `https://eve.example.com` where Daniel logs in with EVE SSO for each of four characters, sees them on an Overview page, manages accounts/characters in Settings, and a worker keeps their corp/alliance info fresh via ESI.
 
 **Architecture:** One Next.js 16 app (UI + route handlers) and one `tsx` worker process share a Postgres 17 database. All EVE traffic goes through one ESI client that handles token refresh, ETag/Expires caching and rate limits. Pages read only from Postgres. Traefik terminates TLS (Cloudflare DNS-01) on the VM; Ansible provisions the VM and deploys via Docker Compose.
 
@@ -22,7 +22,7 @@
 - Imports between local TS files use the `.js` extension (Animal convention; `extensionAlias` in `next.config.ts`).
 - Every task ends with a commit on `main` (single-developer repo, no branches needed). Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - Tests: `npm test` (vitest). DB tests need the local Postgres from `compose.dev.yml` and `DATABASE_URL` pointing at the `eve_test` database.
-- VM: `ssh daniel@10.5.5.150` (key auth, passwordless sudo). Tailscale IP `100.114.208.10`. Domain `eve.plasma66.com` already resolves to it.
+- VM: `ssh <user>@<host>` (key auth, passwordless sudo). Tailscale IP `<tailscale-ip>`. Domain `eve.example.com` already resolves to it.
 
 ## File Structure
 
@@ -1023,11 +1023,11 @@ describe("sso", () => {
   });
 
   it("builds the authorize URL", () => {
-    const url = new URL(buildAuthorizeUrl({ metadata, clientId: "cid", callbackUrl: "https://eve.plasma66.com/auth/callback", state: "st", challenge: "ch" }));
+    const url = new URL(buildAuthorizeUrl({ metadata, clientId: "cid", callbackUrl: "https://eve.example.com/auth/callback", state: "st", challenge: "ch" }));
     expect(url.origin + url.pathname).toBe(metadata.authorization_endpoint);
     expect(url.searchParams.get("response_type")).toBe("code");
     expect(url.searchParams.get("client_id")).toBe("cid");
-    expect(url.searchParams.get("redirect_uri")).toBe("https://eve.plasma66.com/auth/callback");
+    expect(url.searchParams.get("redirect_uri")).toBe("https://eve.example.com/auth/callback");
     expect(url.searchParams.get("code_challenge_method")).toBe("S256");
     expect(url.searchParams.get("code_challenge")).toBe("ch");
     expect(url.searchParams.get("state")).toBe("st");
@@ -1194,7 +1194,7 @@ import { loadConfig } from "../../src/lib/config.js";
 import type { SsoMetadata } from "../../src/lib/auth/sso.js";
 
 const config = loadConfig({
-  EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.plasma66.com/auth/callback",
+  EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.example.com/auth/callback",
   ALLOWED_CHARACTER_IDS: "90000101", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",
 });
@@ -2805,7 +2805,7 @@ networks:
   internal:
 ```
 
-- [ ] **Step 4: `deploy/.env.example`** — same keys as the root `.env.example` plus `APP_DOMAIN=eve.plasma66.com`; `DATABASE_URL=postgres://eve:<POSTGRES_PASSWORD>@postgres:5432/eve`.
+- [ ] **Step 4: `deploy/.env.example`** — same keys as the root `.env.example` plus `APP_DOMAIN=eve.example.com`; `DATABASE_URL=postgres://eve:<POSTGRES_PASSWORD>@postgres:5432/eve`.
 
 - [ ] **Step 5: Local build check** — `docker build -t eve:latest .` on the dev machine — Expected: image builds (this also validates `.dockerignore` keeps `.env` out: `docker run --rm eve:latest ls -a /app | grep -c '^.env$'` prints `0`).
 
@@ -2820,7 +2820,7 @@ networks:
 
 **Interfaces:**
 - Consumes: Task 13 compose stack; the Prometheus `app-01` roles as the source to copy.
-- Produces: a running site at `https://eve.plasma66.com`.
+- Produces: a running site at `https://eve.example.com`.
 
 - [ ] **Step 1: Ansible skeleton**
 
@@ -2830,7 +2830,7 @@ networks:
 `deploy/ansible/inventory.ini`:
 ```ini
 [eve]
-eve ansible_host=10.5.5.150
+eve ansible_host=<host>
 
 [eve:vars]
 ansible_user=daniel
@@ -2842,8 +2842,8 @@ ansible_python_interpreter=/usr/bin/python3
 ---
 timezone: "Etc/UTC"
 base_dir: /opt/eve
-domain: eve.plasma66.com
-acme_email: "dac9dc@gmail.com"
+domain: eve.example.com
+acme_email: "you@example.com"
 swap_size_mb: 4096
 # Tailscale CGNAT range + the VM's LAN + loopback. Cloudflare record is grey-cloud, so Traefik sees real client IPs.
 lan_allowed_cidrs:
@@ -2853,14 +2853,14 @@ lan_allowed_cidrs:
 images:
   traefik: "traefik:v3.6"
 esi_compatibility_date: "2026-08-28"
-esi_user_agent: "EVE-Plasma/0.1 (dac9dc@gmail.com)"
+esi_user_agent: "EVE-Plasma/0.1 (you@example.com)"
 allowed_character_ids: "90000101,90000102,90000103,90000104"
 ```
 
 `deploy/ansible/vars/secrets.yml.example`:
 ```yaml
 ---
-cloudflare_dns_api_token: "CHANGEME"   # Zone:DNS:Edit on plasma66.com
+cloudflare_dns_api_token: "CHANGEME"   # Zone:DNS:Edit on example.com
 eve_client_id: "CHANGEME"
 eve_client_secret: "CHANGEME"
 session_secret: "CHANGEME"             # openssl rand -hex 32
@@ -3003,10 +3003,10 @@ Expected: play recap with `failed=0`. First real run takes several minutes (Dock
 
 - [ ] **Step 4: Verify on the VM**
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"; docker logs --tail 5 eve-worker; docker logs --tail 20 traefik 2>&1 | grep -iE "certificate|error" | tail -5'
-curl -sS -o /dev/null -w "%{http_code} %{ssl_verify_result}\n" https://eve.plasma66.com/api/health
-curl -sS https://eve.plasma66.com/api/health
-curl -sS -o /dev/null -w "%{http_code} %{redirect_url}\n" https://eve.plasma66.com/
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"; docker logs --tail 5 eve-worker; docker logs --tail 20 traefik 2>&1 | grep -iE "certificate|error" | tail -5'
+curl -sS -o /dev/null -w "%{http_code} %{ssl_verify_result}\n" https://eve.example.com/api/health
+curl -sS https://eve.example.com/api/health
+curl -sS -o /dev/null -w "%{http_code} %{redirect_url}\n" https://eve.example.com/
 ```
 Expected: `traefik`, `eve-app`, `eve-worker`, `eve-postgres` all `Up`; the worker log shows `[worker] started`; health returns `200` with a valid cert (`ssl_verify_result` 0) and `{"ok":true,"db":true}`; `/` returns `307` to `/login`. If the cert is still pending, wait 60 s and retry — DNS-01 issuance takes up to a minute.
 
@@ -3014,13 +3014,13 @@ Expected: `traefik`, `eve-app`, `eve-worker`, `eve-postgres` all `Up`; the worke
 
 - [ ] **Step 6: Acceptance (needs Daniel in a browser on the tailnet)**
 
-1. Open `https://eve.plasma66.com` → login card → "Log in with EVE Online" → sign in to the **main** account, pick **Mara Vexley**, approve scopes → lands on Overview with Mara Vexley's card.
+1. Open `https://eve.example.com` → login card → "Log in with EVE Online" → sign in to the **main** account, pick **Mara Vexley**, approve scopes → lands on Overview with Mara Vexley's card.
 2. Character menu → **Add character** → same account, pick **Jorin Hale** → lands on Settings.
 3. Repeat Add character for **Nyx Calder** and **Tove Ash** (alt account).
 4. Settings → create accounts "Main" and "Alt"; assign the four characters. Character menu now shows two groups.
 5. Within ~1 minute the Sync status table shows four `character-info` rows with status `ok`; Overview cards show corp/alliance names.
 6. Settings → Remove **Tove Ash** → card disappears; Add character again → returns with status `ok`.
-7. Check `ssh daniel@10.5.5.150 docker logs eve-worker` shows four `character-info ... ok rows=1` lines and no errors.
+7. Check `ssh <user>@<host> docker logs eve-worker` shows four `character-info ... ok rows=1` lines and no errors.
 
 Record the outcome (pass, or what failed) in the plan's final commit message.
 

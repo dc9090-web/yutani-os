@@ -32,7 +32,7 @@
 - **Never log tokens; never print `.env`.** The killmail body endpoint is public and must be called **without** `characterId` so no `Authorization` header is attached.
 - Tests live in `tests/**` mirroring `src/**`. `npm test` = `vitest run` with `fileParallelism: false`; the environment is happy-dom with `tests/setup.ts`.
 - Work happens on branch **`feature/phase7-combat`**, created from `main`. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
 
 ## Decisions taken once, for the whole plan
 
@@ -46,7 +46,7 @@ These are the places the spec left a choice, or where two binding documents disa
 6. **The backfill spends at most 20 zKillboard page requests per *run*, across all cursors.** Spec §2's ruling is "one request per 2 s, at most 20 pages per run, no parallelism"; spec §4's job table reads "for each character … up to 20 pages". The §2 ruling is the explicitly-labelled one and is the stricter bound, so a run is capped at 20 pages total (≈ 40 s of pacing), cursors served round-robin in `(character_id, kind)` order starting from the least-recently-updated. With four characters the whole 20,000-killmail ceiling is still reached in days, not weeks.
 7. **The backfill cursor advances after every *successful* page.** Spec §7 says a non-200 leaves `next_page` unchanged; that is satisfied by advancing per page and letting the failing page throw — `next_page` then points at exactly the page that failed, and the 19 pages before it are not re-fetched.
 8. **"Killmails imported" in the backfill status line is a `count(*)`, not a stored counter.** The spec's data model has no counter column and this plan does not add one: the line reads `count(*) FROM character_killmails WHERE character_id = $1`.
-9. **The zKillboard `User-Agent` is a module constant, not a new env var.** Spec §2 pins it verbatim to `EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)`. `ESI_USER_AGENT` on the VM is currently `EVE-Plasma/0.1 (dac9dc@gmail.com)`, which lacks the project URL zKillboard's etiquette asks for, so reusing it would be a downgrade. No `.env`, `deploy/.env.example`, `env.j2` or `group_vars` change.
+9. **The zKillboard `User-Agent` is a module constant, not a new env var.** Spec §2 pins it verbatim to `YutaniOS/1.0 (you@example.com; +https://eve.example.com)`. `ESI_USER_AGENT` on the VM is currently `EVE-Plasma/0.1 (you@example.com)`, which lacks the project URL zKillboard's etiquette asks for, so reusing it would be a downgrade. No `.env`, `deploy/.env.example`, `env.j2` or `group_vars` change.
 10. **Period tabs and the All-characters toggle are links carrying query parameters**, so `/combat` stays a server component: `/combat?period=90d&all=1`. The only client island on the page is the killmail table's "Show more" button, which mirrors the phase-3b `WalletTables` pattern. `period` and `all` travel to `GET /api/characters/[id]/killmails` too, so an appended page matches the rows already on screen.
 11. **In the All-characters view a killmail appears once.** Rows are deduplicated on `killmail_id` with `DISTINCT ON`; the role is `loss` when any of our characters is the victim, otherwise `kill` — `role = 'loss'` short-circuits first, so a killmail on which one of ours died is never even considered for the `kill` branch below. Only when the role is `kill` does "our ship" get taken from the attacker row of the **lowest of our character ids among the attackers** (the victim is by definition never one of the attacker rows, so it never enters this comparison). Deterministic, and it stops a fleet kill counting four times.
 12. **An unvalued killmail contributes 0 ISK to the statistics and renders "—" in the table.** `value` is `number | null` all the way through; `combatStats` treats `null` as 0 so a partly-valued database still produces an efficiency figure.
@@ -1525,7 +1525,7 @@ export interface ZkbBlock { hash: string; totalValue?: number; points?: number;
 ```ts
 // src/lib/combat/zkb.ts
 export const ZKB_BASE_URL: string;      // "https://zkillboard.com/api/"
-export const ZKB_USER_AGENT: string;    // "EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)"
+export const ZKB_USER_AGENT: string;    // "YutaniOS/1.0 (you@example.com; +https://eve.example.com)"
 export const ZKB_PAGE_SIZE: number;     // 200
 export const ZKB_MAX_PAGE: number;      // 100
 export const ZKB_PACE_MS: number;       // 2000
@@ -1601,7 +1601,7 @@ describe("zkbPageUrl", () => {
     expect(ZKB_BASE_URL).toBe("https://zkillboard.com/api/");
   });
   it("pins the etiquette constants from spec §2", () => {
-    expect(ZKB_USER_AGENT).toBe("EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)");
+    expect(ZKB_USER_AGENT).toBe("YutaniOS/1.0 (you@example.com; +https://eve.example.com)");
     expect(ZKB_PAGE_SIZE).toBe(200);
     expect(ZKB_MAX_PAGE).toBe(100);
     expect(ZKB_PACE_MS).toBe(2000);
@@ -1703,10 +1703,10 @@ import type { EsiKillmail, ZkbBlock } from "./killmail.js";
 export const ZKB_BASE_URL = "https://zkillboard.com/api/";
 /**
  * Spec §2 pins this string. It is deliberately NOT `config.esiUserAgent`: that value is
- * `EVE-Plasma/0.1 (dac9dc@gmail.com)`, with no project URL, which is exactly what zKillboard's
+ * `EVE-Plasma/0.1 (you@example.com)`, with no project URL, which is exactly what zKillboard's
  * etiquette asks you not to send.
  */
-export const ZKB_USER_AGENT = "EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)";
+export const ZKB_USER_AGENT = "YutaniOS/1.0 (you@example.com; +https://eve.example.com)";
 /** 200 killmails a page, pages 1..100 — 20,000 killmails per filter (verified, research §6). */
 export const ZKB_PAGE_SIZE = 200;
 export const ZKB_MAX_PAGE = 100;
@@ -4390,7 +4390,7 @@ const CID = 90000101;
 const OTHER = 2112625428;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const request = (query: string) =>
-  new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/killmails${query}`);
+  new NextRequest(`https://eve.example.com/api/characters/${CID}/killmails${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -5552,7 +5552,7 @@ vi.mock("../../src/lib/combat/fit.js", () => ({ fitFromKillmail }));
 const { POST } = await import("../../src/app/api/fits/from-killmail/route.js");
 
 const CID = 90000101;
-const post = (body: unknown) => new NextRequest("https://eve.plasma66.com/api/fits/from-killmail", {
+const post = (body: unknown) => new NextRequest("https://eve.example.com/api/fits/from-killmail", {
   method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
 });
 
@@ -5873,7 +5873,7 @@ Daniel logs it in again through **Add character**. The zKillboard backfill needs
 
 **Interfaces:**
 - Consumes: Tasks 1–13, all committed on `feature/phase7-combat`.
-- Produces: `https://eve.plasma66.com/combat` live, `/combat/<killmailId>` serving the detail page,
+- Produces: `https://eve.example.com/combat` live, `/combat/<killmailId>` serving the detail page,
   and populated `killmails` / `killmail_attackers` / `killmail_items` / `character_killmails` /
   `killmail_backfill` tables in the production database.
 
@@ -5950,8 +5950,8 @@ non-blocking stdio.)
 - [ ] **Step 4: Confirm the containers came back and the site is healthy**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health returns
 `{"ok":true,"db":true}`.
@@ -5959,10 +5959,10 @@ Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health re
 - [ ] **Step 5: Confirm the migration created the five combat tables and their cascades**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select table_name from information_schema.tables
   where table_schema='public' and table_name like '%killmail%' order by table_name\""
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select conrelid::regclass, conname, confdeltype from pg_constraint
   where confrelid in ('characters'::regclass,'killmails'::regclass) and contype='f'
     and conrelid::regclass::text like '%killmail%' order by 1,2\""
@@ -5978,11 +5978,11 @@ The `killmail-backfill` job is global and due on the worker's very first tick, s
 within a minute of the restart. Give it two runs (about 15 minutes) and then:
 
 ```bash
-ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose logs --tail=80 worker | grep killmail'
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> 'cd /opt/eve/src/deploy && docker compose logs --tail=80 worker | grep killmail'
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select job, status, rows, coalesce(error,'-') from sync_runs
   where job like 'killmail%' order by started_at desc limit 12\""
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select (select count(*) from killmails),
          (select count(*) from character_killmails),
          (select count(*) from killmails where computed_value is not null),
@@ -5994,12 +5994,12 @@ every backfilled row. `killmails` rows may be `0` or carry the `warn:` scope mes
 
 - [ ] **Step 7: Re-authorise the characters so the ESI half works**
 
-In a browser on the tailnet, open `https://eve.plasma66.com`, and for **each** of the four
+In a browser on the tailnet, open `https://eve.example.com`, and for **each** of the four
 characters use the top-right menu → **Add character** and complete the EVE SSO round trip. This
 replaces the stored refresh token with one carrying `esi-killmails.read_killmails.v1`. Then:
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select name, 'esi-killmails.read_killmails.v1' = any(scopes) from characters order by name\""
 ```
 Expected: `t` for all four. Within the hour the `killmails` job's `sync_runs` rows turn `ok` with a
@@ -6009,7 +6009,7 @@ non-zero `rows` on any character who has died or scored recently, and no `warn:`
 
 Work through this list and record the result of each item.
 
-1. `https://eve.plasma66.com/combat` loads with the nav item **Combat** highlighted and **no**
+1. `https://eve.example.com/combat` loads with the nav item **Combat** highlighted and **no**
    "Coming in phase 7" card.
 2. The stats header shows six tiles — Kills, Losses, Efficiency, ISK destroyed, ISK lost, Solo
    kills — with real numbers for the active character over the default **90 d** tab.
@@ -6055,7 +6055,7 @@ Work through this list and record the result of each item.
 15. `/settings` → **Sync status** lists `killmails`, `killmail-backfill` and `killmail-values` with
     `ok` badges. Any `killmails` row still showing the re-login warning names a character that
     step 7 missed.
-16. Break something on purpose: open `https://eve.plasma66.com/combat/1` (a killmail id that cannot
+16. Break something on purpose: open `https://eve.example.com/combat/1` (a killmail id that cannot
     exist). Expect Next's 404 page, not a stack trace.
 
 - [ ] **Step 9: Commit the acceptance and merge**
@@ -6183,7 +6183,7 @@ it the same way from `displayNames` + `getTypes` + `getSolarSystems`.
 - **`computed_value` is all-or-nothing** (Decision 5). The alternative reading of spec §4 would make
   "the killmail stays NULL until priced" unreachable.
 - **The zKillboard `User-Agent` is a module constant, not `config.esiUserAgent`** (Decision 9): the
-  deployed `ESI_USER_AGENT` is `EVE-Plasma/0.1 (dac9dc@gmail.com)` and carries no project URL, which
+  deployed `ESI_USER_AGENT` is `EVE-Plasma/0.1 (you@example.com)` and carries no project URL, which
   is exactly what zKillboard's etiquette asks for. No new env var either way.
 - **Two killmail item rows can share one numeric flag** (a launcher and its ammo). The fit builder
   resolves that with the dogma engine's `slotOfType` rather than a heuristic on quantity

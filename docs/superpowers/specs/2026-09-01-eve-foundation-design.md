@@ -5,7 +5,7 @@
 
 ## 1. What EVE is
 
-A private website (`https://eve.plasma66.com`) for managing Daniel's EVE Online characters:
+A private website (`https://eve.example.com`) for managing Daniel's EVE Online characters:
 skills and training, ships and fittings (with CPU/powergrid computed against the character's
 actual skills), a fitting designer, assets, clones/implants, wallet, and killmails/PvP stats.
 
@@ -170,8 +170,8 @@ its row. Nobody else can ever get in.
   `postgres:17` (named volume). Only Traefik binds host ports 80/443.
 - **Ansible** in `deploy/ansible` following the app-01 layout: `site.yml`, `group_vars`,
   `vars/secrets.yml` (Cloudflare DNS token, EVE client secret, DB password, session secret).
-- **DNS:** Cloudflare grey-cloud `A eve.plasma66.com → <VM Tailscale IP>`.
-- **EVE developer portal app:** callback `https://eve.plasma66.com/auth/callback`; the scopes
+- **DNS:** Cloudflare grey-cloud `A eve.example.com → <VM Tailscale IP>`.
+- **EVE developer portal app:** callback `https://eve.example.com/auth/callback`; the scopes
   in §3.2 assigned to the app.
 - **Dev loop:** code is synced to the VM and run with `docker compose up --build`; unit tests
   run locally and in the VM.

@@ -29,7 +29,7 @@
 - **Never print the contents of `.env`** beyond the single `ESI_COMPATIBILITY_DATE` line; the file is git-ignored and holds real secrets.
 - Work happens on branch `feature/phase3-character-sync`, branched from `main` after phase 2 merges. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - No UI work here. Do not create pages or API routes — that is phase 3b.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`.
 
 ## File Structure
 

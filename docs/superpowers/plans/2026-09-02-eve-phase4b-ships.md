@@ -33,7 +33,7 @@
 - Tests live in `tests/**` mirroring `src/**`. `npm test` = `vitest run` with `fileParallelism: false`; the environment is happy-dom with `tests/setup.ts`. DB tests use `tests/db/helpers.ts` (`resetDb`, `resetSde`) against `eve_test` on the local compose Postgres (`postgres://eve:eve@127.0.0.1:5432/eve_test`; start it with `docker compose -f compose.dev.yml up -d`).
 - **No network in tests.** The market tests inject a fake `fetch`; the engine-backed tests read the committed phase-4a snapshot `tests/fixtures/dogma/rifter.json` through `tests/dogma/fixture.ts`.
 - Work happens on branch `feature/phase4-ships` (created by phase 4a Task 1). **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
 
 ## File Structure
 
@@ -399,7 +399,7 @@ describe("fetchAggregates", () => {
       "34": { buy: { max: "3.67", min: "0.01" }, sell: { min: "3.85", max: "38420.0" } },
       "587": { buy: { max: "0" }, sell: { min: "0" } },
     }));
-    const rows = await fetchAggregates([34, 587], fetchImpl as unknown as typeof fetch, "EVE/0.1 dac9dc@gmail.com");
+    const rows = await fetchAggregates([34, 587], fetchImpl as unknown as typeof fetch, "EVE/0.1 you@example.com");
 
     expect(rows).toEqual([
       { typeId: 34, sellMin: 3.85, buyMax: 3.67 },
@@ -408,7 +408,7 @@ describe("fetchAggregates", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://market.fuzzwork.co.uk/aggregates/?region=10000002&types=34,587");
-    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("EVE/0.1 dac9dc@gmail.com");
+    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("EVE/0.1 you@example.com");
   });
 
   it("chunks at 500 ids per request and deduplicates", async () => {
@@ -4020,7 +4020,7 @@ would silently do nothing. Step 5 therefore forces a re-import and Step 6 checks
 
 **Interfaces:**
 - Consumes: Tasks 1–13 of this plan and Tasks 1–15 of the 4a plan, all committed on `feature/phase4-ships`.
-- Produces: `https://eve.plasma66.com/ships` serving live fit sheets, and `ok` rows in `sync_runs` for
+- Produces: `https://eve.example.com/ships` serving live fit sheets, and `ok` rows in `sync_runs` for
   `market-prices`.
 
 - [ ] **Step 1: Confirm the branch is clean and green**
@@ -4068,9 +4068,9 @@ non-blocking stdio.)
 - [ ] **Step 4: Confirm the containers came back and the site is healthy**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-ssh daniel@10.5.5.150 'docker logs --tail 60 eve-worker'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+ssh <user>@<host> 'docker logs --tail 60 eve-worker'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; the worker log says
 `[worker] started with 9 jobs`; health returns `{"ok":true,"db":true}`.
@@ -4078,7 +4078,7 @@ Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; the worke
 - [ ] **Step 5: Force an SDE re-import so the two new dogma columns are populated**
 
 ```bash
-ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
+ssh <user>@<host> 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
 ```
 Expected: the import logs its table counts and finishes in roughly five minutes — it downloads ~95 MB
 and swaps the tables atomically. This is bounded work; if it is still running after ~10 minutes, check
@@ -4087,7 +4087,7 @@ and swaps the tables atomically. This is bounded work; if it is still running af
 - [ ] **Step 6: Check the new columns landed, and restart so the caches reload**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select count(*) from sde_dogma_attributes where max_attribute_id is not null\""
 ```
 Expected: **29** — the SDE archive has exactly 29 attributes with a `maxAttributeID`. A `0` means the
@@ -4097,8 +4097,8 @@ error mentioning the column means the migration did not run at all.
 The app and worker memoise `DogmaData` per process, and that cache has no invalidation hook, so it must
 be dropped by restarting:
 ```bash
-ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose restart app worker'
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
+ssh <user>@<host> 'cd /opt/eve/src/deploy && docker compose restart app worker'
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
 ```
 Expected: both containers `Up` again within a few seconds.
 
@@ -4109,7 +4109,7 @@ foreground `sleep`** — re-issue this roughly once a minute (the Monitor tool w
 the tidy way), for **at most 20 minutes**, until `status` reads `ok`:
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select status, rows, coalesce(error, '-') from sync_runs
   where job = 'market-prices' order by started_at desc limit 1\""
 ```
@@ -4121,7 +4121,7 @@ the message and `docker logs --tail 200 eve-worker`.
 - [ ] **Step 8: Check `market_prices` is populated, including a real Jita price for Tritanium**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select count(*) from market_prices;
   select count(*) from market_prices where jita_sell_min is not null;
   select type_id, adjusted_price, average_price, jita_sell_min, jita_buy_max from market_prices where type_id = 34\""
@@ -4133,7 +4133,7 @@ type of interest.
 
 - [ ] **Step 9: Verify the Ships pages (Daniel, in a browser on the tailnet)**
 
-1. `https://eve.plasma66.com/ships` — with Mara Vexley active, the **Fitted ships** section lists the
+1. `https://eve.example.com/ships` — with Mara Vexley active, the **Fitted ships** section lists the
    ship the character is docked in (and every other assembled hull), each card showing the custom name
    or type, the station or system it is in, CPU and powergrid gauges with real numbers, a missing-skill
    count or "All skills trained", and an ISK value. Cards are ordered most valuable first. No card says
@@ -4147,7 +4147,7 @@ type of interest.
    it, and closes on a second click.
 5. Click a saved fit's card → `/ships/fit/<fittingId>` renders the same sheet with the subtitle
    "Saved fit".
-6. `https://eve.plasma66.com/settings` — Sync status lists `market-prices` as `ok` (or amber `warn:`).
+6. `https://eve.example.com/settings` — Sync status lists `market-prices` as `ok` (or amber `warn:`).
 
 - [ ] **Step 10: Operator check — compare one sheet with the in-game fitting window**
 

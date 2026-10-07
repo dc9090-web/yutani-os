@@ -169,7 +169,7 @@ when `X-ESI-Error-Limit-Remain` drops low, and it should not tight-retry 5xx.**
 Required by best practice; can get you banned if absent/uninformative. Should contain an email (strongly
 preferred) and/or `AppName/1.2.3`, source URL, discord, or eve character. Browser fallbacks: `X-User-Agent`
 header or `user_agent` query param. `EsiClient` already sends `User-Agent` from config — just make sure
-`ESI_USER_AGENT` contains `dac9dc@gmail.com` and an app name/version.
+`ESI_USER_AGENT` contains `you@example.com` and an app name/version.
 
 ---
 
@@ -851,7 +851,7 @@ Base `https://zkillboard.com/api/`. Docs: `https://zkillboard.com/api/docs/` (th
 **Etiquette / requirements (from the docs, all confirmed):**
 
 - **Send a descriptive `User-Agent`** with a maintainer contact or project URL. Example format:
-  `MyApp/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)`.
+  `MyApp/1.0 (you@example.com; +https://eve.example.com)`.
 - **Send `Accept-Encoding: gzip`** (use `curl --compressed` / fetch default).
 - Cache locally and space repeated requests out. *"Do not hammer the server with API requests. Be polite."*
 - **A trailing slash is required**; requests without it silently fail.

@@ -32,7 +32,7 @@
 - **Pristine test output.** A test that exercises a caught-and-logged failure must stub `console.error` (`vi.spyOn(console, "error").mockImplementation(() => {})`) so the run stays clean.
 - **Never log tokens; never print `.env`.** No new secret is introduced by this phase.
 - Work happens on branch **`feature/phase5-fitting`**, created from `main` after phase 4 merges (Task 1, Step 1). **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`, Compose project directory `/opt/eve/src/deploy`.
 
 ## Decisions taken once, for the whole plan
 
@@ -1966,7 +1966,7 @@ const { GET: TYPES } = await import("../../src/app/api/dogma/types/route.js");
 
 const data = fixtureData("rifter");
 const request = (path: string, headers: Record<string, string> = {}) =>
-  new NextRequest(`https://eve.plasma66.com${path}`, { headers });
+  new NextRequest(`https://eve.example.com${path}`, { headers });
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -2308,7 +2308,7 @@ vi.mock("../../src/lib/sde/repo.js", () => ({ browseTypes, listMarketGroups, get
 const { GET: TYPES } = await import("../../src/app/api/sde/types/route.js");
 const { GET: GROUPS } = await import("../../src/app/api/sde/market-groups/route.js");
 
-const request = (path: string) => new NextRequest(`https://eve.plasma66.com${path}`);
+const request = (path: string) => new NextRequest(`https://eve.example.com${path}`);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -2608,7 +2608,7 @@ vi.mock("../../src/lib/db/market-prices.js", () => ({ getPrices, stalePriceIds, 
 vi.mock("../../src/lib/market/fuzzwork.js", () => ({ fetchAggregates, FUZZWORK_CHUNK: 500 }));
 
 const { GET } = await import("../../src/app/api/market/prices/route.js");
-const request = (query: string) => new NextRequest(`https://eve.plasma66.com/api/market/prices${query}`);
+const request = (query: string) => new NextRequest(`https://eve.example.com/api/market/prices${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -2792,7 +2792,7 @@ const { GET } = await import("../../src/app/api/characters/[id]/skills/route.js"
 
 const CID = 90000101;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const request = () => new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/skills`);
+const request = () => new NextRequest(`https://eve.example.com/api/characters/${CID}/skills`);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -2972,11 +2972,11 @@ const FIT = {
 };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const post = (body: unknown) =>
-  new NextRequest("https://eve.plasma66.com/api/fits", {
+  new NextRequest("https://eve.example.com/api/fits", {
     method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 const put = (body: unknown) =>
-  new NextRequest("https://eve.plasma66.com/api/fits/1", {
+  new NextRequest("https://eve.example.com/api/fits/1", {
     method: "PUT", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 
@@ -3035,7 +3035,7 @@ describe("the fits routes", () => {
     const list = await LIST();
     expect(list.status).toBe(200);
     expect((await list.json()).fits).toHaveLength(1);
-    const one = await ONE(new NextRequest("https://eve.plasma66.com/api/fits/1"), ctx("1"));
+    const one = await ONE(new NextRequest("https://eve.example.com/api/fits/1"), ctx("1"));
     expect((await one.json()).fit.name).toBe("Cheap Rifter");
   });
 
@@ -3054,20 +3054,20 @@ describe("the fits routes", () => {
   });
 
   it("deletes with a 204", async () => {
-    expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/fits/1"), ctx("1"))).status).toBe(204);
+    expect((await DELETE(new NextRequest("https://eve.example.com/api/fits/1"), ctx("1"))).status).toBe(204);
   });
 
   it("400s on bad ids and bad bodies, 404s on unknown fits", async () => {
-    expect((await ONE(new NextRequest("https://eve.plasma66.com/api/fits/x"), ctx("x"))).status).toBe(400);
-    expect((await ONE(new NextRequest("https://eve.plasma66.com/api/fits/2"), ctx("2"))).status).toBe(404);
+    expect((await ONE(new NextRequest("https://eve.example.com/api/fits/x"), ctx("x"))).status).toBe(400);
+    expect((await ONE(new NextRequest("https://eve.example.com/api/fits/2"), ctx("2"))).status).toBe(404);
     expect((await POST(post({ shipTypeId: 587 }))).status).toBe(400);
     expect((await PUT(put({ items: "nope" }), ctx("1"))).status).toBe(400);
     expect((await PUT(put({ name: "x" }), ctx("2"))).status).toBe(404);
-    expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/fits/2"), ctx("2"))).status).toBe(404);
+    expect((await DELETE(new NextRequest("https://eve.example.com/api/fits/2"), ctx("2"))).status).toBe(404);
   });
 
   it("400s on a body that is not JSON at all", async () => {
-    const broken = new NextRequest("https://eve.plasma66.com/api/fits", {
+    const broken = new NextRequest("https://eve.example.com/api/fits", {
       method: "POST", body: "{", headers: { "content-type": "application/json" },
     });
     expect((await POST(broken)).status).toBe(400);
@@ -3388,7 +3388,7 @@ const byName = new Map<string, number>();
 for (const type of data.types.values()) if (type.name !== null) byName.set(type.name.toLowerCase(), type.id);
 
 const post = (path: string, body: unknown) =>
-  new NextRequest(`https://eve.plasma66.com/api/fits/${path}`, {
+  new NextRequest(`https://eve.example.com/api/fits/${path}`, {
     method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 
@@ -6561,7 +6561,7 @@ adds no `sde_*` columns.
 
 **Interfaces:**
 - Consumes: Tasks 1–17, all committed on `feature/phase5-fitting`.
-- Produces: `https://eve.plasma66.com/fitting` serving a live editor, and `fits` / `fit_items` rows
+- Produces: `https://eve.example.com/fitting` serving a live editor, and `fits` / `fit_items` rows
   in the production database.
 
 - [ ] **Step 1: Confirm the branch is clean and green**
@@ -6613,8 +6613,8 @@ non-blocking stdio.)
 - [ ] **Step 4: Confirm the containers came back and the site is healthy**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health returns
 `{"ok":true,"db":true}`.
@@ -6622,10 +6622,10 @@ Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; health re
 - [ ] **Step 5: Confirm the migration created the two tables**
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select table_name from information_schema.tables
   where table_schema='public' and table_name in ('fits','fit_items') order by table_name\""
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"
   select conname, confdeltype from pg_constraint
   where conrelid in ('fits'::regclass,'fit_items'::regclass) and contype='f'\""
 ```
@@ -6636,9 +6636,9 @@ did not run; check the eve role's migrate task in the play output.
 - [ ] **Step 6: Check the dogma routes over the wire, including the 304**
 
 ```bash
-curl -sS -o /dev/null -w '%{size_download} %{content_type}\n' https://eve.plasma66.com/api/dogma/meta --cookie "eve_session=$COOKIE"
-curl -sSI https://eve.plasma66.com/api/dogma/meta --cookie "eve_session=$COOKIE" | grep -i -E 'etag|cache-control'
-curl -sS -o /dev/null -w '%{http_code}\n' https://eve.plasma66.com/api/dogma/meta \
+curl -sS -o /dev/null -w '%{size_download} %{content_type}\n' https://eve.example.com/api/dogma/meta --cookie "eve_session=$COOKIE"
+curl -sSI https://eve.example.com/api/dogma/meta --cookie "eve_session=$COOKIE" | grep -i -E 'etag|cache-control'
+curl -sS -o /dev/null -w '%{http_code}\n' https://eve.example.com/api/dogma/meta \
   --cookie "eve_session=$COOKIE" -H 'If-None-Match: "sde-<the ETag value>"'
 ```
 `$COOKIE` is the `eve_session` value from a logged-in browser (DevTools → Application → Cookies).
@@ -6650,7 +6650,7 @@ max-age=86400` and an `ETag` of the form `"sde-3484357"`; and `304` for the cond
 
 Work through this list and record the result of each item.
 
-1. `https://eve.plasma66.com/fitting` loads with the nav item **Fitting** highlighted and no longer
+1. `https://eve.example.com/fitting` loads with the nav item **Fitting** highlighted and no longer
    says "Coming in phase 5". With no fits yet it says "No fits yet — start one with 'New fit'".
 2. **Import EFT** → paste the contents of `tests/fixtures/fits/rifter.eft` → the editor opens on a
    Rifter named "Cheap Rifter", with Damage Control II offline in the first low slot, two 200mm
@@ -6677,12 +6677,12 @@ Work through this list and record the result of each item.
    `[Empty Low slot]` markers and the `/offline` suffix, and the Copy button puts it on the
    clipboard. Pasting that text back into **Import EFT** produces an identical fit.
 10. **From my ships** → pick Mara Vexley's docked ship → a new fit opens. Compare its CPU and
-    powergrid **used/output** against `https://eve.plasma66.com/ships/asset/<the same itemId>`:
+    powergrid **used/output** against `https://eve.example.com/ships/asset/<the same itemId>`:
     they must be **identical to two decimals**. This is the phase-4-vs-phase-5 agreement check and
     the single most important item on this list — the server and the browser are running the same
     engine on the same data, so a mismatch is a serialisation bug.
 11. **From saved fittings** → pick an ESI fitting → the same comparison against
-    `https://eve.plasma66.com/ships/fit/<fittingId>`.
+    `https://eve.example.com/ships/fit/<fittingId>`.
 12. **Delete** a fit from the list; it disappears and does not come back on reload.
 13. Open DevTools → Network, reload the editor and confirm `/api/dogma/meta` is served **from the
     disk cache or as a 304**, not re-downloaded, and that editing a module fires **no** request at

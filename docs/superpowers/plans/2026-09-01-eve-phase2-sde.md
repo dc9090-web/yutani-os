@@ -27,7 +27,7 @@
 - Never inline colours in components — use the CSS variables and the existing classes in `src/app/globals.css` (`card`, `card-title`, `table`, `muted`, `faint`, `badge`).
 - Work happens on branch `feature/phase2-sde`. **Every task ends with a commit.** Commit trailer: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - The full real archive `.superpowers/research/sde-3484357.zip` (build 3484357, released 2026-08-28) is git-ignored and is the only input to the fixture generator. `unzip` is not installed; use Node or `python3 -c "import zipfile…"` to inspect it.
-- VM: `ssh daniel@10.5.5.150`, site `https://eve.plasma66.com`, Ansible in `deploy/ansible`.
+- VM: `ssh <user>@<host>`, site `https://eve.example.com`, Ansible in `deploy/ansible`.
 
 ## File Structure
 
@@ -2067,7 +2067,7 @@ export function downloadSde(destPath: string, fetchImpl?: typeof fetch): Promise
 **Resolved ambiguity:** the spec says the version poll sends `User-Agent: <ESI_USER_AGENT>`. Reading
 it through `getConfig()` would force every unrelated env var to be set just to poll a public URL, so
 `sdeUserAgent()` reads `process.env.ESI_USER_AGENT` directly and falls back to
-`"EVE-Plasma (dac9dc@gmail.com)"`. In the worker and the CLI the env var is always present.
+`"EVE-Plasma (you@example.com)"`. In the worker and the CLI the env var is always present.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -2082,7 +2082,7 @@ afterEach(() => { delete process.env.ESI_USER_AGENT; });
 
 describe("fetchLatestBuild", () => {
   it("parses the single-line build pointer and identifies itself", async () => {
-    process.env.ESI_USER_AGENT = "EVE-Plasma/0.1 (dac9dc@gmail.com)";
+    process.env.ESI_USER_AGENT = "EVE-Plasma/0.1 (you@example.com)";
     const fetchImpl = vi.fn(async () => new Response(LATEST_LINE, { status: 200 }));
     const build = await fetchLatestBuild(fetchImpl as unknown as typeof fetch);
     expect(build.buildNumber).toBe(3484357);
@@ -2090,7 +2090,7 @@ describe("fetchLatestBuild", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(SDE_LATEST_URL);
-    expect((init.headers as Record<string, string>)["user-agent"]).toBe("EVE-Plasma/0.1 (dac9dc@gmail.com)");
+    expect((init.headers as Record<string, string>)["user-agent"]).toBe("EVE-Plasma/0.1 (you@example.com)");
   });
 
   it("throws on a non-2xx response", async () => {
@@ -2106,7 +2106,7 @@ describe("fetchLatestBuild", () => {
   });
 
   it("falls back to a default user agent", () => {
-    expect(sdeUserAgent()).toBe("EVE-Plasma (dac9dc@gmail.com)");
+    expect(sdeUserAgent()).toBe("EVE-Plasma (you@example.com)");
   });
 });
 ```
@@ -2153,7 +2153,7 @@ export interface SdeBuild { buildNumber: number; releaseDate: Date }
 
 /** CCP asks callers to identify themselves; the SDE endpoints reuse the ESI user agent. */
 export function sdeUserAgent(): string {
-  return process.env.ESI_USER_AGENT ?? "EVE-Plasma (dac9dc@gmail.com)";
+  return process.env.ESI_USER_AGENT ?? "EVE-Plasma (you@example.com)";
 }
 
 /**
@@ -2873,7 +2873,7 @@ EOM
 
 **Interfaces:**
 - Consumes: Tasks 1–10, all committed on `feature/phase2-sde`.
-- Produces: `https://eve.plasma66.com/settings` showing the live SDE build, and an `ok`
+- Produces: `https://eve.example.com/settings` showing the live SDE build, and an `ok`
   `sde-update` row in `sync_runs`.
 
 - [ ] **Step 1: Confirm the branch is clean and green**
@@ -2897,9 +2897,9 @@ non-blocking stdio.)
 - [ ] **Step 3: Confirm the containers came back and the worker started the import**
 
 ```bash
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-ssh daniel@10.5.5.150 'docker logs --tail 50 eve-worker'
-curl -sS https://eve.plasma66.com/api/health
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+ssh <user>@<host> 'docker logs --tail 50 eve-worker'
+curl -sS https://eve.example.com/api/health
 ```
 Expected: `eve-app`, `eve-worker`, `eve-postgres`, `traefik` all `Up`; the worker log shows
 `[worker] started` followed by `sde-update: no SDE to build <n>; downloading`; health returns
@@ -2912,17 +2912,17 @@ Poll — **do not use a foreground `sleep`**; re-issue this command roughly once
 Monitor tool with an until-condition is the tidy way) until it prints a status:
 
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"select status, coalesce(rows::text,'-'), coalesce(error,'') from sync_runs where job = 'sde-update' order by started_at desc limit 1\""
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"select status, coalesce(rows::text,'-'), coalesce(error,'') from sync_runs where job = 'sde-update' order by started_at desc limit 1\""
 ```
 Expected eventually: `ok|52xxx|` (a `running` row while it works, and an empty result before the
 first tick reaches the database). If it prints `error|...`, read the message and
-`ssh daniel@10.5.5.150 'docker logs --tail 100 eve-worker'`.
+`ssh <user>@<host> 'docker logs --tail 100 eve-worker'`.
 
 - [ ] **Step 5: Verify the imported data on the VM**
 
 ```bash
-ssh daniel@10.5.5.150 'docker exec eve-postgres psql -U eve -d eve -Atc "select build_number, imported_at from sde_meta; select count(*) from sde_types"'
-ssh daniel@10.5.5.150 'docker exec eve-postgres psql -U eve -d eve -Atc "select count(*) from sde_type_attributes; select name from sde_types where id = 587; select security_status from sde_solar_systems where id = 30000142"'
+ssh <user>@<host> 'docker exec eve-postgres psql -U eve -d eve -Atc "select build_number, imported_at from sde_meta; select count(*) from sde_types"'
+ssh <user>@<host> 'docker exec eve-postgres psql -U eve -d eve -Atc "select count(*) from sde_type_attributes; select name from sde_types where id = 587; select security_status from sde_solar_systems where id = 30000142"'
 ```
 Expected: one `sde_meta` row with the current build number and a timestamp from the last few
 minutes; `sde_types` around **52 900**; `sde_type_attributes` over 1 000 000; `Rifter`; `0.945913`.
@@ -2934,19 +2934,19 @@ immediately; because `sde_meta.build_number` now matches the pointer it must ret
 downloading anything.
 
 ```bash
-ssh daniel@10.5.5.150 'docker restart eve-worker'
+ssh <user>@<host> 'docker restart eve-worker'
 ```
 Then poll (again, no foreground `sleep` — re-issue until two rows come back):
 ```bash
-ssh daniel@10.5.5.150 "docker exec eve-postgres psql -U eve -d eve -Atc \"select status, coalesce(rows::text,'-') from sync_runs where job = 'sde-update' order by started_at desc limit 2\""
-ssh daniel@10.5.5.150 'docker logs --tail 20 eve-worker'
+ssh <user>@<host> "docker exec eve-postgres psql -U eve -d eve -Atc \"select status, coalesce(rows::text,'-') from sync_runs where job = 'sde-update' order by started_at desc limit 2\""
+ssh <user>@<host> 'docker logs --tail 20 eve-worker'
 ```
 Expected: two rows, the newest `ok|0`; the log shows `sde-update: build <n> is already imported`
 and `sde-update global ok rows=0`.
 
 - [ ] **Step 7: Verify the UI (Daniel, in a browser on the tailnet)**
 
-1. Open `https://eve.plasma66.com/settings`.
+1. Open `https://eve.example.com/settings`.
 2. The **Static data** card shows the current SDE build number, its release date, an imported-at
    timestamp from the last few minutes, and counts of roughly `52,900` types, `2,867` dogma
    attributes, `3,4xx` dogma effects and `8,4xx` solar systems.

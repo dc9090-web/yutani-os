@@ -18,7 +18,7 @@ victim's fit, which can be opened in the fitting designer.
   `GET /killmails/{id}/{hash}` (public, 30-day cache, 3600 tokens / 15 min) gives the body.
 - **zKillboard** `GET https://zkillboard.com/api/{kills|losses}/characterID/{id}/page/{n}/` (trailing slash
   required, 200 per page, pages 1–100, 1 h cache, `Accept-Encoding: gzip`, descriptive `User-Agent`
-  `EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)`) returns full ESI-shaped killmails plus a
+  `YutaniOS/1.0 (you@example.com; +https://eve.example.com)`) returns full ESI-shaped killmails plus a
   `zkb` block (`hash`, `totalValue`, `points`, `npc`, `solo`, `awox`). Ruling: one request per **2 s**, at most
   20 pages per run, no parallelism — etiquette is the only published limit. Cost if wrong: a slower backfill.
 
