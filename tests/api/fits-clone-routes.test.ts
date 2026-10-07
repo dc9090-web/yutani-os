@@ -38,7 +38,7 @@ const byName = new Map<string, number>();
 for (const type of data.types.values()) if (type.name !== null) byName.set(type.name.toLowerCase(), type.id);
 
 const post = (path: string, body: unknown) =>
-  new NextRequest(`https://eve.plasma66.com/api/fits/${path}`, {
+  new NextRequest(`https://eve.example.com/api/fits/${path}`, {
     method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 

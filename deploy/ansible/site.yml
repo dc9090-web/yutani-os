@@ -1,20 +1,45 @@
 ---
-- name: Configure the EVE VM
+- name: Install Yutani OS
   hosts: eve
   become: true
   gather_facts: true
-  vars_files: [vars/secrets.yml]
+  vars_files: [vars/site.yml, vars/secrets.yml]
   pre_tasks:
+    - name: Check the site settings
+      ansible.builtin.assert:
+        quiet: true
+        fail_msg: "Run deploy/setup.sh first: vars/site.yml is incomplete."
+        that:
+          - domain is defined and domain | length > 0 and domain != "eve.example.com"
+          - acme_email is defined and "@" in acme_email
+          - allowed_character_ids is defined and allowed_character_ids | string | length > 0
     - name: Fail early on placeholder secrets
       ansible.builtin.assert:
+        quiet: true
+        fail_msg: "Run deploy/setup.sh first: vars/secrets.yml still has placeholders."
         that:
           - cloudflare_dns_api_token != "CHANGEME"
+          - eve_client_id != "CHANGEME"
           - eve_client_secret != "CHANGEME"
           - session_secret != "CHANGEME"
           - postgres_password != "CHANGEME"
+    - name: Check the host is Debian or Ubuntu
+      ansible.builtin.assert:
         quiet: true
+        fail_msg: "The docker role installs from download.docker.com's apt repository; this host is {{ ansible_distribution }}."
+        that: ansible_os_family == "Debian"
+    # The host's own LAN, as the kernel sees it, so nothing has to be typed in for the common case.
+    - name: Work out which networks may reach the site
+      ansible.builtin.set_fact:
+        lan_allowed_cidrs: >-
+          {{ lan_allowed_cidrs | default(
+               [ansible_default_ipv4.network ~ '/' ~ (ansible_default_ipv4.prefix | default(24)), tailscale_cidr, '127.0.0.1/32']
+               + (extra_allowed_cidrs | default([]))) }}
+    - name: Show the plan
+      ansible.builtin.debug:
+        msg: "https://{{ domain }} on {{ inventory_hostname }} ({{ ansible_default_ipv4.address }}), reachable from {{ lan_allowed_cidrs | join(', ') }}"
   roles:
-    - { role: common,  tags: [common] }
-    - { role: docker,  tags: [docker] }
+    - { role: common, tags: [common] }
+    - { role: docker, tags: [docker] }
     - { role: traefik, tags: [traefik] }
-    - { role: eve,     tags: [eve, app] }
+    - { role: eve, tags: [eve, app] }

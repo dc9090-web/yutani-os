@@ -55,11 +55,11 @@ describe("sso", () => {
   });
 
   it("builds the authorize URL", () => {
-    const url = new URL(buildAuthorizeUrl({ metadata, clientId: "cid", callbackUrl: "https://eve.plasma66.com/auth/callback", state: "st", challenge: "ch" }));
+    const url = new URL(buildAuthorizeUrl({ metadata, clientId: "cid", callbackUrl: "https://eve.example.com/auth/callback", state: "st", challenge: "ch" }));
     expect(url.origin + url.pathname).toBe(metadata.authorization_endpoint);
     expect(url.searchParams.get("response_type")).toBe("code");
     expect(url.searchParams.get("client_id")).toBe("cid");
-    expect(url.searchParams.get("redirect_uri")).toBe("https://eve.plasma66.com/auth/callback");
+    expect(url.searchParams.get("redirect_uri")).toBe("https://eve.example.com/auth/callback");
     expect(url.searchParams.get("code_challenge_method")).toBe("S256");
     expect(url.searchParams.get("code_challenge")).toBe("ch");
     expect(url.searchParams.get("state")).toBe("st");

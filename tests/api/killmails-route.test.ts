@@ -13,7 +13,7 @@ const CID = 669539978;
 const OTHER = 2112625428;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const request = (query: string) =>
-  new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/killmails${query}`);
+  new NextRequest(`https://eve.example.com/api/characters/${CID}/killmails${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();

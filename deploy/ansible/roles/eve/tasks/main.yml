@@ -20,6 +20,8 @@
       - "--exclude=.env"
       - "--exclude=.env.*"
       - "--exclude=deploy/ansible/vars/secrets.yml"
+      - "--exclude=deploy/ansible/vars/site.yml"
+      - "--exclude=deploy/ansible/inventory.ini"
       - "--exclude=.superpowers"
   become: false
 

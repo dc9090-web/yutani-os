@@ -17,10 +17,10 @@ const TAG = { id: 1, name: "Miner" };
 const TAG2 = { id: 2, name: "Scanner" };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const post = (body: unknown) =>
-  new NextRequest("https://eve.plasma66.com/api/tags", {
+  new NextRequest("https://eve.example.com/api/tags", {
     method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
-const put = (body: unknown, url = "https://eve.plasma66.com/api/characters/1/tags") =>
+const put = (body: unknown, url = "https://eve.example.com/api/characters/1/tags") =>
   new NextRequest(url, {
     method: "PUT", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
@@ -62,13 +62,13 @@ describe("the tags routes", () => {
   });
 
   it("deletes with a 204", async () => {
-    const res = await DELETE(new NextRequest("https://eve.plasma66.com/api/tags/1"), ctx("1"));
+    const res = await DELETE(new NextRequest("https://eve.example.com/api/tags/1"), ctx("1"));
     expect(res.status).toBe(204);
     expect(deleteTag).toHaveBeenCalledWith(1);
   });
 
   it("400s a delete with a bad id", async () => {
-    expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/tags/x"), ctx("x"))).status).toBe(400);
+    expect((await DELETE(new NextRequest("https://eve.example.com/api/tags/x"), ctx("x"))).status).toBe(400);
     expect(deleteTag).not.toHaveBeenCalled();
   });
 
@@ -79,7 +79,7 @@ describe("the tags routes", () => {
   });
 
   it("404s an unknown character", async () => {
-    const res = await PUT(put({ tagIds: [1] }, "https://eve.plasma66.com/api/characters/2/tags"), ctx("2"));
+    const res = await PUT(put({ tagIds: [1] }, "https://eve.example.com/api/characters/2/tags"), ctx("2"));
     expect(res.status).toBe(404);
     expect(setCharacterTags).not.toHaveBeenCalled();
   });

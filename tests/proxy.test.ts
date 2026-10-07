@@ -24,16 +24,16 @@ describe("proxy", () => {
 
   it("redirects to /login when SESSION_SECRET is unset", () => {
     delete process.env.SESSION_SECRET;
-    const req = new NextRequest("https://eve.plasma66.com/settings");
+    const req = new NextRequest("https://eve.example.com/settings");
     const res = proxy(req);
     expect(res.status).toBe(307);
-    expect(res.headers.get("location")).toBe("https://eve.plasma66.com/login");
+    expect(res.headers.get("location")).toBe("https://eve.example.com/login");
   });
 
   it("passes through with a valid signed session cookie", () => {
     process.env.SESSION_SECRET = "s".repeat(32);
     const cookie = signPayload({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET);
-    const req = new NextRequest("https://eve.plasma66.com/settings");
+    const req = new NextRequest("https://eve.example.com/settings");
     req.cookies.set(SESSION_COOKIE, cookie);
     const res = proxy(req);
     expect(res.status).toBe(200);

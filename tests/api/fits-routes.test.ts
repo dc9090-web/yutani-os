@@ -17,11 +17,11 @@ const FIT = {
 };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const post = (body: unknown) =>
-  new NextRequest("https://eve.plasma66.com/api/fits", {
+  new NextRequest("https://eve.example.com/api/fits", {
     method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 const put = (body: unknown) =>
-  new NextRequest("https://eve.plasma66.com/api/fits/1", {
+  new NextRequest("https://eve.example.com/api/fits/1", {
     method: "PUT", body: JSON.stringify(body), headers: { "content-type": "application/json" },
   });
 
@@ -121,7 +121,7 @@ describe("the fits routes", () => {
     const list = await LIST();
     expect(list.status).toBe(200);
     expect((await list.json()).fits).toHaveLength(1);
-    const one = await ONE(new NextRequest("https://eve.plasma66.com/api/fits/1"), ctx("1"));
+    const one = await ONE(new NextRequest("https://eve.example.com/api/fits/1"), ctx("1"));
     expect((await one.json()).fit.name).toBe("Cheap Rifter");
   });
 
@@ -140,16 +140,16 @@ describe("the fits routes", () => {
   });
 
   it("deletes with a 204", async () => {
-    expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/fits/1"), ctx("1"))).status).toBe(204);
+    expect((await DELETE(new NextRequest("https://eve.example.com/api/fits/1"), ctx("1"))).status).toBe(204);
   });
 
   it("400s on bad ids and bad bodies, 404s on unknown fits", async () => {
-    expect((await ONE(new NextRequest("https://eve.plasma66.com/api/fits/x"), ctx("x"))).status).toBe(400);
-    expect((await ONE(new NextRequest("https://eve.plasma66.com/api/fits/2"), ctx("2"))).status).toBe(404);
+    expect((await ONE(new NextRequest("https://eve.example.com/api/fits/x"), ctx("x"))).status).toBe(400);
+    expect((await ONE(new NextRequest("https://eve.example.com/api/fits/2"), ctx("2"))).status).toBe(404);
     expect((await POST(post({ shipTypeId: 587 }))).status).toBe(400);
     expect((await PUT(put({ items: "nope" }), ctx("1"))).status).toBe(400);
     expect((await PUT(put({ name: "x" }), ctx("2"))).status).toBe(404);
-    expect((await DELETE(new NextRequest("https://eve.plasma66.com/api/fits/2"), ctx("2"))).status).toBe(404);
+    expect((await DELETE(new NextRequest("https://eve.example.com/api/fits/2"), ctx("2"))).status).toBe(404);
   });
 
   it("400s an empty PUT body instead of bumping updated_at for nothing", async () => {
@@ -158,7 +158,7 @@ describe("the fits routes", () => {
   });
 
   it("400s on a body that is not JSON at all", async () => {
-    const broken = new NextRequest("https://eve.plasma66.com/api/fits", {
+    const broken = new NextRequest("https://eve.example.com/api/fits", {
       method: "POST", body: "{", headers: { "content-type": "application/json" },
     });
     expect((await POST(broken)).status).toBe(400);

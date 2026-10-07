@@ -7,7 +7,7 @@ afterEach(() => { delete process.env.ESI_USER_AGENT; });
 
 describe("fetchLatestBuild", () => {
   it("parses the single-line build pointer and identifies itself", async () => {
-    process.env.ESI_USER_AGENT = "EVE-Plasma/0.1 (dac9dc@gmail.com)";
+    process.env.ESI_USER_AGENT = "YutaniOS/0.1 (ops@example.com)";
     const fetchImpl = vi.fn(async () => new Response(LATEST_LINE, { status: 200 }));
     const build = await fetchLatestBuild(fetchImpl as unknown as typeof fetch);
     expect(build.buildNumber).toBe(3484357);
@@ -15,7 +15,7 @@ describe("fetchLatestBuild", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe(SDE_LATEST_URL);
-    expect((init.headers as Record<string, string>)["user-agent"]).toBe("EVE-Plasma/0.1 (dac9dc@gmail.com)");
+    expect((init.headers as Record<string, string>)["user-agent"]).toBe("YutaniOS/0.1 (ops@example.com)");
   });
 
   it("throws on a non-2xx response", async () => {
@@ -45,6 +45,6 @@ describe("fetchLatestBuild", () => {
   });
 
   it("falls back to a default user agent", () => {
-    expect(sdeUserAgent()).toBe("EVE-Plasma (dac9dc@gmail.com)");
+    expect(sdeUserAgent()).toBe("YutaniOS (unconfigured: set ESI_USER_AGENT)");
   });
 });

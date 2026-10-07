@@ -4,7 +4,7 @@ import type { SessionPayload } from "../../src/lib/auth/session.js";
 
 process.env.EVE_CLIENT_ID = "cid";
 process.env.EVE_CLIENT_SECRET = "sec";
-process.env.EVE_CALLBACK_URL = "https://eve.plasma66.com/auth/callback";
+process.env.EVE_CALLBACK_URL = "https://eve.example.com/auth/callback";
 process.env.ALLOWED_CHARACTER_IDS = "1,2";
 process.env.ESI_COMPATIBILITY_DATE = "2026-08-28";
 process.env.ESI_USER_AGENT = "ua";
@@ -43,7 +43,7 @@ describe("auth callback", () => {
 
   it("redirects to /settings and keeps the existing active character when a session exists", async () => {
     const res = await GET(req());
-    expect(res.headers.get("location")).toBe("https://eve.plasma66.com/settings");
+    expect(res.headers.get("location")).toBe("https://eve.example.com/settings");
     const cookie = res.cookies.get(SESSION_COOKIE)?.value;
     const payload = verifyPayload<SessionPayload>(cookie, process.env.SESSION_SECRET!, SESSION_MAX_AGE);
     expect(payload).toMatchObject({ activeCharacterId: 1 });
@@ -52,7 +52,7 @@ describe("auth callback", () => {
   it("redirects to / and uses the newly logged-in character when there is no existing session", async () => {
     vi.mocked(readSession).mockResolvedValue(null);
     const res = await GET(req());
-    expect(res.headers.get("location")).toBe("https://eve.plasma66.com/");
+    expect(res.headers.get("location")).toBe("https://eve.example.com/");
     const cookie = res.cookies.get(SESSION_COOKIE)?.value;
     const payload = verifyPayload<SessionPayload>(cookie, process.env.SESSION_SECRET!, SESSION_MAX_AGE);
     expect(payload).toMatchObject({ activeCharacterId: 2 });
@@ -63,6 +63,6 @@ describe("auth callback failure path", () => {
   it("redirects to the public /login with the error code, not the container origin", async () => {
     vi.mocked(completeLogin).mockRejectedValueOnce(Object.assign(new Error("bad"), { name: "AuthError", code: "jwt" }));
     const res = await GET(req());
-    expect(res.headers.get("location")).toMatch(/^https:\/\/eve\.plasma66\.com\/login\?error=/);
+    expect(res.headers.get("location")).toMatch(/^https:\/\/eve\.example\.com\/login\?error=/);
   });
 });

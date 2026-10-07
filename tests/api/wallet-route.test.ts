@@ -14,7 +14,7 @@ const { GET } = await import("../../src/app/api/characters/[id]/wallet/route.js"
 
 const CID = 669539978;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const request = (query: string) => new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/wallet${query}`);
+const request = (query: string) => new NextRequest(`https://eve.example.com/api/characters/${CID}/wallet${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();

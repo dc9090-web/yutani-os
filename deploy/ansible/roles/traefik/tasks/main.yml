@@ -52,14 +52,23 @@
 # configures netfilter after dockerd finishes), every Tailscale request to the
 # published port arrives as 172.18.0.1 and gets a 403. This VM advertises no
 # routes, so SNAT is pointless: keep it off. Persisted in tailscaled's prefs.
+# Only when Tailscale is installed; the site works without it.
+- name: Look for Tailscale
+  ansible.builtin.command: which tailscale
+  register: traefik_tailscale_bin
+  changed_when: false
+  failed_when: false
+
 - name: Read Tailscale prefs
   ansible.builtin.command: tailscale debug prefs
-  register: tailscale_prefs
+  register: traefik_tailscale_prefs
   changed_when: false
+  when: traefik_tailscale_bin.rc == 0
 
 - name: Disable Tailscale subnet-route SNAT so Traefik sees real peer IPs
   ansible.builtin.command: tailscale set --snat-subnet-routes=false
-  when: not (tailscale_prefs.stdout | from_json).NoSNAT
+  changed_when: true
+  when: traefik_tailscale_bin.rc == 0 and not (traefik_tailscale_prefs.stdout | from_json).NoSNAT
 
 - name: Deploy Traefik
   community.docker.docker_compose_v2:

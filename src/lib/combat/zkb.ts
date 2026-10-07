@@ -1,4 +1,5 @@
 import type { EsiKillmail, ZkbBlock } from "./killmail.js";
+import { getConfig } from "../config.js";
 
 /**
  * zKillboard's killmail query API (research §6). It publishes no numeric rate limit — only
@@ -8,11 +9,15 @@ import type { EsiKillmail, ZkbBlock } from "./killmail.js";
  */
 export const ZKB_BASE_URL = "https://zkillboard.com/api/";
 /**
- * Spec §2 pins this string. It is deliberately NOT `config.esiUserAgent`: that value is
- * `EVE-Plasma/0.1 (dac9dc@gmail.com)`, with no project URL, which is exactly what zKillboard's
- * etiquette asks you not to send.
+ * zKillboard's etiquette wants a User-Agent with a contact AND a project URL. ESI_USER_AGENT carries
+ * the contact (CCP asks for it too); this appends the site's public origin unless the operator already
+ * put a URL in it.
  */
-export const ZKB_USER_AGENT = "EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)";
+export function zkbUserAgent(esiUserAgent: string, siteOrigin: string): string {
+  if (/https?:\/\//.test(esiUserAgent)) return esiUserAgent;
+  const m = /^(.*)\)\s*$/.exec(esiUserAgent);
+  return m ? `${m[1]}; +${siteOrigin})` : `${esiUserAgent} (+${siteOrigin})`;
+}
 /** 200 killmails a page, pages 1..100 — 20,000 killmails per filter (verified, research §6). */
 export const ZKB_PAGE_SIZE = 200;
 export const ZKB_MAX_PAGE = 100;
@@ -78,6 +83,8 @@ export function parseZkbPage(body: unknown): ZkbRecord[] | null {
 
 export interface ZkbClientDeps {
   fetchImpl?: typeof fetch; now?: () => number; sleep?: (ms: number) => Promise<void>;
+  /** Defaults to zkbUserAgent() over the app config, resolved on the first request. */
+  userAgent?: string;
 }
 export interface ZkbClient {
   fetchPage(kind: ZkbKind, characterId: number, page: number): Promise<ZkbRecord[]>;
@@ -88,9 +95,11 @@ export function createZkbClient(deps: ZkbClientDeps = {}): ZkbClient {
   const now = deps.now ?? Date.now;
   const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   let nextAllowedAt = 0;
+  let userAgent = deps.userAgent;
 
   return {
     async fetchPage(kind, characterId, page) {
+      userAgent ??= zkbUserAgent(getConfig().esiUserAgent, getConfig().siteOrigin);
       const wait = nextAllowedAt - now();
       if (wait > 0) await sleep(wait);
       nextAllowedAt = now() + ZKB_PACE_MS;
@@ -100,7 +109,7 @@ export function createZkbClient(deps: ZkbClientDeps = {}): ZkbClient {
         headers: {
           Accept: "application/json",
           "Accept-Encoding": "gzip",
-          "User-Agent": ZKB_USER_AGENT,
+          "User-Agent": userAgent,
         },
       });
       const where = `${kind}/characterID/${characterId}/page/${page}/`;

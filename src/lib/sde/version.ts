@@ -4,7 +4,7 @@ export interface SdeBuild { buildNumber: number; releaseDate: Date }
 
 /** CCP asks callers to identify themselves; the SDE endpoints reuse the ESI user agent. */
 export function sdeUserAgent(): string {
-  return process.env.ESI_USER_AGENT ?? "EVE-Plasma (dac9dc@gmail.com)";
+  return process.env.ESI_USER_AGENT ?? "YutaniOS (unconfigured: set ESI_USER_AGENT)";
 }
 
 /**

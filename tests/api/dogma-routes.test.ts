@@ -11,7 +11,7 @@ const { GET: TYPES } = await import("../../src/app/api/dogma/types/route.js");
 
 const data = fixtureData("rifter");
 const request = (path: string, headers: Record<string, string> = {}) =>
-  new NextRequest(`https://eve.plasma66.com${path}`, { headers });
+  new NextRequest(`https://eve.example.com${path}`, { headers });
 
 beforeEach(() => {
   vi.resetAllMocks();

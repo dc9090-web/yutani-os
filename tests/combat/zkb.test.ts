@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  ZKB_BASE_URL, ZKB_MAX_PAGE, ZKB_PACE_MS, ZKB_PAGE_SIZE, ZKB_USER_AGENT,
-  createZkbClient, parseZkbPage, zkbPageUrl, type ZkbRecord,
+  ZKB_BASE_URL, ZKB_MAX_PAGE, ZKB_PACE_MS, ZKB_PAGE_SIZE,
+  createZkbClient, parseZkbPage, zkbPageUrl, zkbUserAgent, type ZkbRecord,
 } from "../../src/lib/combat/zkb.js";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
@@ -12,6 +12,7 @@ const page = (): ZkbRecord[] =>
   JSON.parse(readFileSync(path.join(dir, "../fixtures/zkb/kills-page.json"), "utf8")) as ZkbRecord[];
 
 const CID = 669539978;
+const UA = "YutaniOS/0.1 (ops@example.com; +https://eve.example.com)";
 
 describe("zkbPageUrl", () => {
   it("puts the page modifier after the entity filter and ends with a slash", () => {
@@ -20,10 +21,20 @@ describe("zkbPageUrl", () => {
     expect(ZKB_BASE_URL).toBe("https://zkillboard.com/api/");
   });
   it("pins the etiquette constants from spec §2", () => {
-    expect(ZKB_USER_AGENT).toBe("EVE-plasma66/1.0 (dac9dc@gmail.com; +https://eve.plasma66.com)");
     expect(ZKB_PAGE_SIZE).toBe(200);
     expect(ZKB_MAX_PAGE).toBe(100);
     expect(ZKB_PACE_MS).toBe(2000);
+  });
+});
+
+describe("zkbUserAgent", () => {
+  it("adds the site URL to the ESI user agent, inside its parenthesis when it has one", () => {
+    expect(zkbUserAgent("YutaniOS/0.1 (ops@example.com)", "https://eve.example.com")).toBe(UA);
+    expect(zkbUserAgent("YutaniOS/0.1 ops@example.com", "https://eve.example.com"))
+      .toBe("YutaniOS/0.1 ops@example.com (+https://eve.example.com)");
+  });
+  it("leaves a user agent alone when the operator already put a URL in it", () => {
+    expect(zkbUserAgent(UA, "https://somewhere.else")).toBe(UA);
   });
 });
 
@@ -88,6 +99,7 @@ describe("createZkbClient", () => {
     });
     const client = createZkbClient({
       fetchImpl: fetchImpl as unknown as typeof fetch,
+      userAgent: UA,
       now: () => clock,
       sleep: async (ms) => { slept.push(ms); clock += ms; },
     });
@@ -99,7 +111,7 @@ describe("createZkbClient", () => {
     const rows = await h.client.fetchPage("kills", CID, 1);
     expect(rows).toHaveLength(3);
     expect(h.seen[0].url).toBe(`${ZKB_BASE_URL}kills/characterID/${CID}/page/1/`);
-    expect(h.seen[0].headers["User-Agent"]).toBe(ZKB_USER_AGENT);
+    expect(h.seen[0].headers["User-Agent"]).toBe(UA);
     expect(h.seen[0].headers["Accept-Encoding"]).toBe("gzip");
     expect(h.seen[0].headers.Accept).toBe("application/json");
   });

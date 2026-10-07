@@ -24,9 +24,9 @@ const PLAN = {
 };
 const TIMELINE = { entries: [], totalSp: 8000, totalMs: 15_000_000, doneAt: new Date("2026-09-01T04:10:00Z"), unknownSkillIds: [] };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const get = (url: string) => new NextRequest(`https://eve.plasma66.com${url}`);
+const get = (url: string) => new NextRequest(`https://eve.example.com${url}`);
 const body = (url: string, method: string, value: unknown) =>
-  new NextRequest(`https://eve.plasma66.com${url}`,
+  new NextRequest(`https://eve.example.com${url}`,
     { method, body: JSON.stringify(value), headers: { "content-type": "application/json" } });
 
 beforeEach(() => {

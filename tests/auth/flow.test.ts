@@ -7,7 +7,7 @@ import type { SsoMetadata } from "../../src/lib/auth/sso.js";
 
 const config = loadConfig({
   NODE_ENV: "test",
-  EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.plasma66.com/auth/callback",
+  EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.example.com/auth/callback",
   ALLOWED_CHARACTER_IDS: "669539978", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",
 });
@@ -64,7 +64,7 @@ describe("completeLogin", () => {
 });
 
 describe("safeNextPath", () => {
-  const origin = "https://eve.plasma66.com";
+  const origin = "https://eve.example.com";
   it.each([
     ["/ships", "/ships"],
     ["//evil.com/x", "/"],

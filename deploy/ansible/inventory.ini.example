@@ -1,0 +1,13 @@
+# deploy/setup.sh writes inventory.ini for you. Two shapes:
+
+# Install on the machine you run the playbook on:
+[eve]
+yutani-os ansible_host=127.0.0.1 ansible_connection=local
+
+# ...or over SSH (key auth, a user with sudo):
+# [eve]
+# yutani-os ansible_host=192.168.1.50
+
+[eve:vars]
+ansible_user=youruser
+ansible_python_interpreter=/usr/bin/python3

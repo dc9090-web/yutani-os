@@ -22,7 +22,7 @@ describe("config", () => {
   });
   it("derives siteOrigin from the callback URL (route handlers behind Traefik see localhost)", () => {
     expect(loadConfig(full).siteOrigin).toBe("https://x");
-    expect(loadConfig({ ...full, EVE_CALLBACK_URL: "https://eve.plasma66.com/auth/callback" }).siteOrigin).toBe("https://eve.plasma66.com");
+    expect(loadConfig({ ...full, EVE_CALLBACK_URL: "https://eve.example.com/auth/callback" }).siteOrigin).toBe("https://eve.example.com");
   });
   it("names every missing variable", () => {
     const { EVE_CLIENT_SECRET: _a, DATABASE_URL: _b, ...rest } = full;

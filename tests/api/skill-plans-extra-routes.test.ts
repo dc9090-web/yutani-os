@@ -34,9 +34,9 @@ const CONTEXT = {
 };
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
-const get = (url: string) => new NextRequest(`https://eve.plasma66.com${url}`);
+const get = (url: string) => new NextRequest(`https://eve.example.com${url}`);
 const post = (url: string, value: unknown) =>
-  new NextRequest(`https://eve.plasma66.com${url}`,
+  new NextRequest(`https://eve.example.com${url}`,
     { method: "POST", body: JSON.stringify(value), headers: { "content-type": "application/json" } });
 
 beforeEach(() => {

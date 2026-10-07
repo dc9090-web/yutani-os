@@ -9,7 +9,7 @@ vi.mock("../../src/lib/sde/repo.js", () => ({ browseTypes, listMarketGroups, get
 const { GET: TYPES } = await import("../../src/app/api/sde/types/route.js");
 const { GET: GROUPS } = await import("../../src/app/api/sde/market-groups/route.js");
 
-const request = (path: string) => new NextRequest(`https://eve.plasma66.com${path}`);
+const request = (path: string) => new NextRequest(`https://eve.example.com${path}`);
 
 beforeEach(() => {
   vi.resetAllMocks();

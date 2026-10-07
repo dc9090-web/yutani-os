@@ -13,3 +13,7 @@ next-env.d.ts
 # Design-package hand-backs and local scratch
 *.zip
 /resources/
+
+# Per-site install settings written by deploy/setup.sh
+deploy/ansible/inventory.ini
+deploy/ansible/vars/site.yml

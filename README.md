@@ -257,7 +257,7 @@ The first worker tick downloads and imports the SDE, which takes a few minutes. 
 | `ALLOWED_CHARACTER_IDS` | Comma-separated character IDs that may sign in. |
 | `OVERVIEW_CHARACTER_IDS` | Which of them the Overview and the Training overview show. Empty means all. |
 | `ESI_COMPATIBILITY_DATE` | A date from ESI's published list. Pinned in five places; bump them together and re-run `npm run esi:types`. |
-| `ESI_USER_AGENT` | A descriptive user agent with a contact, as CCP asks. |
+| `ESI_USER_AGENT` | A descriptive user agent with a contact, as CCP asks. The zKillboard client appends the site URL to it. |
 | `SESSION_SECRET` | Signs the session cookie and encrypts refresh tokens. `openssl rand -hex 32`. |
 | `DATABASE_URL`, `POSTGRES_PASSWORD` | Where Postgres is. |
 
@@ -280,15 +280,16 @@ The first worker tick downloads and imports the SDE, which takes a few minutes. 
 
 ## 🤖 Deploying
 
-`deploy/` has the production Compose file and an Ansible playbook with four roles: `common`, `docker`, `traefik` and `eve`. Traefik terminates TLS with a Cloudflare DNS challenge and the app is restricted to your LAN and tailnet. The whole stack is three containers: Postgres, the app and the worker, built from one image.
+One script asks the questions, one playbook does the install, on the machine you run it from or on a host over SSH. You pick the subdomain; the host's address, its LAN range and the secrets are detected or generated.
 
 ```bash
+./deploy/setup.sh                                   # subdomain, email, characters, EVE SSO app, Cloudflare token
 cd deploy/ansible
 ansible-galaxy collection install -r requirements.yml
-cp vars/secrets.yml.example vars/secrets.yml      # fill it in; the playbook refuses CHANGEME
-ansible-playbook site.yml                          # first deploy
-ansible-playbook site.yml --tags eve               # redeploy app changes
+ansible-playbook -K site.yml                        # first install; later: --tags eve to redeploy the app
 ```
+
+What you need: a Debian or Ubuntu host, a subdomain whose DNS zone is on Cloudflare with an A record pointing at the host, a Cloudflare DNS token, and an EVE developer application with `https://<your domain>/auth/callback` as its callback. The stack is three containers, Postgres, the app and the worker, behind Traefik with a Let's Encrypt certificate obtained through a DNS challenge, so it works on a LAN-only host. Only the host's own LAN, Tailscale and the networks you add can reach it.
 
 See [deploy/README.md](deploy/README.md) for the SDE, market, fitting, planner and combat operational notes.
 

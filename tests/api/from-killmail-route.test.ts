@@ -10,7 +10,7 @@ vi.mock("../../src/lib/combat/fit.js", () => ({ fitFromKillmail }));
 const { POST } = await import("../../src/app/api/fits/from-killmail/route.js");
 
 const CID = 669539978;
-const post = (body: unknown) => new NextRequest("https://eve.plasma66.com/api/fits/from-killmail", {
+const post = (body: unknown) => new NextRequest("https://eve.example.com/api/fits/from-killmail", {
   method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
 });
 

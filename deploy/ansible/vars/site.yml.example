@@ -1,0 +1,8 @@
+---
+# deploy/setup.sh writes vars/site.yml for you. Defaults for everything else are in group_vars/eve.yml.
+domain: "eve.example.com"                 # the subdomain; its DNS zone must be on Cloudflare
+acme_email: "you@example.com"             # Let's Encrypt notices + the contact in the ESI user agent
+allowed_character_ids: "90000101,90000102" # who may sign in (comma-separated character IDs)
+overview_character_ids: ""                # shown on the Overview and Training overview; empty = all
+extra_allowed_cidrs: []                   # e.g. ["192.168.1.0/24"]; the host's LAN and Tailscale are always allowed
+# lan_allowed_cidrs: [...]                # set this to replace the detected list entirely

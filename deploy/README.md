@@ -1,43 +1,56 @@
-# Deploying EVE
+# Deploying Yutani OS
 
-Ansible provisions and updates the VM at `10.5.5.150` (inventory group `eve`), which runs Traefik
-plus the app/worker/postgres stack via Docker Compose.
+One Ansible playbook installs everything on a Debian or Ubuntu host: Docker, Traefik (TLS through a
+Cloudflare DNS-01 challenge, so a LAN-only host gets a real certificate), then the app, the worker and
+Postgres from `deploy/docker-compose.yml`. It installs on the machine you run it from, or on a host over
+SSH; the host's own LAN, Tailscale and loopback are the only networks allowed in unless you add more.
 
-## Prerequisites
+## 1. Answer the questions
+
+```
+./deploy/setup.sh
+```
+
+It asks for the subdomain, a contact email, which characters may sign in, your EVE SSO application and a
+Cloudflare DNS token, generates the session secret and the Postgres password, and writes three git-ignored
+files: `ansible/inventory.ini` (where), `ansible/vars/site.yml` (what) and `ansible/vars/secrets.yml`
+(0600). Re-running keeps your answers as defaults and never regenerates a secret. Every prompt can be
+pre-seeded from an environment variable of the same name (`DOMAIN=eve.example.com ./deploy/setup.sh`).
+
+You need, before you start:
+
+- A subdomain whose DNS zone is on Cloudflare, with an **A record pointing at the host** (DNS-only, grey
+  cloud; a private LAN address is fine). `setup.sh` prints the address it detected.
+- A Cloudflare API token with *Zone → DNS → Edit* on that zone.
+- An EVE developer application (<https://developers.eveonline.com>) with the callback
+  `https://<your domain>/auth/callback` and the twelve scopes listed in `src/lib/auth/sso.ts`.
+- The character IDs you want to allow in.
+
+## 2. Install
 
 ```
 cd deploy/ansible
 ansible-galaxy collection install -r requirements.yml
-cp vars/secrets.yml.example vars/secrets.yml
+ansible-playbook -K site.yml
 ```
 
-Fill in `vars/secrets.yml` with real values (Cloudflare DNS API token, EVE SSO client secret,
-session secret, Postgres password). `site.yml` refuses to run while any value is still
-`CHANGEME`. Never commit `vars/secrets.yml`.
-
-## First deploy
-
-```
-ansible-playbook site.yml
-```
-
-This runs all four roles in order: `common` (base packages, users), `docker` (engine + compose
-plugin), `traefik` (reverse proxy, TLS via Cloudflare DNS challenge), `eve` (syncs the repo to the
-VM, builds the app image, starts the stack, applies the DB schema).
+`-K` asks for the sudo password; drop it if the user has passwordless sudo. The playbook refuses to run
+while `site.yml` or `secrets.yml` still hold placeholders. The four roles run in order: `common` (base
+packages, swap), `docker` (engine + compose plugin), `traefik` (reverse proxy and certificate), `eve`
+(syncs this repository to `/opt/eve/src`, builds the image, starts the stack, applies the schema).
 
 ## Redeploying app changes
 
 ```
-ansible-playbook site.yml --tags eve
+ansible-playbook -K site.yml --tags eve
 ```
 
-Only re-syncs the repo, rebuilds the image, restarts the stack and re-applies the schema — skips
-the (idempotent but slower) `common`/`docker`/`traefik` roles.
+Only re-syncs the repository, rebuilds the image, restarts the stack and re-applies the schema; skips the
+idempotent but slower `common`/`docker`/`traefik` roles. Changed a setting in `vars/site.yml`? Same command.
 
-## Running Ansible from Claude's shell
+## Running Ansible from a non-interactive shell
 
-The Bash tool's non-interactive shell breaks Ansible's progress/callback output. Wrap the command
-in `script` to give it a pseudo-tty:
+A shell without a pseudo-tty breaks Ansible's progress output. Wrap the command in `script`:
 
 ```
 script -qc "ansible-playbook site.yml --tags eve" /dev/null
@@ -69,7 +82,7 @@ and `scripts/esi-types.ts`. Bump all five together and re-run `npm run esi:types
 ## Where things live on the VM
 
 - `/opt/eve/traefik` — Traefik config, dynamic routes, ACME certificate storage.
-- `/opt/eve/src` — the synced repository; `/opt/eve/src/deploy` is the Compose project directory
+- `/opt/eve/src` — the synced repository (`base_dir` in `group_vars/eve.yml`); `/opt/eve/src/deploy` is the Compose project directory
   (`docker-compose.yml`, the templated `.env`) that `docker compose` commands run from.
 
 ## Static data (SDE)
@@ -87,7 +100,7 @@ The worker polls CCP's Static Data Export on a schedule; there is nothing to pro
 - To force a re-import without waiting for the schedule:
 
   ```
-  ssh daniel@10.5.5.150 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
+  ssh <user>@<host> 'cd /opt/eve/src/deploy && docker compose exec -T worker npm run sde:import'
   ```
 
 - **A release that adds new `sde_*` tables needs a forced import.** The `sde-update` job only
@@ -204,9 +217,11 @@ Everything is behind the session cookie: `src/proxy.ts` guards every path except
 ## Logs and troubleshooting
 
 ```
-ssh daniel@10.5.5.150 'docker ps --format "{{.Names}} {{.Status}}"'
-ssh daniel@10.5.5.150 'docker logs --tail 50 eve-app'
-ssh daniel@10.5.5.150 'docker logs --tail 50 eve-worker'
+ssh <user>@<host> 'docker ps --format "{{.Names}} {{.Status}}"'
+ssh <user>@<host> 'docker logs --tail 50 eve-app'
+ssh <user>@<host> 'docker logs --tail 50 eve-worker'
 ```
 
-Health check: `curl -sS https://eve.plasma66.com/api/health` should return `{"ok":true,"db":true}`.
+On a local install, drop the `ssh` and run the commands directly.
+
+Health check: `curl -sS https://<your domain>/api/health` should return `{"ok":true,"db":true}`.

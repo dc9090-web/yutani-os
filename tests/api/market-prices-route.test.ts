@@ -11,7 +11,7 @@ vi.mock("../../src/lib/db/market-prices.js", () => ({
 vi.mock("../../src/lib/market/fuzzwork.js", () => ({ fetchAggregates, FUZZWORK_CHUNK: 500 }));
 
 const { GET } = await import("../../src/app/api/market/prices/route.js");
-const request = (query: string) => new NextRequest(`https://eve.plasma66.com/api/market/prices${query}`);
+const request = (query: string) => new NextRequest(`https://eve.example.com/api/market/prices${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();

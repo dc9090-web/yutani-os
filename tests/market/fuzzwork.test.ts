@@ -26,7 +26,7 @@ describe("fetchAggregates", () => {
       "34": { buy: { max: "3.67", min: "0.01" }, sell: { min: "3.85", max: "38420.0" } },
       "587": { buy: { max: "0" }, sell: { min: "0" } },
     }));
-    const rows = await fetchAggregates([34, 587], fetchImpl as unknown as typeof fetch, "EVE/0.1 dac9dc@gmail.com");
+    const rows = await fetchAggregates([34, 587], fetchImpl as unknown as typeof fetch, "EVE/0.1 ops@example.com");
 
     expect(rows).toEqual([
       { typeId: 34, sellMin: 3.85, buyMax: 3.67 },
@@ -35,7 +35,7 @@ describe("fetchAggregates", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
     const [url, init] = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toBe("https://market.fuzzwork.co.uk/aggregates/?region=10000002&types=34,587");
-    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("EVE/0.1 dac9dc@gmail.com");
+    expect((init.headers as Record<string, string>)["User-Agent"]).toBe("EVE/0.1 ops@example.com");
   });
 
   it("chunks at 500 ids per request and deduplicates", async () => {

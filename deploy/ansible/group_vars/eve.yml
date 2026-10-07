@@ -1,18 +1,18 @@
 ---
+# Defaults for every install. Site-specific values (domain, email, characters, networks) come from
+# vars/site.yml, which deploy/setup.sh writes; secrets from vars/secrets.yml.
 timezone: "Etc/UTC"
 base_dir: /opt/eve
-domain: eve.plasma66.com
-acme_email: "dac9dc@gmail.com"
-swap_size_mb: 4096
-# Tailscale CGNAT range + the VM's LAN + loopback. Cloudflare record is grey-cloud, so Traefik sees real client IPs.
-lan_allowed_cidrs:
-  - "100.64.0.0/10"
-  - "10.5.5.0/24"
-  - "127.0.0.1/32"
+swap_size_mb: 4096            # build headroom: `next build` needs ~2 GB on a small VM
 images:
   traefik: "traefik:v3.6"
+# Must be a date ESI publishes (GET https://esi.evetech.net/meta/compatibility-dates). Pinned in five
+# places: here, .env, .env.example, deploy/.env.example and scripts/esi-types.ts. Bump them together.
 esi_compatibility_date: "2026-08-18"
-esi_user_agent: "EVE-Plasma/0.1 (dac9dc@gmail.com)"
-allowed_character_ids: "669539978,2124678472,2124630678,2124676962,2124685484,2124685500,2124716065"
-# Overview page + Skills training overview: TrilliumONE, Sasha-9999, Reacher-9, Lana C
-overview_character_ids: "669539978,2124630678,2124678472,2124676962"
+# CCP asks every ESI caller to identify itself with a contact; zKillboard also wants the project URL.
+esi_user_agent: "YutaniOS/0.1 ({{ acme_email }}; +https://{{ domain }})"
+overview_character_ids: ""
+# Traefik's lan-only allow-list is built at install time from the host's own LAN, Tailscale's range
+# and loopback, plus extra_allowed_cidrs. Set lan_allowed_cidrs in site.yml to replace it outright.
+extra_allowed_cidrs: []
+tailscale_cidr: "100.64.0.0/10"
