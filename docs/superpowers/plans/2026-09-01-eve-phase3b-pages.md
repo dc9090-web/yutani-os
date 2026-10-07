@@ -1123,12 +1123,12 @@ describe("displayNames", () => {
   it("returns only the ids universe_names has a name for", async () => {
     await putNames([
       { id: 1000035, category: "corporation", name: "Caldari Navy" },
-      { id: 669539978, category: "character", name: "TrilliumONE" },
+      { id: 90000101, category: "character", name: "Mara Vexley" },
       { id: 777, category: "unknown", name: null },
     ]);
-    const names = await displayNames([1000035, 669539978, 777, 888]);
+    const names = await displayNames([1000035, 90000101, 777, 888]);
     expect(names.get(1000035)).toBe("Caldari Navy");
-    expect(names.get(669539978)).toBe("TrilliumONE");
+    expect(names.get(90000101)).toBe("Mara Vexley");
     expect(names.has(777)).toBe(false);        // cached as unresolvable
     expect(names.has(888)).toBe(false);        // never seen
   });
@@ -1553,8 +1553,8 @@ import { render, screen } from "@testing-library/react";
 import { CharacterCard, type OverviewCard } from "../../src/app/components/CharacterCard.js";
 
 const full: OverviewCard = {
-  id: 669539978,
-  name: "TrilliumONE",
+  id: 90000101,
+  name: "Mara Vexley",
   corp: "Caldari Navy · Northern Coalition",
   needsReauth: false,
   balance: "1,234,567.89 ISK",
@@ -1570,7 +1570,7 @@ const full: OverviewCard = {
 describe("CharacterCard", () => {
   it("shows the balance, location, ship, training, SP and last sync", () => {
     render(<CharacterCard card={full} />);
-    expect(screen.getByRole("heading", { name: /TrilliumONE/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Mara Vexley/ })).toBeInTheDocument();
     expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
     expect(screen.getByText("1,234,567.89 ISK")).toBeInTheDocument();
     expect(screen.getByText("Jita")).toBeInTheDocument();
@@ -3203,7 +3203,7 @@ const journal: JournalRow[] = [
     id: 24_000_000_001, date: new Date("2026-08-31T18:30:12Z"), refType: "market_transaction",
     description: "Market transaction", amount: -4180.5, balance: 1234567.89, reason: null,
     contextId: 99, contextIdType: "market_transaction_id",
-    firstPartyId: 669539978, secondPartyId: 2112625428, tax: null, taxReceiverId: null,
+    firstPartyId: 90000101, secondPartyId: 2112625428, tax: null, taxReceiverId: null,
   },
   {
     id: 24_000_000_002, date: new Date("2026-08-31T17:00:00Z"), refType: "brand_new_ref_type_2027",
@@ -3213,11 +3213,11 @@ const journal: JournalRow[] = [
   {
     id: 24_000_000_003, date: new Date("2026-08-31T16:00:00Z"), refType: "player_donation",
     description: "gift", amount: 1000000, balance: 1238748.39, reason: "thanks",
-    contextId: null, contextIdType: null, firstPartyId: 2112625428, secondPartyId: 669539978, tax: null, taxReceiverId: null,
+    contextId: null, contextIdType: null, firstPartyId: 2112625428, secondPartyId: 90000101, tax: null, taxReceiverId: null,
   },
 ];
 
-const names = new Map([[669539978, "TrilliumONE"], [2112625428, "Caldari Navy"]]);
+const names = new Map([[90000101, "Mara Vexley"], [2112625428, "Caldari Navy"]]);
 
 describe("toJournalViews", () => {
   it("formats the date, humanises the ref type and signs the amount", () => {
@@ -3225,7 +3225,7 @@ describe("toJournalViews", () => {
     expect(first).toEqual({
       id: 24_000_000_001, date: "2026-08-31 18:30", refType: "Market transaction",
       description: "Market transaction", amount: "-4,180.50 ISK", sign: "neg", balance: "1,234,567.89 ISK",
-      firstParty: "TrilliumONE", secondParty: "Caldari Navy",
+      firstParty: "Mara Vexley", secondParty: "Caldari Navy",
     });
     expect(toJournalViews(journal, names)[2].sign).toBe("pos");
   });
@@ -3299,13 +3299,13 @@ vi.mock("../../src/lib/view/wallet.js", () => ({ loadJournalViews, loadTransacti
 
 const { GET } = await import("../../src/app/api/characters/[id]/wallet/route.js");
 
-const CID = 669539978;
+const CID = 90000101;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const request = (query: string) => new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/wallet${query}`);
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "TrilliumONE" } : null));
+  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "Mara Vexley" } : null));
   loadJournalViews.mockResolvedValue([{ id: 1, date: "2026-08-31 18:30", refType: "Market transaction", description: "", amount: null, sign: "", balance: null, firstParty: null, secondParty: null }]);
   loadTransactionViews.mockResolvedValue([{ transactionId: 2, date: "2026-08-31 18:30", side: "Buy", typeName: "Tritanium", quantity: "1,000", unitPrice: "4.18 ISK", total: "4,180.00 ISK", location: "Jita" }]);
 });
@@ -3345,7 +3345,7 @@ describe("GET /api/characters/[id]/wallet", () => {
 Append to the `describe("isPublicPath", …)` block in `tests/proxy.test.ts`:
 ```ts
   it("guards the wallet JSON route like every other API route", () => {
-    expect(isPublicPath("/api/characters/669539978/wallet?kind=journal&offset=100")).toBe(false);
+    expect(isPublicPath("/api/characters/90000101/wallet?kind=journal&offset=100")).toBe(false);
   });
 ```
 
@@ -3562,13 +3562,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { JournalTable, TransactionsTable } from "../../src/app/wallet/WalletTables.js";
 import type { JournalView, TransactionView } from "../../src/lib/view/wallet.js";
 
-const CID = 669539978;
+const CID = 90000101;
 
 function journalRow(id: number, sign: "pos" | "neg" | "" = "neg"): JournalView {
   return {
     id, date: "2026-08-31 18:30", refType: "Market transaction", description: "",
     amount: sign === "" ? null : "-4,180.50 ISK", sign, balance: "1,234,567.89 ISK",
-    firstParty: "TrilliumONE", secondParty: "Caldari Navy",
+    firstParty: "Mara Vexley", secondParty: "Caldari Navy",
   };
 }
 function transactionRow(id: number): TransactionView {
@@ -3590,7 +3590,7 @@ describe("JournalTable", () => {
     render(<JournalTable characterId={CID} initial={[journalRow(1), { ...journalRow(2), sign: "pos", amount: "1,000,000.00 ISK" }]} />);
     expect(screen.getByText("-4,180.50 ISK")).toHaveClass("neg");
     expect(screen.getByText("1,000,000.00 ISK")).toHaveClass("pos");
-    expect(screen.getAllByText("TrilliumONE")).toHaveLength(2);
+    expect(screen.getAllByText("Mara Vexley")).toHaveLength(2);
     expect(screen.getAllByText("Market transaction")).toHaveLength(2);
   });
 

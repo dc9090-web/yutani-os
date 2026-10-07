@@ -525,9 +525,15 @@ li.slot-row:last-child { border-bottom: 0; }
 .badge.queued { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
 .badge.planned { background: rgba(125, 211, 160, 0.14); color: var(--pos); }
 .plan-actions { display: flex; gap: 2px; align-items: center; white-space: nowrap; }
-.plan-editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-.plan-editor-main { display: grid; gap: 20px; }
+/* The plan table has ten columns; it gets the full content width. The skill picker and the attributes
+   panel share the band under it (picker left, attributes 340px right), like the fitting editor's .fit-lower. */
+.plan-editor { display: grid; gap: 20px; }
+.plan-lower { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 .plan-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 18px; }
+.plan-head { margin: 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+.plan-table th, .plan-table td { white-space: nowrap; }
+.plan-table td:nth-child(2) { white-space: normal; min-width: 200px; }
+.plan-group { display: block; }
 .remap-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 2px; font-size: 12px; }
 .remap-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; gap: 8px; }
 .remap-delta { color: var(--accent); }
@@ -536,7 +542,7 @@ li.slot-row:last-child { border-bottom: 0; }
 .skill-picker-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 320px; overflow: auto; }
 .skill-picker-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
 .skill-picker-row:hover { background: var(--raised); }
-@media (max-width: 900px) { .plan-editor { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .plan-lower { grid-template-columns: 1fr; } .plan-table th, .plan-table td { white-space: normal; } }
 
 /* ---------- Combat (phase 7) ---------- */
 .badge.kill { background: rgba(67, 217, 160,.14); color: var(--pos); }
@@ -613,7 +619,7 @@ a:not([class]) { color: var(--accent-2); }
 .page-sub::after { content: ""; flex: 1; max-width: 220px; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 
 /* ---------- panels: glass, lit top edge, corner brackets ---------- */
-.card, .fit-toolbar, .login-card {
+.card, .fit-toolbar, .plan-head, .login-card {
   border-radius: 0; border: 1px solid var(--border); border-top-color: rgba(245, 166, 35, .30);
   background:
     linear-gradient(var(--bracket), var(--bracket)) left 8px top 8px / 12px 1px no-repeat,
@@ -758,7 +764,7 @@ a:not([class]) { color: var(--accent-2); }
     </nav>
     <button type="button" class="user-menu" aria-label="Character menu">
       <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
-      <span class="user-name">TrilliumONE</span>
+      <span class="user-name">Mara Vexley</span>
       <span class="user-caret" aria-hidden="true"></span>
     </button>
   </div>
@@ -774,7 +780,7 @@ a:not([class]) { color: var(--accent-2); }
 <main class="app-main">
 <!-- src/app/wallet/page.tsx + src/app/wallet/WalletTables.tsx -->
 <h1 class="page-title">Wallet</h1>
-<p class="page-sub">TrilliumONE</p>
+<p class="page-sub">Mara Vexley</p>
 <div class="card-stack">
   <div class="card">
     <h2 class="card-title">Balance</h2>
@@ -790,14 +796,14 @@ a:not([class]) { color: var(--accent-2); }
           <td class="muted">2026-09-30 21:14</td>
           <td>Bounty prizes</td>
           <td>CONCORD</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">2,418,955.00 ISK</span></td>
           <td class="num muted">128,450,032.10 ISK</td>
         </tr>
         <tr>
           <td class="muted">2026-09-30 19:02</td>
           <td>Market transaction</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>Caldari Navy</td>
           <td class="num"><span class="neg">-54,900,000.00 ISK</span></td>
           <td class="num muted">126,031,077.10 ISK</td>
@@ -805,7 +811,7 @@ a:not([class]) { color: var(--accent-2); }
         <tr>
           <td class="muted">2026-09-30 19:02</td>
           <td>Brokers fee</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>Caldari Navy</td>
           <td class="num"><span class="neg">-1,647,000.00 ISK</span></td>
           <td class="num muted">180,931,077.10 ISK</td>
@@ -813,7 +819,7 @@ a:not([class]) { color: var(--accent-2); }
         <tr>
           <td class="muted">2026-09-30 17:45</td>
           <td>Transaction tax</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>Secure Commerce Commission</td>
           <td class="num"><span class="neg">-312,480.00 ISK</span></td>
           <td class="num muted">182,578,077.10 ISK</td>
@@ -821,16 +827,16 @@ a:not([class]) { color: var(--accent-2); }
         <tr>
           <td class="muted">2026-09-30 17:45</td>
           <td>Market transaction</td>
-          <td>Lana C</td>
-          <td>TrilliumONE</td>
+          <td>Tove Ash</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">8,680,000.00 ISK</span></td>
           <td class="num muted">182,890,557.10 ISK</td>
         </tr>
         <tr>
           <td class="muted">2026-09-29 23:10</td>
           <td>Player donation</td>
-          <td>TrilliumONE</td>
-          <td>Sasha-9999</td>
+          <td>Mara Vexley</td>
+          <td>Nyx Calder</td>
           <td class="num"><span class="neg">-25,000,000.00 ISK</span></td>
           <td class="num muted">174,210,557.10 ISK</td>
         </tr>
@@ -838,14 +844,14 @@ a:not([class]) { color: var(--accent-2); }
           <td class="muted">2026-09-29 20:33</td>
           <td>Insurance</td>
           <td>Secure Commerce Commission</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">11,257,320.00 ISK</span></td>
           <td class="num muted">199,210,557.10 ISK</td>
         </tr>
         <tr>
           <td class="muted">2026-09-29 20:31</td>
           <td>Insurance</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>Secure Commerce Commission</td>
           <td class="num"><span class="neg">-3,377,196.00 ISK</span></td>
           <td class="num muted">187,953,237.10 ISK</td>
@@ -854,7 +860,7 @@ a:not([class]) { color: var(--accent-2); }
           <td class="muted">2026-09-29 14:08</td>
           <td>Agent mission reward</td>
           <td>Aursa Kunivuri</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">1,086,000.00 ISK</span></td>
           <td class="num muted">191,330,433.10 ISK</td>
         </tr>
@@ -862,22 +868,22 @@ a:not([class]) { color: var(--accent-2); }
           <td class="muted">2026-09-29 14:08</td>
           <td>Agent mission time bonus reward</td>
           <td>Aursa Kunivuri</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">842,000.00 ISK</span></td>
           <td class="num muted">190,244,433.10 ISK</td>
         </tr>
         <tr>
           <td class="muted">2026-09-28 09:52</td>
           <td>Contract price</td>
-          <td>TrilliumONE</td>
-          <td>Reacher-9</td>
+          <td>Mara Vexley</td>
+          <td>Jorin Hale</td>
           <td class="num"><span class="neg">-140,000,000.00 ISK</span></td>
           <td class="num muted">189,402,433.10 ISK</td>
         </tr>
         <tr>
           <td class="muted">2026-09-28 09:52</td>
           <td>Contract brokers fee</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>Boundless Creation</td>
           <td class="num"><span class="neg">-10,000.00 ISK</span></td>
           <td class="num muted">329,402,433.10 ISK</td>
@@ -885,7 +891,7 @@ a:not([class]) { color: var(--accent-2); }
         <tr>
           <td class="muted">2026-09-27 22:40</td>
           <td>Market escrow</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>—</td>
           <td class="num"><span class="neg">-6,500,000.00 ISK</span></td>
           <td class="num muted">329,412,433.10 ISK</td>
@@ -894,7 +900,7 @@ a:not([class]) { color: var(--accent-2); }
           <td class="muted">2026-09-27 22:38</td>
           <td>Corporation account withdrawal</td>
           <td>Republic Fleet Reserves</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td class="num"><span class="pos">50,000,000.00 ISK</span></td>
           <td class="num muted">335,912,433.10 ISK</td>
         </tr>
@@ -902,7 +908,7 @@ a:not([class]) { color: var(--accent-2); }
         <tr>
           <td class="muted">2026-09-27 12:00</td>
           <td>Skill purchase</td>
-          <td>TrilliumONE</td>
+          <td>Mara Vexley</td>
           <td>—</td>
           <td class="num">—</td>
           <td class="num muted">—</td>

@@ -2751,16 +2751,16 @@ beforeEach(async () => {
   await pool.query("TRUNCATE characters RESTART IDENTITY CASCADE");
   await pool.query(
     `INSERT INTO characters (id, name, refresh_token_enc) VALUES
-      (669539978, 'TrilliumONE', 'enc'), (95465499, 'Reacher-9', 'enc')`);
+      (90000101, 'Mara Vexley', 'enc'), (95465499, 'Jorin Hale', 'enc')`);
 });
 
 describe("createPlan / getPlan", () => {
   it("stores the head, the remap and the entries in order", async () => {
     const plan = await createPlan({
-      characterId: 669539978, name: "Gunnery", remap: REMAP,
+      characterId: 90000101, name: "Gunnery", remap: REMAP,
       entries: [{ skillId: 3300, level: 5 }, { skillId: 3318, level: 4, note: "for AWU" }],
     });
-    expect(plan).toMatchObject({ characterId: 669539978, name: "Gunnery", remap: REMAP });
+    expect(plan).toMatchObject({ characterId: 90000101, name: "Gunnery", remap: REMAP });
     expect(plan.entries).toEqual([
       { position: 0, skillId: 3300, level: 5, note: null },
       { position: 1, skillId: 3318, level: 4, note: "for AWU" },
@@ -2769,7 +2769,7 @@ describe("createPlan / getPlan", () => {
   });
 
   it("defaults the remap to null and the entries to empty", async () => {
-    const plan = await createPlan({ characterId: 669539978, name: "Empty" });
+    const plan = await createPlan({ characterId: 90000101, name: "Empty" });
     expect(plan.remap).toBeNull();
     expect(plan.entries).toEqual([]);
   });
@@ -2781,10 +2781,10 @@ describe("createPlan / getPlan", () => {
 
 describe("listPlans", () => {
   it("returns only that character's plans, newest first", async () => {
-    const first = await createPlan({ characterId: 669539978, name: "First", entries: [{ skillId: 3300, level: 1 }] });
-    const second = await createPlan({ characterId: 669539978, name: "Second" });
+    const first = await createPlan({ characterId: 90000101, name: "First", entries: [{ skillId: 3300, level: 1 }] });
+    const second = await createPlan({ characterId: 90000101, name: "Second" });
     await createPlan({ characterId: 95465499, name: "Someone else's" });
-    const plans = await listPlans(669539978);
+    const plans = await listPlans(90000101);
     expect(plans.map((p) => p.name)).toEqual(["Second", "First"]);
     expect(plans.find((p) => p.id === first.id)!.entries).toHaveLength(1);
     expect(plans.find((p) => p.id === second.id)!.entries).toEqual([]);
@@ -2794,7 +2794,7 @@ describe("listPlans", () => {
 describe("updatePlan", () => {
   it("replaces the entries wholesale and touches updated_at", async () => {
     const plan = await createPlan({
-      characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }],
+      characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }],
     });
     const updated = await updatePlan(plan.id, {
       name: "Gunnery and frigates",
@@ -2808,7 +2808,7 @@ describe("updatePlan", () => {
 
   it("leaves the entries alone when the patch omits them, and clears a remap with null", async () => {
     const plan = await createPlan({
-      characterId: 669539978, name: "Gunnery", remap: REMAP, entries: [{ skillId: 3300, level: 5 }],
+      characterId: 90000101, name: "Gunnery", remap: REMAP, entries: [{ skillId: 3300, level: 5 }],
     });
     const renamed = await updatePlan(plan.id, { name: "Renamed" });
     expect(renamed!.entries).toHaveLength(1);
@@ -2819,7 +2819,7 @@ describe("updatePlan", () => {
   });
 
   it("can empty a plan and answers null for an unknown id", async () => {
-    const plan = await createPlan({ characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
+    const plan = await createPlan({ characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
     expect((await updatePlan(plan.id, { entries: [] }))!.entries).toEqual([]);
     expect(await updatePlan(999999, { name: "nope" })).toBeNull();
   });
@@ -2827,7 +2827,7 @@ describe("updatePlan", () => {
 
 describe("deletePlan and cascades", () => {
   it("deletes a plan and its entries, and reports an unknown id", async () => {
-    const plan = await createPlan({ characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
+    const plan = await createPlan({ characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
     expect(await deletePlan(plan.id)).toBe(true);
     expect(await getPlan(plan.id)).toBeNull();
     const { rows } = await pool.query("SELECT count(*) FROM skill_plan_entries WHERE plan_id = $1", [plan.id]);
@@ -3124,11 +3124,11 @@ describe("loadPlanContext", () => {
   beforeEach(async () => {
     await pool.query("TRUNCATE characters RESTART IDENTITY CASCADE");
     await pool.query(
-      `INSERT INTO characters (id, name, refresh_token_enc) VALUES (669539978, 'TrilliumONE', 'enc')`);
+      `INSERT INTO characters (id, name, refresh_token_enc) VALUES (90000101, 'Mara Vexley', 'enc')`);
   });
 
   it("falls back to EVE's displayed baseline when nothing is synced", async () => {
-    const ctx = await loadPlanContext(669539978);
+    const ctx = await loadPlanContext(90000101);
     expect(ctx.base).toEqual(DEFAULT_BASE_ATTRIBUTES);
     expect(DEFAULT_BASE_ATTRIBUTES).toEqual(
       { charisma: 19, intelligence: 20, memory: 20, perception: 20, willpower: 20 });
@@ -3142,22 +3142,22 @@ describe("loadPlanContext", () => {
   it("adds implant bonuses to the stored base and reads the queue", async () => {
     await pool.query(
       `INSERT INTO character_attributes (character_id, charisma, intelligence, memory, perception, willpower, bonus_remaps)
-       VALUES (669539978, 18, 20, 18, 21, 22, 2)`);
+       VALUES (90000101, 18, 20, 18, 21, 22, 2)`);
     // Ocular Filter - Basic (+3 perception) and Neural Boost - Basic (+3 willpower).
-    await pool.query("INSERT INTO character_implants (character_id, type_id) VALUES (669539978, 9899), (669539978, 9942)");
+    await pool.query("INSERT INTO character_implants (character_id, type_id) VALUES (90000101, 9899), (90000101, 9942)");
     await pool.query(
       `INSERT INTO sde_type_attributes (type_id, attribute_id, value) VALUES
         (9899, 178, 3), (9899, 331, 1), (9942, 179, 3), (9942, 331, 3)`);
     await pool.query(
       `INSERT INTO character_skills (character_id, skill_id, trained_level, active_level, skillpoints)
-       VALUES (669539978, 3300, 2, 2, 3000)`);
+       VALUES (90000101, 3300, 2, 2, 3000)`);
     await pool.query(
       `INSERT INTO character_skill_queue
          (character_id, queue_position, skill_id, finished_level, start_date, finish_date, training_start_sp, level_end_sp)
-       VALUES (669539978, 0, 3300, 3, '2026-09-01T00:00:00Z', '2026-09-08T00:00:00Z', 1415, 8000),
-              (669539978, 1, 3300, 4, '2026-09-08T00:00:00Z', '2026-09-20T00:00:00Z', 8000, 45255)`);
+       VALUES (90000101, 0, 3300, 3, '2026-09-01T00:00:00Z', '2026-09-08T00:00:00Z', 1415, 8000),
+              (90000101, 1, 3300, 4, '2026-09-08T00:00:00Z', '2026-09-20T00:00:00Z', 8000, 45255)`);
 
-    const ctx = await loadPlanContext(669539978);
+    const ctx = await loadPlanContext(90000101);
     expect(ctx.base).toEqual({ charisma: 18, intelligence: 20, memory: 18, perception: 21, willpower: 22 });
     expect(ctx.implantBonus).toEqual({ charisma: 0, intelligence: 0, memory: 0, perception: 3, willpower: 3 });
     expect(ctx.effective).toEqual({ charisma: 18, intelligence: 20, memory: 18, perception: 24, willpower: 25 });
@@ -3173,8 +3173,8 @@ describe("loadPlanContext", () => {
   it("flags attributes that cannot be a legal base", async () => {
     await pool.query(
       `INSERT INTO character_attributes (character_id, charisma, intelligence, memory, perception, willpower)
-       VALUES (669539978, 24, 25, 25, 26, 27)`);                 // sums to 127, so implants are baked in
-    expect((await loadPlanContext(669539978)).attributesSane).toBe(false);
+       VALUES (90000101, 24, 25, 25, 26, 27)`);                 // sums to 127, so implants are baked in
+    expect((await loadPlanContext(90000101)).attributesSane).toBe(false);
   });
 });
 
@@ -3184,7 +3184,7 @@ describe("accountTrainingBlock", () => {
     await pool.query("INSERT INTO accounts (id, name) VALUES (1, 'Account one')");
     await pool.query(
       `INSERT INTO characters (id, name, refresh_token_enc, account_id) VALUES
-        (669539978, 'TrilliumONE', 'enc', 1), (95465499, 'Reacher-9', 'enc', 1),
+        (90000101, 'Mara Vexley', 'enc', 1), (95465499, 'Jorin Hale', 'enc', 1),
         (11111111, 'Loner', 'enc', NULL)`);
   });
 
@@ -3193,15 +3193,15 @@ describe("accountTrainingBlock", () => {
       `INSERT INTO character_skill_queue (character_id, queue_position, skill_id, finished_level, start_date, finish_date)
        VALUES (95465499, 0, 3300, 5, '2026-09-01T00:00:00Z', '2026-09-30T00:00:00Z'),
               (95465499, 1, 3318, 4, '2026-09-30T00:00:00Z', '2026-10-05T00:00:00Z')`);
-    const block = await accountTrainingBlock(669539978, new Date("2026-09-02T00:00:00Z"));
-    expect(block).toEqual({ characterId: 95465499, name: "Reacher-9", until: new Date("2026-10-05T00:00:00Z") });
+    const block = await accountTrainingBlock(90000101, new Date("2026-09-02T00:00:00Z"));
+    expect(block).toEqual({ characterId: 95465499, name: "Jorin Hale", until: new Date("2026-10-05T00:00:00Z") });
   });
 
   it("is null when the mate's queue has already finished, and when there is no account", async () => {
     await pool.query(
       `INSERT INTO character_skill_queue (character_id, queue_position, skill_id, finished_level, start_date, finish_date)
        VALUES (95465499, 0, 3300, 5, '2026-08-01T00:00:00Z', '2026-08-10T00:00:00Z')`);
-    expect(await accountTrainingBlock(669539978, new Date("2026-09-02T00:00:00Z"))).toBeNull();
+    expect(await accountTrainingBlock(90000101, new Date("2026-09-02T00:00:00Z"))).toBeNull();
     expect(await accountTrainingBlock(11111111, new Date("2026-09-02T00:00:00Z"))).toBeNull();
   });
 });
@@ -3209,14 +3209,14 @@ describe("accountTrainingBlock", () => {
 describe("computePlan", () => {
   beforeEach(async () => {
     await pool.query("TRUNCATE characters RESTART IDENTITY CASCADE");
-    await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (669539978, 'TrilliumONE', 'enc')");
+    await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES (90000101, 'Mara Vexley', 'enc')");
     await pool.query(
       `INSERT INTO character_attributes (character_id, charisma, intelligence, memory, perception, willpower)
-       VALUES (669539978, 18, 20, 18, 21, 22)`);
+       VALUES (90000101, 18, 20, 18, 21, 22)`);
   });
 
   it("expands and prices the plan from now", async () => {
-    const plan = await createPlan({ characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 3 }] });
+    const plan = await createPlan({ characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 3 }] });
     const now = new Date("2026-09-01T00:00:00Z");
     const computed = await computePlan(plan, { now });
     expect(computed.entries.map((e) => [e.skillId, e.level])).toEqual([[3300, 1], [3300, 2], [3300, 3]]);
@@ -3229,8 +3229,8 @@ describe("computePlan", () => {
   it("applies a remap and can start after the queue", async () => {
     await pool.query(
       `INSERT INTO character_skill_queue (character_id, queue_position, skill_id, finished_level, start_date, finish_date)
-       VALUES (669539978, 0, 3413, 5, '2026-09-01T00:00:00Z', '2026-09-05T00:00:00Z')`);
-    const plan = await createPlan({ characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
+       VALUES (90000101, 0, 3413, 5, '2026-09-01T00:00:00Z', '2026-09-05T00:00:00Z')`);
+    const plan = await createPlan({ characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 5 }] });
     const remap = { charisma: 17, intelligence: 17, memory: 17, perception: 27, willpower: 21 };
     const computed = await computePlan(plan, { now: new Date("2026-09-01T00:00:00Z"), afterQueue: true, remap });
     expect(computed.startAt.toISOString()).toBe("2026-09-05T00:00:00.000Z");
@@ -3401,7 +3401,7 @@ export async function loadPlanContext(characterId: number): Promise<PlanContext>
 
 export interface AccountBlock { characterId: number; name: string; until: Date }
 
-/** Spec §5: "Reacher-9 is training until <date> — this plan can't start before then". */
+/** Spec §5: "Jorin Hale is training until <date> — this plan can't start before then". */
 export async function accountTrainingBlock(
   characterId: number, now: Date = new Date(),
 ): Promise<AccountBlock | null> {
@@ -3546,7 +3546,7 @@ export async function summarisePlans(plans: readonly PlanRow[], opts?: ComputeOp
 
 **Response shapes (this is the contract the editor and the pages code against):**
 ```ts
-GET  /api/skill-plans?characterId=669539978  → 200 { plans: PlanSummary[] }
+GET  /api/skill-plans?characterId=90000101  → 200 { plans: PlanSummary[] }
 POST /api/skill-plans                        → 201 { plan: PlanRow }
 GET  /api/skill-plans/7?afterQueue=1         → 200 { plan: PlanRow, timeline: Timeline, startAt: string }
 PUT  /api/skill-plans/7                      → 200 { plan: PlanRow, timeline: Timeline, startAt: string }
@@ -3614,8 +3614,8 @@ describe("parseRemap", () => {
 
 describe("parsePlanCreate", () => {
   it("requires a character and a name, and defaults the rest", () => {
-    expect(parsePlanCreate({ characterId: 669539978, name: " Gunnery " }))
-      .toEqual({ characterId: 669539978, name: "Gunnery", entries: [], templateId: null });
+    expect(parsePlanCreate({ characterId: 90000101, name: " Gunnery " }))
+      .toEqual({ characterId: 90000101, name: "Gunnery", entries: [], templateId: null });
   });
   it("takes entries or a template, never both", () => {
     expect(parsePlanCreate({ characterId: 1, name: "x", entries: [{ skillId: 3300, level: 1 }] }))
@@ -3827,7 +3827,7 @@ const { GET: LIST, POST } = await import("../../src/app/api/skill-plans/route.js
 const { GET: ONE, PUT, DELETE } = await import("../../src/app/api/skill-plans/[id]/route.js");
 
 const PLAN = {
-  id: 7, characterId: 669539978, name: "Gunnery", remap: null,
+  id: 7, characterId: 90000101, name: "Gunnery", remap: null,
   createdAt: new Date("2026-09-02T10:00:00Z"), updatedAt: new Date("2026-09-02T10:00:00Z"),
   entries: [{ position: 0, skillId: 3300, level: 3, note: null }],
 };
@@ -3846,7 +3846,7 @@ beforeEach(() => {
   createPlan.mockResolvedValue(PLAN);
   updatePlan.mockImplementation(async (id: number) => (id === 7 ? PLAN : null));
   deletePlan.mockImplementation(async (id: number) => id === 7);
-  getCharacter.mockImplementation(async (id: number) => (id === 669539978 ? { id, name: "TrilliumONE" } : null));
+  getCharacter.mockImplementation(async (id: number) => (id === 90000101 ? { id, name: "Mara Vexley" } : null));
   getCareerPlan.mockImplementation(async (id: number) =>
     (id === 4 ? { id: 4, name: "Minmatar Militia Fighter", description: "", skills: [{ skillId: 3327, level: 1 }], milestones: [] } : null));
   computePlan.mockResolvedValue({ plan: PLAN, timeline: TIMELINE, startAt: new Date("2026-09-01T00:00:00Z") });
@@ -3854,10 +3854,10 @@ beforeEach(() => {
 
 describe("GET /api/skill-plans", () => {
   it("lists a character's plans with their totals", async () => {
-    const res = await LIST(get("/api/skill-plans?characterId=669539978"));
+    const res = await LIST(get("/api/skill-plans?characterId=90000101"));
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({ plans: [{ id: 7, entryCount: 3, totalMs: 15_000_000 }] });
-    expect(listPlans).toHaveBeenCalledWith(669539978);
+    expect(listPlans).toHaveBeenCalledWith(90000101);
   });
 
   it("400s without a usable characterId", async () => {
@@ -3870,30 +3870,30 @@ describe("GET /api/skill-plans", () => {
 describe("POST /api/skill-plans", () => {
   it("creates a plan from entries", async () => {
     const res = await POST(body("/api/skill-plans", "POST",
-      { characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 3 }] }));
+      { characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 3 }] }));
     expect(res.status).toBe(201);
     expect(createPlan).toHaveBeenCalledWith({
-      characterId: 669539978, name: "Gunnery", entries: [{ skillId: 3300, level: 3, note: null }],
+      characterId: 90000101, name: "Gunnery", entries: [{ skillId: 3300, level: 3, note: null }],
     });
   });
 
   it("creates a plan from a CCP template", async () => {
     const res = await POST(body("/api/skill-plans", "POST",
-      { characterId: 669539978, name: "Militia", templateId: 4 }));
+      { characterId: 90000101, name: "Militia", templateId: 4 }));
     expect(res.status).toBe(201);
     expect(createPlan).toHaveBeenCalledWith({
-      characterId: 669539978, name: "Militia", entries: [{ skillId: 3327, level: 1, note: null }],
+      characterId: 90000101, name: "Militia", entries: [{ skillId: 3327, level: 1, note: null }],
     });
   });
 
   it("404s on an unknown character and on an unknown template", async () => {
     expect((await POST(body("/api/skill-plans", "POST", { characterId: 1, name: "x" }))).status).toBe(404);
-    expect((await POST(body("/api/skill-plans", "POST", { characterId: 669539978, name: "x", templateId: 99 }))).status).toBe(404);
+    expect((await POST(body("/api/skill-plans", "POST", { characterId: 90000101, name: "x", templateId: 99 }))).status).toBe(404);
   });
 
   it("400s on a malformed body", async () => {
     expect((await POST(body("/api/skill-plans", "POST", { name: "x" }))).status).toBe(400);
-    expect((await POST(body("/api/skill-plans", "POST", { characterId: 669539978, name: "x", templateId: 4, entries: [] }))).status).toBe(400);
+    expect((await POST(body("/api/skill-plans", "POST", { characterId: 90000101, name: "x", templateId: 4, entries: [] }))).status).toBe(400);
   });
 });
 
@@ -4199,7 +4199,7 @@ const SKILLS = [
   { id: 3327, name: "Spaceship Command", groupId: 257, groupName: "Spaceship Command", rank: 1, primaryAttr: 167, secondaryAttr: 168, prereqs: [], alphaMaxLevel: 5 },
 ];
 const PLAN = {
-  id: 7, characterId: 669539978, name: "Gunnery", remap: null,
+  id: 7, characterId: 90000101, name: "Gunnery", remap: null,
   createdAt: new Date("2026-09-02T10:00:00Z"), updatedAt: new Date("2026-09-02T10:00:00Z"),
   entries: [{ position: 0, skillId: 3300, level: 3, note: null }],
 };
@@ -4224,7 +4224,7 @@ beforeEach(() => {
   vi.resetAllMocks();
   getPlan.mockImplementation(async (id: number) => (id === 7 ? PLAN : null));
   createPlan.mockImplementation(async (input: { entries: unknown[] }) => ({ ...PLAN, id: 9, entries: input.entries }));
-  getCharacter.mockImplementation(async (id: number) => (id === 669539978 ? { id, name: "TrilliumONE" } : null));
+  getCharacter.mockImplementation(async (id: number) => (id === 90000101 ? { id, name: "Mara Vexley" } : null));
   loadSkillCatalogue.mockResolvedValue(SKILLS);
   computePlan.mockResolvedValue({
     plan: PLAN, context: CONTEXT, catalogue: SKILLS, entries: EXPANDED,
@@ -4257,7 +4257,7 @@ describe("POST /api/skill-plans/[id]/optimise", () => {
 describe("POST /api/skill-plans/import", () => {
   it("creates a plan from pasted text and reports what did not resolve", async () => {
     const res = await IMPORT(post("/api/skill-plans/import", {
-      characterId: 669539978, name: "Pasted",
+      characterId: 90000101, name: "Pasted",
       text: "Gunnery V\nSpaceship Command 1\n200mm AutoCannon II\n",
     }));
     expect(res.status).toBe(201);
@@ -4270,7 +4270,7 @@ describe("POST /api/skill-plans/import", () => {
 
   it("reports the overflow instead of silently dropping it", async () => {
     const text = `${Array.from({ length: 505 }, () => "Gunnery 1").join("\n")}\n`;
-    const res = await IMPORT(post("/api/skill-plans/import", { characterId: 669539978, name: "Big", text }));
+    const res = await IMPORT(post("/api/skill-plans/import", { characterId: 90000101, name: "Big", text }));
     expect(res.status).toBe(201);
     const json = await res.json();
     expect(json.plan.entries).toHaveLength(500);
@@ -4278,7 +4278,7 @@ describe("POST /api/skill-plans/import", () => {
   });
 
   it("400s on a malformed body and 404s on an unknown character", async () => {
-    expect((await IMPORT(post("/api/skill-plans/import", { characterId: 669539978, name: "x", text: "" }))).status).toBe(400);
+    expect((await IMPORT(post("/api/skill-plans/import", { characterId: 90000101, name: "x", text: "" }))).status).toBe(400);
     expect((await IMPORT(post("/api/skill-plans/import", { characterId: 1, name: "x", text: "Gunnery V" }))).status).toBe(404);
   });
 });
@@ -5466,7 +5466,7 @@ const CONTEXT = {
   attributesSane: true, synced: true,
 };
 const PLAN = {
-  id: 7, characterId: 669539978, name: "Gunnery", remap: null,
+  id: 7, characterId: 90000101, name: "Gunnery", remap: null,
   entries: [{ skillId: 3300, level: 3, note: null }],
 };
 const NOW = "2026-09-01T00:00:00.000Z";
@@ -5497,14 +5497,14 @@ beforeEach(() => {
 });
 
 const editor = (over: Partial<React.ComponentProps<typeof PlanEditor>> = {}) =>
-  render(<PlanEditor plan={PLAN} characterName="TrilliumONE" catalogue={CATALOGUE}
+  render(<PlanEditor plan={PLAN} characterName="Mara Vexley" catalogue={CATALOGUE}
                      context={CONTEXT} accountBlock={null} now={NOW} {...over} />);
 
 describe("PlanEditor", () => {
   it("expands the stored entries and totals them", () => {
     editor();
     expect(screen.getByDisplayValue("Gunnery")).toBeInTheDocument();
-    expect(screen.getByText("TrilliumONE")).toBeInTheDocument();
+    expect(screen.getByText("Mara Vexley")).toBeInTheDocument();
     // Gunnery I..III = 8,000 SP at perception 21 + willpower 22/2 = 32 SP/min = 250 min.
     expect(screen.getAllByRole("row")).toHaveLength(4);
     // Both the totals card and the last row's cumulative cell read the same span.
@@ -5560,8 +5560,8 @@ describe("PlanEditor", () => {
   });
 
   it("shows the account-rule banner", () => {
-    editor({ accountBlock: { name: "Reacher-9", until: "2026-09-20T00:00:00.000Z" } });
-    expect(screen.getByText(/Reacher-9 is training until 2026-09-20 00:00/)).toBeInTheDocument();
+    editor({ accountBlock: { name: "Jorin Hale", until: "2026-09-20T00:00:00.000Z" } });
+    expect(screen.getByText(/Jorin Hale is training until 2026-09-20 00:00/)).toBeInTheDocument();
   });
 
   it("exports through the route after flushing the pending save", async () => {
@@ -6086,7 +6086,7 @@ beforeEach(() => {
 });
 
 const card = (plans: PlanListRow[] = PLANS) =>
-  render(<PlansCard characterId={669539978} plans={plans} templates={TEMPLATES} />);
+  render(<PlansCard characterId={90000101} plans={plans} templates={TEMPLATES} />);
 
 describe("PlansCard", () => {
   it("lists the plans with their remaining time", () => {
@@ -6108,7 +6108,7 @@ describe("PlansCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create" }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/skills/plans/9"));
     expect(posts[0]).toEqual({
-      url: "/api/skill-plans", body: { characterId: 669539978, name: "Frigates" },
+      url: "/api/skill-plans", body: { characterId: 90000101, name: "Frigates" },
     });
   });
 
@@ -6120,7 +6120,7 @@ describe("PlansCard", () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith("/skills/plans/9"));
     expect(posts[0]).toEqual({
       url: "/api/skill-plans",
-      body: { characterId: 669539978, name: "Minmatar Militia Fighter", templateId: 4 },
+      body: { characterId: 90000101, name: "Minmatar Militia Fighter", templateId: 4 },
     });
   });
 
@@ -6134,7 +6134,7 @@ describe("PlansCard", () => {
     expect(await screen.findByText("200mm AutoCannon II")).toBeInTheDocument();
     expect(posts[0]).toEqual({
       url: "/api/skill-plans/import",
-      body: { characterId: 669539978, name: "Pasted", text: "Gunnery V\n200mm AutoCannon II\n" },
+      body: { characterId: 90000101, name: "Pasted", text: "Gunnery V\n200mm AutoCannon II\n" },
     });
   });
 

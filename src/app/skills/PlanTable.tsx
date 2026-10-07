@@ -31,9 +31,9 @@ export function PlanTable({ rows, onMove, onRemove, onLevel }: PlanTableProps) {
               <td className="muted">{row.position}</td>
               <td>
                 <span>{row.skill}</span>
-                {row.group === null ? null : <span className="faint"> · {row.group}</span>}
                 {row.prereq ? <span className="badge prereq-badge">prereq</span> : null}
                 {row.alpha ? <span className="badge alpha">alpha</span> : null}
+                {row.group === null ? null : <span className="faint plan-group">{row.group}</span>}
                 {row.note === null ? null : <div className="faint">{row.note}</div>}
               </td>
               <td>{row.level}</td>

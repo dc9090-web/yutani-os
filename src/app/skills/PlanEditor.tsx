@@ -217,56 +217,56 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
 
   return (
     <div className="plan-editor">
-      <div className="plan-editor-main">
-        <div className="plan-toolbar">
-          <input className="fit-name-input" aria-label="Plan name" value={name} maxLength={60}
-                 onChange={(e) => setName(e.target.value)} />
-          <span className="muted">{characterName}</span>
-          <button type="button" className="fit-btn" onClick={() => void flush()}>
-            <IconDeviceFloppy size={14} /> Save
-          </button>
-          <button type="button" className="fit-btn" onClick={() => void openExport(exportFormat)}>
-            <IconFileExport size={14} /> Export
-          </button>
-          <span className={`save-state ${saveState === "error" ? "error" : ""}`}>{SAVE_LABELS[saveState]}</span>
-        </div>
+      <div className="plan-toolbar plan-head">
+        <input className="fit-name-input" aria-label="Plan name" value={name} maxLength={60}
+               onChange={(e) => setName(e.target.value)} />
+        <span className="muted">{characterName}</span>
+        <button type="button" className="fit-btn" onClick={() => void flush()}>
+          <IconDeviceFloppy size={14} /> Save
+        </button>
+        <button type="button" className="fit-btn" onClick={() => void openExport(exportFormat)}>
+          <IconFileExport size={14} /> Export
+        </button>
+        <span className={`save-state ${saveState === "error" ? "error" : ""}`}>{SAVE_LABELS[saveState]}</span>
+      </div>
 
-        {context.synced ? null : (
-          <p className="banner">No skills synced yet for {characterName} — this plan is computed from level 0.</p>
-        )}
+      {context.synced ? null : (
+        <p className="banner">No skills synced yet for {characterName} — this plan is computed from level 0.</p>
+      )}
+      {accountBlock === null ? null : (
+        <p className="banner">
+          {accountBlock.name} is training until {stamp(new Date(accountBlock.until))} — this plan
+          can’t start before then.
+        </p>
+      )}
+
+      <div className="card">
+        <div className="stat-row">
+          <div><span className="stat-label">Entries</span><span className="stat-value">{view.totals.entries}</span></div>
+          <div><span className="stat-label">Remaining</span><span className="stat-value">{view.totals.remaining}</span></div>
+          <div><span className="stat-label">SP</span><span className="stat-value">{view.totals.sp}</span></div>
+          <div><span className="stat-label">Time</span><span className="stat-value">{view.totals.time}</span></div>
+          <div><span className="stat-label">Done</span><span className="stat-value">{view.totals.doneAt}</span></div>
+        </div>
+        <label className="check-row">
+          <input type="checkbox" aria-label="After current queue" checked={afterQueue}
+                 onChange={(e) => setAfterQueue(e.target.checked)} />
+          After current queue
+        </label>
         {accountBlock === null ? null : (
-          <p className="banner">
-            {accountBlock.name} is training until {stamp(new Date(accountBlock.until))} — this plan
-            can’t start before then.
-          </p>
-        )}
-
-        <div className="card">
-          <div className="stat-row">
-            <div><span className="stat-label">Entries</span><span className="stat-value">{view.totals.entries}</span></div>
-            <div><span className="stat-label">Remaining</span><span className="stat-value">{view.totals.remaining}</span></div>
-            <div><span className="stat-label">SP</span><span className="stat-value">{view.totals.sp}</span></div>
-            <div><span className="stat-label">Time</span><span className="stat-value">{view.totals.time}</span></div>
-            <div><span className="stat-label">Done</span><span className="stat-value">{view.totals.doneAt}</span></div>
-          </div>
           <label className="check-row">
-            <input type="checkbox" aria-label="After current queue" checked={afterQueue}
-                   onChange={(e) => setAfterQueue(e.target.checked)} />
-            After current queue
+            <input type="checkbox" aria-label="Start when the account is free" checked={afterAccount}
+                   onChange={(e) => setAfterAccount(e.target.checked)} />
+            Start when the account is free
           </label>
-          {accountBlock === null ? null : (
-            <label className="check-row">
-              <input type="checkbox" aria-label="Start when the account is free" checked={afterAccount}
-                     onChange={(e) => setAfterAccount(e.target.checked)} />
-              Start when the account is free
-            </label>
-          )}
-          {view.unknownCount === 0 ? null : (
-            <p className="faint">{view.unknownCount} entr{view.unknownCount === 1 ? "y" : "ies"} reference a skill this SDE build does not have.</p>
-          )}
-          <PlanTable rows={view.rows} onMove={moveEntry} onRemove={removeEntry} onLevel={levelEntry} />
-        </div>
+        )}
+        {view.unknownCount === 0 ? null : (
+          <p className="faint">{view.unknownCount} entr{view.unknownCount === 1 ? "y" : "ies"} reference a skill this SDE build does not have.</p>
+        )}
+        <PlanTable rows={view.rows} onMove={moveEntry} onRemove={removeEntry} onLevel={levelEntry} />
+      </div>
 
+      <div className="plan-lower">
         <div className="card skill-picker">
           <h2 className="card-title">Add skill</h2>
           {entries.length < MAX_PLAN_ENTRIES ? null : (
@@ -293,11 +293,10 @@ export function PlanEditor({ plan, characterName, catalogue, context, accountBlo
             ))}
           </ul>
         </div>
+        <AttributesPanel panel={panel} suggestion={suggestion} optimising={optimising}
+                         usingRemap={remap !== null} onOptimise={() => void optimise()}
+                         onToggleRemap={toggleRemap} />
       </div>
-
-      <AttributesPanel panel={panel} suggestion={suggestion} optimising={optimising}
-                       usingRemap={remap !== null} onOptimise={() => void optimise()}
-                       onToggleRemap={toggleRemap} />
 
       {exportText === null ? null : (
         <div className="modal-backdrop" role="dialog" aria-label="Export plan"

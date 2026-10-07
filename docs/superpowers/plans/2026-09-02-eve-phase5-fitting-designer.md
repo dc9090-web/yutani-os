@@ -532,7 +532,7 @@ import { createFit, deleteFit, getFit, listFits, updateFit } from "../../src/lib
 import type { FitItem } from "../../src/lib/fits/doc.js";
 
 let pool: Pool;
-const CID = 669539978;
+const CID = 90000101;
 
 const GUN: FitItem = { typeId: 2889, quantity: 1, flag: "HiSlot0", chargeTypeId: 12608, state: "active" };
 const DC: FitItem = { typeId: 2048, quantity: 1, flag: "LoSlot0", chargeTypeId: null, state: "offline" };
@@ -544,7 +544,7 @@ beforeEach(async () => {
   await pool.query("TRUNCATE fits RESTART IDENTITY CASCADE");
   await pool.query("TRUNCATE characters CASCADE");
   await pool.query(
-    `INSERT INTO characters (id, name, refresh_token_enc) VALUES ($1, 'TrilliumONE', 'enc')`, [CID]);
+    `INSERT INTO characters (id, name, refresh_token_enc) VALUES ($1, 'Mara Vexley', 'enc')`, [CID]);
 });
 
 describe("the fits repo", () => {
@@ -2790,13 +2790,13 @@ vi.mock("../../src/lib/db/character-clones.js", () => ({ listImplants }));
 
 const { GET } = await import("../../src/app/api/characters/[id]/skills/route.js");
 
-const CID = 669539978;
+const CID = 90000101;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const request = () => new NextRequest(`https://eve.plasma66.com/api/characters/${CID}/skills`);
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "TrilliumONE" } : null));
+  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "Mara Vexley" } : null));
   listSkills.mockResolvedValue([
     { skillId: 3426, trainedLevel: 5, activeLevel: 4, skillpoints: 256000 },
     { skillId: 3413, trainedLevel: 4, activeLevel: 4, skillpoints: 45255 },
@@ -2967,7 +2967,7 @@ const { GET: ONE, PUT, DELETE } = await import("../../src/app/api/fits/[id]/rout
 
 const GUN = { typeId: 2889, quantity: 1, flag: "HiSlot0", chargeTypeId: 12608, state: "active" };
 const FIT = {
-  id: 1, name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 669539978,
+  id: 1, name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 90000101,
   createdAt: new Date("2026-09-02T10:00:00Z"), updatedAt: new Date("2026-09-02T10:00:00Z"), items: [GUN],
 };
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
@@ -3024,7 +3024,7 @@ describe("parseFitCreate / parseFitPatch", () => {
   it("tells an absent characterId from an explicit null", () => {
     expect(parseFitPatch({ name: "New" })).toEqual({ name: "New" });
     expect(parseFitPatch({ characterId: null })).toEqual({ characterId: null });
-    expect(parseFitPatch({ characterId: 669539978 })).toEqual({ characterId: 669539978 });
+    expect(parseFitPatch({ characterId: 90000101 })).toEqual({ characterId: 90000101 });
     expect(parseFitPatch({ characterId: 0 })).toBeNull();
     expect(parseFitPatch({})).toEqual({});
   });
@@ -3040,10 +3040,10 @@ describe("the fits routes", () => {
   });
 
   it("creates with a 201 and passes the parsed body through", async () => {
-    const res = await POST(post({ name: "Cheap Rifter", shipTypeId: 587, characterId: 669539978, items: [GUN] }));
+    const res = await POST(post({ name: "Cheap Rifter", shipTypeId: 587, characterId: 90000101, items: [GUN] }));
     expect(res.status).toBe(201);
     expect(createFit).toHaveBeenCalledWith({
-      name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 669539978, items: [GUN],
+      name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 90000101, items: [GUN],
     });
   });
 
@@ -3368,7 +3368,7 @@ const { POST: FROM_FITTING } = await import("../../src/app/api/fits/from-fitting
 const { POST: FROM_ASSET } = await import("../../src/app/api/fits/from-asset/route.js");
 
 const data = fixtureData("rifter");
-const CID = 669539978;
+const CID = 90000101;
 const ctx = { data, skills: new Map([[3426, 5]]), implants: [] };
 
 const SHIP: AssetRow = {
@@ -3394,7 +3394,7 @@ const post = (path: string, body: unknown) =>
 
 beforeEach(() => {
   vi.resetAllMocks();
-  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "TrilliumONE" } : null));
+  getCharacter.mockImplementation(async (id: number) => (id === CID ? { id: CID, name: "Mara Vexley" } : null));
   loadFitData.mockResolvedValue({ assets: [SHIP, ...CHILDREN], fittings: [FITTING], ctx, skillsSynced: true });
   loadDogmaData.mockResolvedValue(data);
   getTypesByNames.mockImplementation(async (names: string[]) =>
@@ -3834,7 +3834,7 @@ describe("the browser dogma store", () => {
 
   it("builds a character context from the skills route and loads those types", async () => {
     await getDogmaMeta(server);
-    const context = await skillContext(669539978, server);
+    const context = await skillContext(90000101, server);
     expect(context.skills.get(3426)).toBe(5);
     expect(context.implants).toEqual([27143]);
     expect(context.synced).toBe(true);
@@ -3845,7 +3845,7 @@ describe("the browser dogma store", () => {
     const logged = vi.spyOn(console, "error").mockImplementation(() => {});
     await getDogmaMeta(server);
     const broken = (async () => { throw new Error("offline"); }) as unknown as typeof fetch;
-    await expect(skillContext(669539978, broken)).resolves.toEqual({
+    await expect(skillContext(90000101, broken)).resolves.toEqual({
       skills: new Map(), implants: [], synced: false,
     });
     logged.mockRestore();
@@ -4672,7 +4672,7 @@ import { StatsPanel } from "../../src/app/fitting/StatsPanel.js";
 
 const data = fixtureData("rifter");
 const DOC: FitDoc = {
-  id: 1, name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 669539978,
+  id: 1, name: "Cheap Rifter", description: "", shipTypeId: 587, characterId: 90000101,
   items: [{ typeId: 2889, quantity: 1, flag: "HiSlot0", chargeTypeId: null, state: "active" }],
 };
 // CPU Management V and Power Grid Management V only: the hull's own skill is missing.
@@ -5591,7 +5591,7 @@ beforeEach(() => {
 afterEach(() => { vi.useRealTimers(); });
 
 async function renderEditor() {
-  render(<FitEditor fit={FIT} characters={[{ id: 669539978, name: "TrilliumONE" }]} bonuses={[]} />);
+  render(<FitEditor fit={FIT} characters={[{ id: 90000101, name: "Mara Vexley" }]} bonuses={[]} />);
   // All skills V by default (characterId null), so the first gauge is the all-V number.
   await waitFor(() => expect(screen.getByText("20.25 / 162.50 tf")).toBeInTheDocument());
 }
@@ -5644,7 +5644,7 @@ describe("FitEditor", () => {
       return Promise.resolve({ ok: true, status: 200, json: async () => ({ build: 3484357, types: ALL_TYPES, prices: {}, groups: [], attributes: [], effects: [] }) } as Response);
     }) as typeof fetch;
 
-    fireEvent.change(screen.getByLabelText("Pilot"), { target: { value: "669539978" } });
+    fireEvent.change(screen.getByLabelText("Pilot"), { target: { value: "90000101" } });
     await waitFor(() => expect(screen.getByText("Minmatar Frigate")).toBeInTheDocument());
     expect(screen.getByText("No skills synced yet — every skill is treated as level 0, so these numbers are worst case."))
       .toBeInTheDocument();
@@ -6091,7 +6091,7 @@ import { upsertJitaPrices } from "../../src/lib/db/market-prices.js";
 import { loadFittingIndex } from "../../src/lib/fits/load.js";
 
 let pool: Pool;
-const CID = 669539978;
+const CID = 90000101;
 const NOW = new Date("2026-09-02T12:00:00Z");
 
 beforeAll(async () => { pool = await resetDb(); });
@@ -6102,7 +6102,7 @@ beforeEach(async () => {
   resetDogmaCache();
   await pool.query("TRUNCATE fits RESTART IDENTITY CASCADE");
   await pool.query("TRUNCATE characters CASCADE");
-  await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES ($1, 'TrilliumONE', 'enc')", [CID]);
+  await pool.query("INSERT INTO characters (id, name, refresh_token_enc) VALUES ($1, 'Mara Vexley', 'enc')", [CID]);
   await pool.query("INSERT INTO sde_categories (id, name, published) VALUES (6, 'Ship', true), (7, 'Module', true)");
   await pool.query("INSERT INTO sde_groups (id, category_id, name, published) VALUES (25, 6, 'Frigate', true), (55, 7, 'Projectile Weapon', true)");
   await pool.query("INSERT INTO sde_types (id, group_id, name, published) VALUES (587, 25, 'Rifter', true), (2889, 55, '200mm AutoCannon II', true)");
@@ -6124,7 +6124,7 @@ describe("loadFittingIndex", () => {
     const index = await loadFittingIndex(CID, NOW);
     expect(index.rows).toHaveLength(1);
     expect(index.rows[0]).toMatchObject({
-      name: "Cheap Rifter", typeName: "Rifter", pilot: "TrilliumONE", value: "8.0M ISK",
+      name: "Cheap Rifter", typeName: "Rifter", pilot: "Mara Vexley", value: "8.0M ISK",
     });
     expect(index.rows[0].unpriced).toBe("1 item unpriced");   // the autocannon has no price row
   });
@@ -6164,7 +6164,7 @@ const refresh = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push, refresh }) }));
 
 const INDEX = {
-  rows: [{ id: 7, name: "Cheap Rifter", typeName: "Rifter", pilot: "TrilliumONE",
+  rows: [{ id: 7, name: "Cheap Rifter", typeName: "Rifter", pilot: "Mara Vexley",
            updated: "2 h ago", value: "8.0M ISK", unpriced: null }],
   fittings: [{ id: 55, label: "Saved Rifter" }],
   ships: [{ id: 1000, label: "Scarlet Dart" }],
@@ -6190,19 +6190,19 @@ beforeEach(() => {
 
 describe("FitList", () => {
   it("lists the saved fits", () => {
-    render(<FitList index={INDEX} characterId={669539978} />);
+    render(<FitList index={INDEX} characterId={90000101} />);
     expect(screen.getByText("Cheap Rifter")).toBeInTheDocument();
     expect(screen.getByText("8.0M ISK")).toBeInTheDocument();
   });
 
   it("creates a new fit from a hull search and opens it", async () => {
-    render(<FitList index={INDEX} characterId={669539978} />);
+    render(<FitList index={INDEX} characterId={90000101} />);
     fireEvent.click(screen.getByRole("button", { name: "New fit" }));
     fireEvent.change(screen.getByLabelText("Search hulls"), { target: { value: "rifter" } });
     await waitFor(() => expect(screen.getByRole("button", { name: "New Rifter fit" })).toBeInTheDocument());
     fireEvent.click(screen.getByRole("button", { name: "New Rifter fit" }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/fitting/9"));
-    expect(posts[0]).toMatchObject({ url: "/api/fits", body: { name: "Rifter", shipTypeId: 587, characterId: 669539978 } });
+    expect(posts[0]).toMatchObject({ url: "/api/fits", body: { name: "Rifter", shipTypeId: 587, characterId: 90000101 } });
   });
 
   it("imports EFT text and reports unresolved lines", async () => {
@@ -6212,7 +6212,7 @@ describe("FitList", () => {
         json: async () => ({ fit: { id: 9 }, unresolved: ["Damage Controll II"] }) } as Response;
     }) as typeof fetch;
 
-    render(<FitList index={INDEX} characterId={669539978} />);
+    render(<FitList index={INDEX} characterId={90000101} />);
     fireEvent.click(screen.getByRole("button", { name: "Import EFT" }));
     fireEvent.change(screen.getByLabelText("EFT text"), { target: { value: "[Rifter, x]\nDamage Controll II\n" } });
     fireEvent.click(screen.getByRole("button", { name: "Import" }));
@@ -6221,18 +6221,18 @@ describe("FitList", () => {
   });
 
   it("clones from a saved fitting and from an assembled ship", async () => {
-    render(<FitList index={INDEX} characterId={669539978} />);
+    render(<FitList index={INDEX} characterId={90000101} />);
     fireEvent.change(screen.getByLabelText("From saved fittings"), { target: { value: "55" } });
     await waitFor(() => expect(posts[0]).toMatchObject({
-      url: "/api/fits/from-fitting", body: { characterId: 669539978, fittingId: 55 } }));
+      url: "/api/fits/from-fitting", body: { characterId: 90000101, fittingId: 55 } }));
 
     fireEvent.change(screen.getByLabelText("From my ships"), { target: { value: "1000" } });
     await waitFor(() => expect(posts[1]).toMatchObject({
-      url: "/api/fits/from-asset", body: { characterId: 669539978, itemId: 1000 } }));
+      url: "/api/fits/from-asset", body: { characterId: 90000101, itemId: 1000 } }));
   });
 
   it("deletes a fit and refreshes the list", async () => {
-    render(<FitList index={INDEX} characterId={669539978} />);
+    render(<FitList index={INDEX} characterId={90000101} />);
     fireEvent.click(screen.getByRole("button", { name: "Delete Cheap Rifter" }));
     await waitFor(() => expect(deletes).toEqual(["/api/fits/7"]));
     expect(refresh).toHaveBeenCalled();
@@ -6659,7 +6659,7 @@ Work through this list and record the result of each item.
 3. The stats panel shows CPU, powergrid and calibration gauges with real numbers, the slot and
    hardpoint counters (High 2/3, Mid 3/3, Low 2/4, Rigs 1/3, Turrets 2/3, Launchers 0/2), the
    Problems list, Missing skills as `have → need`, an estimated value and the Rifter's hull bonuses.
-4. **Switch the pilot** between "All skills V" and TrilliumONE: the CPU figure and the missing-skill
+4. **Switch the pilot** between "All skills V" and Mara Vexley: the CPU figure and the missing-skill
    list both change, within a second and without a page reload.
 5. **Add a module** from the browser (search "Damage Control", press the + button): it lands in the
    first free low slot and the CPU gauge jumps immediately. Set it **offline**: its CPU cost drops
@@ -6676,7 +6676,7 @@ Work through this list and record the result of each item.
 9. **Export EFT** → the modal shows text that begins `[Rifter, <name>]`, contains
    `[Empty Low slot]` markers and the `/offline` suffix, and the Copy button puts it on the
    clipboard. Pasting that text back into **Import EFT** produces an identical fit.
-10. **From my ships** → pick TrilliumONE's docked ship → a new fit opens. Compare its CPU and
+10. **From my ships** → pick Mara Vexley's docked ship → a new fit opens. Compare its CPU and
     powergrid **used/output** against `https://eve.plasma66.com/ships/asset/<the same itemId>`:
     they must be **identical to two decimals**. This is the phase-4-vs-phase-5 agreement check and
     the single most important item on this list — the server and the browser are running the same

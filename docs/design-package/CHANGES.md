@@ -93,3 +93,15 @@ three legacy variables at the new ones in `layout.tsx`. Body size 13 px.
 
 All component logic, routes and data shapes. `previews/*.png` were re-rendered from these screens after the hand-back.
 Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`, `.footer-icon`.
+
+## 2026-10-07 follow-up: skill plan layout, fictional names
+
+- **Plan editor** (`skill-plan.html`, `PlanEditor.tsx`, `PlanTable.tsx`): the ten-column plan table no longer shares the
+  row with the 340 px attributes panel, which squeezed every cell onto three or four lines once the body font became
+  monospaced. `.plan-editor` is now a one-column grid; the toolbar carries ★`.plan-head` (panel chrome, same as
+  `.fit-toolbar`); the plan card spans the full content width; the skill picker and the attributes panel share a new
+  ★`.plan-lower` band (`minmax(0,1fr) 340px`, one column under 900 px). `.plan-editor-main` is gone. In the table,
+  numeric columns are `white-space: nowrap`, and the skill's group sits under its name as ★`.plan-group` instead of
+  trailing it after a middle dot.
+- **Sample data**: the four characters are fictional (Mara Vexley, Jorin Hale, Nyx Calder, Tove Ash) with made-up
+  character IDs; `previews/*.png` re-rendered.

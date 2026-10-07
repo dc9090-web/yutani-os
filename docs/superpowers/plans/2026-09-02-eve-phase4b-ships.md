@@ -728,7 +728,7 @@ In `tests/components/sync-status.test.tsx`, add:
         { job: "market-prices", characterId: null, startedAt: new Date(), finishedAt: new Date(), status: "ok", rows: 12, error: "warn: fuzzwork 503" },
         { job: "skills", characterId: 1, startedAt: new Date(), finishedAt: new Date(), status: "error", rows: null, error: "boom" },
       ]}
-      names={{ 1: "TrilliumONE" }} />);
+      names={{ 1: "Mara Vexley" }} />);
     expect(screen.getByText("warn: fuzzwork 503")).toHaveClass("warn-text");
     expect(screen.getByText("boom")).toHaveClass("neg");
     expect(container.querySelectorAll("tbody tr")).toHaveLength(2);
@@ -4133,7 +4133,7 @@ type of interest.
 
 - [ ] **Step 9: Verify the Ships pages (Daniel, in a browser on the tailnet)**
 
-1. `https://eve.plasma66.com/ships` — with TrilliumONE active, the **Fitted ships** section lists the
+1. `https://eve.plasma66.com/ships` — with Mara Vexley active, the **Fitted ships** section lists the
    ship the character is docked in (and every other assembled hull), each card showing the custom name
    or type, the station or system it is in, CPU and powergrid gauges with real numbers, a missing-skill
    count or "All skills trained", and an ISK value. Cards are ordered most valuable first. No card says
@@ -4175,7 +4175,7 @@ Deploy phase 4 (dogma engine, market prices, Ships pages) and record acceptance
 
 Acceptance: forced SDE re-import populated max_attribute_id on 29 attributes;
 market-prices finished ok with <n> rows and a Jita sell price for Tritanium
-(type 34) of <x> ISK; /ships lists TrilliumONE's docked ship with CPU/PG
+(type 34) of <x> ISK; /ships lists Mara Vexley's docked ship with CPU/PG
 gauges and <n> saved fits; the asset and saved-fit sheets render slot columns,
 problems, missing skills, cargo/drones and an estimated value, and the
 affected-by popover opens. Operator comparison against the in-game fitting

@@ -208,7 +208,7 @@ Create `tests/fixtures/esi/killmails-recent.json` — one page of `GET /characte
 ]
 ```
 
-Create `tests/fixtures/esi/killmail.json` — the body of 120000001, a loss for character 669539978
+Create `tests/fixtures/esi/killmail.json` — the body of 120000001, a loss for character 90000101
 flying a Caracal (type 621) in Jita (30000142), with one container holding two stacks:
 ```json
 {
@@ -216,7 +216,7 @@ flying a Caracal (type 621) in Jita (30000142), with one container holding two s
   "killmail_time": "2026-09-01T12:00:00Z",
   "solar_system_id": 30000142,
   "victim": {
-    "character_id": 669539978,
+    "character_id": 90000101,
     "corporation_id": 98000001,
     "alliance_id": 99000001,
     "damage_taken": 4210,
@@ -235,7 +235,7 @@ flying a Caracal (type 621) in Jita (30000142), with one container holding two s
   "attackers": [
     { "character_id": 2112625428, "corporation_id": 98000002, "damage_done": 1200,
       "final_blow": false, "security_status": -1.4, "ship_type_id": 587, "weapon_type_id": 2929 },
-    { "character_id": 2124678472, "corporation_id": 98000002, "alliance_id": 99000002,
+    { "character_id": 90000102, "corporation_id": 98000002, "alliance_id": 99000002,
       "damage_done": 3010, "final_blow": true, "security_status": 0.6,
       "ship_type_id": 11393, "weapon_type_id": 3025 },
     { "faction_id": 500003, "damage_done": 0, "final_blow": false, "security_status": 0 }
@@ -306,7 +306,7 @@ import {
 import { esiFixture } from "../fixtures/esi.js";
 
 const body = (): EsiKillmail => esiFixture<EsiKillmail>("killmail");
-const VICTIM = 669539978;
+const VICTIM = 90000101;
 const ATTACKER = 2112625428;
 
 describe("flattenItems", () => {
@@ -341,7 +341,7 @@ describe("toKillmailWrite", () => {
       victimAllianceId: 99000001, victimFactionId: null,
       victimShipTypeId: 621, damageTaken: 4210,
       positionX: 1.5e11, positionY: -2.5e10, positionZ: 3.75e11,
-      attackerCount: 3, finalBlowCharacterId: 2124678472,
+      attackerCount: 3, finalBlowCharacterId: 90000102,
       finalBlowShipTypeId: 11393, finalBlowWeaponTypeId: 3025,
       zkbTotalValue: null, zkbPoints: null, zkbNpc: null, zkbSolo: null, zkbAwox: null,
       source: "esi",
@@ -381,7 +381,7 @@ describe("roleFor", () => {
   it("is a loss for the victim, a kill for an attacker and null for a bystander", () => {
     expect(roleFor(body(), VICTIM)).toBe("loss");
     expect(roleFor(body(), ATTACKER)).toBe("kill");
-    expect(roleFor(body(), 2124678472)).toBe("kill");
+    expect(roleFor(body(), 90000102)).toBe("kill");
     expect(roleFor(body(), 1)).toBeNull();
   });
 });
@@ -389,7 +389,7 @@ describe("roleFor", () => {
 describe("partyIds", () => {
   it("collects every character, corporation and alliance id exactly once", () => {
     expect(partyIds(body()).sort((a, b) => a - b)).toEqual([
-      98000001, 98000002, 99000001, 99000002, 669539978, 2112625428, 2124678472,
+      98000001, 98000002, 99000001, 99000002, 90000101, 2112625428, 90000102,
     ].sort((a, b) => a - b));
   });
 });
@@ -671,7 +671,7 @@ import { toKillmailWrite, type EsiKillmail } from "../../src/lib/combat/killmail
 import { esiFixture } from "../fixtures/esi.js";
 
 let pool: Pool;
-const CID = 669539978;
+const CID = 90000101;
 const body = (): EsiKillmail => esiFixture<EsiKillmail>("killmail");
 
 beforeAll(async () => {
@@ -690,7 +690,7 @@ describe("saveKillmails", () => {
     const km = await pool.query("SELECT * FROM killmails WHERE killmail_id = 120000001");
     expect(km.rows[0].source).toBe("esi");
     expect(km.rows[0].attacker_count).toBe(3);
-    expect(km.rows[0].final_blow_character_id).toBe("2124678472");
+    expect(km.rows[0].final_blow_character_id).toBe("90000102");
     expect(Number(km.rows[0].damage_taken)).toBe(4210);
     expect((await pool.query("SELECT count(*)::int AS n FROM killmail_attackers")).rows[0].n).toBe(3);
     expect((await pool.query("SELECT count(*)::int AS n FROM killmail_items")).rows[0].n).toBe(5);
@@ -1179,7 +1179,7 @@ import type { CharacterKillmailLink, EsiKillmail, KillmailWrite } from "../../sr
 import { EsiError } from "../../src/lib/esi/client.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 const body = (id: number): EsiKillmail => ({ ...esiFixture<EsiKillmail>("killmail"), killmail_id: id });
 const ref = (id: number): EsiKillmailRef => ({ killmail_id: id, killmail_hash: `hash-${id}` });
 
@@ -1272,7 +1272,7 @@ describe("killmails job", () => {
     await h.job.run({ characterId: CID, esi: h.esi as never });
     expect(h.resolved).toHaveLength(1);
     expect([...h.resolved[0]].sort((a, b) => a - b)).toEqual(
-      [98000001, 98000002, 99000001, 99000002, 669539978, 2112625428, 2124678472].sort((a, b) => a - b));
+      [98000001, 98000002, 99000001, 99000002, 90000101, 2112625428, 90000102].sort((a, b) => a - b));
   });
 
   it("returns 0 without calling ESI when the character has not granted the scope", async () => {
@@ -1551,15 +1551,15 @@ read; the third is an NPC kill with no victim character:
     "victim": { "character_id": 2112625428, "corporation_id": 98000002, "damage_taken": 1420,
       "ship_type_id": 587,
       "items": [ { "item_type_id": 3634, "flag": 27, "singleton": 0, "quantity_dropped": 1 } ] },
-    "attackers": [ { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 1420,
+    "attackers": [ { "character_id": 90000101, "corporation_id": 98000001, "damage_done": 1420,
       "final_blow": true, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 } ],
     "zkb": { "hash": "349571831ca127c015bc34050b4c02b29927827d", "totalValue": 60633419.79,
       "points": 1, "npc": false, "solo": true, "awox": false } },
   { "killmail_id": 110000002, "killmail_time": "2021-04-06T22:10:03Z", "solar_system_id": 30002320,
-    "victim": { "character_id": 2124678472, "corporation_id": 98000003, "damage_taken": 9800,
+    "victim": { "character_id": 90000102, "corporation_id": 98000003, "damage_taken": 9800,
       "ship_type_id": 11393, "items": [] },
     "attackers": [
-      { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 5000,
+      { "character_id": 90000101, "corporation_id": 98000001, "damage_done": 5000,
         "final_blow": false, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 },
       { "character_id": 90000001, "corporation_id": 98000001, "damage_done": 4800,
         "final_blow": true, "security_status": -1.2, "ship_type_id": 621, "weapon_type_id": 2929 } ],
@@ -1568,7 +1568,7 @@ read; the third is an NPC kill with no victim character:
   { "killmail_id": 110000003, "killmail_time": "2021-04-05T11:00:00Z", "solar_system_id": 30000144,
     "victim": { "corporation_id": 1000035, "faction_id": 500003, "damage_taken": 300,
       "ship_type_id": 3766, "items": [] },
-    "attackers": [ { "character_id": 669539978, "corporation_id": 98000001, "damage_done": 300,
+    "attackers": [ { "character_id": 90000101, "corporation_id": 98000001, "damage_done": 300,
       "final_blow": true, "security_status": 0.4, "ship_type_id": 621, "weapon_type_id": 2929 } ],
     "zkb": { "hash": "c1d2e3f405162738495a6b7c8d9e0f1020304050", "totalValue": 12000,
       "points": 1, "npc": true, "solo": true, "awox": false } }
@@ -1592,7 +1592,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const page = (): ZkbRecord[] =>
   JSON.parse(readFileSync(path.join(dir, "../fixtures/zkb/kills-page.json"), "utf8")) as ZkbRecord[];
 
-const CID = 669539978;
+const CID = 90000101;
 
 describe("zkbPageUrl", () => {
   it("puts the page modifier after the entity filter and ends with a slash", () => {
@@ -1892,7 +1892,7 @@ import {
 } from "../../src/lib/db/killmail-backfill.js";
 
 let pool: Pool;
-const A = 669539978;
+const A = 90000101;
 const B = 2112625428;
 
 beforeAll(async () => {
@@ -2065,7 +2065,7 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const fixture = (): ZkbRecord[] =>
   JSON.parse(readFileSync(path.join(dir, "../fixtures/zkb/kills-page.json"), "utf8")) as ZkbRecord[];
 
-const A = 669539978;
+const A = 90000101;
 
 /** A full page: the fixture's first record repeated 200 times with distinct ids (Decision 15). */
 function fullPage(base: number): ZkbRecord[] {
@@ -2632,12 +2632,12 @@ describe("pruneKillmailCache", () => {
          (0, '/killmails/1/hash1', 1, now() - interval '8 days'),
          (0, '/killmails/2/hash2', 1, now() - interval '1 day'),
          (0, '/markets/prices', 1, now() - interval '30 days'),
-         (669539978, '/killmails/1/hash1', 1, now() - interval '8 days')`);
+         (90000101, '/killmails/1/hash1', 1, now() - interval '8 days')`);
     expect(await pruneKillmailCache()).toBe(1);
     const { rows } = await pool.query(
       `SELECT character_id AS "characterId", path FROM esi_cache ORDER BY "characterId", path`);
     expect(rows.map((r) => `${r.characterId}:${r.path}`)).toEqual([
-      "0:/killmails/2/hash2", "0:/markets/prices", "669539978:/killmails/1/hash1",
+      "0:/killmails/2/hash2", "0:/markets/prices", "90000101:/killmails/1/hash1",
     ]);
   });
 });
@@ -3406,7 +3406,7 @@ import { toKillmailWrite, type EsiKillmail } from "../../src/lib/combat/killmail
 import { esiFixture } from "../fixtures/esi.js";
 
 let pool: Pool;
-const A = 669539978;      // the fixture's victim
+const A = 90000101;      // the fixture's victim
 const B = 2112625428;     // the fixture's first attacker
 
 function killmail(id: number, time: string, over: Partial<EsiKillmail> = {}): EsiKillmail {
@@ -3469,7 +3469,7 @@ describe("listCombatRows", () => {
     const rows = await listCombatRows([A, B], { since: null });
     expect(rows.map((r) => r.killmailId)).toEqual([1, 3, 2]);
     expect(rows[0].role).toBe("loss");
-    // The lowest of OUR ids on killmail 1 is A (669539978), who was the victim, so our ship is the
+    // The lowest of OUR ids on killmail 1 is A (90000101), who was the victim, so our ship is the
     // ship that died, not B's Rifter.
     expect(rows[0].ourShipTypeId).toBe(621);
   });
@@ -3500,7 +3500,7 @@ describe("getKillmail", () => {
     });
     expect(full.head.killmailTime).toEqual(new Date("2026-09-01T12:00:00Z"));
     expect(full.attackers.map((a) => a.idx)).toEqual([0, 1, 2]);
-    expect(full.attackers[1]).toMatchObject({ characterId: 2124678472, finalBlow: true, damageDone: 3010 });
+    expect(full.attackers[1]).toMatchObject({ characterId: 90000102, finalBlow: true, damageDone: 3010 });
     expect(full.attackers[2]).toMatchObject({ characterId: null, factionId: 500003 });
     expect(full.items.map((i) => i.itemTypeId)).toEqual([3634, 11488, 34, 35, 2456]);
     expect(full.items[2]).toMatchObject({ parentIdx: 1, quantityDestroyed: 5000, quantityDropped: 0 });
@@ -3833,7 +3833,7 @@ import type { CombatRow } from "../../src/lib/db/killmails.js";
 const NOW = new Date("2026-09-02T00:00:00Z");
 
 const labels: Labels = {
-  names: new Map([[669539978, "TrilliumONE"], [98000001, "Trill Industries"]]),
+  names: new Map([[90000101, "Mara Vexley"], [98000001, "Trill Industries"]]),
   types: new Map([[621, "Caracal"], [587, "Rifter"], [2929, "150mm Light AutoCannon II"]]),
   systems: new Map([[30000142, { name: "Jita", security: 0.946 }],
                     [30002187, { name: "Amarr", security: 1.0 }]]),
@@ -3841,14 +3841,14 @@ const labels: Labels = {
 
 const row: CombatRow = {
   killmailId: 120000001, role: "loss", time: new Date("2026-09-01T12:00:00Z"), value: 8_125_000,
-  solarSystemId: 30000142, victimCharacterId: 669539978, victimCorporationId: 98000001,
+  solarSystemId: 30000142, victimCharacterId: 90000101, victimCorporationId: 98000001,
   victimShipTypeId: 621, ourShipTypeId: 621, weaponTypeId: null,
   solo: false, finalBlow: false, attackerCount: 3,
 };
 
 describe("nameOf / typeOf", () => {
   it("falls back to a readable placeholder rather than crashing", () => {
-    expect(nameOf(669539978, labels)).toBe("TrilliumONE");
+    expect(nameOf(90000101, labels)).toBe("Mara Vexley");
     expect(nameOf(4242, labels)).toBe("ID 4242");
     expect(nameOf(null, labels)).toBe("—");
     expect(typeOf(621, labels)).toBe("Caracal");
@@ -3863,7 +3863,7 @@ describe("killmailRows", () => {
       killmailId: 120000001, href: "/combat/120000001", time: "2026-09-01 12:00",
       role: "loss", roleLabel: "Loss",
       victimShipTypeId: 621, victimShip: "Caracal",
-      victim: "TrilliumONE", victimCorp: "Trill Industries",
+      victim: "Mara Vexley", victimCorp: "Trill Industries",
       system: "Jita", secClass: "sec-high", secText: "0.9",
       // iskShort(8,125,000) = (8.125).toFixed(1) = "8.1M ISK"
       value: "8.1M ISK", attackers: "3", ourShip: "Caracal",
@@ -4143,7 +4143,7 @@ import { loadCombatPage, loadKillmailRows } from "../../src/lib/combat/load.js";
 import { esiFixture } from "../fixtures/esi.js";
 
 let pool: Pool;
-const A = 669539978;
+const A = 90000101;
 const NOW = new Date("2026-09-02T00:00:00Z");
 
 beforeAll(async () => {
@@ -4156,7 +4156,7 @@ beforeAll(async () => {
     `INSERT INTO sde_solar_systems (id, name, security_status) VALUES (30000142, 'Jita', 0.946)`);
   await pool.query(
     `INSERT INTO universe_names (id, category, name)
-     VALUES ($1, 'character', 'TrilliumONE'), (98000001, 'corporation', 'Trill Industries')`, [A]);
+     VALUES ($1, 'character', 'Mara Vexley'), (98000001, 'corporation', 'Trill Industries')`, [A]);
   await ensureBackfillRows([A]);
 
   const base = esiFixture<EsiKillmail>("killmail");
@@ -4177,7 +4177,7 @@ describe("loadCombatPage", () => {
     expect(view.hasMore).toBe(false);
     expect(view.rows.map((r) => r.killmailId)).toEqual([202, 201, 200]);
     expect(view.rows[0]).toMatchObject({
-      victim: "TrilliumONE", victimCorp: "Trill Industries", victimShip: "Caracal",
+      victim: "Mara Vexley", victimCorp: "Trill Industries", victimShip: "Caracal",
       system: "Jita", secClass: "sec-high", value: "8.1M ISK", roleLabel: "Loss",
     });
     expect(view.tiles.find((t) => t.key === "losses")?.value).toBe("3");
@@ -4386,7 +4386,7 @@ vi.mock("../../src/lib/combat/load.js", () => ({ loadKillmailRows }));
 
 const { GET } = await import("../../src/app/api/characters/[id]/killmails/route.js");
 
-const CID = 669539978;
+const CID = 90000101;
 const OTHER = 2112625428;
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
 const request = (query: string) =>
@@ -4489,13 +4489,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { KillmailTable } from "../../src/app/combat/KillmailTable.js";
 import type { KillmailRowView } from "../../src/lib/view/combat.js";
 
-const CID = 669539978;
+const CID = 90000101;
 
 function row(id: number, over: Partial<KillmailRowView> = {}): KillmailRowView {
   return {
     killmailId: id, href: `/combat/${id}`, time: "2026-09-01 12:00",
     role: "loss", roleLabel: "Loss", victimShipTypeId: 621, victimShip: "Caracal",
-    victim: "TrilliumONE", victimCorp: "Trill Industries",
+    victim: "Mara Vexley", victimCorp: "Trill Industries",
     system: "Jita", secClass: "sec-high", secText: "0.9",
     value: "8.1M ISK", attackers: "3", ourShip: "Caracal", ...over,
   };
@@ -4978,12 +4978,12 @@ import type { Labels } from "../../src/lib/view/combat.js";
 import type { KillmailFull } from "../../src/lib/db/killmails.js";
 import type { Price } from "../../src/lib/view/price.js";
 
-const A = 669539978;
+const A = 90000101;
 const price = (sell: number | null): Price => ({ sell, buy: null, adjusted: null });
 
 const labels: Labels = {
   names: new Map([
-    [A, "TrilliumONE"], [98000001, "Trill Industries"], [99000001, "Trill Alliance"],
+    [A, "Mara Vexley"], [98000001, "Trill Industries"], [99000001, "Trill Alliance"],
     [2112625428, "Bad Guy"], [98000002, "Bad Corp"],
   ]),
   types: new Map([
@@ -5054,8 +5054,8 @@ describe("killmailView", () => {
 
   it("builds the victim card", () => {
     expect(view.victim).toEqual({
-      name: "TrilliumONE", corp: "Trill Industries", alliance: "Trill Alliance",
-      portrait: "https://images.evetech.net/characters/669539978/portrait?size=128",
+      name: "Mara Vexley", corp: "Trill Industries", alliance: "Trill Alliance",
+      portrait: "https://images.evetech.net/characters/90000101/portrait?size=128",
       shipTypeId: 621, shipName: "Caracal",
       shipRender: "https://images.evetech.net/types/621/render?size=128",
       damageTaken: "4,210",
@@ -5551,7 +5551,7 @@ vi.mock("../../src/lib/combat/fit.js", () => ({ fitFromKillmail }));
 
 const { POST } = await import("../../src/app/api/fits/from-killmail/route.js");
 
-const CID = 669539978;
+const CID = 90000101;
 const post = (body: unknown) => new NextRequest("https://eve.plasma66.com/api/fits/from-killmail", {
   method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
 });
@@ -5750,12 +5750,12 @@ describe("OpenInDesigner", () => {
       return new Response(JSON.stringify({ fit: { id: 42 } }), { status: 201 });
     }) as unknown as typeof fetch;
 
-    render(<OpenInDesigner killmailId={120000001} characterId={669539978} />);
+    render(<OpenInDesigner killmailId={120000001} characterId={90000101} />);
     fireEvent.click(screen.getByRole("button", { name: /open in fitting designer/i }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/fitting/42"));
     expect(posts).toEqual([{
       url: "/api/fits/from-killmail",
-      body: { killmailId: 120000001, characterId: 669539978 },
+      body: { killmailId: 120000001, characterId: 90000101 },
     }]);
   });
 

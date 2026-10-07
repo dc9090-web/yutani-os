@@ -525,9 +525,15 @@ li.slot-row:last-child { border-bottom: 0; }
 .badge.queued { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
 .badge.planned { background: rgba(125, 211, 160, 0.14); color: var(--pos); }
 .plan-actions { display: flex; gap: 2px; align-items: center; white-space: nowrap; }
-.plan-editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-.plan-editor-main { display: grid; gap: 20px; }
+/* The plan table has ten columns; it gets the full content width. The skill picker and the attributes
+   panel share the band under it (picker left, attributes 340px right), like the fitting editor's .fit-lower. */
+.plan-editor { display: grid; gap: 20px; }
+.plan-lower { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 .plan-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 18px; }
+.plan-head { margin: 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+.plan-table th, .plan-table td { white-space: nowrap; }
+.plan-table td:nth-child(2) { white-space: normal; min-width: 200px; }
+.plan-group { display: block; }
 .remap-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 2px; font-size: 12px; }
 .remap-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; gap: 8px; }
 .remap-delta { color: var(--accent); }
@@ -536,7 +542,7 @@ li.slot-row:last-child { border-bottom: 0; }
 .skill-picker-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 320px; overflow: auto; }
 .skill-picker-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
 .skill-picker-row:hover { background: var(--raised); }
-@media (max-width: 900px) { .plan-editor { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .plan-lower { grid-template-columns: 1fr; } .plan-table th, .plan-table td { white-space: normal; } }
 
 /* ---------- Combat (phase 7) ---------- */
 .badge.kill { background: rgba(67, 217, 160,.14); color: var(--pos); }
@@ -613,7 +619,7 @@ a:not([class]) { color: var(--accent-2); }
 .page-sub::after { content: ""; flex: 1; max-width: 220px; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 
 /* ---------- panels: glass, lit top edge, corner brackets ---------- */
-.card, .fit-toolbar, .login-card {
+.card, .fit-toolbar, .plan-head, .login-card {
   border-radius: 0; border: 1px solid var(--border); border-top-color: rgba(245, 166, 35, .30);
   background:
     linear-gradient(var(--bracket), var(--bracket)) left 8px top 8px / 12px 1px no-repeat,
@@ -758,7 +764,7 @@ a:not([class]) { color: var(--accent-2); }
     </nav>
     <button type="button" class="user-menu" aria-label="Character menu">
       <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
-      <span class="user-name">TrilliumONE</span>
+      <span class="user-name">Mara Vexley</span>
       <span class="user-caret" aria-hidden="true"></span>
     </button>
   </div>
@@ -815,7 +821,7 @@ a:not([class]) { color: var(--accent-2); }
         <!-- Mantine Group gap="sm" wrap="nowrap" approximation -->
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
           <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
-          <div><div>TrilliumONE</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
+          <div><div>Mara Vexley</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
         </div>
         <!-- Mantine Group gap="xs" wrap="nowrap" approximation -->
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
@@ -844,7 +850,7 @@ a:not([class]) { color: var(--accent-2); }
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
           <img src="https://images.evetech.net/characters/2118141166/portrait?size=64" alt="" class="char-avatar">
-          <div><div>Reacher-9</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
+          <div><div>Jorin Hale</div><div class="faint" style="font-size: 12px;">Republic Fleet Reserves</div></div>
         </div>
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
           <select class="fit-select" aria-label="Account">
@@ -868,7 +874,7 @@ a:not([class]) { color: var(--accent-2); }
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
           <img src="https://images.evetech.net/characters/2116628746/portrait?size=64" alt="" class="char-avatar">
-          <div><div>Sasha-9999</div><div class="faint" style="font-size: 12px;">Brutor Tribe</div></div>
+          <div><div>Nyx Calder</div><div class="faint" style="font-size: 12px;">Brutor Tribe</div></div>
         </div>
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
           <select class="fit-select" aria-label="Account">
@@ -893,7 +899,7 @@ a:not([class]) { color: var(--accent-2); }
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 16px;">
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 12px;">
           <img src="https://images.evetech.net/characters/2117838135/portrait?size=64" alt="" class="char-avatar warn">
-          <div><div>Lana C</div><div class="faint" style="font-size: 12px;">—<span class="badge needs_reauth" style="margin-left: 8px;">needs re-authorisation</span></div></div>
+          <div><div>Tove Ash</div><div class="faint" style="font-size: 12px;">—<span class="badge needs_reauth" style="margin-left: 8px;">needs re-authorisation</span></div></div>
         </div>
         <div style="display: flex; align-items: center; flex-wrap: nowrap; gap: 10px;">
           <select class="fit-select" aria-label="Account">
@@ -971,7 +977,7 @@ a:not([class]) { color: var(--accent-2); }
   <tbody>
     <tr>
       <td>assets</td>
-      <td>TrilliumONE</td>
+      <td>Mara Vexley</td>
       <td class="muted">2026-10-01 06:10</td>
       <td><span class="badge ok">ok</span></td>
       <td>4,812</td>
@@ -979,7 +985,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>assets</td>
-      <td>Lana C</td>
+      <td>Tove Ash</td>
       <td class="muted">2026-10-01 06:10</td>
       <td><span class="badge error">error</span></td>
       <td>—</td>
@@ -987,7 +993,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>character-info</td>
-      <td>Sasha-9999</td>
+      <td>Nyx Calder</td>
       <td class="muted">2026-10-01 06:00</td>
       <td><span class="badge ok">ok</span></td>
       <td>1</td>
@@ -995,7 +1001,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>killmail-backfill</td>
-      <td>TrilliumONE</td>
+      <td>Mara Vexley</td>
       <td class="muted">2026-10-01 06:15</td>
       <td><span class="badge running">running</span></td>
       <td>—</td>
@@ -1003,7 +1009,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>killmails</td>
-      <td>Reacher-9</td>
+      <td>Jorin Hale</td>
       <td class="muted">2026-10-01 06:00</td>
       <td><span class="badge ok">ok</span></td>
       <td>12</td>
@@ -1027,7 +1033,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>skills</td>
-      <td>TrilliumONE</td>
+      <td>Mara Vexley</td>
       <td class="muted">2026-10-01 06:00</td>
       <td><span class="badge ok">ok</span></td>
       <td>318</td>
@@ -1035,7 +1041,7 @@ a:not([class]) { color: var(--accent-2); }
     </tr>
     <tr>
       <td>wallet</td>
-      <td>Reacher-9</td>
+      <td>Jorin Hale</td>
       <td class="muted">2026-10-01 06:05</td>
       <td><span class="badge ok">ok</span></td>
       <td>1,000</td>

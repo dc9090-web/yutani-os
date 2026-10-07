@@ -525,9 +525,15 @@ li.slot-row:last-child { border-bottom: 0; }
 .badge.queued { background: rgba(95, 211, 232, 0.14); color: var(--accent-2); }
 .badge.planned { background: rgba(125, 211, 160, 0.14); color: var(--pos); }
 .plan-actions { display: flex; gap: 2px; align-items: center; white-space: nowrap; }
-.plan-editor { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
-.plan-editor-main { display: grid; gap: 20px; }
+/* The plan table has ten columns; it gets the full content width. The skill picker and the attributes
+   panel share the band under it (picker left, attributes 340px right), like the fitting editor's .fit-lower. */
+.plan-editor { display: grid; gap: 20px; }
+.plan-lower { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
 .plan-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 18px; }
+.plan-head { margin: 0; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 18px; }
+.plan-table th, .plan-table td { white-space: nowrap; }
+.plan-table td:nth-child(2) { white-space: normal; min-width: 200px; }
+.plan-group { display: block; }
 .remap-list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 2px; font-size: 12px; }
 .remap-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; gap: 8px; }
 .remap-delta { color: var(--accent); }
@@ -536,7 +542,7 @@ li.slot-row:last-child { border-bottom: 0; }
 .skill-picker-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 320px; overflow: auto; }
 .skill-picker-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 3px 6px; border-radius: 6px; font-size: 13px; }
 .skill-picker-row:hover { background: var(--raised); }
-@media (max-width: 900px) { .plan-editor { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .plan-lower { grid-template-columns: 1fr; } .plan-table th, .plan-table td { white-space: normal; } }
 
 /* ---------- Combat (phase 7) ---------- */
 .badge.kill { background: rgba(67, 217, 160,.14); color: var(--pos); }
@@ -613,7 +619,7 @@ a:not([class]) { color: var(--accent-2); }
 .page-sub::after { content: ""; flex: 1; max-width: 220px; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 
 /* ---------- panels: glass, lit top edge, corner brackets ---------- */
-.card, .fit-toolbar, .login-card {
+.card, .fit-toolbar, .plan-head, .login-card {
   border-radius: 0; border: 1px solid var(--border); border-top-color: rgba(245, 166, 35, .30);
   background:
     linear-gradient(var(--bracket), var(--bracket)) left 8px top 8px / 12px 1px no-repeat,
@@ -758,7 +764,7 @@ a:not([class]) { color: var(--accent-2); }
     </nav>
     <button type="button" class="user-menu" aria-label="Character menu">
       <img src="https://images.evetech.net/characters/2114794365/portrait?size=64" alt="" class="char-avatar">
-      <span class="user-name">TrilliumONE</span>
+      <span class="user-name">Mara Vexley</span>
       <span class="user-caret" aria-hidden="true"></span>
     </button>
   </div>
@@ -772,14 +778,13 @@ a:not([class]) { color: var(--accent-2); }
   <span class="sys-item sys-right">2026-10-01 · 13:25 UTC</span>
 </div>
 <main class="app-main">
-<!-- src/app/skills/plans/[id]/page.tsx → PlanEditor.tsx (client). Plan "Vargur ready" for TrilliumONE; now = 2026-10-01 12:00 UTC.
+<!-- src/app/skills/plans/[id]/page.tsx → PlanEditor.tsx (client). Plan "Vargur ready" for Mara Vexley; now = 2026-10-01 12:00 UTC.
      "After current queue" is ticked, so the timeline starts at the queue's end (2026-10-31 04:11). -->
 <h1 class="page-title">Skill plan</h1>
 <div class="plan-editor">
-  <div class="plan-editor-main">
-    <div class="plan-toolbar">
+  <div class="plan-toolbar plan-head">
       <input class="fit-name-input" aria-label="Plan name" value="Vargur ready" maxlength="60">
-      <span class="muted">TrilliumONE</span>
+      <span class="muted">Mara Vexley</span>
       <button type="button" class="fit-btn">
         <!-- Tabler IconDeviceFloppy -->
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h10l4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><circle cx="12" cy="14" r="2"/><path d="M14 4v4H8V4"/></svg> Save
@@ -794,7 +799,7 @@ a:not([class]) { color: var(--accent-2); }
 
     <!-- accountBlock !== null: another character on the account is training (one Omega queue per account). -->
     <p class="banner">
-      TrilliumTWO is training until 2026-10-03 04:02 — this plan
+      Jorin Hale is training until 2026-10-03 04:02 — this plan
       can’t start before then.
     </p>
 
@@ -835,7 +840,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">1</td>
             <td>
-              <span>Gunnery</span><span class="faint"> · Gunnery</span>
+              <span>Gunnery</span><span class="faint plan-group">Gunnery</span>
             </td>
             <td>V</td>
             <td class="num">×1</td>
@@ -856,7 +861,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">2</td>
             <td>
-              <span>Large Projectile Turret</span><span class="faint"> · Gunnery</span>
+              <span>Large Projectile Turret</span><span class="faint plan-group">Gunnery</span>
             </td>
             <td>V</td>
             <td class="num">×5</td>
@@ -876,7 +881,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">3</td>
             <td>
-              <span>Surgical Strike</span><span class="faint"> · Gunnery</span>
+              <span>Surgical Strike</span><span class="faint plan-group">Gunnery</span>
             </td>
             <td>V</td>
             <td class="num">×4</td>
@@ -897,8 +902,8 @@ a:not([class]) { color: var(--accent-2); }
           <tr class="prereq">
             <td class="muted">4</td>
             <td>
-              <span>Weapon Upgrades</span><span class="faint"> · Gunnery</span>
-              <span class="badge prereq-badge">prereq</span>
+              <span>Weapon Upgrades</span>
+              <span class="badge prereq-badge">prereq</span><span class="faint plan-group">Gunnery</span>
             </td>
             <td>V</td>
             <td class="num">×2</td>
@@ -913,7 +918,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">5</td>
             <td>
-              <span>Advanced Weapon Upgrades</span><span class="faint"> · Gunnery</span>
+              <span>Advanced Weapon Upgrades</span><span class="faint plan-group">Gunnery</span>
               <div class="faint">needed for the 800mm Vargur fit</div>
             </td>
             <td>V</td>
@@ -935,8 +940,8 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">6</td>
             <td>
-              <span>Rapid Firing</span><span class="faint"> · Gunnery</span>
-              <span class="badge alpha">alpha</span>
+              <span>Rapid Firing</span>
+              <span class="badge alpha">alpha</span><span class="faint plan-group">Gunnery</span>
             </td>
             <td>IV</td>
             <td class="num">×2</td>
@@ -956,7 +961,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">7</td>
             <td>
-              <span>Minmatar Battleship</span><span class="faint"> · Spaceship Command</span>
+              <span>Minmatar Battleship</span><span class="faint plan-group">Spaceship Command</span>
             </td>
             <td>IV</td>
             <td class="num">×8</td>
@@ -976,7 +981,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">8</td>
             <td>
-              <span>Minmatar Battleship</span><span class="faint"> · Spaceship Command</span>
+              <span>Minmatar Battleship</span><span class="faint plan-group">Spaceship Command</span>
             </td>
             <td>V</td>
             <td class="num">×8</td>
@@ -996,7 +1001,7 @@ a:not([class]) { color: var(--accent-2); }
           <tr>
             <td class="muted">9</td>
             <td>
-              <span>Marauders</span><span class="faint"> · Spaceship Command</span>
+              <span>Marauders</span><span class="faint plan-group">Spaceship Command</span>
             </td>
             <td>IV</td>
             <td class="num">×10</td>
@@ -1041,6 +1046,7 @@ a:not([class]) { color: var(--accent-2); }
 
     <!-- Skill picker: results (max 30) appear as soon as the query is non-empty; each row offers I–V add buttons followed by a bare
          IconPlus glyph (not a button). The "Plan is full" warn-text only shows at MAX_PLAN_ENTRIES (500). -->
+  <div class="plan-lower">
     <div class="card skill-picker">
       <h2 class="card-title">Add skill</h2>
       <input class="filter-input" aria-label="Search skills" value="proj" placeholder="Search skills">
@@ -1109,7 +1115,6 @@ a:not([class]) { color: var(--accent-2); }
         </li>
       </ul>
     </div>
-  </div>
 
   <!-- AttributesPanel.tsx — attributePanel() rows in ATTRIBUTE_KEYS order (Charisma, Intelligence, Memory, Perception, Willpower):
        total = (remap ?? base) + implant bonus, with the base shown faint. Training rate = one row per primary/secondary pair the
@@ -1154,18 +1159,19 @@ a:not([class]) { color: var(--accent-2); }
       Plan with this remap
     </label>
   </div>
+  </div>
 
   <section class="pkg-states"><p class="pkg-states-label">Other states — reference only, never shown here in the live app</p><!-- ======================= OTHER STATES (for the designer) ======================= -->
-  <!-- These are the editor's alternative renderings, stacked in a third column cell of .plan-editor so they do not disturb the live
+  <!-- These are the editor's alternative renderings, stacked under .plan-editor so they do not disturb the live
        layout above. In the app each one replaces the element it is annotated with. -->
-  <div class="plan-editor-main">
+  <div class="plan-editor">
     <!-- toolbar save-state variants -->
     <div class="plan-toolbar">
       <span class="save-state ">Saving…</span>
       <span class="save-state error">Could not save — retrying on the next change</span>
     </div>
     <!-- context.synced === false -->
-    <p class="banner">No skills synced yet for TrilliumONE — this plan is computed from level 0.</p>
+    <p class="banner">No skills synced yet for Mara Vexley — this plan is computed from level 0.</p>
     <!-- PlanTable with no rows -->
     <div class="card">
       <p class="faint">No entries yet — add a skill to start planning.</p>

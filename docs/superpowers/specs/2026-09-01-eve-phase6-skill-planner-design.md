@@ -68,7 +68,7 @@ skill_plan_entries   (plan_id int REFERENCES skill_plans ON DELETE CASCADE, posi
     "plan with this remap" toggle that recomputes the timeline; remap availability from `character_attributes`
     (`bonus_remaps`, `accrued_remap_cooldown_date`).
   - **Account rule** banner: if another character on the same account has a queue finishing in the future,
-    show "Reacher-9 is training until <date> — this plan can't start before then" (informational; timeline
+    show "Jorin Hale is training until <date> — this plan can't start before then" (informational; timeline
     offset option "start when account is free").
   - **Export** modal: EVEMon text (`Skill Name V` with Roman numerals) and in-game format (Arabic digits, one
     line per level, e.g. `Gunnery 5`), copy buttons. **Import** accepts both (Roman or Arabic; `Skill Name` alone

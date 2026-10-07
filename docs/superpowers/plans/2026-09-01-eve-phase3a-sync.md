@@ -1251,10 +1251,10 @@ import {
   type SkillsWrite,
 } from "../../src/lib/db/character-skills.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
@@ -1317,10 +1317,10 @@ import { closePool } from "../../src/lib/db/client.js";
 import { upsertCharacter } from "../../src/lib/db/characters.js";
 import { replaceClones, getClones, listImplants, type ClonesWrite } from "../../src/lib/db/character-clones.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
@@ -1675,10 +1675,10 @@ import { closePool } from "../../src/lib/db/client.js";
 import { upsertCharacter } from "../../src/lib/db/characters.js";
 import { replaceAssets, listAssets, type AssetRow } from "../../src/lib/db/character-assets.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
@@ -1723,10 +1723,10 @@ import { closePool } from "../../src/lib/db/client.js";
 import { upsertCharacter } from "../../src/lib/db/characters.js";
 import { replaceFittings, listFittings, type FittingRow } from "../../src/lib/db/character-fittings.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
@@ -1964,15 +1964,15 @@ import { closePool } from "../../src/lib/db/client.js";
 import { upsertCharacter } from "../../src/lib/db/characters.js";
 import { saveWallet, getWallet, listJournal, listTransactions, type JournalRow, type TransactionRow } from "../../src/lib/db/character-wallet.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
 const journal: JournalRow[] = [
-  { id: 24000000001, date: new Date("2026-09-01T10:14:07Z"), refType: "market_transaction", description: "Market: bought Tritanium", amount: -418293.5, balance: 1234567.89, reason: null, contextId: 6100000001, contextIdType: "market_transaction_id", firstPartyId: 669539978, secondPartyId: 2112625428, tax: null, taxReceiverId: null },
+  { id: 24000000001, date: new Date("2026-09-01T10:14:07Z"), refType: "market_transaction", description: "Market: bought Tritanium", amount: -418293.5, balance: 1234567.89, reason: null, contextId: 6100000001, contextIdType: "market_transaction_id", firstPartyId: 90000101, secondPartyId: 2112625428, tax: null, taxReceiverId: null },
   { id: 24000000004, date: new Date("2026-08-31T18:22:51Z"), refType: "corporate_reward_payout", description: "Corporation reward payout", amount: null, balance: null, reason: null, contextId: null, contextIdType: null, firstPartyId: null, secondPartyId: null, tax: null, taxReceiverId: null },
 ];
 const transactions: TransactionRow[] = [
@@ -2026,10 +2026,10 @@ import { closePool } from "../../src/lib/db/client.js";
 import { upsertCharacter } from "../../src/lib/db/characters.js";
 import { upsertLocation, getLocation, type LocationInput } from "../../src/lib/db/character-location.js";
 
-const CID = 669539978;
+const CID = 90000101;
 beforeEach(async () => {
   await resetDb();
-  await upsertCharacter({ id: CID, name: "TrilliumONE", refreshTokenEnc: "enc", scopes: [] });
+  await upsertCharacter({ id: CID, name: "Mara Vexley", refreshTokenEnc: "enc", scopes: [] });
 });
 afterAll(closePool);
 
@@ -2300,11 +2300,11 @@ afterAll(closePool);
 describe("names repo", () => {
   it("upserts names and reads them back by id", async () => {
     expect(await putNames([
-      { id: 669539978, category: "character", name: "TrilliumONE" },
+      { id: 90000101, category: "character", name: "Mara Vexley" },
       { id: 34, category: "inventory_type", name: "Tritanium" },
     ])).toBe(2);
-    const rows = await getNames([669539978, 34, 999]);
-    expect(rows.map((r) => r.id).sort((a, b) => a - b)).toEqual([34, 669539978]);
+    const rows = await getNames([90000101, 34, 999]);
+    expect(rows.map((r) => r.id).sort((a, b) => a - b)).toEqual([34, 90000101]);
     expect((await getName(34))!.name).toBe("Tritanium");
     expect(await getName(999)).toBeNull();
   });
@@ -2531,7 +2531,7 @@ import type { UniverseName, StructureRow } from "../../src/lib/db/names.js";
 
 const NOW = Date.UTC(2026, 8, 1, 12, 0, 0);
 const KNOWN: Record<number, { name: string; category: string }> = {
-  669539978: { name: "TrilliumONE", category: "character" },
+  90000101: { name: "Mara Vexley", category: "character" },
   1000035: { name: "Caldari Navy", category: "corporation" },
   34: { name: "Tritanium", category: "inventory_type" },
   60003760: { name: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", category: "station" },
@@ -2581,10 +2581,10 @@ describe("resolveNames", () => {
   });
   it("refreshes character/corporation/alliance rows older than 30 days", async () => {
     const h = harness();
-    h.names.set(669539978, stored(669539978, "character", "Old Name", VOLATILE_TTL_MS + 1000));
-    const out = await h.resolver.resolveNames([669539978]);
-    expect(h.posts).toEqual([[669539978]]);
-    expect(out.get(669539978)!.name).toBe("TrilliumONE");
+    h.names.set(90000101, stored(90000101, "character", "Old Name", VOLATILE_TTL_MS + 1000));
+    const out = await h.resolver.resolveNames([90000101]);
+    expect(h.posts).toEqual([[90000101]]);
+    expect(out.get(90000101)!.name).toBe("Mara Vexley");
   });
   it("posts only the ids it does not already have, deduplicated, ignoring junk", async () => {
     const h = harness();
@@ -2594,13 +2594,13 @@ describe("resolveNames", () => {
   });
   it("bisects a 404 batch and caches the unresolvable id as 'unknown'", async () => {
     const h = harness();
-    const out = await h.resolver.resolveNames([669539978, 999999999, 34]);
-    expect(out.get(669539978)!.name).toBe("TrilliumONE");
+    const out = await h.resolver.resolveNames([90000101, 999999999, 34]);
+    expect(out.get(90000101)!.name).toBe("Mara Vexley");
     expect(out.get(34)!.name).toBe("Tritanium");
     expect(out.get(999999999)).toEqual({ name: null, category: "unknown" });
     expect(h.names.get(999999999)!.category).toBe("unknown");
     expect(h.posts.length).toBeGreaterThan(1);            // the whole batch, then halves, then singles
-    expect(h.posts[0]).toEqual([669539978, 999999999, 34]);
+    expect(h.posts[0]).toEqual([90000101, 999999999, 34]);
   });
   it("does not retry an unknown id for 7 days, then does", async () => {
     const fresh = harness();
@@ -3280,12 +3280,12 @@ export function esiFixture<T>(name: string): T {
     "id": 24000000001,
     "date": "2026-09-01T10:14:07Z",
     "ref_type": "market_transaction",
-    "description": "Market: TrilliumONE bought Tritanium",
+    "description": "Market: Mara Vexley bought Tritanium",
     "amount": -418293.5,
     "balance": 1234567.89,
     "context_id": 6100000001,
     "context_id_type": "market_transaction_id",
-    "first_party_id": 669539978,
+    "first_party_id": 90000101,
     "second_party_id": 2112625428
   },
   {
@@ -3297,7 +3297,7 @@ export function esiFixture<T>(name: string): T {
     "balance": 1652861.39,
     "context_id": 60003760,
     "context_id_type": "station_id",
-    "first_party_id": 669539978,
+    "first_party_id": 90000101,
     "second_party_id": 1000035,
     "tax": 0,
     "tax_receiver_id": 1000035
@@ -3306,12 +3306,12 @@ export function esiFixture<T>(name: string): T {
     "id": 24000000003,
     "date": "2026-08-31T22:03:12Z",
     "ref_type": "player_donation",
-    "description": "TrilliumONE transferred cash to Sasha-9999",
+    "description": "Mara Vexley transferred cash to Nyx Calder",
     "reason": "for the doctrine",
     "amount": -5000000,
     "balance": 1665310.19,
-    "first_party_id": 669539978,
-    "second_party_id": 2124678472
+    "first_party_id": 90000101,
+    "second_party_id": 90000102
   },
   {
     "id": 24000000004,
@@ -3375,7 +3375,7 @@ export function esiFixture<T>(name: string): T {
 `tests/fixtures/esi/universe-names.json`:
 ```json
 [
-  { "id": 669539978, "name": "TrilliumONE", "category": "character" },
+  { "id": 90000101, "name": "Mara Vexley", "category": "character" },
   { "id": 2112625428, "name": "Broker Bob", "category": "character" },
   { "id": 1000035, "name": "Caldari Navy", "category": "corporation" },
   { "id": 60003760, "name": "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "category": "station" },
@@ -3450,7 +3450,7 @@ import type { SkillsWrite } from "../../src/lib/db/character-skills.js";
 import { esiFixture } from "../fixtures/esi.js";
 import { EsiUnavailableError } from "../../src/lib/esi/client.js";
 
-const CID = 669539978;
+const CID = 90000101;
 const NOW = Date.parse("2026-09-01T12:00:00Z");
 const ALL = ["esi-skills.read_skills.v1", "esi-skills.read_skillqueue.v1"];
 
@@ -3778,7 +3778,7 @@ import { createClonesJob, clonesJob, CLONES_INTERVAL_MS, CLONES_RETRY_MS, type C
 import type { ClonesWrite } from "../../src/lib/db/character-clones.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 const ALL = ["esi-clones.read_clones.v1", "esi-clones.read_implants.v1"];
 
 function harness(scopes: string[] = ALL) {
@@ -3860,7 +3860,7 @@ import { createFittingsJob, fittingsJob, FITTINGS_INTERVAL_MS, FITTINGS_RETRY_MS
 import type { FittingRow } from "../../src/lib/db/character-fittings.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 
 function harness(scopes: string[] = ["esi-fittings.read_fittings.v1"]) {
   const writes: FittingRow[][] = [];
@@ -4080,7 +4080,7 @@ import type { AssetRow } from "../../src/lib/db/character-assets.js";
 import { EsiUnavailableError } from "../../src/lib/esi/client.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 type RawAsset = { item_id: number; type_id: number; quantity: number; location_id: number; location_type: string; location_flag: string; is_singleton: boolean; is_blueprint_copy?: boolean };
 
 function harness(scopes: string[] = ["esi-assets.read_assets.v1"], assets = esiFixture<RawAsset[]>("assets")) {
@@ -4313,7 +4313,7 @@ import {
 import type { WalletWrite } from "../../src/lib/db/character-wallet.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 const WALLET_SCOPE = "esi-wallet.read_character_wallet.v1";
 
 function harness(scopes: string[] = [WALLET_SCOPE]) {
@@ -4364,9 +4364,9 @@ describe("wallet job", () => {
     expect(journal).toHaveLength(4);
     expect(journal[0]).toEqual({
       id: 24000000001, date: new Date("2026-09-01T10:14:07Z"), refType: "market_transaction",
-      description: "Market: TrilliumONE bought Tritanium", amount: -418293.5, balance: 1234567.89,
+      description: "Market: Mara Vexley bought Tritanium", amount: -418293.5, balance: 1234567.89,
       reason: null, contextId: 6100000001, contextIdType: "market_transaction_id",
-      firstPartyId: 669539978, secondPartyId: 2112625428, tax: null, taxReceiverId: null,
+      firstPartyId: 90000101, secondPartyId: 2112625428, tax: null, taxReceiverId: null,
     });
     expect(journal[3]).toEqual({
       id: 24000000004, date: new Date("2026-08-31T18:22:51Z"), refType: "corporate_reward_payout",
@@ -4386,7 +4386,7 @@ describe("wallet job", () => {
       journalRefId: 24000000001,
     });
     expect(h.resolved).toHaveLength(1);
-    expect([...h.resolved[0]].sort((a, b) => a - b)).toEqual([1000035, 669539978, 2112625428, 2124678472]);
+    expect([...h.resolved[0]].sort((a, b) => a - b)).toEqual([1000035, 90000101, 2112625428, 90000102]);
   });
   it("returns 0 without calling ESI when the scope is missing", async () => {
     const h = harness([]);
@@ -4617,7 +4617,7 @@ import { createLocationJob, locationJob, LOCATION_INTERVAL_MS, LOCATION_RETRY_MS
 import type { LocationInput } from "../../src/lib/db/character-location.js";
 import { esiFixture } from "../fixtures/esi.js";
 
-const CID = 669539978;
+const CID = 90000101;
 const ALL = ["esi-location.read_location.v1", "esi-location.read_ship_type.v1", "esi-location.read_online.v1"];
 
 function harness(scopes: string[] = ALL, location: unknown = esiFixture("location")) {
@@ -4870,10 +4870,10 @@ Append to `tests/components/sync-status.test.tsx`:
         job, characterId: job === "sde-update" ? null : 1, startedAt: new Date("2026-09-01T12:00:00Z"),
         finishedAt: new Date("2026-09-01T12:00:05Z"), status: "ok" as const, rows: i, error: null,
       }))}
-      names={{ 1: "TrilliumONE" }} />);
+      names={{ 1: "Mara Vexley" }} />);
     for (const job of names) expect(screen.getByText(job)).toBeInTheDocument();
     expect(screen.getByText("—")).toBeInTheDocument();          // the global sde-update row
-    expect(screen.getAllByText("TrilliumONE")).toHaveLength(7);
+    expect(screen.getAllByText("Mara Vexley")).toHaveLength(7);
   });
 ```
 

@@ -15,7 +15,7 @@
 - Ports of Animal's Midnight theme: `theme.ts`, `fonts.ts`, and the `:root` token block of `globals.css` are copied **verbatim** from `/home/daniel/AI/Plasma/Animal/src/app/`; accent `#4d8dff`, page bg `#070d1c`, card `#0e1830`, column `1123px`, header `80px`, mobile breakpoint `760px`.
 - Never inline colours in components — use the CSS variables (`--card`, `--border`, `--accent`, …).
 - `.env` is git-ignored and already exists locally with real values; never commit it, never print `EVE_CLIENT_SECRET`, `SESSION_SECRET`, or `POSTGRES_PASSWORD`.
-- Allow-listed character IDs: `669539978,2124678472,2124630678,2124676962`.
+- Allow-listed character IDs: `90000101,90000102,90000103,90000104`.
 - ESI base `https://esi.evetech.net`; header `X-Compatibility-Date` from env `ESI_COMPATIBILITY_DATE` (`2026-08-28`); `User-Agent` from env `ESI_USER_AGENT`.
 - SSO scopes (exact string, space-separated): `esi-skills.read_skills.v1 esi-skills.read_skillqueue.v1 esi-assets.read_assets.v1 esi-fittings.read_fittings.v1 esi-clones.read_clones.v1 esi-clones.read_implants.v1 esi-wallet.read_character_wallet.v1 esi-killmails.read_killmails.v1 esi-location.read_location.v1 esi-location.read_ship_type.v1`
 - Route guard is `src/proxy.ts` (`export function proxy`) — Next 16 naming, not `middleware.ts`.
@@ -624,7 +624,7 @@ import { startRun, finishRun, latestRuns } from "../../src/lib/db/sync-runs.js";
 beforeEach(async () => { await resetDb(); });
 afterAll(closePool);
 
-const tril = { id: 669539978, name: "TrilliumONE", refreshTokenEnc: "enc1", scopes: ["esi-skills.read_skills.v1"] };
+const tril = { id: 90000101, name: "Mara Vexley", refreshTokenEnc: "enc1", scopes: ["esi-skills.read_skills.v1"] };
 
 describe("accounts", () => {
   it("creates, lists, renames, deletes", async () => {
@@ -664,7 +664,7 @@ describe("characters", () => {
   });
   it("updates public info and deletes", async () => {
     await upsertCharacter(tril);
-    await updateCharacterInfo(tril.id, { name: "TrilliumONE", corporationId: 98000001, corporationName: "Corp", allianceId: null, allianceName: null });
+    await updateCharacterInfo(tril.id, { name: "Mara Vexley", corporationId: 98000001, corporationName: "Corp", allianceId: null, allianceName: null });
     expect((await getCharacter(tril.id))!.corporationName).toBe("Corp");
     await deleteCharacter(tril.id);
     expect(await getCharacter(tril.id)).toBeNull();
@@ -1009,7 +1009,7 @@ async function signedJwt(claims: Record<string, unknown>, opts: { aud?: string[]
   const jwks = createLocalJWKSet({ keys: [jwk] });
   const token = await new SignJWT(claims).setProtectedHeader({ alg: "RS256", kid: "k1" })
     .setIssuer(opts.iss ?? "https://login.eveonline.com/").setAudience(opts.aud ?? ["cid", "EVE Online"])
-    .setSubject(opts.sub ?? "CHARACTER:EVE:669539978").setIssuedAt().setExpirationTime("20m").sign(privateKey);
+    .setSubject(opts.sub ?? "CHARACTER:EVE:90000101").setIssuedAt().setExpirationTime("20m").sign(privateKey);
   return { token, jwks };
 }
 
@@ -1054,9 +1054,9 @@ describe("sso", () => {
   });
 
   it("verifies a good JWT", async () => {
-    const { token, jwks } = await signedJwt({ name: "TrilliumONE", scp: ["esi-skills.read_skills.v1", "esi-assets.read_assets.v1"], owner: "own" });
+    const { token, jwks } = await signedJwt({ name: "Mara Vexley", scp: ["esi-skills.read_skills.v1", "esi-assets.read_assets.v1"], owner: "own" });
     const v = await verifyEveJwt(token, { jwks, clientId: "cid" });
-    expect(v).toEqual({ characterId: 669539978, name: "TrilliumONE", scopes: ["esi-skills.read_skills.v1", "esi-assets.read_assets.v1"], owner: "own" });
+    expect(v).toEqual({ characterId: 90000101, name: "Mara Vexley", scopes: ["esi-skills.read_skills.v1", "esi-assets.read_assets.v1"], owner: "own" });
   });
 
   it("accepts a single-string scp and rejects wrong aud/iss", async () => {
@@ -1195,7 +1195,7 @@ import type { SsoMetadata } from "../../src/lib/auth/sso.js";
 
 const config = loadConfig({
   EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.plasma66.com/auth/callback",
-  ALLOWED_CHARACTER_IDS: "669539978", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
+  ALLOWED_CHARACTER_IDS: "90000101", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",
 });
 const metadata: SsoMetadata = { issuer: "https://login.eveonline.com/", authorization_endpoint: "https://login.eveonline.com/v2/oauth/authorize", token_endpoint: "https://login.eveonline.com/v2/oauth/token", jwks_uri: "https://login.eveonline.com/oauth/jwks" };
@@ -1205,7 +1205,7 @@ function deps(over: Partial<Parameters<typeof completeLogin>[2]> = {}) {
     metadata: async () => metadata,
     jwks: () => (async () => { throw new Error("unused"); }) as never,
     exchange: vi.fn(async () => ({ access_token: "at", refresh_token: "rt", expires_in: 1199 })),
-    verify: vi.fn(async () => ({ characterId: 669539978, name: "TrilliumONE", scopes: ["a"], owner: "o" })),
+    verify: vi.fn(async () => ({ characterId: 90000101, name: "Mara Vexley", scopes: ["a"], owner: "o" })),
     upsert: vi.fn(async (input: { id: number; name: string; refreshTokenEnc: string; scopes: string[] }) => ({ ...input, accountId: null, corporationId: null, corporationName: null, allianceId: null, allianceName: null, tokenStatus: "ok" as const, lastLoginAt: null })),
     ...over,
   };
@@ -1226,7 +1226,7 @@ describe("completeLogin", () => {
   it("stores the encrypted refresh token and returns the character", async () => {
     const d = deps();
     const out = await completeLogin({ code: "c", state: "st", oauthCookie: cookie }, config, d);
-    expect(out).toEqual({ characterId: 669539978, name: "TrilliumONE" });
+    expect(out).toEqual({ characterId: 90000101, name: "Mara Vexley" });
     const arg = d.upsert.mock.calls[0][0];
     expect(arg.refreshTokenEnc).toMatch(/^v1\./);
     expect(arg.refreshTokenEnc).not.toContain("rt");
@@ -2043,15 +2043,15 @@ import { MantineProvider } from "@mantine/core";
 import { CharacterSwitcher } from "../../src/app/components/CharacterSwitcher.js";
 
 const groups = [
-  { label: "Main", characters: [{ id: 1, name: "TrilliumONE", accountId: 1, corporationName: null, allianceName: null, tokenStatus: "ok" as const }, { id: 2, name: "Reacher-9", accountId: 1, corporationName: null, allianceName: null, tokenStatus: "needs_reauth" as const }] },
-  { label: "Alt", characters: [{ id: 3, name: "Sasha-9999", accountId: 2, corporationName: null, allianceName: null, tokenStatus: "ok" as const }] },
+  { label: "Main", characters: [{ id: 1, name: "Mara Vexley", accountId: 1, corporationName: null, allianceName: null, tokenStatus: "ok" as const }, { id: 2, name: "Jorin Hale", accountId: 1, corporationName: null, allianceName: null, tokenStatus: "needs_reauth" as const }] },
+  { label: "Alt", characters: [{ id: 3, name: "Nyx Calder", accountId: 2, corporationName: null, allianceName: null, tokenStatus: "ok" as const }] },
 ];
 const ui = (activeId: number | null) => render(<MantineProvider><CharacterSwitcher groups={groups} activeId={activeId} pathname="/ships" /></MantineProvider>);
 
 describe("CharacterSwitcher", () => {
   it("shows the active character in the trigger", () => {
     ui(3);
-    expect(screen.getByRole("button", { name: /character menu/i })).toHaveTextContent("Sasha-9999");
+    expect(screen.getByRole("button", { name: /character menu/i })).toHaveTextContent("Nyx Calder");
   });
   it("lists groups, marks re-auth, and posts a switch form to /auth/switch with the current path", () => {
     ui(1);
@@ -2059,7 +2059,7 @@ describe("CharacterSwitcher", () => {
     expect(screen.getByText("Main")).toBeInTheDocument();
     expect(screen.getByText("Alt")).toBeInTheDocument();
     expect(screen.getByText(/re-authorise/i)).toBeInTheDocument();
-    const form = screen.getByText("Reacher-9").closest("form")!;
+    const form = screen.getByText("Jorin Hale").closest("form")!;
     expect(form.getAttribute("action")).toBe("/auth/switch");
     expect((form.querySelector('input[name="characterId"]') as HTMLInputElement).value).toBe("2");
     expect((form.querySelector('input[name="next"]') as HTMLInputElement).value).toBe("/ships");
@@ -2471,9 +2471,9 @@ import { render, screen } from "@testing-library/react";
 import { SyncStatus } from "../../src/app/settings/SyncStatus.js";
 describe("SyncStatus", () => {
   it("renders a row per run with status badge and character name", () => {
-    render(<SyncStatus runs={[{ job: "character-info", characterId: 1, startedAt: new Date(), finishedAt: new Date(), status: "error", rows: null, error: "boom" }]} names={{ 1: "TrilliumONE" }} />);
+    render(<SyncStatus runs={[{ job: "character-info", characterId: 1, startedAt: new Date(), finishedAt: new Date(), status: "error", rows: null, error: "boom" }]} names={{ 1: "Mara Vexley" }} />);
     expect(screen.getByText("character-info")).toBeInTheDocument();
-    expect(screen.getByText("TrilliumONE")).toBeInTheDocument();
+    expect(screen.getByText("Mara Vexley")).toBeInTheDocument();
     expect(screen.getByText("error")).toHaveClass("badge");
     expect(screen.getByText("boom")).toBeInTheDocument();
   });
@@ -2854,7 +2854,7 @@ images:
   traefik: "traefik:v3.6"
 esi_compatibility_date: "2026-08-28"
 esi_user_agent: "EVE-Plasma/0.1 (dac9dc@gmail.com)"
-allowed_character_ids: "669539978,2124678472,2124630678,2124676962"
+allowed_character_ids: "90000101,90000102,90000103,90000104"
 ```
 
 `deploy/ansible/vars/secrets.yml.example`:
@@ -3014,12 +3014,12 @@ Expected: `traefik`, `eve-app`, `eve-worker`, `eve-postgres` all `Up`; the worke
 
 - [ ] **Step 6: Acceptance (needs Daniel in a browser on the tailnet)**
 
-1. Open `https://eve.plasma66.com` → login card → "Log in with EVE Online" → sign in to the **main** account, pick **TrilliumONE**, approve scopes → lands on Overview with TrilliumONE's card.
-2. Character menu → **Add character** → same account, pick **Reacher-9** → lands on Settings.
-3. Repeat Add character for **Sasha-9999** and **Lana C** (alt account).
+1. Open `https://eve.plasma66.com` → login card → "Log in with EVE Online" → sign in to the **main** account, pick **Mara Vexley**, approve scopes → lands on Overview with Mara Vexley's card.
+2. Character menu → **Add character** → same account, pick **Jorin Hale** → lands on Settings.
+3. Repeat Add character for **Nyx Calder** and **Tove Ash** (alt account).
 4. Settings → create accounts "Main" and "Alt"; assign the four characters. Character menu now shows two groups.
 5. Within ~1 minute the Sync status table shows four `character-info` rows with status `ok`; Overview cards show corp/alliance names.
-6. Settings → Remove **Lana C** → card disappears; Add character again → returns with status `ok`.
+6. Settings → Remove **Tove Ash** → card disappears; Add character again → returns with status `ok`.
 7. Check `ssh daniel@10.5.5.150 docker logs eve-worker` shows four `character-info ... ok rows=1` lines and no errors.
 
 Record the outcome (pass, or what failed) in the plan's final commit message.

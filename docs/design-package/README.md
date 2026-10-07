@@ -96,8 +96,8 @@ Each screen mirrors the JSX of its route one to one — same elements, class nam
 strings — and is styled by the unmodified stylesheet, so what you see is what the browser
 renders, with these approximations:
 
-- **Sample data.** Names, ISK, systems, fits, skills and dates are placeholder; the four
-  characters are the ones on the allow-list.
+- **Sample data.** Names, ISK, systems, fits, skills and dates are placeholder, and the four
+  characters are fictional.
 - **Fonts.** The app self-hosts Inter, Poppins and Space Grotesk through `next/font`; the package
   loads the same families from Google Fonts instead.
 - **Icons.** The app uses Tabler icons as inline React SVGs. The package uses hand-drawn
