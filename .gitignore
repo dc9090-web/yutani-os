@@ -9,3 +9,7 @@ deploy/ansible/vars/secrets.yml
 .superpowers/
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# Design-package hand-backs and local scratch
+*.zip
+/resources/
