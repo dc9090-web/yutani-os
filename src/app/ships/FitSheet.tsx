@@ -1,3 +1,4 @@
+import { IconTargetOff } from "@tabler/icons-react";
 import type { FitSheetView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
@@ -11,13 +12,15 @@ function RangeCols({ range }: { range: RangeCells | null }) {
   </>);
 }
 
-/** Short / Medium / Long as a three-tick meter with the word; the hover text carries the distances. */
+/** Short / Medium / Long as a three-tick meter with the word, every pill the same width; a target-off glyph marks ammo that out-ranges the lock. */
 function RangePill({ band }: { band: RangeBand | null }) {
   if (band === null) return <span />;
   return (
     <span className={`range-pill level-${band.level}`} data-desc={band.desc}>
       <i /><i /><i />
       <span className="range-pill-label">{band.label}</span>
+      {/* Reaches further than the ship can lock: the pill still says Long, the glyph says why that matters. */}
+      {band.beyond ? <IconTargetOff size={11} className="range-pill-beyond" aria-label="Further than this ship can lock" /> : null}
     </span>
   );
 }

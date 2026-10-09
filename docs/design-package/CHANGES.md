@@ -127,4 +127,4 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
 - **Cargo & drones** (`fit-sheet.html`, `FitSheet.tsx`): the cargo list is ammunition first, then a ★`.sheet-entry-break`
   ("other cargo", hairlines either side), then the rest. The Value column is gone (the Estimated value card keeps the
   totals); its place is a ★`.range-pill` for ammo rows: three ticks and a word (`.level-1` Short, `.level-2` Medium,
-  `.level-3` Long), classed against the hull's lock range; ammo that out-ranges the lock is still Long, and the hover text says so. Item thumbnails are ~30 % larger: module icons 36 px, the ammo thumbnail 26 px, cargo and drone icons 34 px.
+  `.level-3` Long), classed against the hull's lock range; ammo that out-ranges the lock is still Long with a target-off glyph (★`.range-pill-beyond`, warning colour) at the pill's right edge; every pill is 104 px wide. Item thumbnails are ~30 % larger: module icons 36 px, the ammo thumbnail 26 px, cargo and drone icons 34 px.

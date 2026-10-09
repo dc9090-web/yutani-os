@@ -120,6 +120,15 @@ describe("FitSheet", () => {
     expect(screen.queryByRole("button", { name: /CPU/ })).toBeNull();
   });
 
+  it("marks ammo that out-ranges the ship's lock with a glyph, still labelled Long", () => {
+    const beyond = { ...view, cargo: { ...view.cargo, ammo: [{ ...view.cargo.ammo[0], band: { label: "Long" as const, level: 3 as const, beyond: true, desc: "Reaches 45.0 km of this ship's 30.0 km lock range — further than it can target" } }] } };
+    const { container } = render(<FitSheet view={beyond} />);
+    const pill = container.querySelector(".range-pill")!;
+    expect(pill).toHaveClass("level-3");
+    expect(pill).toHaveTextContent(/^Long$/);
+    expect(pill.querySelector(".range-pill-beyond")).toHaveAttribute("aria-label", "Further than this ship can lock");
+  });
+
   it("gives Cargo & drones the same Optimal and Falloff columns, blank for anything that is not ammo", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemOptimalFalloffRange");
@@ -133,6 +142,7 @@ describe("FitSheet", () => {
     expect(pill).toHaveTextContent("Short");
     expect(pill).toHaveAttribute("data-desc", "Reaches 4.9 km of this ship's 22.5 km lock range");
     expect(container.querySelectorAll(".range-pill")).toHaveLength(1);   // drones and Tritanium get none
+    expect(pill.querySelector(".range-pill-beyond")).toBeNull();
     expect(container.querySelector(".sheet-entries .num.muted")).toBeNull();   // no Value column any more
     const rows = [...container.querySelectorAll(".sheet-entries li")];
     const hail = rows.find((r) => r.textContent?.includes("Hail S"))!;
