@@ -56,10 +56,13 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility.", range: { optimal: "600 m", falloff: "4.3 km" } }],
-  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, value: null, desc: null, range: null }],
+  cargo: {
+    ammo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, desc: "Hail is an attempt to combine penetration with versatility.", range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" } }],
+    other: [{ key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null, range: null, band: null }],
+  },
+  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, desc: null, range: null, band: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, value: null, desc: null, range: null }],
+  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, desc: null, range: null, band: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],
@@ -119,7 +122,18 @@ describe("FitSheet", () => {
 
   it("gives Cargo & drones the same Optimal and Falloff columns, blank for anything that is not ammo", () => {
     const { container } = render(<FitSheet view={view} />);
-    expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemOptimalFalloffValue");
+    expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemOptimalFalloffRange");
+    // Ammunition first, a labelled break, then the rest of the hold; the ammo row carries its range pill.
+    const lists = container.querySelectorAll(".sheet-entries");
+    expect(container.querySelector(".sheet-entry-break")).toHaveTextContent("other cargo");
+    expect(lists[1]).toHaveTextContent("Hail S");
+    expect(lists[2]).toHaveTextContent("Tritanium");
+    const pill = container.querySelector(".range-pill")!;
+    expect(pill).toHaveClass("level-1");
+    expect(pill).toHaveTextContent("Short");
+    expect(pill).toHaveAttribute("data-desc", "Reaches 4.9 km of this ship's 22.5 km lock range");
+    expect(container.querySelectorAll(".range-pill")).toHaveLength(1);   // drones and Tritanium get none
+    expect(container.querySelector(".sheet-entries .num.muted")).toBeNull();   // no Value column any more
     const rows = [...container.querySelectorAll(".sheet-entries li")];
     const hail = rows.find((r) => r.textContent?.includes("Hail S"))!;
     expect([...hail.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
@@ -178,14 +192,14 @@ describe("FitSheet", () => {
     const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;
     expect(unknown).not.toHaveTextContent("×");
     expect(unknown.querySelector("img")).toBeNull();
-    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(2);
+    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(3);   // Hail S, Tritanium, Hobgoblin; the unknown type has none
     expect(screen.getByText("13,100,100.00 ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
   });
 
   it("says so when no problems, no missing skills and no skills synced", () => {
     render(<FitSheet view={{
-      ...view, skillsSynced: false, problems: [], missing: [], cargo: [], drones: [], unknown: [],
+      ...view, skillsSynced: false, problems: [], missing: [], cargo: { ammo: [], other: [] }, drones: [], unknown: [],
     }} />);
     expect(screen.getByText(/No skills synced yet/)).toBeInTheDocument();
     expect(screen.getByText("No problems — this fit is legal.")).toBeInTheDocument();

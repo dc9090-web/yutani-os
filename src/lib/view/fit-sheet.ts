@@ -90,15 +90,50 @@ export interface SlotColumnView { slot: SlotKind; title: string; used: number; t
 export interface CounterView { label: string; used: number; total: number; over: boolean }
 export interface ProblemView { kind: ProblemKind; label: string; text: string }
 export interface MissingSkillView { skillTypeId: number; name: string; have: number; need: number }
+/**
+ * How far a round of ammunition reaches, as a class. Measured against *this ship*: its reach (optimal +
+ * falloff for a turret, flight range for a missile) as a share of the hull's lock range — under a
+ * third is Short, under two thirds Medium, the rest Long, and more than the ship can lock at all is
+ * Beyond lock. Ammo nothing fitted can load is classed by its own range modifier instead (Short for
+ * a −25 % round or worse, Long for +25 % or better). `desc` says which rule produced the label.
+ */
+export interface RangeBand { label: "Short" | "Medium" | "Long" | "Beyond lock"; level: 1 | 2 | 3; beyond: boolean; desc: string }
+
 export interface EntryView {
   key: string; typeId: number;
   /** The type name, always — "Unknown type (id)" when this SDE build lacks the type. */
   name: string;
   /** The pilot's own name for the item, when it has one. */
   nickname: string | null;
-  quantity: number; value: string | null; desc: string | null;
+  quantity: number; desc: string | null;
   /** Ammo only: what it gives the first fitted weapon that takes it, or what it says on its own. */
   range: RangeCells | null;
+  /** Ammo only: the range class of that reach. */
+  band: RangeBand | null;
+}
+
+/** The cargo hold, ammunition first. The sheet draws a break between the two. */
+export interface CargoView { ammo: EntryView[]; other: EntryView[] }
+
+const BAND_ABSOLUTE_SHORT_M = 10_000;
+const BAND_ABSOLUTE_MEDIUM_M = 40_000;
+/** The class of a reach in metres, against the ship's lock range when it has one. */
+export function reachBand(reach: number, lockRange: number | null): RangeBand {
+  if (lockRange === null || lockRange <= 0) {
+    const level = reach < BAND_ABSOLUTE_SHORT_M ? 1 : reach < BAND_ABSOLUTE_MEDIUM_M ? 2 : 3;
+    return { label: (["Short", "Medium", "Long"] as const)[level - 1], level, beyond: false, desc: `Reaches ${dist(reach)}; this ship's lock range is not known` };
+  }
+  const share = reach / lockRange;
+  const desc = `Reaches ${dist(reach)} of this ship's ${dist(lockRange)} lock range`;
+  if (share > 1) return { label: "Beyond lock", level: 3, beyond: true, desc: `${desc} — further than it can target` };
+  const level = share < 1 / 3 ? 1 : share < 2 / 3 ? 2 : 3;
+  return { label: (["Short", "Medium", "Long"] as const)[level - 1], level, beyond: false, desc };
+}
+/** The class of ammo by its own optimal-range modifier, for ammo nothing fitted can load. */
+export function modifierBand(optimalMultiplier: number): RangeBand {
+  const level = optimalMultiplier <= 0.75 ? 1 : optimalMultiplier < 1.25 ? 2 : 3;
+  const label = (["Short", "Medium", "Long"] as const)[level - 1];
+  return { label, level, beyond: false, desc: `${label}-range ammunition: ${pct(optimalMultiplier)} optimal on whatever gun loads it` };
 }
 
 /** A weapon's reach as the two cells. */
@@ -150,7 +185,7 @@ export interface FitSheetView {
   stats: ShipStatsView;
   bonuses: BonusView[]; gauges: GaugeView[]; slots: SlotColumnView[]; counters: CounterView[];
   problems: ProblemView[]; missing: MissingSkillView[];
-  cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
+  cargo: CargoView; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
   value: { total: string; lines: ValueLineView[]; unpriced: string | null };
 }
 
@@ -329,12 +364,15 @@ function mergeEntries(entries: FitEntry[]): FitEntry[] {
   return [...merged.values()];
 }
 
+interface AmmoInfo { range: RangeCells | null; band: RangeBand | null }
+const NO_AMMO: AmmoInfo = { range: null, band: null };
+
 function entryViews(
-  entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>,
-  rangeFor: (typeId: number) => RangeCells | null = () => null,
+  entries: FitEntry[], data: DogmaData, descriptions: ReadonlyMap<number, string>,
+  ammoFor: (typeId: number) => AmmoInfo = () => NO_AMMO,
 ): EntryView[] {
   return mergeEntries(entries).map((entry, index) => {
-    const unit = priceOf(prices.get(entry.typeId));
+    const ammo = ammoFor(entry.typeId);
     return {
       key: `${entry.flag}:${entry.typeId}:${index}`,
       typeId: entry.typeId,
@@ -344,9 +382,9 @@ function entryViews(
       name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
       nickname: entry.name,
       quantity: entry.quantity,
-      value: unit === null ? null : isk(unit * entry.quantity),
       desc: descriptions.get(entry.typeId) ?? null,
-      range: rangeFor(entry.typeId),
+      range: ammo.range,
+      band: ammo.band,
     };
   });
 }
@@ -393,19 +431,29 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
   // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
   // by construction, and a test pins that.
-  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it;
-  // when nothing fitted takes it, with what the charge says on its own (a missile's flight range,
-  // a turret charge's range modifiers), so every ammo row says something about range.
-  const cargoRange = (typeId: number): RangeCells | null => {
+  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it,
+  // classed against the ship's lock range; when nothing fitted takes it, with what the charge says on
+  // its own (a missile's flight range, a turret charge's range modifiers), so every ammo row says
+  // something about range.
+  const lockRange = input.perf.maxTargetRange;
+  const cargoAmmo = (typeId: number): AmmoInfo => {
     const chargeType = fit.data.types.get(typeId);
-    if (chargeType === undefined || chargeType.categoryId !== CATEGORY.charge) return null;
+    if (chargeType === undefined || chargeType.categoryId !== CATEGORY.charge) return NO_AMMO;
     for (const { item } of fit.modules) {
       if (hardpointOf(item) === null) continue;
       const weaponType = fit.data.types.get(item.typeId);
-      if (weaponType !== undefined && chargeFits(weaponType, chargeType)) return rangeCells(weaponRangeWith(fit, item, typeId));
+      if (weaponType === undefined || !chargeFits(weaponType, chargeType)) continue;
+      const wr = weaponRangeWith(fit, item, typeId);
+      if (wr === null) return NO_AMMO;
+      const reach = wr.kind === "turret" ? wr.optimal + wr.falloff : wr.range;
+      return { range: rangeCells(wr), band: reachBand(reach, lockRange) };
     }
-    return hintCells(chargeRangeHint(fit, typeId));
+    const hint = chargeRangeHint(fit, typeId);
+    if (hint === null) return NO_AMMO;
+    return { range: hintCells(hint), band: hint.kind === "missile" ? reachBand(hint.range, lockRange) : modifierBand(hint.optimal) };
   };
+  const cargoAll = entryViews(built.cargo, fit.data, descriptions, cargoAmmo);
+  const cargo: CargoView = { ammo: cargoAll.filter((e) => e.band !== null), other: cargoAll.filter((e) => e.band === null) };
 
   const groups = fitValueGroups(built);
   let total = 0;
@@ -436,10 +484,10 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     slots, counters,
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
-    cargo: entryViews(built.cargo, fit.data, prices, descriptions, cargoRange),
-    drones: entryViews(built.drones, fit.data, prices, descriptions),
-    unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),
-    unknown: entryViews(built.unknown, fit.data, prices, descriptions),
+    cargo,
+    drones: entryViews(built.drones, fit.data, descriptions),
+    unfittable: entryViews(built.unfittable, fit.data, descriptions),
+    unknown: entryViews(built.unknown, fit.data, descriptions),
     value: { total: isk(total), lines, unpriced: unpricedNote(unpriced) },
   };
 }

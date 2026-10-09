@@ -414,18 +414,29 @@ body {
 .sheet-slot-empty { grid-template-columns: 1fr; font-size: 12px; }
 /* Two columns: icons left, names right. A loaded weapon takes two lines, the ammo's thumbnail
    centred under the module's icon and its name aligned with the module's name. */
-.sheet-mod { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; row-gap: 4px; align-items: center; min-width: 0; line-height: 1.3; }
-.sheet-mod .module-icon { grid-column: 1; width: 28px; height: 28px; margin: 0; }
+.sheet-mod { display: grid; grid-template-columns: 36px minmax(0, 1fr); column-gap: 12px; row-gap: 5px; align-items: center; min-width: 0; line-height: 1.3; }
+.sheet-mod .module-icon { grid-column: 1; width: 36px; height: 36px; margin: 0; }
 .sheet-mod-name { grid-column: 2; }
-.sheet-mod .charge-icon { grid-column: 1; justify-self: center; width: 20px; height: 20px; border-radius: 1px; background: var(--raised); box-shadow: 0 0 0 1px var(--border); }
+.sheet-mod .charge-icon { grid-column: 1; justify-self: center; width: 26px; height: 26px; border-radius: 1px; background: var(--raised); box-shadow: 0 0 0 1px var(--border); }
 .sheet-mod-charge { grid-column: 2; font-size: 12px; color: var(--muted); }
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* The same four columns as the module list, so Optimal and Falloff line up down the whole sheet. */
-.entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; align-items: center; padding: 4px 0; }
-.sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 4px 0; }
+.sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .sheet-entry-head span:not(:first-child) { text-align: right; }
-.sheet-entry { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.sheet-entry .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
+/* The break between ammunition and the rest of the hold. */
+.sheet-entry-break { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; font-family: var(--font-label); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); }
+.sheet-entry-break::before, .sheet-entry-break::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+/* Range class: three ticks and a word. Short fills one, Medium two, Long three; Beyond lock is all
+   three in the warning colour, because the ammo out-ranges what the ship can target. */
+.range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
+.range-pill.level-1 i:nth-child(-n+1), .range-pill.level-2 i:nth-child(-n+2), .range-pill.level-3 i:nth-child(-n+3) { background: var(--accent); box-shadow: 0 0 5px rgba(245, 166, 35, .55); }
+.range-pill-label { margin-left: 4px; }
+.range-pill.beyond { border-color: rgba(255, 127, 80, .5); color: var(--warn); }
+.range-pill.beyond i { background: var(--warn); box-shadow: 0 0 5px rgba(255, 127, 80, .55); }
+.sheet-entry { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.sheet-entry .module-icon { width: 34px; height: 34px; margin: 0; flex: 0 0 auto; }
 .sheet-entry-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sheet-entry-qty { color: var(--muted); font-variant-numeric: tabular-nums; }
 .state-pill { justify-self: end; display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: var(--raised); border: 1px solid var(--border); color: var(--muted); }
@@ -438,9 +449,8 @@ body {
   .sheet-slot-head, .sheet-entry-head { display: none; }
   .sheet-slot-row, .entry-list.sheet-entries li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
   .sheet-slot-row .sheet-mod, .entry-list.sheet-entries li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
-  .sheet-slot-row .state-pill, .entry-list.sheet-entries li .num.muted { grid-column: 4; grid-row: 1; align-self: center; }
+  .sheet-slot-row .state-pill, .entry-list.sheet-entries li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
   .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
-  .entry-list.sheet-entries li .num.muted { white-space: nowrap; font-size: 12px; }
   .sheet-range:nth-of-type(2) { grid-column: 1; }
   .sheet-range:nth-of-type(3) { grid-column: 2; }
   .sheet-range:empty { display: none; }
@@ -450,9 +460,10 @@ body {
   .sheet-entry-name { white-space: normal; }
   /* Names get the width back by wrapping rather than clipping at two words. */
   .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
-  .sheet-mod { grid-template-columns: 22px minmax(0, 1fr); column-gap: 8px; }
-  .sheet-mod .module-icon { width: 22px; height: 22px; }
-  .sheet-mod .charge-icon { width: 16px; height: 16px; }
+  .sheet-mod { grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; }
+  .sheet-mod .module-icon { width: 28px; height: 28px; }
+  .sheet-mod .charge-icon { width: 20px; height: 20px; }
+  .sheet-entry .module-icon { width: 28px; height: 28px; }
   .state-pill { padding: 2px 6px; font-size: 10px; }
   .fit-sheet .fit-head { flex-direction: column; gap: 14px; }
   .fit-sheet .fit-render { width: 96px; height: 96px; }
@@ -1019,7 +1030,7 @@ a:not([class]) { color: var(--accent-2); }
     <div class="card">
       <h2 class="card-title">Cargo &amp; drones</h2>
       <div class="sheet-entry-head" aria-hidden="true">
-        <span>Item</span><span>Optimal</span><span>Falloff</span><span>Value</span>
+        <span>Item</span><span>Optimal</span><span>Falloff</span><span>Range</span>
       </div>
       <h3 class="slot-title">Drone bay</h3>
       <!-- Merged stacks: ESI's singleton drone rows summed per type -->
@@ -1032,7 +1043,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">4,210,000.00 ISK</span>
+          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Valkyrie II — Combat Drone">
@@ -1042,7 +1053,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">1,640,000.00 ISK</span>
+          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Hobgoblin II — Combat Drone">
@@ -1051,7 +1062,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">—</span>
+          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Warrior II — Combat Drone">
@@ -1060,7 +1071,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">342,500.00 ISK</span>
+          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Cargo</h3>
@@ -1073,8 +1084,11 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range">38.2 km</span>
           <span class="num sheet-range">—</span>
-          <span class="num muted">1,920,000.00 ISK</span>
+          <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>
         </li>
+      </ul>
+      <div class="sheet-entry-break" aria-hidden="true"><span>other cargo</span></div>
+      <ul class="entry-list sheet-entries">
         <li>
           <span class="sheet-entry" data-desc="Nanite Repair Paste — Nanite Repair Paste">
             <img class="module-icon" src="https://images.evetech.net/types/28668/icon?size=32" alt="">
@@ -1083,7 +1097,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">4,480,000.00 ISK</span>
+          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Mobile Tractor Unit — Mobile Tractor Unit">
@@ -1092,7 +1106,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">6,120,000.00 ISK</span>
+          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Rifter — Frigate">
@@ -1101,7 +1115,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">—</span>
+          <span></span>
         </li>
       </ul>
       <!-- Unknown types: icons=false (no image server entry for a type the SDE lacks) -->
@@ -1115,7 +1129,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">—</span>
+          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Not fitted</h3>
@@ -1128,7 +1142,7 @@ a:not([class]) { color: var(--accent-2); }
           </span>
           <span class="num sheet-range"></span>
           <span class="num sheet-range"></span>
-          <span class="num muted">1,180,000.00 ISK</span>
+          <span></span>
         </li>
       </ul>
     </div>

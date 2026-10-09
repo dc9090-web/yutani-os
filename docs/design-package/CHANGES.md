@@ -124,3 +124,8 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
 - **Module rows with ammo** (`fit-sheet.html`, `FitSheet.tsx`): `.sheet-mod` is a two-column grid (icons, names) and a loaded
   weapon takes two lines: its icon and name, then the charge's thumbnail (★`.charge-icon`, 20 px, framed) centred under the
   module icon with the charge name aligned under the module name. `.sheet-mod-text` is gone.
+- **Cargo & drones** (`fit-sheet.html`, `FitSheet.tsx`): the cargo list is ammunition first, then a ★`.sheet-entry-break`
+  ("other cargo", hairlines either side), then the rest. The Value column is gone (the Estimated value card keeps the
+  totals); its place is a ★`.range-pill` for ammo rows: three ticks and a word (`.level-1` Short, `.level-2` Medium,
+  `.level-3` Long; `.beyond` = Beyond lock, all three ticks in the warning colour), classed against the hull's lock
+  range. Item thumbnails are ~30 % larger: module icons 36 px, the ammo thumbnail 26 px, cargo and drone icons 34 px.

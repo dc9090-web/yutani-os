@@ -1,4 +1,4 @@
-import type { FitSheetView, EntryView, RangeCells } from "../../lib/view/fit-sheet.js";
+import type { FitSheetView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -9,6 +9,17 @@ function RangeCols({ range }: { range: RangeCells | null }) {
     <span className="num sheet-range">{range === null ? "" : range.optimal ?? "—"}</span>
     <span className="num sheet-range">{range === null ? "" : range.falloff ?? "—"}</span>
   </>);
+}
+
+/** Short / Medium / Long as a three-tick meter with the word; Beyond lock fills all three in the warning colour. */
+function RangePill({ band }: { band: RangeBand | null }) {
+  if (band === null) return <span />;
+  return (
+    <span className={`range-pill level-${band.level}${band.beyond ? " beyond" : ""}`} data-desc={band.desc}>
+      <i /><i /><i />
+      <span className="range-pill-label">{band.label}</span>
+    </span>
+  );
 }
 
 /** `icons` is off for the unknown-types list: the image server has nothing for a type the SDE lacks. */
@@ -27,7 +38,7 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
           </span>
           <RangeCols range={entry.range} />
-          <span className="num muted">{entry.value ?? "—"}</span>
+          <RangePill band={entry.band} />
         </li>
       ))}
     </ul>
@@ -36,7 +47,8 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
 
 /** Spec §4's fit sheet. Every value here was computed on the server by `buildFitSheet`. */
 export function FitSheet({ view }: { view: FitSheetView }) {
-  const holdEmpty = view.cargo.length === 0 && view.drones.length === 0;
+  const cargoCount = view.cargo.ammo.length + view.cargo.other.length;
+  const holdEmpty = cargoCount === 0 && view.drones.length === 0;
   return (
     <div className="fit-sheet">
       <div className="card fit-head fit-sheet-head">
@@ -118,10 +130,17 @@ export function FitSheet({ view }: { view: FitSheetView }) {
           {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
             <>
               <div className="sheet-entry-head" aria-hidden="true">
-                <span>Item</span><span>Optimal</span><span>Falloff</span><span>Value</span>
+                <span>Item</span><span>Optimal</span><span>Falloff</span><span>Range</span>
               </div>
               {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}
-              {view.cargo.length === 0 ? null : <><h3 className="slot-title">Cargo</h3><EntryList entries={view.cargo} /></>}
+              {cargoCount === 0 ? null : (<>
+                <h3 className="slot-title">Cargo</h3>
+                {/* Ammunition first, then a break, then everything else in the hold. */}
+                {view.cargo.ammo.length === 0 ? null : <EntryList entries={view.cargo.ammo} />}
+                {view.cargo.ammo.length > 0 && view.cargo.other.length > 0
+                  ? <div className="sheet-entry-break" aria-hidden="true"><span>other cargo</span></div> : null}
+                {view.cargo.other.length === 0 ? null : <EntryList entries={view.cargo.other} />}
+              </>)}
             </>
           )}
           {view.unknown.length === 0 ? null : (
