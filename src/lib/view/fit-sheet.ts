@@ -93,11 +93,12 @@ export interface MissingSkillView { skillTypeId: number; name: string; have: num
 /**
  * How far a round of ammunition reaches, as a class. Measured against *this ship*: its reach (optimal +
  * falloff for a turret, flight range for a missile) as a share of the hull's lock range — under a
- * third is Short, under two thirds Medium, the rest Long, and more than the ship can lock at all is
- * Beyond lock. Ammo nothing fitted can load is classed by its own range modifier instead (Short for
- * a −25 % round or worse, Long for +25 % or better). `desc` says which rule produced the label.
+ * third is Short, under two thirds Medium, the rest Long. `beyond` marks ammo that reaches further
+ * than the ship can lock at all (still Long on the pill; the hover text says so). Ammo nothing fitted
+ * can load is classed by its own range modifier instead (Short for a −25 % round or worse, Long for
+ * +25 % or better). `desc` says which rule produced the label.
  */
-export interface RangeBand { label: "Short" | "Medium" | "Long" | "Beyond lock"; level: 1 | 2 | 3; beyond: boolean; desc: string }
+export interface RangeBand { label: "Short" | "Medium" | "Long"; level: 1 | 2 | 3; beyond: boolean; desc: string }
 
 export interface EntryView {
   key: string; typeId: number;
@@ -125,7 +126,7 @@ export function reachBand(reach: number, lockRange: number | null): RangeBand {
   }
   const share = reach / lockRange;
   const desc = `Reaches ${dist(reach)} of this ship's ${dist(lockRange)} lock range`;
-  if (share > 1) return { label: "Beyond lock", level: 3, beyond: true, desc: `${desc} — further than it can target` };
+  if (share > 1) return { label: "Long", level: 3, beyond: true, desc: `${desc} — further than it can target` };
   const level = share < 1 / 3 ? 1 : share < 2 / 3 ? 2 : 3;
   return { label: (["Short", "Medium", "Long"] as const)[level - 1], level, beyond: false, desc };
 }

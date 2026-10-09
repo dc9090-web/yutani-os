@@ -427,14 +427,11 @@ body {
 /* The break between ammunition and the rest of the hold. */
 .sheet-entry-break { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; font-family: var(--font-label); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); }
 .sheet-entry-break::before, .sheet-entry-break::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
-/* Range class: three ticks and a word. Short fills one, Medium two, Long three; Beyond lock is all
-   three in the warning colour, because the ammo out-ranges what the ship can target. */
+/* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
 .range-pill.level-1 i:nth-child(-n+1), .range-pill.level-2 i:nth-child(-n+2), .range-pill.level-3 i:nth-child(-n+3) { background: var(--accent); box-shadow: 0 0 5px rgba(245, 166, 35, .55); }
 .range-pill-label { margin-left: 4px; }
-.range-pill.beyond { border-color: rgba(255, 127, 80, .5); color: var(--warn); }
-.range-pill.beyond i { background: var(--warn); box-shadow: 0 0 5px rgba(255, 127, 80, .55); }
 .sheet-entry { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .sheet-entry .module-icon { width: 34px; height: 34px; margin: 0; flex: 0 0 auto; }
 .sheet-entry-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

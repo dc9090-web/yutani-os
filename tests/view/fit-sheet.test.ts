@@ -118,11 +118,11 @@ describe("rangeText", () => {
 });
 
 describe("range bands", () => {
-  it("classes reach against the ship's lock range, with Beyond lock past it", () => {
+  it("classes reach against the ship's lock range, and marks reach past it", () => {
     expect(reachBand(5_000, 30_000)).toMatchObject({ label: "Short", level: 1, beyond: false, desc: "Reaches 5.0 km of this ship's 30.0 km lock range" });
     expect(reachBand(12_000, 30_000)).toMatchObject({ label: "Medium", level: 2 });
     expect(reachBand(25_000, 30_000)).toMatchObject({ label: "Long", level: 3 });
-    expect(reachBand(45_000, 30_000)).toMatchObject({ label: "Beyond lock", level: 3, beyond: true });
+    expect(reachBand(45_000, 30_000)).toMatchObject({ label: "Long", level: 3, beyond: true });   // still Long on the pill
     expect(reachBand(45_000, 30_000).desc).toBe("Reaches 45.0 km of this ship's 30.0 km lock range — further than it can target");
   });
   it("falls back to fixed distances when the lock range is unknown", () => {

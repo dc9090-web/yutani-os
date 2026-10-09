@@ -11,11 +11,11 @@ function RangeCols({ range }: { range: RangeCells | null }) {
   </>);
 }
 
-/** Short / Medium / Long as a three-tick meter with the word; Beyond lock fills all three in the warning colour. */
+/** Short / Medium / Long as a three-tick meter with the word; the hover text carries the distances. */
 function RangePill({ band }: { band: RangeBand | null }) {
   if (band === null) return <span />;
   return (
-    <span className={`range-pill level-${band.level}${band.beyond ? " beyond" : ""}`} data-desc={band.desc}>
+    <span className={`range-pill level-${band.level}`} data-desc={band.desc}>
       <i /><i /><i />
       <span className="range-pill-label">{band.label}</span>
     </span>
