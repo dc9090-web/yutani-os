@@ -105,3 +105,6 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   trailing it after a middle dot.
 - **Sample data**: the four characters are fictional (Mara Vexley, Jorin Hale, Nyx Calder, Tove Ash) with made-up
   character IDs; `previews/*.png` re-rendered.
+- **Fit sheet ranges** (`fit-sheet.html`, `FitSheet.tsx`): a loaded weapon shows its reach on a line under the charge,
+  ★`.sheet-mod-range` ("optimal 1.2 km · falloff 5.2 km" for a turret, "range 38.2 km" for a launcher); ammo in the
+  cargo hold shows what it would give the first fitted weapon that takes it, ★`.sheet-entry-range` after the quantity.

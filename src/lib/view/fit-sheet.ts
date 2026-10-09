@@ -1,8 +1,5 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2,
-  type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats,
-  type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem,
-  type ProblemKind, type SlotKind,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith, type WeaponRange,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
@@ -88,6 +85,8 @@ export interface ModuleRowView {
   desc: string | null; chargeDesc: string | null;
   /** The charge was loaded by the app from the cargo hold (`assumeCargoAmmo`), not by the pilot. */
   chargeAssumed: boolean;
+  /** "optimal 1.2 km · falloff 5.2 km" for a loaded turret, "range 38.2 km" for a loaded launcher; null otherwise. */
+  chargeRange: string | null;
   cpu: string; power: string; state: string;
   cpuExplain: ExplainRowView[]; powerExplain: ExplainRowView[];
 }
@@ -95,7 +94,11 @@ export interface SlotColumnView { slot: SlotKind; title: string; used: number; t
 export interface CounterView { label: string; used: number; total: number; over: boolean }
 export interface ProblemView { kind: ProblemKind; label: string; text: string }
 export interface MissingSkillView { skillTypeId: number; name: string; have: number; need: number }
-export interface EntryView { key: string; typeId: number; name: string; quantity: number; value: string | null; desc: string | null }
+export interface EntryView {
+  key: string; typeId: number; name: string; quantity: number; value: string | null; desc: string | null;
+  /** For ammo in the cargo hold: what it would give the first fitted weapon that takes it, as `chargeRange`. */
+  range: string | null;
+}
 export interface BonusView { skill: string | null; level: number | null; text: string }
 export interface ValueLineView { label: string; value: string }
 
@@ -157,6 +160,12 @@ const fmtNum = (value: number | null, decimals: number, unit = ""): string =>
   value === null ? DASH : `${grouped(value.toFixed(decimals))}${unit}`;
 const whole = (value: number | null, unit = ""): string => value === null ? DASH : `${grouped(Math.round(value))}${unit}`;
 const km = (metres: number | null): string => metres === null ? DASH : `${grouped((metres / 1000).toFixed(1))} km`;
+/** A weapon range: metres under a kilometre, otherwise one decimal of km — the fitting window's convention. */
+const dist = (metres: number): string => metres < 1000 ? `${Math.round(metres)} m` : `${grouped((metres / 1000).toFixed(1))} km`;
+export function rangeText(range: WeaponRange | null): string | null {
+  if (range === null) return null;
+  return range.kind === "turret" ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `range ${dist(range.range)}`;
+}
 
 function layerRow(layer: string, perf: LayerPerformance | null, note: string | null = null): ResistRowView | null {
   if (perf === null) return null;
@@ -289,6 +298,7 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
     desc: descriptions.get(stat.item.typeId) ?? null,
     chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
     chargeAssumed: stat.item.charge?.assumed === true,
+    chargeRange: stat.item.charge === undefined ? null : rangeText(weaponRange(fit, stat.item)),
     // Half-even round to 2dp first — same convention as the pool totals in `fitStats` — so a row's
     // own cpu/power always matches what the gauge above it is summing.
     cpu: round2(stat.cpu).toFixed(2),
@@ -316,7 +326,10 @@ function mergeEntries(entries: FitEntry[]): FitEntry[] {
   return [...merged.values()];
 }
 
-function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>): EntryView[] {
+function entryViews(
+  entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>,
+  rangeFor: (typeId: number) => string | null = () => null,
+): EntryView[] {
   return mergeEntries(entries).map((entry, index) => {
     const unit = priceOf(prices.get(entry.typeId));
     return {
@@ -328,6 +341,7 @@ function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<nu
       quantity: entry.quantity,
       value: unit === null ? null : isk(unit * entry.quantity),
       desc: descriptions.get(entry.typeId) ?? null,
+      range: rangeFor(entry.typeId),
     };
   });
 }
@@ -374,6 +388,18 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
   // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
   // by construction, and a test pins that.
+  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it.
+  const cargoRange = (typeId: number): string | null => {
+    const chargeType = fit.data.types.get(typeId);
+    if (chargeType === undefined || chargeType.categoryId !== CATEGORY.charge) return null;
+    for (const { item } of fit.modules) {
+      if (hardpointOf(item) === null) continue;
+      const weaponType = fit.data.types.get(item.typeId);
+      if (weaponType !== undefined && chargeFits(weaponType, chargeType)) return rangeText(weaponRangeWith(fit, item, typeId));
+    }
+    return null;
+  };
+
   const groups = fitValueGroups(built);
   let total = 0;
   let unpriced = 0;
@@ -403,7 +429,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     slots, counters,
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
-    cargo: entryViews(built.cargo, fit.data, prices, descriptions),
+    cargo: entryViews(built.cargo, fit.data, prices, descriptions, cargoRange),
     drones: entryViews(built.drones, fit.data, prices, descriptions),
     unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),
     unknown: entryViews(built.unknown, fit.data, prices, descriptions),

@@ -17,6 +17,7 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
             ) : null}
             <span className="sheet-entry-name">{entry.name}</span>
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
+            {entry.range === null ? null : <span className="sheet-entry-range">· {entry.range}</span>}
           </span>
           <span className="num muted">{entry.value ?? "—"}</span>
         </li>
@@ -88,6 +89,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                               {row.charge}{row.chargeAssumed ? <span className="sheet-mod-assumed"> · from cargo</span> : null}
                             </span>
                           )}
+                          {row.chargeRange === null ? null : <span className="sheet-mod-range">{row.chargeRange}</span>}
                         </span>
                       </span>
                       <span className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></span>

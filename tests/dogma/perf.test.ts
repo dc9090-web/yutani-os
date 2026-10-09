@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, PROP_EFFECT, fitPerformance, type CapStability } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, PROP_EFFECT, fitPerformance, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -26,6 +26,9 @@ const PERF_ATTRS: readonly (readonly [AttrId, string, number, boolean, boolean])
   [70, "agility", 0, false, false],
   [73, "duration", 0, true, false],
   [76, "maxTargetRange", 0, false, true],
+  [54, "maxRange", 0, false, true],
+  [158, "falloff", 1, false, true],
+  [281, "explosionDelay", 0, false, true],
   [109, "kineticDamageResonance", 1, false, false],
   [110, "thermalDamageResonance", 1, false, false],
   [111, "explosiveDamageResonance", 1, false, false],
@@ -220,6 +223,45 @@ describe("damage", () => {
       modules: [[jammed, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]),
     });
     expect(fitPerformance(fit)).toMatchObject({ dps: null, volley: null });
+  });
+});
+
+describe("weapon range", () => {
+  it("reads a turret's optimal and falloff off the module, where the ammo effects land", () => {
+    const b = bench();
+    const gun = b.turret([[PERF_ATTR.maxRange, 1200], [PERF_ATTR.falloff, 5160]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[gun, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]) });
+    expect(weaponRange(fit, fit.modules[0].item)).toEqual({ kind: "turret", optimal: 1200, falloff: 5160 });
+  });
+
+  it("flies a missile for explosionDelay milliseconds at maxVelocity", () => {
+    const b = bench();
+    const missile = b.charge([...SHELL, [PERF_ATTR.maxVelocity, 1800], [PERF_ATTR.explosionDelay, 7200]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[b.launcher([]), "high", 0]], charges: new Map([[0, missile]]) });
+    expect(weaponRange(fit, fit.modules[0].item)).toEqual({ kind: "missile", range: 12_960 });   // 1800 x 7.2 s
+  });
+
+  it("is null for an empty launcher, a module with no hardpoint, and a turret with no range figures", () => {
+    const b = bench();
+    const fit = buildFit(b.data, b.hull(HULL), {
+      modules: [[b.launcher([]), "high", 0], [b.active([]), "mid", 0], [b.turret([]), "high", 1]],
+    });
+    expect(fit.modules.map(({ item }) => weaponRange(fit, item))).toEqual([null, null, null]);
+  });
+
+  it("answers for another charge without leaving it loaded", () => {
+    const b = bench();
+    const launcher = b.launcher([]);
+    const slow = b.charge([...SHELL, [PERF_ATTR.maxVelocity, 1000], [PERF_ATTR.explosionDelay, 5000]]);
+    const fast = b.charge([...SHELL, [PERF_ATTR.maxVelocity, 2000], [PERF_ATTR.explosionDelay, 5000]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[launcher, "high", 0]], charges: new Map([[0, slow]]) });
+    const item = fit.modules[0].item;
+    expect(weaponRangeWith(fit, item, fast)).toEqual({ kind: "missile", range: 10_000 });
+    expect(item.charge?.typeId).toBe(slow);
+    expect(weaponRange(fit, item)).toEqual({ kind: "missile", range: 5_000 });
+    const empty = buildFit(b.data, b.hull(HULL), { modules: [[launcher, "high", 0]] });
+    expect(weaponRangeWith(empty, empty.modules[0].item, fast)).toEqual({ kind: "missile", range: 10_000 });
+    expect(empty.modules[0].item.charge).toBeUndefined();
   });
 });
 

@@ -12,8 +12,8 @@
  * name of each one so a snapshot regeneration that moves an id fails loudly.
  */
 import { ATTR, State, type AttrId } from "./data.js";
-import { getAttr } from "./calc.js";
-import { hardpointOf, type Fit, type Item } from "./fit.js";
+import { clearMemo, getAttr } from "./calc.js";
+import { attachCharge, hardpointOf, makeItem, type Fit, type Item } from "./fit.js";
 
 /** Attribute ids beyond the fitting set already in `ATTR` (data.ts). Verified by name — see above. */
 export const PERF_ATTR = {
@@ -25,6 +25,9 @@ export const PERF_ATTR = {
   agility: 70,
   duration: 73,               // cycle time, ms — used by modules that have no `speed`
   maxTargetRange: 76,
+  maxRange: 54,               // a turret's optimal range, m (the loaded charge's ammoInfluenceRange is folded in)
+  falloff: 158,               // a turret's falloff, m (likewise ammoInfluenceFalloff)
+  explosionDelay: 281,        // a missile's flight time, ms
   emDamage: 114,
   explosiveDamage: 116,
   kineticDamage: 117,
@@ -212,6 +215,57 @@ export interface FitPerformance {
   droneBandwidth: number | null;
   droneBay: number | null;
   droneControlRange: number | null;
+}
+
+/** How far a weapon reaches with the charge it holds. Metres. */
+export type WeaponRange =
+  | { kind: "turret"; optimal: number; falloff: number }
+  | { kind: "missile"; range: number };
+
+/**
+ * A turret's optimal + falloff, or a missile's flight range, as the fitting window shows them.
+ *
+ * The turret figures are read off the *module*: the charge's `ammoInfluenceRange` and
+ * `ammoInfluenceFalloff` effects (596 / 599, verified in the rifter snapshot) are ItemModifiers on
+ * the charge's container, so `getAttr` on the gun already folds the ammo in together with the
+ * skills, rigs and hull bonuses. A missile has no optimal: it flies for `explosionDelay` ms at
+ * `maxVelocity` m/s, and the missile skills reach those two attributes because charges are
+ * ownerModifiable. `null` for anything that is not a weapon, a launcher with nothing loaded, or a
+ * data set without the attributes.
+ */
+export function weaponRange(fit: Fit, weapon: Item): WeaponRange | null {
+  const hardpoint = hardpointOf(weapon);
+  if (hardpoint === "turret") {
+    const optimal = attrOr(fit, weapon, PERF_ATTR.maxRange, 0);
+    const falloff = attrOr(fit, weapon, PERF_ATTR.falloff, 0);
+    return optimal > 0 ? { kind: "turret", optimal, falloff } : null;   // falloff alone defaults to 1 m, which is no range
+  }
+  if (hardpoint === "launcher") {
+    const charge = weapon.charge;
+    if (charge === undefined) return null;
+    const velocity = attrOr(fit, charge, PERF_ATTR.maxVelocity, 0);
+    const flightMs = attrOr(fit, charge, PERF_ATTR.explosionDelay, 0);
+    return velocity > 0 && flightMs > 0 ? { kind: "missile", range: velocity * flightMs / 1000 } : null;
+  }
+  return null;
+}
+
+/**
+ * `weaponRange` as if `weapon` held `chargeTypeId` instead of whatever it holds now — what a stack
+ * of ammo in the cargo hold would give this gun. The swap is undone before returning, and the
+ * calculator's memo is cleared on both sides so neither reading sees the other's values.
+ */
+export function weaponRangeWith(fit: Fit, weapon: Item, chargeTypeId: number): WeaponRange | null {
+  const current = weapon.charge;
+  attachCharge(weapon, makeItem(fit.data, chargeTypeId));
+  clearMemo(fit);
+  try {
+    return weaponRange(fit, weapon);
+  } finally {
+    if (current === undefined) delete weapon.charge;
+    else attachCharge(weapon, current);
+    clearMemo(fit);
+  }
 }
 
 /**

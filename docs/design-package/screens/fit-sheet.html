@@ -382,6 +382,7 @@ body {
 .stat-rows dd { margin: 0; color: var(--text); }
 .stat-note { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
 .sheet-mod-assumed { color: var(--accent-2); }
+.sheet-mod-range, .sheet-entry-range { font-size: 12px; color: var(--muted); }
 .stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
 .resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
 .resist-table th { font-weight: 500; text-align: left; padding: 0; }
@@ -409,7 +410,7 @@ body {
 .sheet-mod { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sheet-mod .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
 .sheet-mod-text { display: grid; min-width: 0; line-height: 1.3; }
-.sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-mod-name, .sheet-mod-charge, .sheet-mod-range { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sheet-mod-charge { font-size: 12px; color: var(--faint); }
 .sheet-entries li { align-items: center; padding: 4px 0; }
 .sheet-entry { display: flex; align-items: center; gap: 10px; min-width: 0; }
@@ -423,7 +424,7 @@ body {
 @media (max-width: 480px) {
   .sheet-slot-head, .sheet-slot-row { grid-template-columns: minmax(0, 1fr) 50px 50px 66px; gap: 6px; }
   /* Names get the width back by wrapping rather than clipping at two words. */
-  .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
+  .sheet-mod-name, .sheet-mod-charge, .sheet-mod-range { white-space: normal; }
   .sheet-mod .module-icon { width: 22px; height: 22px; }
   .state-pill { padding: 2px 6px; font-size: 10px; }
   .fit-sheet .fit-head { flex-direction: column; gap: 14px; }
@@ -821,6 +822,7 @@ a:not([class]) { color: var(--accent-2); }
               <span class="sheet-mod-text">
                 <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
                 <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
+                <span class="sheet-mod-range">range 38.2 km</span>
               </span>
             </span>
             <span class="num">
@@ -857,6 +859,7 @@ a:not([class]) { color: var(--accent-2); }
               <span class="sheet-mod-text">
                 <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
                 <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile<span class="sheet-mod-assumed"> · from cargo</span></span>
+                <span class="sheet-mod-range">range 38.2 km</span>
               </span>
             </span>
             <span class="num">
@@ -1147,6 +1150,7 @@ a:not([class]) { color: var(--accent-2); }
             <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
             <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
             <span class="sheet-entry-qty">×2400</span>
+            <span class="sheet-entry-range">· range 38.2 km</span>
           </span>
           <span class="num muted">1,920,000.00 ISK</span>
         </li>
