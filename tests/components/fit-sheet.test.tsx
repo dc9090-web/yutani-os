@@ -130,11 +130,11 @@ describe("FitSheet", () => {
   it("lists every round in an Ammunition panel above the hold: columns, loaded tag, range pill", () => {
     const { container } = render(<FitSheet view={view} />);
     expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Cargo & drones"]);
-    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundOptimalFalloffRange");
+    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundHoldOptimalFalloffRange");
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
-    expect(row.querySelector(".sheet-entry-qty")).toHaveTextContent("×1000");
-    expect(row.querySelector(".ammo-loaded")).toBeNull();   // no loaded tag on the row
+    expect(row.querySelector(".ammo-qty")).toHaveTextContent("1,000");   // the hold count, as a pill in its own column
+    expect(row.querySelector(".sheet-entry-qty")).toBeNull();
     expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
     const pill = row.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-1");
@@ -149,11 +149,11 @@ describe("FitSheet", () => {
     expect(container.querySelectorAll(".range-pill")).toHaveLength(1);
   });
 
-  it("omits the hold count for a round that is only loaded in the weapons", () => {
+  it("shows a dash in the Hold column for a round that is only loaded in the weapons", () => {
     const { container } = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], quantity: 0, loadedIn: 4 }] }} />);
-    const row = container.querySelector(".ammo-list li")!;
-    expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
-    expect(row.querySelector(".sheet-entry-qty")).toBeNull();
+    const qty = container.querySelector(".ammo-list li .ammo-qty")!;
+    expect(qty).toHaveTextContent("—");
+    expect(qty).toHaveClass("none");
   });
 
   it("puts each item's description on the name as hover text, and none when the SDE has none", () => {
@@ -201,7 +201,8 @@ describe("FitSheet", () => {
     const { container } = render(<FitSheet view={view} />);
     const cargo = screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")!;
     expect(cargo.querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/12608/icon?size=32");
-    expect(cargo).toHaveTextContent(/Hail S×1000/);
+    expect(cargo).toHaveTextContent("Hail S");
+    expect(cargo.closest("li")!.querySelector(".ammo-qty")).toHaveTextContent("1,000");   // the hold count lives in its own column
     expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).toHaveTextContent("×5");
     // A single item is just its name, and a type the SDE lacks gets no icon.
     const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;

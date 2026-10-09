@@ -422,12 +422,16 @@ body {
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .entry-list.sheet-entries li { align-items: center; padding: 4px 0; }
 /* The Ammunition panel: the same four columns as the module list, so Optimal and Falloff line up down the sheet. */
-.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 5px 0; }
-.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 60px 66px 66px 104px; gap: 8px; align-items: center; padding: 5px 0; }
+.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 60px 66px 66px 104px; gap: 8px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .ammo-head span:not(:first-child) { text-align: right; }
-/* The icon stays put; the text beside it (name, hold count) wraps rather than truncates. */
-.ammo-text { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
-.ammo-list .sheet-entry-name { white-space: normal; }
+.card .ammo-head { font-size: 8px; letter-spacing: 1px; }   /* the narrow columns: tighter than the other column heads */
+/* One line per round: the name never wraps, and the four narrow columns leave it the room. */
+.ammo-text { display: flex; align-items: center; min-width: 0; }
+.ammo-list .sheet-entry-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The hold count as a pill, right-aligned under the Hold heading. */
+.ammo-qty { justify-self: end; min-width: 56px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-size: 11px; font-variant-numeric: tabular-nums; text-align: center; color: var(--text-2); white-space: nowrap; }
+.ammo-qty.none { color: var(--faint); }
 /* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; width: 104px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
@@ -450,12 +454,21 @@ body {
   .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
   .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
   .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
-  .sheet-range:nth-of-type(2) { grid-column: 1; }
-  .sheet-range:nth-of-type(3) { grid-column: 2; }
+  .sheet-range.opt { grid-column: 1; }
+  .sheet-range.fall { grid-column: 2; }
   .sheet-range:empty { display: none; }
   .sheet-range::before { font-family: var(--font-label); font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
-  .sheet-range:nth-of-type(2)::before { content: "optimal"; }
-  .sheet-range:nth-of-type(3)::before { content: "falloff"; }
+  .sheet-range.opt::before { content: "optimal"; }
+  .sheet-range.fall::before { content: "falloff"; }
+  /* Ammunition on a phone: line 1 is the round with its hold count on the right; line 2 is
+     optimal, falloff and the range pill on the right. */
+  .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; }
+  .ammo-list .sheet-entry-name { white-space: normal; font-size: 13px; }
+  .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
+  .entry-list.ammo-list li .ammo-qty { grid-column: 4; grid-row: 1; justify-self: end; }
+  .entry-list.ammo-list li .sheet-range.opt { grid-row: 2; grid-column: 1; }
+  .entry-list.ammo-list li .sheet-range.fall { grid-row: 2; grid-column: 2; }
+  .entry-list.ammo-list li .range-pill { grid-row: 2; grid-column: 4; justify-self: end; }
   .sheet-entry-name { white-space: normal; }
   /* Names get the width back by wrapping rather than clipping at two words. */
   .sheet-mod-name, .sheet-mod-charge { white-space: normal; }

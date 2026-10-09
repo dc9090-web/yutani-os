@@ -1,5 +1,6 @@
 import { IconTargetOff } from "@tabler/icons-react";
 import type { FitSheetView, AmmoRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
+import { grouped } from "../../lib/view/format.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -7,8 +8,8 @@ import { ShipStats } from "./ShipStats.js";
 /** The Optimal and Falloff cells: blank for a row that is not ammo, a dash for a figure ammo does not have. */
 function RangeCols({ range }: { range: RangeCells | null }) {
   return (<>
-    <span className="num sheet-range">{range === null ? "" : range.optimal ?? "—"}</span>
-    <span className="num sheet-range">{range === null ? "" : range.falloff ?? "—"}</span>
+    <span className="num sheet-range opt">{range === null ? "" : range.optimal ?? "—"}</span>
+    <span className="num sheet-range fall">{range === null ? "" : range.falloff ?? "—"}</span>
   </>);
 }
 
@@ -46,13 +47,13 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
   );
 }
 
-/** Every round the ship carries, in its weapons or its hold (×quantity is what the hold has), shortest reach first. */
+/** Every round the ship carries, in its weapons or its hold, shortest reach first; the Hold column is what the hold has. */
 function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
   return (
     <div className="card">
       <h2 className="card-title">Ammunition</h2>
       <div className="ammo-head" aria-hidden="true">
-        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+        <span>Round</span><span>Hold</span><span>Optimal</span><span>Falloff</span><span>Range</span>
       </div>
       <ul className="entry-list ammo-list">
         {ammo.map((row) => (
@@ -62,9 +63,10 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
               <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
               <span className="ammo-text">
                 <span className="sheet-entry-name">{row.name}</span>
-                {row.quantity === 0 ? null : <span className="sheet-entry-qty">×{row.quantity}</span>}
               </span>
             </span>
+            {/* What the hold has; a round that is only loaded in the weapons shows a dash. */}
+            <span className={`ammo-qty${row.quantity === 0 ? " none" : ""}`}>{row.quantity === 0 ? "—" : grouped(row.quantity)}</span>
             <RangeCols range={row.range} />
             <RangePill band={row.band} />
           </li>
