@@ -107,7 +107,7 @@ describe("FitSheet", () => {
   it("lists the module with its charge, its optimal and falloff cells and its state, without CPU or PG", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
-    expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent("Hail S · from cargo");   // the charge under its turret, app-loaded
+    expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent(/^Hail S$/);   // the charge under its turret; app-loaded is not flagged inline (the Offense note says so)
     expect(container.querySelector(".sheet-slot-head")).toHaveTextContent("ModuleOptimalFalloffState");
     const cells = container.querySelectorAll(".sheet-slot-row .sheet-range");
     expect([...cells].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);

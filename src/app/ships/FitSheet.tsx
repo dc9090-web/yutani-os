@@ -94,7 +94,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                           <span className="sheet-mod-name">{row.name}</span>
                           {row.charge === null ? null : (
                             <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>
-                              {row.charge}{row.chargeAssumed ? <span className="sheet-mod-assumed"> · from cargo</span> : null}
+                              {row.charge}
                             </span>
                           )}
                         </span>

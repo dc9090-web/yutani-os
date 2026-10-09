@@ -120,3 +120,4 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   grid, so the two range columns line up down the sheet. Cells are ★`.sheet-range`; a missile's range sits under
   Optimal with a dash under Falloff, unloadable ammo shows its multipliers ("−50%"), and non-ammo rows stay blank.
   `.sheet-mod-range` and `.sheet-entry-range` are gone.
+- **Fit sheet**: the " · from cargo" tag (`.sheet-mod-assumed`) no longer follows an app-loaded charge; the Offense note still counts them.
