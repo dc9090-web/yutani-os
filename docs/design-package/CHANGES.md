@@ -114,3 +114,9 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   only its own range).
 - **Fit sheet cargo** (`FitSheet.tsx`): every entry is labelled with its type name; a pilot's nickname follows it in
   ★`.sheet-entry-nick` instead of replacing it.
+- **Fit sheet columns** (`fit-sheet.html`, `FitSheet.tsx`): the Modules list is now Module · Optimal · Falloff · State
+  (the CPU and PG columns and their affected-by popovers are gone from this screen; the Fitting card still carries the
+  totals), and Cargo & drones gets a ★`.sheet-entry-head` (Item · Optimal · Falloff · Value) with every `li` on the same
+  grid, so the two range columns line up down the sheet. Cells are ★`.sheet-range`; a missile's range sits under
+  Optimal with a dash under Falloff, unloadable ammo shows its multipliers ("−50%"), and non-ammo rows stay blank.
+  `.sheet-mod-range` and `.sheet-entry-range` are gone.

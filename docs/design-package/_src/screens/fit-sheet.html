@@ -70,7 +70,7 @@
     <div class="card">
       <h2 class="card-title">Modules</h2>
       <div class="sheet-slot-head" aria-hidden="true">
-        <span>Module</span><span>CPU</span><span>PG</span><span>State</span>
+        <span>Module</span><span>Optimal</span><span>Falloff</span><span>State</span>
       </div>
 
       <!-- High 4 / 4 -->
@@ -79,41 +79,16 @@
           High <span class="slot-count">4 / 4</span>
         </h3>
         <ul class="sheet-slot-list">
-          <!-- Row with charge + AffectedBy popover rendered OPEN on CPU -->
+          <!-- Row with a charge: the launcher's missile range in the Optimal column (the AffectedBy popover lives on the fitting editor screen) -->
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Rapid Light Missile Launcher II — Missile Launcher Rapid Light">
               <img class="module-icon" src="https://images.evetech.net/types/25715/icon?size=32" alt="">
               <span class="sheet-mod-text">
                 <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
                 <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
-                <span class="sheet-mod-range">range 38.2 km</span>
               </span>
             </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="true" aria-label="CPU 31.50, affected by 2 modifiers">
-                  31.50
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-                <span class="popover" role="dialog" aria-label="Affected by — CPU">
-                  <span class="popover-title">Affected by</span>
-                  <ul class="popover-list">
-                    <li><span>Weapon Upgrades V</span><span class="num">% -25</span></li>
-                    <li><span>Co-Processor II</span><span class="num">% 10</span><span class="faint"> penalised</span></li>
-                  </ul>
-                </span>
-              </span>
-            </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="Powergrid 13.20, affected by 1 modifier">
-                  13.20
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
+            <span class="num sheet-range">38.2 km</span><span class="num sheet-range">—</span>
             <span class="state-pill active">Active</span>
           </li>
           <!-- Charge assumed from the cargo hold (assumeCargoAmmo) -->
@@ -123,27 +98,9 @@
               <span class="sheet-mod-text">
                 <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
                 <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile<span class="sheet-mod-assumed"> · from cargo</span></span>
-                <span class="sheet-mod-range">range 38.2 km</span>
               </span>
             </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 31.50, affected by 2 modifiers">
-                  31.50
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="Powergrid 13.20, affected by 1 modifier">
-                  13.20
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
+            <span class="num sheet-range">38.2 km</span><span class="num sheet-range">—</span>
             <span class="state-pill active">Active</span>
           </li>
           <!-- Unloaded launcher, Online -->
@@ -154,24 +111,7 @@
                 <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
               </span>
             </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="CPU 31.50, affected by 2 modifiers">
-                  31.50
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="Powergrid 13.20, affected by 1 modifier">
-                  13.20
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <!-- No modifiers on either attribute: AffectedBy renders a plain <span class="num"> -->
@@ -182,8 +122,7 @@
                 <span class="sheet-mod-name">Drone Link Augmentor I</span>
               </span>
             </span>
-            <span class="num"><span class="num">40.00</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
         </ul>
@@ -202,8 +141,7 @@
                 <span class="sheet-mod-name">10MN Afterburner II</span>
               </span>
             </span>
-            <span class="num"><span class="num">22.50</span></span>
-            <span class="num"><span class="num">135.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill overload">Overload</span>
           </li>
           <li class="sheet-slot-row">
@@ -213,16 +151,7 @@
                 <span class="sheet-mod-name">Large Shield Extender II</span>
               </span>
             </span>
-            <span class="num"><span class="num">27.00</span></span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="Powergrid 135.00, affected by 1 modifier">
-                  135.00
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row">
@@ -232,16 +161,7 @@
                 <span class="sheet-mod-name">Large Shield Extender II</span>
               </span>
             </span>
-            <span class="num"><span class="num">27.00</span></span>
-            <span class="num">
-              <span class="affected">
-                <button type="button" class="affected-btn num" aria-expanded="false" aria-label="Powergrid 135.00, affected by 1 modifier">
-                  135.00
-                  <!-- Tabler IconInfoCircle size=12 -->
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
-                </button>
-              </span>
-            </span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row">
@@ -251,8 +171,7 @@
                 <span class="sheet-mod-name">Multispectrum Shield Hardener II</span>
               </span>
             </span>
-            <span class="num"><span class="num">36.00</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill active">Active</span>
           </li>
           <li class="sheet-slot-row">
@@ -262,8 +181,7 @@
                 <span class="sheet-mod-name">Drone Navigation Computer II</span>
               </span>
             </span>
-            <span class="num"><span class="num">30.00</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <!-- Offline module (dashed pill) -->
@@ -275,8 +193,7 @@
                 <span class="sheet-mod-charge" data-desc="Optimal Range Script — Tracking Script">Optimal Range Script</span>
               </span>
             </span>
-            <span class="num"><span class="num">0.00</span></span>
-            <span class="num"><span class="num">0.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill offline">Offline</span>
           </li>
         </ul>
@@ -295,8 +212,7 @@
                 <span class="sheet-mod-name">Drone Damage Amplifier II</span>
               </span>
             </span>
-            <span class="num"><span class="num">22.50</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row">
@@ -306,8 +222,7 @@
                 <span class="sheet-mod-name">Drone Damage Amplifier II</span>
               </span>
             </span>
-            <span class="num"><span class="num">22.50</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row">
@@ -317,8 +232,7 @@
                 <span class="sheet-mod-name">Damage Control II</span>
               </span>
             </span>
-            <span class="num"><span class="num">30.00</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill active">Active</span>
           </li>
           <li class="sheet-slot-row">
@@ -328,8 +242,7 @@
                 <span class="sheet-mod-name">Capacitor Power Relay II</span>
               </span>
             </span>
-            <span class="num"><span class="num">1.00</span></span>
-            <span class="num"><span class="num">1.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
         </ul>
@@ -348,8 +261,7 @@
                 <span class="sheet-mod-name">Medium Core Defense Field Extender I</span>
               </span>
             </span>
-            <span class="num"><span class="num">0.00</span></span>
-            <span class="num"><span class="num">0.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row">
@@ -359,8 +271,7 @@
                 <span class="sheet-mod-name">Medium Anti-EM Screen Reinforcer I</span>
               </span>
             </span>
-            <span class="num"><span class="num">0.00</span></span>
-            <span class="num"><span class="num">0.00</span></span>
+            <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
           </li>
           <li class="sheet-slot-row sheet-slot-empty">
@@ -373,6 +284,9 @@
 
     <div class="card">
       <h2 class="card-title">Cargo &amp; drones</h2>
+      <div class="sheet-entry-head" aria-hidden="true">
+        <span>Item</span><span>Optimal</span><span>Falloff</span><span>Value</span>
+      </div>
       <h3 class="slot-title">Drone bay</h3>
       <!-- Merged stacks: ESI's singleton drone rows summed per type -->
       <ul class="entry-list sheet-entries">
@@ -382,6 +296,8 @@
             <span class="sheet-entry-name">Hammerhead II</span>
             <span class="sheet-entry-qty">×5</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">4,210,000.00 ISK</span>
         </li>
         <li>
@@ -390,6 +306,8 @@
             <span class="sheet-entry-name">Valkyrie II</span>
             <span class="sheet-entry-qty">×2</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">1,640,000.00 ISK</span>
         </li>
         <li>
@@ -397,6 +315,8 @@
             <img class="module-icon" src="https://images.evetech.net/types/2456/icon?size=32" alt="">
             <span class="sheet-entry-name">Hobgoblin II</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">—</span>
         </li>
         <li>
@@ -404,6 +324,8 @@
             <img class="module-icon" src="https://images.evetech.net/types/2488/icon?size=32" alt="">
             <span class="sheet-entry-name">Warrior II</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">342,500.00 ISK</span>
         </li>
       </ul>
@@ -414,8 +336,9 @@
             <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
             <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
             <span class="sheet-entry-qty">×2400</span>
-            <span class="sheet-entry-range">· range 38.2 km</span>
           </span>
+          <span class="num sheet-range">38.2 km</span>
+          <span class="num sheet-range">—</span>
           <span class="num muted">1,920,000.00 ISK</span>
         </li>
         <li>
@@ -424,6 +347,8 @@
             <span class="sheet-entry-name">Nanite Repair Paste</span>
             <span class="sheet-entry-qty">×200</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">4,480,000.00 ISK</span>
         </li>
         <li>
@@ -431,6 +356,8 @@
             <img class="module-icon" src="https://images.evetech.net/types/33475/icon?size=32" alt="">
             <span class="sheet-entry-name">Mobile Tractor Unit</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">6,120,000.00 ISK</span>
         </li>
         <li>
@@ -438,6 +365,8 @@
             <img class="module-icon" src="https://images.evetech.net/types/587/icon?size=32" alt="">
             <span class="sheet-entry-name">Scout's Rifter</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">—</span>
         </li>
       </ul>
@@ -450,6 +379,8 @@
             <span class="sheet-entry-name">Unknown type (87432)</span>
             <span class="sheet-entry-qty">×3</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">—</span>
         </li>
       </ul>
@@ -461,6 +392,8 @@
             <img class="module-icon" src="https://images.evetech.net/types/3831/icon?size=32" alt="">
             <span class="sheet-entry-name">Medium Shield Extender II</span>
           </span>
+          <span class="num sheet-range"></span>
+          <span class="num sheet-range"></span>
           <span class="num muted">1,180,000.00 ISK</span>
         </li>
       </ul>

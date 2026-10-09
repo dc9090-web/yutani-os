@@ -1,11 +1,11 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type WeaponRange,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
-import { bonusLabel, fitValueGroups, gauge, type GaugeView, rangeText } from "./ships.js";
-export { rangeText };
+import { bonusLabel, fitValueGroups, gauge, type GaugeView, rangeText, hintText, dist, pct } from "./ships.js";
+export { hintText, rangeText };
 
 const SLOT_TITLES: Record<SlotKind, string> = {
   high: "High", mid: "Mid", low: "Low", rig: "Rigs", subsystem: "Subsystems",
@@ -67,29 +67,22 @@ export function explainRows(applied: AppliedModifier[]): ExplainRowView[] {
  * A module whose "affected by" cannot be computed must not take down a sheet that otherwise renders,
  * so the failure is logged and the popover comes up empty.
  */
-function safeExplain(fit: Fit, item: Item, attrId: number): ExplainRowView[] {
-  try {
-    return explainRows(explain(fit, item, attrId));
-  } catch (e) {
-    console.error(`[ships] could not explain attribute ${attrId} of type ${item.typeId}`, e);
-    return [];
-  }
-}
 
 export function problemText(p: Problem): string {
   return p.item === undefined ? p.detail : `${itemLabel(p.item)} — ${p.detail}`;
 }
 
+/** The two range columns of the Modules and Cargo & drones lists. `null` in a cell renders as a dash. */
+export interface RangeCells { optimal: string | null; falloff: string | null }
+
 export interface ModuleRowView {
   key: string; name: string; typeId: number; charge: string | null;
-  /** SDE descriptions, plain text — `typeDescription()`; null when the SDE has none. */
+  state: string;
   desc: string | null; chargeDesc: string | null;
   /** The charge was loaded by the app from the cargo hold (`assumeCargoAmmo`), not by the pilot. */
   chargeAssumed: boolean;
-  /** "optimal 1.2 km · falloff 5.2 km" for a loaded turret, "range 38.2 km" for a loaded launcher; null otherwise. */
-  chargeRange: string | null;
-  cpu: string; power: string; state: string;
-  cpuExplain: ExplainRowView[]; powerExplain: ExplainRowView[];
+  /** Optimal + falloff for a loaded turret, flight range for a loaded launcher; null for anything else. */
+  range: RangeCells | null;
 }
 export interface SlotColumnView { slot: SlotKind; title: string; used: number; total: number; rows: ModuleRowView[] }
 export interface CounterView { label: string; used: number; total: number; over: boolean }
@@ -102,8 +95,21 @@ export interface EntryView {
   /** The pilot's own name for the item, when it has one. */
   nickname: string | null;
   quantity: number; value: string | null; desc: string | null;
-  /** For ammo in the cargo hold: what it would give the first fitted weapon that takes it, as `chargeRange`. */
-  range: string | null;
+  /** Ammo only: what it gives the first fitted weapon that takes it, or what it says on its own. */
+  range: RangeCells | null;
+}
+
+/** A weapon's reach as the two cells. */
+export function rangeCells(range: WeaponRange | null): RangeCells | null {
+  if (range === null) return null;
+  if (range.kind === "missile") return { optimal: dist(range.range), falloff: null };
+  return { optimal: dist(range.optimal), falloff: range.falloff > 1 ? dist(range.falloff) : null };
+}
+/** Unloadable ammo as the two cells: a missile's own range, or a turret charge's multipliers. */
+export function hintCells(hint: ChargeRangeHint | null): RangeCells | null {
+  if (hint === null) return null;
+  if (hint.kind === "missile") return { optimal: dist(hint.range), falloff: null };
+  return { optimal: hint.optimal === 1 ? null : pct(hint.optimal), falloff: hint.falloff === 1 ? null : pct(hint.falloff) };
 }
 export interface BonusView { skill: string | null; level: number | null; text: string }
 export interface ValueLineView { label: string; value: string }
@@ -298,14 +304,8 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
     desc: descriptions.get(stat.item.typeId) ?? null,
     chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
     chargeAssumed: stat.item.charge?.assumed === true,
-    chargeRange: stat.item.charge === undefined ? null : rangeText(weaponRange(fit, stat.item)),
-    // Half-even round to 2dp first — same convention as the pool totals in `fitStats` — so a row's
-    // own cpu/power always matches what the gauge above it is summing.
-    cpu: round2(stat.cpu).toFixed(2),
-    power: round2(stat.power).toFixed(2),
+    range: stat.item.charge === undefined ? null : rangeCells(weaponRange(fit, stat.item)),
     state: stateLabel(stat.state),
-    cpuExplain: safeExplain(fit, stat.item, ATTR.cpu),
-    powerExplain: safeExplain(fit, stat.item, ATTR.power),
   };
 }
 
@@ -328,7 +328,7 @@ function mergeEntries(entries: FitEntry[]): FitEntry[] {
 
 function entryViews(
   entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>,
-  rangeFor: (typeId: number) => string | null = () => null,
+  rangeFor: (typeId: number) => RangeCells | null = () => null,
 ): EntryView[] {
   return mergeEntries(entries).map((entry, index) => {
     const unit = priceOf(prices.get(entry.typeId));
@@ -390,16 +390,18 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
   // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
   // by construction, and a test pins that.
-  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it.
-  const cargoRange = (typeId: number): string | null => {
+  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it;
+  // when nothing fitted takes it, with what the charge says on its own (a missile's flight range,
+  // a turret charge's range modifiers), so every ammo row says something about range.
+  const cargoRange = (typeId: number): RangeCells | null => {
     const chargeType = fit.data.types.get(typeId);
     if (chargeType === undefined || chargeType.categoryId !== CATEGORY.charge) return null;
     for (const { item } of fit.modules) {
       if (hardpointOf(item) === null) continue;
       const weaponType = fit.data.types.get(item.typeId);
-      if (weaponType !== undefined && chargeFits(weaponType, chargeType)) return rangeText(weaponRangeWith(fit, item, typeId));
+      if (weaponType !== undefined && chargeFits(weaponType, chargeType)) return rangeCells(weaponRangeWith(fit, item, typeId));
     }
-    return null;
+    return hintCells(chargeRangeHint(fit, typeId));
   };
 
   const groups = fitValueGroups(built);

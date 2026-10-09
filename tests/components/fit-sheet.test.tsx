@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { FitSheet } from "../../src/app/ships/FitSheet.js";
 import { CouldNotCompute } from "../../src/app/ships/CouldNotCompute.js";
 import type { FitSheetView } from "../../src/lib/view/fit-sheet.js";
@@ -38,10 +38,8 @@ const view: FitSheetView = {
       rows: [{
         key: "high:0", name: "200mm AutoCannon II", typeId: 2889, charge: "Hail S",
         desc: "The 200mm is a powerful autocannon.", chargeDesc: "Hail is an attempt to combine penetration with versatility.", chargeAssumed: true,
-        chargeRange: "optimal 600 m · falloff 4.3 km",
-        cpu: "6.75", power: "12.80", state: "Active",
-        cpuExplain: [{ carrier: "Weapon Upgrades", operator: "%", value: "-25", penalised: false }],
-        powerExplain: [],
+        range: { optimal: "600 m", falloff: "4.3 km" },
+        state: "Active",
       }],
     },
     { slot: "mid", title: "Mid", used: 0, total: 3, rows: [] },
@@ -58,7 +56,7 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility.", range: "optimal 600 m · falloff 4.3 km" }],
+  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility.", range: { optimal: "600 m", falloff: "4.3 km" } }],
   drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, value: null, desc: null, range: null }],
   unfittable: [],
   unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, value: null, desc: null, range: null }],
@@ -106,15 +104,25 @@ describe("FitSheet", () => {
     expect(screen.getByText("121.50 / 162.50 tf")).toBeInTheDocument();
   });
 
-  it("lists the module with its charge, both resource figures and its state", () => {
+  it("lists the module with its charge, its optimal and falloff cells and its state, without CPU or PG", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
     expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent("Hail S · from cargo");   // the charge under its turret, app-loaded
-    expect(screen.getByText("12.80")).toBeInTheDocument();
+    expect(container.querySelector(".sheet-slot-head")).toHaveTextContent("ModuleOptimalFalloffState");
+    const cells = container.querySelectorAll(".sheet-slot-row .sheet-range");
+    expect([...cells].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
     expect(screen.getByText("Active")).toBeInTheDocument();
-    // The CPU cell has modifiers, so it is a popover button; powergrid has none, so it is plain text.
-    fireEvent.click(screen.getByRole("button", { name: /CPU 6.75/ }));
-    expect(screen.getByText("Weapon Upgrades")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /CPU/ })).toBeNull();
+  });
+
+  it("gives Cargo & drones the same Optimal and Falloff columns, blank for anything that is not ammo", () => {
+    const { container } = render(<FitSheet view={view} />);
+    expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemOptimalFalloffValue");
+    const rows = [...container.querySelectorAll(".sheet-entries li")];
+    const hail = rows.find((r) => r.textContent?.includes("Hail S"))!;
+    expect([...hail.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
+    const drone = rows.find((r) => r.textContent?.includes("Hobgoblin II"))!;
+    expect([...drone.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["", ""]);
   });
 
   it("puts each item's description on the name as hover text, and none when the SDE has none", () => {

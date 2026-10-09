@@ -386,7 +386,7 @@ body {
 .stat-rows dd { margin: 0; color: var(--text); }
 .stat-note { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
 .sheet-mod-assumed { color: var(--accent-2); }
-.sheet-mod-range, .sheet-entry-range { font-size: 12px; color: var(--muted); }
+.sheet-range { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .sheet-entry-nick { font-size: 12px; color: var(--faint); font-style: italic; }
 .stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
 .resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
@@ -403,7 +403,7 @@ body {
 .resist-cell.kinetic .resist-fill { background: var(--muted); } .resist-cell.explosive .resist-fill { background: var(--warn); }
 .resist-pct { position: relative; display: block; line-height: 24px; text-align: center; color: var(--text); font-weight: 500; }
 /* Modules: one full-width list per slot kind under a shared column header. */
-.sheet-slot-head, .sheet-slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px 76px 88px; gap: 12px; align-items: center; }
+.sheet-slot-head, .sheet-slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 88px; gap: 12px; align-items: center; }
 .sheet-slot-head { padding: 0 6px 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .sheet-slot-head span:not(:first-child) { text-align: right; }
 .sheet-slot-head + .slot-section { margin-top: 14px; }
@@ -415,9 +415,12 @@ body {
 .sheet-mod { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sheet-mod .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
 .sheet-mod-text { display: grid; min-width: 0; line-height: 1.3; }
-.sheet-mod-name, .sheet-mod-charge, .sheet-mod-range { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sheet-mod-charge { font-size: 12px; color: var(--faint); }
-.sheet-entries li { align-items: center; padding: 4px 0; }
+/* The same four columns as the module list, so Optimal and Falloff line up down the whole sheet. */
+.entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; align-items: center; padding: 4px 0; }
+.sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.sheet-entry-head span:not(:first-child) { text-align: right; }
 .sheet-entry { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .sheet-entry .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
 .sheet-entry-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -427,9 +430,10 @@ body {
 .state-pill.overload { background: rgba(255, 127, 80,.14); border-color: transparent; color: var(--warn); }
 .state-pill.offline { color: var(--faint); border-style: dashed; }
 @media (max-width: 480px) {
-  .sheet-slot-head, .sheet-slot-row { grid-template-columns: minmax(0, 1fr) 50px 50px 66px; gap: 6px; }
+  .sheet-slot-head, .sheet-slot-row { grid-template-columns: minmax(0, 1fr) 56px 56px 66px; gap: 6px; }
+  .entry-list.sheet-entries li, .sheet-entry-head { grid-template-columns: minmax(0, 1fr) 56px 56px 84px; gap: 6px; }
   /* Names get the width back by wrapping rather than clipping at two words. */
-  .sheet-mod-name, .sheet-mod-charge, .sheet-mod-range { white-space: normal; }
+  .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
   .sheet-mod .module-icon { width: 22px; height: 22px; }
   .state-pill { padding: 2px 6px; font-size: 10px; }
   .fit-sheet .fit-head { flex-direction: column; gap: 14px; }
@@ -648,7 +652,7 @@ a:not([class]) { color: var(--accent-2); }
 .card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 .card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
 .slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
-.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .sheet-entry-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
 .attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
 .pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
 .ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }

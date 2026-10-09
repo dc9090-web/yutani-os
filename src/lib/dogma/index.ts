@@ -21,8 +21,8 @@ export {
 } from "./calc.js";
 export { fitStats, type FitStats, type ModuleStat, type ResourcePool, type SlotUsage } from "./stats.js";
 export {
-  CHARACTER_ATTR, PERF_ATTR, fitPerformance, weaponRange, weaponRangeWith,
-  type CapStability, type FitPerformance, type LayerPerformance, type Propulsion, type WeaponRange,
+  CHARACTER_ATTR, PERF_ATTR, chargeRangeHint, fitPerformance, weaponRange, weaponRangeWith,
+  type CapStability, type ChargeRangeHint, type FitPerformance, type LayerPerformance, type Propulsion, type WeaponRange,
 } from "./perf.js";
 export { CHARGE_GROUP_ATTRS, CHARGE_SIZE_ATTR, assumeCargoAmmo, chargeFits, type AssumedAmmo } from "./ammo.js";
 export {

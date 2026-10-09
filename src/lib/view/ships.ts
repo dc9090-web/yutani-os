@@ -8,13 +8,13 @@ import {
   CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
   type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
   assumeCargoAmmo, fitPerformance, hardpointOf, weaponRange,
-  type AssumedAmmo, type Fit, type FitPerformance, type WeaponRange,
+  type AssumedAmmo, type ChargeRangeHint, type Fit, type FitPerformance, type WeaponRange,
 } from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 import { clock, grouped } from "./format.js";
 
 /** A weapon range: metres under a kilometre, otherwise one decimal of km — the fitting window's convention. */
-const dist = (metres: number): string => metres < 1000 ? `${Math.round(metres)} m` : `${grouped((metres / 1000).toFixed(1))} km`;
+export const dist = (metres: number): string => metres < 1000 ? `${Math.round(metres)} m` : `${grouped((metres / 1000).toFixed(1))} km`;
 
 /**
  * "optimal 1.2 km · falloff 5.2 km" for a turret, "range 38.2 km" for a missile. A falloff of a
@@ -24,6 +24,22 @@ export function rangeText(range: WeaponRange | null): string | null {
   if (range === null) return null;
   if (range.kind === "missile") return `range ${dist(range.range)}`;
   return range.falloff > 1 ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `optimal ${dist(range.optimal)}`;
+}
+
+/** "+60%" / "−50%" for a range multiplier. */
+export const pct = (multiplier: number): string => `${multiplier > 1 ? "+" : "−"}${Math.round(Math.abs(multiplier - 1) * 100)}%`;
+
+/**
+ * For ammo nothing fitted can load: a missile's own flight range, or what a turret charge does to
+ * the range of whatever gun takes it, "optimal −50% · falloff −25%".
+ */
+export function hintText(hint: ChargeRangeHint | null): string | null {
+  if (hint === null) return null;
+  if (hint.kind === "missile") return `range ${dist(hint.range)}`;
+  const parts: string[] = [];
+  if (hint.optimal !== 1) parts.push(`optimal ${pct(hint.optimal)}`);
+  if (hint.falloff !== 1) parts.push(`falloff ${pct(hint.falloff)}`);
+  return parts.join(" · ");
 }
 
 /** One line of a ship card's weapons list: identical weapon + charge pairs are counted together. */

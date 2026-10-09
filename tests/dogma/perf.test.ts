@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, PROP_EFFECT, fitPerformance, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, PROP_EFFECT, chargeRangeHint, fitPerformance, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -29,6 +29,8 @@ const PERF_ATTRS: readonly (readonly [AttrId, string, number, boolean, boolean])
   [54, "maxRange", 0, false, true],
   [158, "falloff", 1, false, true],
   [281, "explosionDelay", 0, false, true],
+  [120, "weaponRangeMultiplier", 1, true, true],
+  [517, "fallofMultiplier", 1, true, true],
   [109, "kineticDamageResonance", 1, false, false],
   [110, "thermalDamageResonance", 1, false, false],
   [111, "explosiveDamageResonance", 1, false, false],
@@ -262,6 +264,20 @@ describe("weapon range", () => {
     const empty = buildFit(b.data, b.hull(HULL), { modules: [[launcher, "high", 0]] });
     expect(weaponRangeWith(empty, empty.modules[0].item, fast)).toEqual({ kind: "missile", range: 10_000 });
     expect(empty.modules[0].item.charge).toBeUndefined();
+  });
+});
+
+describe("chargeRangeHint", () => {
+  it("gives a missile its flight range and a turret charge its multipliers, nothing for the rest", () => {
+    const b = bench();
+    const missile = b.charge([...SHELL, [PERF_ATTR.maxVelocity, 2000], [PERF_ATTR.explosionDelay, 5000]]);
+    const shortRange = b.charge([...SHELL, [PERF_ATTR.weaponRangeMultiplier, 0.5], [PERF_ATTR.fallofMultiplier, 0.75]]);
+    const plain = b.charge(SHELL);
+    const fit = buildFit(b.data, b.hull(HULL));
+    expect(chargeRangeHint(fit, missile)).toEqual({ kind: "missile", range: 10_000 });
+    expect(chargeRangeHint(fit, shortRange)).toEqual({ kind: "modifiers", optimal: 0.5, falloff: 0.75 });
+    expect(chargeRangeHint(fit, plain)).toBeNull();
+    expect(chargeRangeHint(fit, b.hull(HULL))).toBeNull();   // not a charge
   });
 });
 

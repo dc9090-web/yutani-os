@@ -11,7 +11,7 @@
  * maps (tests/fixtures/dogma/*.json → `sde_dogma_attributes`); tests/dogma/perf.test.ts asserts the
  * name of each one so a snapshot regeneration that moves an id fails loudly.
  */
-import { ATTR, State, type AttrId } from "./data.js";
+import { ATTR, CATEGORY, State, type AttrId } from "./data.js";
 import { clearMemo, getAttr } from "./calc.js";
 import { attachCharge, hardpointOf, makeItem, type Fit, type Item } from "./fit.js";
 
@@ -28,6 +28,8 @@ export const PERF_ATTR = {
   maxRange: 54,               // a turret's optimal range, m (the loaded charge's ammoInfluenceRange is folded in)
   falloff: 158,               // a turret's falloff, m (likewise ammoInfluenceFalloff)
   explosionDelay: 281,        // a missile's flight time, ms
+  weaponRangeMultiplier: 120, // a turret charge's optimal-range multiplier (1 = unchanged)
+  fallofMultiplier: 517,      // its falloff multiplier; CCP's spelling
   emDamage: 114,
   explosiveDamage: 116,
   kineticDamage: 117,
@@ -248,6 +250,29 @@ export function weaponRange(fit: Fit, weapon: Item): WeaponRange | null {
     return velocity > 0 && flightMs > 0 ? { kind: "missile", range: velocity * flightMs / 1000 } : null;
   }
   return null;
+}
+
+/**
+ * What a charge says about range by itself, for ammo in the hold that nothing fitted can load. A
+ * missile flies `maxVelocity x explosionDelay` wherever it is launched from, and the missile skills
+ * reach it unloaded too (charges are ownerModifiable). A turret charge only carries multipliers on
+ * whichever gun loads it; 1 means unchanged. `null` for anything that is not a charge, or a charge
+ * that changes nothing.
+ */
+export type ChargeRangeHint =
+  | { kind: "missile"; range: number }
+  | { kind: "modifiers"; optimal: number; falloff: number };
+
+export function chargeRangeHint(fit: Fit, chargeTypeId: number): ChargeRangeHint | null {
+  const type = fit.data.types.get(chargeTypeId);
+  if (type === undefined || type.categoryId !== CATEGORY.charge) return null;
+  const charge = makeItem(fit.data, chargeTypeId);
+  const velocity = attrOr(fit, charge, PERF_ATTR.maxVelocity, 0);
+  const flightMs = attrOr(fit, charge, PERF_ATTR.explosionDelay, 0);
+  if (velocity > 0 && flightMs > 0) return { kind: "missile", range: velocity * flightMs / 1000 };
+  const optimal = attrOr(fit, charge, PERF_ATTR.weaponRangeMultiplier, 1);
+  const falloff = attrOr(fit, charge, PERF_ATTR.fallofMultiplier, 1);
+  return optimal !== 1 || falloff !== 1 ? { kind: "modifiers", optimal, falloff } : null;
 }
 
 /**

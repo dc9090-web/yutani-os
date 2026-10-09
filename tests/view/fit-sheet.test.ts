@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
 import { CATEGORY, assumeCargoAmmo, fitFromAssets, fitPerformance, fitStats, validateFit } from "../../src/lib/dogma/index.js";
-import { buildFitSheet, operatorLabel, problemText, rangeText, stateLabel, typeDescription } from "../../src/lib/view/fit-sheet.js";
+import { buildFitSheet, hintText, operatorLabel, problemText, rangeText, stateLabel, typeDescription } from "../../src/lib/view/fit-sheet.js";
 import { fitValueEntries } from "../../src/lib/view/ships.js";
 import { rollUpValue } from "../../src/lib/view/price.js";
 import { isk } from "../../src/lib/view/format.js";
@@ -109,6 +109,12 @@ describe("rangeText", () => {
     expect(rangeText({ kind: "turret", optimal: 12_000, falloff: 1 })).toBe("optimal 12.0 km");   // a mining laser: no falloff
     expect(rangeText(null)).toBeNull();
   });
+  it("describes unloadable ammo by its own flight range or its range multipliers", () => {
+    expect(hintText({ kind: "missile", range: 12_960 })).toBe("range 13.0 km");
+    expect(hintText({ kind: "modifiers", optimal: 0.5, falloff: 0.75 })).toBe("optimal −50% · falloff −25%");
+    expect(hintText({ kind: "modifiers", optimal: 1.6, falloff: 1 })).toBe("optimal +60%");
+    expect(hintText(null)).toBeNull();
+  });
 });
 
 describe("buildFitSheet", () => {
@@ -116,8 +122,8 @@ describe("buildFitSheet", () => {
     const view = sheet();
     const high = view.slots.find((c) => c.slot === "high")!;
     // 1,200 m x Hail's 0.5 range multiplier; 5,160 m falloff x the Rifter's +10 % x Hail's 0.75.
-    expect(high.rows[0].chargeRange).toBe("optimal 600 m · falloff 4.3 km");
-    expect(view.cargo.find((e) => e.typeId === 12608)!.range).toBe("optimal 600 m · falloff 4.3 km");
+    expect(high.rows[0].range).toEqual({ optimal: "600 m", falloff: "4.3 km" });
+    expect(view.cargo.find((e) => e.typeId === 12608)!.range).toEqual({ optimal: "600 m", falloff: "4.3 km" });
     expect(view.drones[0].range).toBeNull();
   });
 
@@ -129,19 +135,25 @@ describe("buildFitSheet", () => {
     expect(view.cargo.map((e) => [e.name, e.nickname])).toEqual([["Hobgoblin II", "Lucky"]]);
   });
 
-  it("leaves the range off an unloaded gun, and off cargo ammo no fitted weapon takes", () => {
+  it("leaves the range off an unloaded gun, and describes cargo ammo no fitted weapon takes by itself", () => {
     const built = fitFromAssets(SHIP, [
       asset({ itemId: 1001, typeId: 2889, locationFlag: "HiSlot0", isSingleton: true }),
-      // A torpedo in the hold: a charge, but nothing fitted launches it.
+      // A torpedo in the hold: nothing fitted launches it, so its own flight range (1,800 m/s x 7.2 s).
       asset({ itemId: 1008, typeId: 27339, locationFlag: "Cargo", quantity: 10 }),
     ], ctx);
     const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
     const gun = view.slots.find((c) => c.slot === "high")!.rows[0];
     expect(gun.charge).toBeNull();
-    expect(gun.chargeRange).toBeNull();
-    expect(view.cargo.find((e) => e.typeId === 27339)!.range).toBeNull();
+    expect(gun.range).toBeNull();
+    expect(view.cargo.find((e) => e.typeId === 27339)!.range).toEqual({ optimal: "13.0 km", falloff: null });
     // Trying the torpedo did not leave anything loaded in the gun.
     expect(built.fit.modules[0].item.charge).toBeUndefined();
+  });
+
+  it("describes turret ammo on an unarmed hull by what it does to a gun's range", () => {
+    const built = fitFromAssets(SHIP, [asset({ itemId: 1005, typeId: 12608, locationFlag: "Cargo", quantity: 1000 })], ctx);
+    const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
+    expect(view.cargo[0].range).toEqual({ optimal: "−50%", falloff: "−25%" });   // Hail: x0.5 range, x0.75 falloff
   });
 
   it("carries each item's description for the hover text", () => {
@@ -183,20 +195,9 @@ describe("buildFitSheet", () => {
     expect(high.rows).toHaveLength(1);
     expect(high.rows[0].name).toBe("200mm AutoCannon II");
     expect(high.rows[0].charge).toBe("Hail S");
-    expect(high.rows[0].cpu).toMatch(/^\d+\.\d{2}$/);      // two decimals, spec §4
-    expect(high.rows[0].power).toMatch(/^\d+\.\d{2}$/);
     expect(high.rows[0].state).toBe("Active");
     expect(view.slots[2].rows[0].name).toBe("Gyrostabilizer II");
     expect(view.slots[1].rows).toEqual([]);
-  });
-
-  it("explains the turret's CPU with the skill that modifies it", () => {
-    const row = sheet().slots[0].rows[0];
-    expect(row.cpuExplain.map((r) => r.carrier)).toContain("Weapon Upgrades");
-    const applied = row.cpuExplain.find((r) => r.carrier === "Weapon Upgrades")!;
-    expect(applied.operator).toBe("%");
-    expect(applied.value).toBe("-25");
-    expect(typeof applied.penalised).toBe("boolean");
   });
 
   it("counts slots and hardpoints", () => {
@@ -216,7 +217,7 @@ describe("buildFitSheet", () => {
 
   it("lists cargo and drones one line per type, split stacks and singleton drones merged", () => {
     const view = sheet();
-    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1500, value: "150,000.00 ISK", desc: DESCRIPTIONS.get(12608), range: "optimal 600 m · falloff 4.3 km" }]);
+    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1500, value: "150,000.00 ISK", desc: DESCRIPTIONS.get(12608), range: { optimal: "600 m", falloff: "4.3 km" } }]);
     expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 6, value: null, desc: "Light Scout Drone", range: null }]);
     expect(view.unfittable).toEqual([]);
     expect(view.unknown).toEqual([]);

@@ -1,8 +1,15 @@
-import type { FitSheetView, EntryView } from "../../lib/view/fit-sheet.js";
+import type { FitSheetView, EntryView, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
-import { AffectedBy } from "./AffectedBy.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
+
+/** The Optimal and Falloff cells: blank for a row that is not ammo, a dash for a figure ammo does not have. */
+function RangeCols({ range }: { range: RangeCells | null }) {
+  return (<>
+    <span className="num sheet-range">{range === null ? "" : range.optimal ?? "—"}</span>
+    <span className="num sheet-range">{range === null ? "" : range.falloff ?? "—"}</span>
+  </>);
+}
 
 /** `icons` is off for the unknown-types list: the image server has nothing for a type the SDE lacks. */
 function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: boolean }) {
@@ -18,8 +25,8 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
             <span className="sheet-entry-name">{entry.name}</span>
             {entry.nickname === null ? null : <span className="sheet-entry-nick">{entry.nickname}</span>}
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
-            {entry.range === null ? null : <span className="sheet-entry-range">· {entry.range}</span>}
           </span>
+          <RangeCols range={entry.range} />
           <span className="num muted">{entry.value ?? "—"}</span>
         </li>
       ))}
@@ -66,7 +73,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
         <div className="card">
           <h2 className="card-title">Modules</h2>
           <div className="sheet-slot-head" aria-hidden="true">
-            <span>Module</span><span>CPU</span><span>PG</span><span>State</span>
+            <span>Module</span><span>Optimal</span><span>Falloff</span><span>State</span>
           </div>
           {/* A slot kind the hull doesn't have (subsystems on a frigate) is noise, not information. */}
           {view.slots.filter((column) => column.total > 0 || column.rows.length > 0).map((column) => {
@@ -90,11 +97,9 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                               {row.charge}{row.chargeAssumed ? <span className="sheet-mod-assumed"> · from cargo</span> : null}
                             </span>
                           )}
-                          {row.chargeRange === null ? null : <span className="sheet-mod-range">{row.chargeRange}</span>}
                         </span>
                       </span>
-                      <span className="num"><AffectedBy label="CPU" value={row.cpu} rows={row.cpuExplain} /></span>
-                      <span className="num"><AffectedBy label="Powergrid" value={row.power} rows={row.powerExplain} /></span>
+                      <RangeCols range={row.range} />
                       <span className={`state-pill ${row.state.toLowerCase()}`}>{row.state}</span>
                     </li>
                   ))}
@@ -113,6 +118,9 @@ export function FitSheet({ view }: { view: FitSheetView }) {
           <h2 className="card-title">Cargo &amp; drones</h2>
           {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
             <>
+              <div className="sheet-entry-head" aria-hidden="true">
+                <span>Item</span><span>Optimal</span><span>Falloff</span><span>Value</span>
+              </div>
               {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}
               {view.cargo.length === 0 ? null : <><h3 className="slot-title">Cargo</h3><EntryList entries={view.cargo} /></>}
             </>
