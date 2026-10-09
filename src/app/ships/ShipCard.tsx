@@ -36,6 +36,18 @@ export function ShipCard({ card }: { card: ShipCardView }) {
               <div className="ship-stat"><dt>Cap</dt><dd className={`num${card.stats.capOk === null ? "" : card.stats.capOk ? " pos" : " warn-text"}`}>{card.stats.cap}</dd></div>
             </dl>
           )}
+          {card.weapons.length === 0 ? null : (
+            <ul className="ship-weapons">
+              {card.weapons.map((w) => (
+                <li key={w.key}>
+                  <span className="ship-weapon-name">{w.count > 1 ? `${w.count}× ` : ""}{w.name}</span>
+                  {w.charge === null && w.range === null ? null : (
+                    <span className="ship-weapon-ammo">{[w.charge, w.range].filter((x) => x !== null).join(" · ")}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
           <Gauge view={card.cpu!} />
           <Gauge view={card.power!} />
           <div className="ship-foot">

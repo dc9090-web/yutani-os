@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { fixtureData } from "../dogma/fixture.js";
 import { fitFromAssets, fitStats, missingSkills, validateFit } from "../../src/lib/dogma/index.js";
-import { assetShipCards, computeFit, fitValueEntries, savedFitCards, toShipCard } from "../../src/lib/view/ships.js";
+import { assetShipCards, computeFit, fitValueEntries, savedFitCards, shipWeapons, toShipCard } from "../../src/lib/view/ships.js";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
 import type { FittingRow } from "../../src/lib/db/character-fittings.js";
 import type { Price } from "../../src/lib/view/price.js";
@@ -104,6 +104,28 @@ describe("a Rifter built from asset rows", () => {
   });
 });
 
+describe("shipWeapons", () => {
+  it("lists each weapon with its charge and reach, identical pairs counted together", () => {
+    const built = fitFromAssets(SHIP, [
+      ...CHILDREN,
+      asset({ itemId: 1011, typeId: 2889, locationFlag: "HiSlot1", isSingleton: true }),
+      asset({ itemId: 1012, typeId: 12608, locationFlag: "HiSlot1", quantity: 400 }),
+      asset({ itemId: 1013, typeId: 2889, locationFlag: "HiSlot2", isSingleton: true }),   // unloaded
+      asset({ itemId: 1014, typeId: 519, locationFlag: "LoSlot1", isSingleton: true }),    // not a weapon
+    ], ctx);
+    // Hail S: 1,200 m x 0.5; 5,160 m x the hull's +10 % x 0.75. Unloaded: the bare gun.
+    expect(shipWeapons(built.fit)).toEqual([
+      { key: "2889:12608", name: "200mm AutoCannon II", count: 2, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
+      { key: "2889:", name: "200mm AutoCannon II", count: 1, charge: null, range: "optimal 1.2 km · falloff 5.7 km" },
+    ]);
+  });
+
+  it("is empty for a fit with no turrets or launchers", () => {
+    const built = fitFromAssets(SHIP, [asset({ itemId: 1003, typeId: 519, locationFlag: "LoSlot0", isSingleton: true })], ctx);
+    expect(shipWeapons(built.fit)).toEqual([]);
+  });
+});
+
 describe("computeFit", () => {
   it("returns the built fit, its stats and its problems", () => {
     const computed = computeFit(() => fitFromAssets(SHIP, CHILDREN, ctx), "asset:1000")!;
@@ -127,6 +149,7 @@ describe("assetShipCards / savedFitCards", () => {
   it("builds one card per assembled ship, sorted by value", () => {
     const groups = [{ ship: SHIP, children: CHILDREN }];
     const cards = assetShipCards(groups, ctx, places, new Map([[1000, SHIP]]), PRICES, races);
+    expect(cards[0].weapons).toEqual([{ key: "2889:12608", name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" }]);
     expect(cards).toHaveLength(1);
     expect(cards[0]).toMatchObject({
       key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeName: "Rifter",

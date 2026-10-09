@@ -344,6 +344,10 @@ body {
 .ship-stat dd { margin: 2px 0 0; font-size: 13px; font-weight: 600; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ship-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; font-size: 13px; }
 .ship-unpriced { margin: 4px 0 0; font-size: 12px; }
+.ship-weapons { list-style: none; margin: 6px 0 4px; padding: 0; display: grid; gap: 5px; font-size: 12px; }
+.ship-weapons li { display: grid; gap: 1px; min-width: 0; }
+.ship-weapon-name { color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ship-weapon-ammo { color: var(--muted); line-height: 1.35; }
 .section-title { font-family: var(--font-poppins), sans-serif; font-size: 18px; font-weight: 600; margin: 28px 0 14px; }
 .card-grid.ships { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 .banner { border-color: var(--warn); color: var(--warn); font-size: 13px; padding: 14px 18px; margin: 0 0 8px; }
@@ -383,6 +387,7 @@ body {
 .stat-note { margin: 6px 0 0; font-size: 11px; line-height: 1.4; }
 .sheet-mod-assumed { color: var(--accent-2); }
 .sheet-mod-range, .sheet-entry-range { font-size: 12px; color: var(--muted); }
+.sheet-entry-nick { font-size: 12px; color: var(--faint); font-style: italic; }
 .stat-bays { padding-top: 10px; border-top: 1px solid var(--hairline); }
 .resist-table { width: calc(100% + 6px); border-collapse: separate; border-spacing: 3px 3px; margin: 6px -3px 0; font-size: 11px; table-layout: fixed; }
 .resist-table th { font-weight: 500; text-align: left; padding: 0; }

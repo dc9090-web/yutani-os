@@ -7,10 +7,47 @@ import type { FittingRow } from "../db/character-fittings.js";
 import {
   CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
   type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
-  assumeCargoAmmo, fitPerformance, type AssumedAmmo, type FitPerformance,
+  assumeCargoAmmo, fitPerformance, hardpointOf, weaponRange,
+  type AssumedAmmo, type Fit, type FitPerformance, type WeaponRange,
 } from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 import { clock, grouped } from "./format.js";
+
+/** A weapon range: metres under a kilometre, otherwise one decimal of km — the fitting window's convention. */
+const dist = (metres: number): string => metres < 1000 ? `${Math.round(metres)} m` : `${grouped((metres / 1000).toFixed(1))} km`;
+
+/**
+ * "optimal 1.2 km · falloff 5.2 km" for a turret, "range 38.2 km" for a missile. A falloff of a
+ * metre or less is the SDE default on a weapon that has none (a mining laser), so it is left off.
+ */
+export function rangeText(range: WeaponRange | null): string | null {
+  if (range === null) return null;
+  if (range.kind === "missile") return `range ${dist(range.range)}`;
+  return range.falloff > 1 ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `optimal ${dist(range.optimal)}`;
+}
+
+/** One line of a ship card's weapons list: identical weapon + charge pairs are counted together. */
+export interface ShipWeaponView { key: string; name: string; count: number; charge: string | null; range: string | null }
+
+/** The fit's turrets and launchers in slot order, grouped by weapon type and loaded charge. */
+export function shipWeapons(fit: Fit): ShipWeaponView[] {
+  const out = new Map<string, ShipWeaponView>();
+  for (const { item } of fit.modules) {
+    if (hardpointOf(item) === null) continue;
+    const chargeId = item.charge?.typeId ?? null;
+    const key = `${item.typeId}:${chargeId ?? ""}`;
+    const seen = out.get(key);
+    if (seen !== undefined) { seen.count += 1; continue; }
+    out.set(key, {
+      key,
+      name: fit.data.types.get(item.typeId)?.name ?? `Unknown type (${item.typeId})`,
+      count: 1,
+      charge: chargeId === null ? null : fit.data.types.get(chargeId)?.name ?? `Unknown type (${chargeId})`,
+      range: rangeText(weaponRange(fit, item)),
+    });
+  }
+  return [...out.values()];
+}
 
 /** dogmaUnits 105 Percentage, 109 Modifier Percent, 127 Absolute Percent all display as "%". */
 const PERCENT_UNIT_IDS: ReadonlySet<number> = new Set([105, 109, 127]);
@@ -155,6 +192,8 @@ export interface ShipCardView {
   groupName: string | null; raceName: string | null; location: string;
   stats: ShipCardStats | null;
   cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
+  /** Turrets and launchers with their charge and reach; empty when the fit has none. */
+  weapons: ShipWeaponView[];
   value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
 }
 
@@ -164,6 +203,7 @@ export function toShipCard(input: {
   stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
   /** `fitPerformance(built.fit)`; absent → no stat strip on the card. */
   perf?: FitPerformance;
+  weapons?: ShipWeaponView[];
 }): ShipCardView {
   const roll = rollUpValue(input.entries, input.prices);
   return {
@@ -173,6 +213,7 @@ export function toShipCard(input: {
     cpu: gauge("CPU", "tf", input.stats.cpu),
     power: gauge("Powergrid", "MW", input.stats.power),
     missingSkills: input.problems.filter((p) => p.kind === "skill").length,
+    weapons: input.weapons ?? [],
     value: iskShort(roll.total), valueRaw: roll.total, unpriced: unpricedNote(roll.unpriced), error: null,
   };
 }
@@ -186,7 +227,7 @@ export function errorShipCard(input: {
   groupName: string | null; raceName: string | null; location: string;
 }): ShipCardView {
   return {
-    ...input, stats: null, cpu: null, power: null, missingSkills: 0,
+    ...input, stats: null, cpu: null, power: null, missingSkills: 0, weapons: [],
     value: null, valueRaw: -1, unpriced: null, error: "Could not compute",
   };
 }
@@ -251,6 +292,7 @@ export function assetShipCards(
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
       entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
+      weapons: shipWeapons(computed.built.fit),
     });
   }));
 }
@@ -276,6 +318,7 @@ export function savedFitCards(
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
       entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
+      weapons: shipWeapons(computed.built.fit),
     });
   }));
 }

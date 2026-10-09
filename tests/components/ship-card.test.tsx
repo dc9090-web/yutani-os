@@ -10,7 +10,12 @@ const card: ShipCardView = {
   stats: { dps: "863.2", ehp: "37,445", velocity: "2,147 m/s", cap: "Stable 68%", capOk: true, propKind: "MWD" },
   cpu: { label: "CPU", unit: "tf", used: 121.5, output: 162.5, text: "121.50 / 162.50 tf", percent: 74.8, over: false },
   power: { label: "Powergrid", unit: "MW", used: 60, output: 51.25, text: "60.00 / 51.25 MW", percent: 100, over: true },
-  missingSkills: 2, value: "13.1M ISK", valueRaw: 13_100_100, unpriced: "1 item unpriced", error: null,
+  missingSkills: 2,
+  weapons: [
+    { key: "2889:12608", name: "200mm AutoCannon II", count: 3, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
+    { key: "2889:", name: "200mm AutoCannon II", count: 1, charge: null, range: "optimal 1.2 km · falloff 5.7 km" },
+  ],
+  value: "13.1M ISK", valueRaw: 13_100_100, unpriced: "1 item unpriced", error: null,
 };
 
 describe("ShipCard", () => {
@@ -36,6 +41,21 @@ describe("ShipCard", () => {
     expect(screen.getByText("13.1M ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
     expect(screen.getByText("2 missing skills")).toBeInTheDocument();
+  });
+
+  it("lists the weapons with a count, the charge and its reach", () => {
+    const { container } = render(<ShipCard card={card} />);
+    const rows = container.querySelectorAll(".ship-weapons li");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelector(".ship-weapon-name")).toHaveTextContent("3× 200mm AutoCannon II");
+    expect(rows[0].querySelector(".ship-weapon-ammo")).toHaveTextContent("Hail S · optimal 600 m · falloff 4.3 km");
+    expect(rows[1].querySelector(".ship-weapon-name")).toHaveTextContent("200mm AutoCannon II");
+    expect(rows[1].querySelector(".ship-weapon-ammo")).toHaveTextContent("optimal 1.2 km · falloff 5.7 km");
+  });
+
+  it("has no weapons list when the fit has no turrets or launchers", () => {
+    const { container } = render(<ShipCard card={{ ...card, weapons: [] }} />);
+    expect(container.querySelector(".ship-weapons")).toBeNull();
   });
 
   it("shows the ship's in-game render, not the generic type icon", () => {
