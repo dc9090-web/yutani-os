@@ -256,8 +256,8 @@ export function weaponRange(fit: Fit, weapon: Item): WeaponRange | null {
  * What a charge says about range by itself, for ammo in the hold that nothing fitted can load. A
  * missile flies `maxVelocity x explosionDelay` wherever it is launched from, and the missile skills
  * reach it unloaded too (charges are ownerModifiable). A turret charge only carries multipliers on
- * whichever gun loads it; 1 means unchanged. `null` for anything that is not a charge, or a charge
- * that changes nothing.
+ * whichever gun loads it; 1 means unchanged. `null` for anything that is not ammunition (a charge
+ * with no damage of its own: probes, scripts, crystals), or ammunition that changes nothing.
  */
 export type ChargeRangeHint =
   | { kind: "missile"; range: number }
@@ -267,6 +267,9 @@ export function chargeRangeHint(fit: Fit, chargeTypeId: number): ChargeRangeHint
   const type = fit.data.types.get(chargeTypeId);
   if (type === undefined || type.categoryId !== CATEGORY.charge) return null;
   const charge = makeItem(fit.data, chargeTypeId);
+  // Only ammunition: a scanner probe is a charge with a velocity and a flight time too, and a
+  // tracking script is a charge with range multipliers, but neither is shot at anything.
+  if (sumDamage(fit, charge) <= 0) return null;
   const velocity = attrOr(fit, charge, PERF_ATTR.maxVelocity, 0);
   const flightMs = attrOr(fit, charge, PERF_ATTR.explosionDelay, 0);
   if (velocity > 0 && flightMs > 0) return { kind: "missile", range: velocity * flightMs / 1000 };

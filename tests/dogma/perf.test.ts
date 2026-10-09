@@ -278,6 +278,9 @@ describe("chargeRangeHint", () => {
     expect(chargeRangeHint(fit, shortRange)).toEqual({ kind: "modifiers", optimal: 0.5, falloff: 0.75 });
     expect(chargeRangeHint(fit, plain)).toBeNull();
     expect(chargeRangeHint(fit, b.hull(HULL))).toBeNull();   // not a charge
+    // A scanner probe: a charge with a velocity and a flight time but no damage — not ammunition.
+    const probe = b.charge([[PERF_ATTR.maxVelocity, 8000], [PERF_ATTR.explosionDelay, 2_500_000]]);
+    expect(chargeRangeHint(fit, probe)).toBeNull();
   });
 });
 
