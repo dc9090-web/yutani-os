@@ -121,3 +121,6 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   Optimal with a dash under Falloff, unloadable ammo shows its multipliers ("−50%"), and non-ammo rows stay blank.
   `.sheet-mod-range` and `.sheet-entry-range` are gone.
 - **Fit sheet**: the " · from cargo" tag (`.sheet-mod-assumed`) no longer follows an app-loaded charge; the Offense note still counts them.
+- **Module rows with ammo** (`fit-sheet.html`, `FitSheet.tsx`): `.sheet-mod` is a two-column grid (icons, names) and a loaded
+  weapon takes two lines: its icon and name, then the charge's thumbnail (★`.charge-icon`, 20 px, framed) centred under the
+  module icon with the charge name aligned under the module name. `.sheet-mod-text` is gone.

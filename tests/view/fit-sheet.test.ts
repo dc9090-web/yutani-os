@@ -195,6 +195,8 @@ describe("buildFitSheet", () => {
     expect(high.rows).toHaveLength(1);
     expect(high.rows[0].name).toBe("200mm AutoCannon II");
     expect(high.rows[0].charge).toBe("Hail S");
+    expect(high.rows[0].chargeTypeId).toBe(12608);
+    expect(view.slots[2].rows[0].chargeTypeId).toBeNull();
     expect(high.rows[0].state).toBe("Active");
     expect(view.slots[2].rows[0].name).toBe("Gyrostabilizer II");
     expect(view.slots[1].rows).toEqual([]);

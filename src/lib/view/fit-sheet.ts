@@ -77,6 +77,8 @@ export interface RangeCells { optimal: string | null; falloff: string | null }
 
 export interface ModuleRowView {
   key: string; name: string; typeId: number; charge: string | null;
+  /** The loaded charge's type, for its icon; null when the module holds none. */
+  chargeTypeId: number | null;
   state: string;
   desc: string | null; chargeDesc: string | null;
   /** The charge was loaded by the app from the cargo hold (`assumeCargoAmmo`), not by the pilot. */
@@ -301,6 +303,7 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
     name: itemLabel(stat.item),
     typeId: stat.item.typeId,
     charge: stat.item.charge === undefined ? null : itemLabel(stat.item.charge),
+    chargeTypeId: stat.item.charge?.typeId ?? null,
     desc: descriptions.get(stat.item.typeId) ?? null,
     chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
     chargeAssumed: stat.item.charge?.assumed === true,

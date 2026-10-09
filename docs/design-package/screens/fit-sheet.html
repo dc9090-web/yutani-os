@@ -409,14 +409,17 @@ body {
 .sheet-slot-head + .slot-section { margin-top: 14px; }
 .fit-sheet .slot-section-title { padding-left: 6px; }
 .sheet-slot-list { list-style: none; margin: 0; padding: 0; }
-.sheet-slot-row { padding: 7px 6px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
+.sheet-slot-row { padding: 8px 6px; border-bottom: 1px solid var(--hairline); font-size: 13px; }
 .sheet-slot-row:last-child { border-bottom: 0; }
 .sheet-slot-empty { grid-template-columns: 1fr; font-size: 12px; }
-.sheet-mod { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.sheet-mod .module-icon { width: 26px; height: 26px; margin: 0; flex: 0 0 auto; }
-.sheet-mod-text { display: grid; min-width: 0; line-height: 1.3; }
+/* Two columns: icons left, names right. A loaded weapon takes two lines, the ammo's thumbnail
+   centred under the module's icon and its name aligned with the module's name. */
+.sheet-mod { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; row-gap: 4px; align-items: center; min-width: 0; line-height: 1.3; }
+.sheet-mod .module-icon { grid-column: 1; width: 28px; height: 28px; margin: 0; }
+.sheet-mod-name { grid-column: 2; }
+.sheet-mod .charge-icon { grid-column: 1; justify-self: center; width: 20px; height: 20px; border-radius: 1px; background: var(--raised); box-shadow: 0 0 0 1px var(--border); }
+.sheet-mod-charge { grid-column: 2; font-size: 12px; color: var(--muted); }
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sheet-mod-charge { font-size: 12px; color: var(--faint); }
 /* The same four columns as the module list, so Optimal and Falloff line up down the whole sheet. */
 .entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; align-items: center; padding: 4px 0; }
 .sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 140px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
@@ -430,11 +433,26 @@ body {
 .state-pill.overload { background: rgba(255, 127, 80,.14); border-color: transparent; color: var(--warn); }
 .state-pill.offline { color: var(--faint); border-style: dashed; }
 @media (max-width: 480px) {
-  .sheet-slot-head, .sheet-slot-row { grid-template-columns: minmax(0, 1fr) 56px 56px 66px; gap: 6px; }
-  .entry-list.sheet-entries li, .sheet-entry-head { grid-template-columns: minmax(0, 1fr) 56px 56px 84px; gap: 6px; }
+  /* Phones: no column headers. Line 1 is the item with its state (or value) on the right; line 2
+     holds the two range cells, each with its own label, and is skipped for rows that are not ammo. */
+  .sheet-slot-head, .sheet-entry-head { display: none; }
+  .sheet-slot-row, .entry-list.sheet-entries li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
+  .sheet-slot-row .sheet-mod, .entry-list.sheet-entries li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
+  .sheet-slot-row .state-pill, .entry-list.sheet-entries li .num.muted { grid-column: 4; grid-row: 1; align-self: center; }
+  .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
+  .entry-list.sheet-entries li .num.muted { white-space: nowrap; font-size: 12px; }
+  .sheet-range:nth-of-type(2) { grid-column: 1; }
+  .sheet-range:nth-of-type(3) { grid-column: 2; }
+  .sheet-range:empty { display: none; }
+  .sheet-range::before { font-family: var(--font-label); font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
+  .sheet-range:nth-of-type(2)::before { content: "optimal"; }
+  .sheet-range:nth-of-type(3)::before { content: "falloff"; }
+  .sheet-entry-name { white-space: normal; }
   /* Names get the width back by wrapping rather than clipping at two words. */
   .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
+  .sheet-mod { grid-template-columns: 22px minmax(0, 1fr); column-gap: 8px; }
   .sheet-mod .module-icon { width: 22px; height: 22px; }
+  .sheet-mod .charge-icon { width: 16px; height: 16px; }
   .state-pill { padding: 2px 6px; font-size: 10px; }
   .fit-sheet .fit-head { flex-direction: column; gap: 14px; }
   .fit-sheet .fit-render { width: 96px; height: 96px; }
@@ -828,10 +846,9 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Rapid Light Missile Launcher II — Missile Launcher Rapid Light">
               <img class="module-icon" src="https://images.evetech.net/types/25715/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
-                <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
-              </span>
+              <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
+              <img class="charge-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
+              <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
             </span>
             <span class="num sheet-range">38.2 km</span><span class="num sheet-range">—</span>
             <span class="state-pill active">Active</span>
@@ -840,10 +857,9 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Rapid Light Missile Launcher II — Missile Launcher Rapid Light">
               <img class="module-icon" src="https://images.evetech.net/types/25715/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
-                <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
-              </span>
+              <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
+              <img class="charge-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
+              <span class="sheet-mod-charge" data-desc="Caldari Navy Scourge Light Missile — Light Missile">Caldari Navy Scourge Light Missile</span>
             </span>
             <span class="num sheet-range">38.2 km</span><span class="num sheet-range">—</span>
             <span class="state-pill active">Active</span>
@@ -852,9 +868,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Rapid Light Missile Launcher II — Missile Launcher Rapid Light">
               <img class="module-icon" src="https://images.evetech.net/types/25715/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
-              </span>
+              <span class="sheet-mod-name">Rapid Light Missile Launcher II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -863,9 +877,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Drone Link Augmentor I — Drone Control Range Module">
               <img class="module-icon" src="https://images.evetech.net/types/23527/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Drone Link Augmentor I</span>
-              </span>
+              <span class="sheet-mod-name">Drone Link Augmentor I</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -882,9 +894,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="10MN Afterburner II — Propulsion Module">
               <img class="module-icon" src="https://images.evetech.net/types/12058/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">10MN Afterburner II</span>
-              </span>
+              <span class="sheet-mod-name">10MN Afterburner II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill overload">Overload</span>
@@ -892,9 +902,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Large Shield Extender II — Shield Extender">
               <img class="module-icon" src="https://images.evetech.net/types/3841/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Large Shield Extender II</span>
-              </span>
+              <span class="sheet-mod-name">Large Shield Extender II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -902,9 +910,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Large Shield Extender II — Shield Extender">
               <img class="module-icon" src="https://images.evetech.net/types/3841/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Large Shield Extender II</span>
-              </span>
+              <span class="sheet-mod-name">Large Shield Extender II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -912,9 +918,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Multispectrum Shield Hardener II — Shield Hardener">
               <img class="module-icon" src="https://images.evetech.net/types/2281/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Multispectrum Shield Hardener II</span>
-              </span>
+              <span class="sheet-mod-name">Multispectrum Shield Hardener II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill active">Active</span>
@@ -922,9 +926,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Drone Navigation Computer II — Drone Navigation Computer">
               <img class="module-icon" src="https://images.evetech.net/types/24405/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Drone Navigation Computer II</span>
-              </span>
+              <span class="sheet-mod-name">Drone Navigation Computer II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -933,10 +935,9 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Omnidirectional Tracking Link II — Drone Tracking Modules">
               <img class="module-icon" src="https://images.evetech.net/types/24438/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Omnidirectional Tracking Link II</span>
-                <span class="sheet-mod-charge" data-desc="Optimal Range Script — Tracking Script">Optimal Range Script</span>
-              </span>
+              <span class="sheet-mod-name">Omnidirectional Tracking Link II</span>
+              <img class="charge-icon" src="https://images.evetech.net/types/29001/icon?size=32" alt="">
+              <span class="sheet-mod-charge" data-desc="Optimal Range Script — Tracking Script">Optimal Range Script</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill offline">Offline</span>
@@ -953,9 +954,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Drone Damage Amplifier II — Drone Damage Modules">
               <img class="module-icon" src="https://images.evetech.net/types/4405/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Drone Damage Amplifier II</span>
-              </span>
+              <span class="sheet-mod-name">Drone Damage Amplifier II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -963,9 +962,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Drone Damage Amplifier II — Drone Damage Modules">
               <img class="module-icon" src="https://images.evetech.net/types/4405/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Drone Damage Amplifier II</span>
-              </span>
+              <span class="sheet-mod-name">Drone Damage Amplifier II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -973,9 +970,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Damage Control II — Damage Control">
               <img class="module-icon" src="https://images.evetech.net/types/2048/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Damage Control II</span>
-              </span>
+              <span class="sheet-mod-name">Damage Control II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill active">Active</span>
@@ -983,9 +978,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Capacitor Power Relay II — Capacitor Power Relay">
               <img class="module-icon" src="https://images.evetech.net/types/1447/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Capacitor Power Relay II</span>
-              </span>
+              <span class="sheet-mod-name">Capacitor Power Relay II</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -1002,9 +995,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Medium Core Defense Field Extender I — Rig Shield">
               <img class="module-icon" src="https://images.evetech.net/types/31790/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Medium Core Defense Field Extender I</span>
-              </span>
+              <span class="sheet-mod-name">Medium Core Defense Field Extender I</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>
@@ -1012,9 +1003,7 @@ a:not([class]) { color: var(--accent-2); }
           <li class="sheet-slot-row">
             <span class="sheet-mod" data-desc="Medium Anti-EM Screen Reinforcer I — Rig Shield">
               <img class="module-icon" src="https://images.evetech.net/types/31716/icon?size=32" alt="">
-              <span class="sheet-mod-text">
-                <span class="sheet-mod-name">Medium Anti-EM Screen Reinforcer I</span>
-              </span>
+              <span class="sheet-mod-name">Medium Anti-EM Screen Reinforcer I</span>
             </span>
             <span class="num sheet-range"></span><span class="num sheet-range"></span>
             <span class="state-pill online">Online</span>

@@ -36,7 +36,7 @@ const view: FitSheetView = {
     {
       slot: "high", title: "High", used: 1, total: 4,
       rows: [{
-        key: "high:0", name: "200mm AutoCannon II", typeId: 2889, charge: "Hail S",
+        key: "high:0", name: "200mm AutoCannon II", typeId: 2889, charge: "Hail S", chargeTypeId: 12608,
         desc: "The 200mm is a powerful autocannon.", chargeDesc: "Hail is an attempt to combine penetration with versatility.", chargeAssumed: true,
         range: { optimal: "600 m", falloff: "4.3 km" },
         state: "Active",
@@ -109,6 +109,8 @@ describe("FitSheet", () => {
     expect(screen.getByText("200mm AutoCannon II")).toBeInTheDocument();
     expect(container.querySelector(".sheet-mod-charge")).toHaveTextContent(/^Hail S$/);   // the charge under its turret; app-loaded is not flagged inline (the Offense note says so)
     expect(container.querySelector(".sheet-slot-head")).toHaveTextContent("ModuleOptimalFalloffState");
+    // The ammo's own thumbnail sits in the icon column under the module's.
+    expect(container.querySelector(".sheet-mod .charge-icon")).toHaveAttribute("src", "https://images.evetech.net/types/12608/icon?size=32");
     const cells = container.querySelectorAll(".sheet-slot-row .sheet-range");
     expect([...cells].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
     expect(screen.getByText("Active")).toBeInTheDocument();

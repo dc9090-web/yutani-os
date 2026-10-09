@@ -90,14 +90,13 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                       <span className="sheet-mod" data-desc={row.desc ?? undefined}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
-                        <span className="sheet-mod-text">
-                          <span className="sheet-mod-name">{row.name}</span>
-                          {row.charge === null ? null : (
-                            <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>
-                              {row.charge}
-                            </span>
-                          )}
-                        </span>
+                        <span className="sheet-mod-name">{row.name}</span>
+                        {row.charge === null || row.chargeTypeId === null ? null : (<>
+                          {/* The ammo sits under its weapon: thumbnail in the icon column, name in the name column. */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img className="charge-icon" src={`https://images.evetech.net/types/${row.chargeTypeId}/icon?size=32`} alt="" />
+                          <span className="sheet-mod-charge" data-desc={row.chargeDesc ?? undefined}>{row.charge}</span>
+                        </>)}
                       </span>
                       <RangeCols range={row.range} />
                       <span className={`state-pill ${row.state.toLowerCase()}`}>{row.state}</span>
