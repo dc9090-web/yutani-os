@@ -128,3 +128,8 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   ("other cargo", hairlines either side), then the rest. The Value column is gone (the Estimated value card keeps the
   totals); its place is a ★`.range-pill` for ammo rows: three ticks and a word (`.level-1` Short, `.level-2` Medium,
   `.level-3` Long), classed against the hull's lock range; ammo that out-ranges the lock is still Long with a target-off glyph (★`.range-pill-beyond`, warning colour) at the pill's right edge; every pill is 104 px wide. Item thumbnails are ~30 % larger: module icons 36 px, the ammo thumbnail 26 px, cargo and drone icons 34 px.
+- **Ammunition panel** (`fit-sheet.html`, `FitSheet.tsx` `AmmoPanel`): a new card between Modules and Cargo & drones with
+  every round in the weapons or the hold, shortest reach first: ★`.ammo-head` (Round · Optimal · Falloff · Range),
+  ★`.ammo-list` rows on the module-list grid, the name, hold count and ★`.ammo-loaded` tag ("loaded ×N" weapons) in a wrapping ★`.ammo-text` block beside the icon, the
+  `.sheet-range` cells and the `.range-pill`. Cargo & drones is plain lists again (no head, no range cells, no pills);
+  `.sheet-entry-head` and `.sheet-entry-break` are gone.

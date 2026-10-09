@@ -56,13 +56,11 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: {
-    ammo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, desc: "Hail is an attempt to combine penetration with versatility.", range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" } }],
-    other: [{ key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null, range: null, band: null }],
-  },
-  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, desc: null, range: null, band: null }],
+  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", quantity: 1000, loadedIn: 1, range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
+  cargo: [{ key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null }],
+  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, desc: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, desc: null, range: null, band: null }],
+  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, desc: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],
@@ -121,7 +119,7 @@ describe("FitSheet", () => {
   });
 
   it("marks ammo that out-ranges the ship's lock with a glyph, still labelled Long", () => {
-    const beyond = { ...view, cargo: { ...view.cargo, ammo: [{ ...view.cargo.ammo[0], band: { label: "Long" as const, level: 3 as const, beyond: true, desc: "Reaches 45.0 km of this ship's 30.0 km lock range — further than it can target" } }] } };
+    const beyond = { ...view, ammo: [{ ...view.ammo[0], band: { label: "Long" as const, level: 3 as const, beyond: true, desc: "Reaches 45.0 km of this ship's 30.0 km lock range — further than it can target" } }] };
     const { container } = render(<FitSheet view={beyond} />);
     const pill = container.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-3");
@@ -129,26 +127,34 @@ describe("FitSheet", () => {
     expect(pill.querySelector(".range-pill-beyond")).toHaveAttribute("aria-label", "Further than this ship can lock");
   });
 
-  it("gives Cargo & drones the same Optimal and Falloff columns, blank for anything that is not ammo", () => {
+  it("lists every round in an Ammunition panel above the hold: columns, loaded tag, range pill", () => {
     const { container } = render(<FitSheet view={view} />);
-    expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemOptimalFalloffRange");
-    // Ammunition first, a labelled break, then the rest of the hold; the ammo row carries its range pill.
-    const lists = container.querySelectorAll(".sheet-entries");
-    expect(container.querySelector(".sheet-entry-break")).toHaveTextContent("other cargo");
-    expect(lists[1]).toHaveTextContent("Hail S");
-    expect(lists[2]).toHaveTextContent("Tritanium");
-    const pill = container.querySelector(".range-pill")!;
+    expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Cargo & drones"]);
+    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundOptimalFalloffRange");
+    const row = container.querySelector(".ammo-list li")!;
+    expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
+    expect(row.querySelector(".sheet-entry-qty")).toHaveTextContent("×1000");
+    expect(row.querySelector(".ammo-loaded")).toHaveTextContent(/^loaded$/);   // one weapon holds it
+    expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
+    const pill = row.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-1");
     expect(pill).toHaveTextContent("Short");
     expect(pill).toHaveAttribute("data-desc", "Reaches 4.9 km of this ship's 22.5 km lock range");
-    expect(container.querySelectorAll(".range-pill")).toHaveLength(1);   // drones and Tritanium get none
     expect(pill.querySelector(".range-pill-beyond")).toBeNull();
-    expect(container.querySelector(".sheet-entries .num.muted")).toBeNull();   // no Value column any more
-    const rows = [...container.querySelectorAll(".sheet-entries li")];
-    const hail = rows.find((r) => r.textContent?.includes("Hail S"))!;
-    expect([...hail.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
-    const drone = rows.find((r) => r.textContent?.includes("Hobgoblin II"))!;
-    expect([...drone.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["", ""]);
+    // The hold itself lists only what is not ammunition, as plain rows.
+    const lists = container.querySelectorAll(".sheet-entries");
+    expect(lists[0]).toHaveTextContent("Hobgoblin II");
+    expect(lists[1]).toHaveTextContent("Tritanium");
+    expect(container.querySelectorAll(".sheet-entries .sheet-range")).toHaveLength(0);
+    expect(container.querySelectorAll(".range-pill")).toHaveLength(1);
+  });
+
+  it("says loaded ×N when several weapons hold the round, and omits the hold count when none is spare", () => {
+    const { container } = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], quantity: 0, loadedIn: 4 }] }} />);
+    const row = container.querySelector(".ammo-list li")!;
+    expect(row.querySelector(".ammo-loaded")).toHaveTextContent("loaded ×4");
+    expect(row.querySelector(".ammo-loaded")).toHaveAttribute("title", "Loaded in 4 weapons");
+    expect(row.querySelector(".sheet-entry-qty")).toBeNull();
   });
 
   it("puts each item's description on the name as hover text, and none when the SDE has none", () => {
@@ -196,7 +202,7 @@ describe("FitSheet", () => {
     const { container } = render(<FitSheet view={view} />);
     const cargo = screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")!;
     expect(cargo.querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/12608/icon?size=32");
-    expect(cargo).toHaveTextContent("Hail S×1000");
+    expect(cargo).toHaveTextContent(/Hail S×1000/);
     expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).toHaveTextContent("×5");
     // A single item is just its name, and a type the SDE lacks gets no icon.
     const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;
@@ -209,7 +215,7 @@ describe("FitSheet", () => {
 
   it("says so when no problems, no missing skills and no skills synced", () => {
     render(<FitSheet view={{
-      ...view, skillsSynced: false, problems: [], missing: [], cargo: { ammo: [], other: [] }, drones: [], unknown: [],
+      ...view, skillsSynced: false, problems: [], missing: [], ammo: [], cargo: [], drones: [], unknown: [],
     }} />);
     expect(screen.getByText(/No skills synced yet/)).toBeInTheDocument();
     expect(screen.getByText("No problems — this fit is legal.")).toBeInTheDocument();

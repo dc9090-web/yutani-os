@@ -253,11 +253,32 @@
       <!-- Subsystems 0 / 0 is filtered out (a slot kind the hull doesn't have) -->
     </div>
 
+    <!-- Ammunition panel (FitSheet.tsx AmmoPanel): every round in the weapons or the hold, shortest reach first.
+         "loaded ×N" = N fitted weapons hold it; ×quantity = what is in the cargo hold. Pill: reach vs lock range. -->
+    <div class="card">
+      <h2 class="card-title">Ammunition</h2>
+      <div class="ammo-head" aria-hidden="true">
+        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+      </div>
+      <ul class="entry-list ammo-list">
+        <li>
+          <span class="sheet-entry" data-desc="Caldari Navy Scourge Light Missile — Light Missile">
+            <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
+            <span class="ammo-text">
+              <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
+              <span class="sheet-entry-qty">×2400</span>
+              <span class="ammo-loaded" title="Loaded in 2 weapons">loaded ×2</span>
+            </span>
+          </span>
+          <span class="num sheet-range">38.2 km</span>
+          <span class="num sheet-range">—</span>
+          <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>
+        </li>
+      </ul>
+    </div>
+
     <div class="card">
       <h2 class="card-title">Cargo &amp; drones</h2>
-      <div class="sheet-entry-head" aria-hidden="true">
-        <span>Item</span><span>Optimal</span><span>Falloff</span><span>Range</span>
-      </div>
       <h3 class="slot-title">Drone bay</h3>
       <!-- Merged stacks: ESI's singleton drone rows summed per type -->
       <ul class="entry-list sheet-entries">
@@ -267,9 +288,6 @@
             <span class="sheet-entry-name">Hammerhead II</span>
             <span class="sheet-entry-qty">×5</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Valkyrie II — Combat Drone">
@@ -277,43 +295,21 @@
             <span class="sheet-entry-name">Valkyrie II</span>
             <span class="sheet-entry-qty">×2</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Hobgoblin II — Combat Drone">
             <img class="module-icon" src="https://images.evetech.net/types/2456/icon?size=32" alt="">
             <span class="sheet-entry-name">Hobgoblin II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Warrior II — Combat Drone">
             <img class="module-icon" src="https://images.evetech.net/types/2488/icon?size=32" alt="">
             <span class="sheet-entry-name">Warrior II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Cargo</h3>
-      <ul class="entry-list sheet-entries">
-        <li>
-          <span class="sheet-entry" data-desc="Caldari Navy Scourge Light Missile — Light Missile">
-            <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
-            <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
-            <span class="sheet-entry-qty">×2400</span>
-          </span>
-          <span class="num sheet-range">38.2 km</span>
-          <span class="num sheet-range">—</span>
-          <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>
-        </li>
-      </ul>
-      <div class="sheet-entry-break" aria-hidden="true"><span>other cargo</span></div>
       <ul class="entry-list sheet-entries">
         <li>
           <span class="sheet-entry" data-desc="Nanite Repair Paste — Nanite Repair Paste">
@@ -321,27 +317,18 @@
             <span class="sheet-entry-name">Nanite Repair Paste</span>
             <span class="sheet-entry-qty">×200</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Mobile Tractor Unit — Mobile Tractor Unit">
             <img class="module-icon" src="https://images.evetech.net/types/33475/icon?size=32" alt="">
             <span class="sheet-entry-name">Mobile Tractor Unit</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Rifter — Frigate">
             <img class="module-icon" src="https://images.evetech.net/types/587/icon?size=32" alt="">
             <span class="sheet-entry-name">Scout's Rifter</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <!-- Unknown types: icons=false (no image server entry for a type the SDE lacks) -->
@@ -353,9 +340,6 @@
             <span class="sheet-entry-name">Unknown type (87432)</span>
             <span class="sheet-entry-qty">×3</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Not fitted</h3>
@@ -366,9 +350,6 @@
             <img class="module-icon" src="https://images.evetech.net/types/3831/icon?size=32" alt="">
             <span class="sheet-entry-name">Medium Shield Extender II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
     </div>

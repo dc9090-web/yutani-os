@@ -107,14 +107,21 @@ export interface EntryView {
   /** The pilot's own name for the item, when it has one. */
   nickname: string | null;
   quantity: number; desc: string | null;
-  /** Ammo only: what it gives the first fitted weapon that takes it, or what it says on its own. */
-  range: RangeCells | null;
-  /** Ammo only: the range class of that reach. */
-  band: RangeBand | null;
 }
 
-/** The cargo hold, ammunition first. The sheet draws a break between the two. */
-export interface CargoView { ammo: EntryView[]; other: EntryView[] }
+/**
+ * One kind of ammunition the ship carries, in its weapons or its hold, for the Ammunition panel.
+ * `quantity` is what sits in the cargo hold (0 when it is only loaded); `loadedIn` is how many
+ * fitted weapons hold it. Reach comes from the weapon that holds it, else from the first fitted
+ * weapon that would take it, else from the charge itself (`chargeRangeHint`).
+ */
+export interface AmmoRowView {
+  key: string; typeId: number; name: string; desc: string | null;
+  quantity: number; loadedIn: number;
+  range: RangeCells | null; band: RangeBand | null;
+  /** Sort key: reach in metres; ammo nothing fitted can load sorts after by its modifier. */
+  order: number;
+}
 
 const BAND_ABSOLUTE_SHORT_M = 10_000;
 const BAND_ABSOLUTE_MEDIUM_M = 40_000;
@@ -186,7 +193,10 @@ export interface FitSheetView {
   stats: ShipStatsView;
   bonuses: BonusView[]; gauges: GaugeView[]; slots: SlotColumnView[]; counters: CounterView[];
   problems: ProblemView[]; missing: MissingSkillView[];
-  cargo: CargoView; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
+  /** Every round in the weapons or the hold, shortest reach first. */
+  ammo: AmmoRowView[];
+  /** The hold without its ammunition. */
+  cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
   value: { total: string; lines: ValueLineView[]; unpriced: string | null };
 }
 
@@ -365,29 +375,88 @@ function mergeEntries(entries: FitEntry[]): FitEntry[] {
   return [...merged.values()];
 }
 
-interface AmmoInfo { range: RangeCells | null; band: RangeBand | null }
-const NO_AMMO: AmmoInfo = { range: null, band: null };
+function entryViews(entries: FitEntry[], data: DogmaData, descriptions: ReadonlyMap<number, string>): EntryView[] {
+  return mergeEntries(entries).map((entry, index) => ({
+    key: `${entry.flag}:${entry.typeId}:${index}`,
+    typeId: entry.typeId,
+    // The type name is the label; spec §6's "Unknown type (id)" when this SDE build lacks the type.
+    // A custom nickname rides alongside rather than replacing it, so a container called "Ammo"
+    // still says what kind of container it is.
+    name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
+    nickname: entry.name,
+    quantity: entry.quantity,
+    desc: descriptions.get(entry.typeId) ?? null,
+  }));
+}
 
-function entryViews(
-  entries: FitEntry[], data: DogmaData, descriptions: ReadonlyMap<number, string>,
-  ammoFor: (typeId: number) => AmmoInfo = () => NO_AMMO,
-): EntryView[] {
-  return mergeEntries(entries).map((entry, index) => {
-    const ammo = ammoFor(entry.typeId);
+interface AmmoReach { range: RangeCells; band: RangeBand; order: number }
+const UNLOADABLE_ORDER_BASE = 1e9;
+
+/**
+ * The Ammunition panel: one row per charge type found loaded in a weapon or lying in the hold,
+ * shortest reach first. A charge that deals no damage (a probe, a script) is not ammunition and
+ * stays in the cargo list.
+ */
+function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyMap<number, string>): { ammo: AmmoRowView[]; ammoTypeIds: Set<number> } {
+  const fit = built.fit;
+  const lockRange = perf.maxTargetRange;
+  const reachOf = (wr: WeaponRange): AmmoReach => {
+    const reach = wr.kind === "turret" ? wr.optimal + wr.falloff : wr.range;
+    return { range: rangeCells(wr)!, band: reachBand(reach, lockRange), order: reach };
+  };
+  const isAmmo = (typeId: number): boolean => chargeRangeHint(fit, typeId) !== null
+    || fit.modules.some(({ item }) => item.charge?.typeId === typeId && hardpointOf(item) !== null);
+
+  // Loaded rounds: which weapons hold which charge, and the reach the first of them gives it.
+  const loaded = new Map<number, { count: number; reach: AmmoReach | null }>();
+  for (const { item } of fit.modules) {
+    if (item.charge === undefined || hardpointOf(item) === null) continue;
+    const seen = loaded.get(item.charge.typeId);
+    if (seen !== undefined) { seen.count += 1; continue; }
+    const wr = weaponRange(fit, item);
+    loaded.set(item.charge.typeId, { count: 1, reach: wr === null ? null : reachOf(wr) });
+  }
+  // Rounds in the hold, merged per type.
+  const held = new Map<number, number>();
+  for (const entry of built.cargo) {
+    if (!isAmmo(entry.typeId)) continue;
+    held.set(entry.typeId, (held.get(entry.typeId) ?? 0) + entry.quantity);
+  }
+  const ammoTypeIds = new Set<number>([...loaded.keys(), ...held.keys()]);
+
+  // Reach for a round nothing holds: the first fitted weapon that takes it, else the charge itself.
+  const unloadedReach = (typeId: number): AmmoReach | null => {
+    const chargeType = fit.data.types.get(typeId);
+    if (chargeType === undefined) return null;
+    for (const { item } of fit.modules) {
+      if (hardpointOf(item) === null) continue;
+      const weaponType = fit.data.types.get(item.typeId);
+      if (weaponType === undefined || !chargeFits(weaponType, chargeType)) continue;
+      const wr = weaponRangeWith(fit, item, typeId);
+      return wr === null ? null : reachOf(wr);
+    }
+    const hint = chargeRangeHint(fit, typeId);
+    if (hint === null) return null;
+    if (hint.kind === "missile") return { range: hintCells(hint)!, band: reachBand(hint.range, lockRange), order: hint.range };
+    return { range: hintCells(hint)!, band: modifierBand(hint.optimal), order: UNLOADABLE_ORDER_BASE * hint.optimal };
+  };
+
+  const ammo: AmmoRowView[] = [...ammoTypeIds].map((typeId) => {
+    const inWeapons = loaded.get(typeId);
+    const reach = inWeapons?.reach ?? unloadedReach(typeId);
     return {
-      key: `${entry.flag}:${entry.typeId}:${index}`,
-      typeId: entry.typeId,
-      // The type name is the label; spec §6's "Unknown type (id)" when this SDE build lacks the type.
-      // A custom nickname rides alongside rather than replacing it, so a container called "Ammo"
-      // still says what kind of container it is.
-      name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
-      nickname: entry.name,
-      quantity: entry.quantity,
-      desc: descriptions.get(entry.typeId) ?? null,
-      range: ammo.range,
-      band: ammo.band,
+      key: `ammo:${typeId}`, typeId,
+      name: fit.data.types.get(typeId)?.name ?? `Unknown type (${typeId})`,
+      desc: descriptions.get(typeId) ?? null,
+      quantity: held.get(typeId) ?? 0,
+      loadedIn: inWeapons?.count ?? 0,
+      range: reach?.range ?? null, band: reach?.band ?? null,
+      order: reach?.order ?? Number.MAX_SAFE_INTEGER,
     };
   });
+  // Shortest reach first; ties by name so the order never depends on Map insertion.
+  ammo.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  return { ammo, ammoTypeIds };
 }
 
 export function buildFitSheet(input: FitSheetInput): FitSheetView {
@@ -432,29 +501,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
   // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
   // by construction, and a test pins that.
-  // Ammo in the hold is shown with the reach it would give the first fitted weapon that accepts it,
-  // classed against the ship's lock range; when nothing fitted takes it, with what the charge says on
-  // its own (a missile's flight range, a turret charge's range modifiers), so every ammo row says
-  // something about range.
-  const lockRange = input.perf.maxTargetRange;
-  const cargoAmmo = (typeId: number): AmmoInfo => {
-    const chargeType = fit.data.types.get(typeId);
-    if (chargeType === undefined || chargeType.categoryId !== CATEGORY.charge) return NO_AMMO;
-    for (const { item } of fit.modules) {
-      if (hardpointOf(item) === null) continue;
-      const weaponType = fit.data.types.get(item.typeId);
-      if (weaponType === undefined || !chargeFits(weaponType, chargeType)) continue;
-      const wr = weaponRangeWith(fit, item, typeId);
-      if (wr === null) return NO_AMMO;
-      const reach = wr.kind === "turret" ? wr.optimal + wr.falloff : wr.range;
-      return { range: rangeCells(wr), band: reachBand(reach, lockRange) };
-    }
-    const hint = chargeRangeHint(fit, typeId);
-    if (hint === null) return NO_AMMO;
-    return { range: hintCells(hint), band: hint.kind === "missile" ? reachBand(hint.range, lockRange) : modifierBand(hint.optimal) };
-  };
-  const cargoAll = entryViews(built.cargo, fit.data, descriptions, cargoAmmo);
-  const cargo: CargoView = { ammo: cargoAll.filter((e) => e.band !== null), other: cargoAll.filter((e) => e.band === null) };
+  const { ammo, ammoTypeIds } = ammoRows(built, input.perf, descriptions);
 
   const groups = fitValueGroups(built);
   let total = 0;
@@ -485,7 +532,8 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     slots, counters,
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
-    cargo,
+    ammo,
+    cargo: entryViews(built.cargo.filter((e) => !ammoTypeIds.has(e.typeId)), fit.data, descriptions),
     drones: entryViews(built.drones, fit.data, descriptions),
     unfittable: entryViews(built.unfittable, fit.data, descriptions),
     unknown: entryViews(built.unknown, fit.data, descriptions),

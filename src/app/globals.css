@@ -393,13 +393,15 @@ body {
 .sheet-mod .charge-icon { grid-column: 1; justify-self: center; width: 26px; height: 26px; border-radius: 1px; background: var(--raised); box-shadow: 0 0 0 1px var(--border); }
 .sheet-mod-charge { grid-column: 2; font-size: 12px; color: var(--muted); }
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* The same four columns as the module list, so Optimal and Falloff line up down the whole sheet. */
-.entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 4px 0; }
-.sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
-.sheet-entry-head span:not(:first-child) { text-align: right; }
-/* The break between ammunition and the rest of the hold. */
-.sheet-entry-break { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; font-family: var(--font-label); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); }
-.sheet-entry-break::before, .sheet-entry-break::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+.entry-list.sheet-entries li { align-items: center; padding: 4px 0; }
+/* The Ammunition panel: the same four columns as the module list, so Optimal and Falloff line up down the sheet. */
+.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 5px 0; }
+.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.ammo-head span:not(:first-child) { text-align: right; }
+/* The icon stays put; the text beside it (name, hold count, loaded tag) wraps rather than truncates. */
+.ammo-text { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
+.ammo-list .sheet-entry-name { white-space: normal; }
+.ammo-loaded { flex: 0 0 auto; padding: 1px 6px; border-radius: 1px; background: rgba(245, 166, 35, .14); color: var(--accent); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap; }
 /* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; width: 104px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
@@ -417,10 +419,10 @@ body {
 @media (max-width: 480px) {
   /* Phones: no column headers. Line 1 is the item with its state (or value) on the right; line 2
      holds the two range cells, each with its own label, and is skipped for rows that are not ammo. */
-  .sheet-slot-head, .sheet-entry-head { display: none; }
-  .sheet-slot-row, .entry-list.sheet-entries li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
-  .sheet-slot-row .sheet-mod, .entry-list.sheet-entries li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
-  .sheet-slot-row .state-pill, .entry-list.sheet-entries li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
+  .sheet-slot-head, .ammo-head { display: none; }
+  .sheet-slot-row, .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
+  .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
+  .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
   .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
   .sheet-range:nth-of-type(2) { grid-column: 1; }
   .sheet-range:nth-of-type(3) { grid-column: 2; }
@@ -655,7 +657,7 @@ a:not([class]) { color: var(--accent-2); }
 .card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 .card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
 .slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
-.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .sheet-entry-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
 .attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
 .pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
 .ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }

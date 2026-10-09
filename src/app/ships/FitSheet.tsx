@@ -1,5 +1,5 @@
 import { IconTargetOff } from "@tabler/icons-react";
-import type { FitSheetView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
+import type { FitSheetView, AmmoRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -40,18 +40,48 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
             {entry.nickname === null ? null : <span className="sheet-entry-nick">{entry.nickname}</span>}
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
           </span>
-          <RangeCols range={entry.range} />
-          <RangePill band={entry.band} />
         </li>
       ))}
     </ul>
   );
 }
 
+/** Every round the ship carries: in its weapons ("loaded ×N" = N weapons) and in its hold (×quantity), shortest reach first. */
+function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
+  return (
+    <div className="card">
+      <h2 className="card-title">Ammunition</h2>
+      <div className="ammo-head" aria-hidden="true">
+        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+      </div>
+      <ul className="entry-list ammo-list">
+        {ammo.map((row) => (
+          <li key={row.key}>
+            <span className="sheet-entry" data-desc={row.desc ?? undefined}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
+              <span className="ammo-text">
+                <span className="sheet-entry-name">{row.name}</span>
+                {row.quantity === 0 ? null : <span className="sheet-entry-qty">×{row.quantity}</span>}
+                {row.loadedIn === 0 ? null : (
+                  <span className="ammo-loaded" title={`Loaded in ${row.loadedIn} weapon${row.loadedIn === 1 ? "" : "s"}`}>
+                    loaded{row.loadedIn === 1 ? "" : ` ×${row.loadedIn}`}
+                  </span>
+                )}
+              </span>
+            </span>
+            <RangeCols range={row.range} />
+            <RangePill band={row.band} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /** Spec §4's fit sheet. Every value here was computed on the server by `buildFitSheet`. */
 export function FitSheet({ view }: { view: FitSheetView }) {
-  const cargoCount = view.cargo.ammo.length + view.cargo.other.length;
-  const holdEmpty = cargoCount === 0 && view.drones.length === 0;
+  const holdEmpty = view.cargo.length === 0 && view.drones.length === 0;
   return (
     <div className="fit-sheet">
       <div className="card fit-head fit-sheet-head">
@@ -128,22 +158,14 @@ export function FitSheet({ view }: { view: FitSheetView }) {
           })}
         </div>
 
+        {view.ammo.length === 0 ? null : <AmmoPanel ammo={view.ammo} />}
+
         <div className="card">
           <h2 className="card-title">Cargo &amp; drones</h2>
           {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
             <>
-              <div className="sheet-entry-head" aria-hidden="true">
-                <span>Item</span><span>Optimal</span><span>Falloff</span><span>Range</span>
-              </div>
               {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}
-              {cargoCount === 0 ? null : (<>
-                <h3 className="slot-title">Cargo</h3>
-                {/* Ammunition first, then a break, then everything else in the hold. */}
-                {view.cargo.ammo.length === 0 ? null : <EntryList entries={view.cargo.ammo} />}
-                {view.cargo.ammo.length > 0 && view.cargo.other.length > 0
-                  ? <div className="sheet-entry-break" aria-hidden="true"><span>other cargo</span></div> : null}
-                {view.cargo.other.length === 0 ? null : <EntryList entries={view.cargo.other} />}
-              </>)}
+              {view.cargo.length === 0 ? null : <><h3 className="slot-title">Cargo</h3><EntryList entries={view.cargo} /></>}
             </>
           )}
           {view.unknown.length === 0 ? null : (

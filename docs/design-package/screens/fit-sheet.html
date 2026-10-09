@@ -420,13 +420,15 @@ body {
 .sheet-mod .charge-icon { grid-column: 1; justify-self: center; width: 26px; height: 26px; border-radius: 1px; background: var(--raised); box-shadow: 0 0 0 1px var(--border); }
 .sheet-mod-charge { grid-column: 2; font-size: 12px; color: var(--muted); }
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* The same four columns as the module list, so Optimal and Falloff line up down the whole sheet. */
-.entry-list.sheet-entries li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 4px 0; }
-.sheet-entry-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
-.sheet-entry-head span:not(:first-child) { text-align: right; }
-/* The break between ammunition and the rest of the hold. */
-.sheet-entry-break { display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; font-family: var(--font-label); font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--faint); }
-.sheet-entry-break::before, .sheet-entry-break::after { content: ""; flex: 1; height: 1px; background: var(--hairline); }
+.entry-list.sheet-entries li { align-items: center; padding: 4px 0; }
+/* The Ammunition panel: the same four columns as the module list, so Optimal and Falloff line up down the sheet. */
+.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 5px 0; }
+.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.ammo-head span:not(:first-child) { text-align: right; }
+/* The icon stays put; the text beside it (name, hold count, loaded tag) wraps rather than truncates. */
+.ammo-text { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
+.ammo-list .sheet-entry-name { white-space: normal; }
+.ammo-loaded { flex: 0 0 auto; padding: 1px 6px; border-radius: 1px; background: rgba(245, 166, 35, .14); color: var(--accent); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap; }
 /* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; width: 104px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
@@ -444,10 +446,10 @@ body {
 @media (max-width: 480px) {
   /* Phones: no column headers. Line 1 is the item with its state (or value) on the right; line 2
      holds the two range cells, each with its own label, and is skipped for rows that are not ammo. */
-  .sheet-slot-head, .sheet-entry-head { display: none; }
-  .sheet-slot-row, .entry-list.sheet-entries li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
-  .sheet-slot-row .sheet-mod, .entry-list.sheet-entries li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
-  .sheet-slot-row .state-pill, .entry-list.sheet-entries li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
+  .sheet-slot-head, .ammo-head { display: none; }
+  .sheet-slot-row, .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
+  .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
+  .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
   .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
   .sheet-range:nth-of-type(2) { grid-column: 1; }
   .sheet-range:nth-of-type(3) { grid-column: 2; }
@@ -679,7 +681,7 @@ a:not([class]) { color: var(--accent-2); }
 .card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 .card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
 .slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
-.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .sheet-entry-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
 .attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
 .pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
 .ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }
@@ -1025,11 +1027,32 @@ a:not([class]) { color: var(--accent-2); }
       <!-- Subsystems 0 / 0 is filtered out (a slot kind the hull doesn't have) -->
     </div>
 
+    <!-- Ammunition panel (FitSheet.tsx AmmoPanel): every round in the weapons or the hold, shortest reach first.
+         "loaded ×N" = N fitted weapons hold it; ×quantity = what is in the cargo hold. Pill: reach vs lock range. -->
+    <div class="card">
+      <h2 class="card-title">Ammunition</h2>
+      <div class="ammo-head" aria-hidden="true">
+        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+      </div>
+      <ul class="entry-list ammo-list">
+        <li>
+          <span class="sheet-entry" data-desc="Caldari Navy Scourge Light Missile — Light Missile">
+            <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
+            <span class="ammo-text">
+              <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
+              <span class="sheet-entry-qty">×2400</span>
+              <span class="ammo-loaded" title="Loaded in 2 weapons">loaded ×2</span>
+            </span>
+          </span>
+          <span class="num sheet-range">38.2 km</span>
+          <span class="num sheet-range">—</span>
+          <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>
+        </li>
+      </ul>
+    </div>
+
     <div class="card">
       <h2 class="card-title">Cargo &amp; drones</h2>
-      <div class="sheet-entry-head" aria-hidden="true">
-        <span>Item</span><span>Optimal</span><span>Falloff</span><span>Range</span>
-      </div>
       <h3 class="slot-title">Drone bay</h3>
       <!-- Merged stacks: ESI's singleton drone rows summed per type -->
       <ul class="entry-list sheet-entries">
@@ -1039,9 +1062,6 @@ a:not([class]) { color: var(--accent-2); }
             <span class="sheet-entry-name">Hammerhead II</span>
             <span class="sheet-entry-qty">×5</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Valkyrie II — Combat Drone">
@@ -1049,43 +1069,21 @@ a:not([class]) { color: var(--accent-2); }
             <span class="sheet-entry-name">Valkyrie II</span>
             <span class="sheet-entry-qty">×2</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Hobgoblin II — Combat Drone">
             <img class="module-icon" src="https://images.evetech.net/types/2456/icon?size=32" alt="">
             <span class="sheet-entry-name">Hobgoblin II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Warrior II — Combat Drone">
             <img class="module-icon" src="https://images.evetech.net/types/2488/icon?size=32" alt="">
             <span class="sheet-entry-name">Warrior II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Cargo</h3>
-      <ul class="entry-list sheet-entries">
-        <li>
-          <span class="sheet-entry" data-desc="Caldari Navy Scourge Light Missile — Light Missile">
-            <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
-            <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
-            <span class="sheet-entry-qty">×2400</span>
-          </span>
-          <span class="num sheet-range">38.2 km</span>
-          <span class="num sheet-range">—</span>
-          <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>
-        </li>
-      </ul>
-      <div class="sheet-entry-break" aria-hidden="true"><span>other cargo</span></div>
       <ul class="entry-list sheet-entries">
         <li>
           <span class="sheet-entry" data-desc="Nanite Repair Paste — Nanite Repair Paste">
@@ -1093,27 +1091,18 @@ a:not([class]) { color: var(--accent-2); }
             <span class="sheet-entry-name">Nanite Repair Paste</span>
             <span class="sheet-entry-qty">×200</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Mobile Tractor Unit — Mobile Tractor Unit">
             <img class="module-icon" src="https://images.evetech.net/types/33475/icon?size=32" alt="">
             <span class="sheet-entry-name">Mobile Tractor Unit</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Rifter — Frigate">
             <img class="module-icon" src="https://images.evetech.net/types/587/icon?size=32" alt="">
             <span class="sheet-entry-name">Scout's Rifter</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <!-- Unknown types: icons=false (no image server entry for a type the SDE lacks) -->
@@ -1125,9 +1114,6 @@ a:not([class]) { color: var(--accent-2); }
             <span class="sheet-entry-name">Unknown type (87432)</span>
             <span class="sheet-entry-qty">×3</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
       <h3 class="slot-title">Not fitted</h3>
@@ -1138,9 +1124,6 @@ a:not([class]) { color: var(--accent-2); }
             <img class="module-icon" src="https://images.evetech.net/types/3831/icon?size=32" alt="">
             <span class="sheet-entry-name">Medium Shield Extender II</span>
           </span>
-          <span class="num sheet-range"></span>
-          <span class="num sheet-range"></span>
-          <span></span>
         </li>
       </ul>
     </div>
