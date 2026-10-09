@@ -4,8 +4,22 @@ import { chunk } from "../chunk.js";
 export interface AssetRow {
   itemId: number; typeId: number; quantity: number; locationId: number;
   locationType: string; locationFlag: string; isSingleton: boolean; isBlueprintCopy: boolean;
-  /** The item's custom name only; null when it was never renamed (ESI echoing the type name back is normalised away). */
+  /** The item's custom name only; null when it was never renamed — see `customAssetName`. */
   name: string | null;
+}
+
+/**
+ * What `/characters/{id}/assets/names` returns for an item that was never renamed is not one
+ * stable thing: the type name echoed back, the string "None", or an empty string have all been
+ * seen in the wild (the live database held 661 "None" rows and 86 blank ones). None of those is a
+ * name, and a blank one rendered as an icon with no label. Applied when the sync writes a row and
+ * again when a row is read, so rows stored before this rule render right without a resync.
+ */
+export function customAssetName(esiName: string | null | undefined, typeName: string | null = null): string | null {
+  if (esiName === null || esiName === undefined) return null;
+  const trimmed = esiName.trim();
+  if (trimmed === "" || trimmed === "None" || trimmed === typeName) return null;
+  return trimmed;
 }
 
 const INSERT_BATCH = 2000;
@@ -44,5 +58,7 @@ export async function listAssets(characterId: number): Promise<AssetRow[]> {
             location_type AS "locationType", location_flag AS "locationFlag",
             is_singleton AS "isSingleton", is_blueprint_copy AS "isBlueprintCopy", name
      FROM character_assets WHERE character_id = $1 ORDER BY item_id`, [characterId]);
-  return rows.map((r) => ({ ...r, itemId: Number(r.itemId), quantity: Number(r.quantity), locationId: Number(r.locationId) }));
+  return rows.map((r) => ({
+    ...r, itemId: Number(r.itemId), quantity: Number(r.quantity), locationId: Number(r.locationId), name: customAssetName(r.name),
+  }));
 }

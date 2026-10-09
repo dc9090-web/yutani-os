@@ -16,6 +16,7 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
               <img className="module-icon" src={`https://images.evetech.net/types/${entry.typeId}/icon?size=32`} alt="" />
             ) : null}
             <span className="sheet-entry-name">{entry.name}</span>
+            {entry.nickname === null ? null : <span className="sheet-entry-nick">{entry.nickname}</span>}
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
             {entry.range === null ? null : <span className="sheet-entry-range">· {entry.range}</span>}
           </span>

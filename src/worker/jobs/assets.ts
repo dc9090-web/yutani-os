@@ -2,7 +2,7 @@ import type { CharacterSyncJob } from "../scheduler.js";
 import { hasScope } from "../../lib/auth/sso.js";
 import { chunk } from "../../lib/chunk.js";
 import { getCharacter } from "../../lib/db/characters.js";
-import { replaceAssets, type AssetRow } from "../../lib/db/character-assets.js";
+import { replaceAssets, type AssetRow, customAssetName } from "../../lib/db/character-assets.js";
 import { resolveLocations } from "../../lib/names/index.js";
 import { getTypes } from "../../lib/sde/repo.js";
 import { isAuthOrOutage } from "./resolve-guard.js";
@@ -45,9 +45,9 @@ export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
         for (const n of named) names.set(n.item_id, n.name);
       }
 
-      // ESI also echoes the type name back for an unrenamed singleton (no distinct blank state).
-      // Look the singleton types up once and null out any ESI name that just repeats the type name,
-      // so a stored name means "this item was actually given a custom name".
+      // An unrenamed singleton comes back as the type name, "None" or "" depending on the item (no
+      // distinct blank state). Look the singleton types up once and let `customAssetName` reduce all
+      // three to null, so a stored name means "this item was actually given a custom name".
       const singletonTypeIds = [...new Set(raw.filter((a) => a.is_singleton).map((a) => a.type_id))];
       const types = singletonTypeIds.length > 0 ? await deps.getTypes(singletonTypeIds) : new Map<number, { name: string | null }>();
 
@@ -59,7 +59,7 @@ export function createAssetsJob(deps: AssetsJobDeps): CharacterSyncJob {
           locationType: a.location_type, locationFlag: a.location_flag, isSingleton: a.is_singleton,
           // ESI only ever sends `true`; absent means "not a blueprint copy". Never compare with false.
           isBlueprintCopy: a.is_blueprint_copy === true,
-          name: esiName !== null && esiName === typeName ? null : esiName,
+          name: customAssetName(esiName, typeName),
         };
       });
       const written = await deps.replaceAssets(characterId, rows);

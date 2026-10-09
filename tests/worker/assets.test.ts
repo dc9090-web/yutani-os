@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { createAssetsJob, assetsJob, ASSETS_INTERVAL_MS, ASSETS_RETRY_MS, ASSET_NAMES_CHUNK, type AssetsJobDeps } from "../../src/worker/jobs/assets.js";
-import type { AssetRow } from "../../src/lib/db/character-assets.js";
+import { customAssetName, type AssetRow } from "../../src/lib/db/character-assets.js";
 import { EsiError, EsiUnavailableError } from "../../src/lib/esi/client.js";
 import { NeedsReauthError } from "../../src/lib/esi/tokens.js";
 import { esiFixture } from "../fixtures/esi.js";
@@ -123,6 +123,19 @@ describe("assets job", () => {
     await h.job.run({ characterId: CID, esi: h.esi as never });
     expect(h.writes[0].find((r) => r.itemId === 1023456789012)!.name).toBeNull();
   });
+  it("nulls the \"None\" and empty names ESI gives unrenamed singletons, and trims a real one", async () => {
+    const h = harness(["esi-assets.read_assets.v1"], undefined, {
+      getTypes: async () => new Map([[587, { name: "Rifter" }]]),
+    });
+    h.esi.post = vi.fn(async () => [
+      { item_id: 1023456789012, name: "None" }, { item_id: 1023456789014, name: "" }, { item_id: 1023456789015, name: " Old Faithful " },
+    ]) as never;
+    await h.job.run({ characterId: CID, esi: h.esi as never });
+    const byId = new Map(h.writes[0].map((r) => [r.itemId, r.name]));
+    expect(byId.get(1023456789012)).toBeNull();
+    expect(byId.get(1023456789014)).toBeNull();
+    expect(byId.get(1023456789015)).toBe("Old Faithful");
+  });
   it("keeps a singleton's name when it differs from the type name", async () => {
     const h = harness(["esi-assets.read_assets.v1"], undefined, {
       getTypes: async () => new Map([[587, { name: "Rifter" }]]),
@@ -164,5 +177,20 @@ describe("assets job", () => {
       resolveLocations: async () => { throw new EsiError(401, "/universe/structures/1", "token rejected"); },
     });
     await expect(h.job.run({ characterId: CID, esi: h.esi as never })).rejects.toMatchObject({ status: 401 });
+  });
+});
+
+describe("customAssetName", () => {
+  it("keeps only a name that is not a placeholder", () => {
+    expect(customAssetName("Fast Tackle", "Rifter")).toBe("Fast Tackle");
+    expect(customAssetName("Rifter", "Rifter")).toBeNull();
+    expect(customAssetName("None", "Rifter")).toBeNull();
+    expect(customAssetName("", "Rifter")).toBeNull();
+    expect(customAssetName("   ", null)).toBeNull();
+    expect(customAssetName(null)).toBeNull();
+    expect(customAssetName(undefined)).toBeNull();
+    // On read the type name is not to hand; the two placeholders still go.
+    expect(customAssetName("None")).toBeNull();
+    expect(customAssetName("Loki - Mara")).toBe("Loki - Mara");
   });
 });

@@ -58,10 +58,10 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility.", range: "optimal 600 m · falloff 4.3 km" }],
-  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", quantity: 5, value: null, desc: null, range: null }],
+  cargo: [{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, value: "100,000.00 ISK", desc: "Hail is an attempt to combine penetration with versatility.", range: "optimal 600 m · falloff 4.3 km" }],
+  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, value: null, desc: null, range: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", quantity: 1, value: null, desc: null, range: null }],
+  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, value: null, desc: null, range: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],

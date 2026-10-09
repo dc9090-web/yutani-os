@@ -106,6 +106,7 @@ describe("rangeText", () => {
     expect(rangeText({ kind: "turret", optimal: 600, falloff: 4257 })).toBe("optimal 600 m · falloff 4.3 km");
     expect(rangeText({ kind: "turret", optimal: 24_000, falloff: 12_500 })).toBe("optimal 24.0 km · falloff 12.5 km");
     expect(rangeText({ kind: "missile", range: 12_960 })).toBe("range 13.0 km");
+    expect(rangeText({ kind: "turret", optimal: 12_000, falloff: 1 })).toBe("optimal 12.0 km");   // a mining laser: no falloff
     expect(rangeText(null)).toBeNull();
   });
 });
@@ -118,6 +119,14 @@ describe("buildFitSheet", () => {
     expect(high.rows[0].chargeRange).toBe("optimal 600 m · falloff 4.3 km");
     expect(view.cargo.find((e) => e.typeId === 12608)!.range).toBe("optimal 600 m · falloff 4.3 km");
     expect(view.drones[0].range).toBeNull();
+  });
+
+  it("labels a nicknamed item with its type name and keeps the nickname beside it", () => {
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 1021, typeId: 2456, locationFlag: "Cargo", quantity: 1, isSingleton: true, name: "Lucky" }),
+    ], ctx);
+    const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
+    expect(view.cargo.map((e) => [e.name, e.nickname])).toEqual([["Hobgoblin II", "Lucky"]]);
   });
 
   it("leaves the range off an unloaded gun, and off cargo ammo no fitted weapon takes", () => {
@@ -207,8 +216,8 @@ describe("buildFitSheet", () => {
 
   it("lists cargo and drones one line per type, split stacks and singleton drones merged", () => {
     const view = sheet();
-    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", quantity: 1500, value: "150,000.00 ISK", desc: DESCRIPTIONS.get(12608), range: "optimal 600 m · falloff 4.3 km" }]);
-    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", quantity: 6, value: null, desc: "Light Scout Drone", range: null }]);
+    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1500, value: "150,000.00 ISK", desc: DESCRIPTIONS.get(12608), range: "optimal 600 m · falloff 4.3 km" }]);
+    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 6, value: null, desc: "Light Scout Drone", range: null }]);
     expect(view.unfittable).toEqual([]);
     expect(view.unknown).toEqual([]);
   });

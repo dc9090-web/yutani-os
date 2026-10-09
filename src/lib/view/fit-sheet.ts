@@ -1,10 +1,11 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith, type WeaponRange,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
-import { bonusLabel, fitValueGroups, gauge, type GaugeView } from "./ships.js";
+import { bonusLabel, fitValueGroups, gauge, type GaugeView, rangeText } from "./ships.js";
+export { rangeText };
 
 const SLOT_TITLES: Record<SlotKind, string> = {
   high: "High", mid: "Mid", low: "Low", rig: "Rigs", subsystem: "Subsystems",
@@ -95,7 +96,12 @@ export interface CounterView { label: string; used: number; total: number; over:
 export interface ProblemView { kind: ProblemKind; label: string; text: string }
 export interface MissingSkillView { skillTypeId: number; name: string; have: number; need: number }
 export interface EntryView {
-  key: string; typeId: number; name: string; quantity: number; value: string | null; desc: string | null;
+  key: string; typeId: number;
+  /** The type name, always — "Unknown type (id)" when this SDE build lacks the type. */
+  name: string;
+  /** The pilot's own name for the item, when it has one. */
+  nickname: string | null;
+  quantity: number; value: string | null; desc: string | null;
   /** For ammo in the cargo hold: what it would give the first fitted weapon that takes it, as `chargeRange`. */
   range: string | null;
 }
@@ -160,12 +166,6 @@ const fmtNum = (value: number | null, decimals: number, unit = ""): string =>
   value === null ? DASH : `${grouped(value.toFixed(decimals))}${unit}`;
 const whole = (value: number | null, unit = ""): string => value === null ? DASH : `${grouped(Math.round(value))}${unit}`;
 const km = (metres: number | null): string => metres === null ? DASH : `${grouped((metres / 1000).toFixed(1))} km`;
-/** A weapon range: metres under a kilometre, otherwise one decimal of km — the fitting window's convention. */
-const dist = (metres: number): string => metres < 1000 ? `${Math.round(metres)} m` : `${grouped((metres / 1000).toFixed(1))} km`;
-export function rangeText(range: WeaponRange | null): string | null {
-  if (range === null) return null;
-  return range.kind === "turret" ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `range ${dist(range.range)}`;
-}
 
 function layerRow(layer: string, perf: LayerPerformance | null, note: string | null = null): ResistRowView | null {
   if (perf === null) return null;
@@ -335,9 +335,11 @@ function entryViews(
     return {
       key: `${entry.flag}:${entry.typeId}:${index}`,
       typeId: entry.typeId,
-      // `entry.name` is the asset's own custom nickname (may be null); fall back to the SDE type name,
-      // and to spec §6's "Unknown type (id)" when this SDE build doesn't know the type either.
-      name: entry.name ?? data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
+      // The type name is the label; spec §6's "Unknown type (id)" when this SDE build lacks the type.
+      // A custom nickname rides alongside rather than replacing it, so a container called "Ammo"
+      // still says what kind of container it is.
+      name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
+      nickname: entry.name,
       quantity: entry.quantity,
       value: unit === null ? null : isk(unit * entry.quantity),
       desc: descriptions.get(entry.typeId) ?? null,
