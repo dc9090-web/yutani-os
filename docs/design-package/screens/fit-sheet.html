@@ -425,10 +425,9 @@ body {
 .entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; align-items: center; padding: 5px 0; }
 .ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 118px; gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .ammo-head span:not(:first-child) { text-align: right; }
-/* The icon stays put; the text beside it (name, hold count, loaded tag) wraps rather than truncates. */
+/* The icon stays put; the text beside it (name, hold count) wraps rather than truncates. */
 .ammo-text { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
 .ammo-list .sheet-entry-name { white-space: normal; }
-.ammo-loaded { flex: 0 0 auto; padding: 1px 6px; border-radius: 1px; background: rgba(245, 166, 35, .14); color: var(--accent); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap; }
 /* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; width: 104px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
@@ -1028,7 +1027,7 @@ a:not([class]) { color: var(--accent-2); }
     </div>
 
     <!-- Ammunition panel (FitSheet.tsx AmmoPanel): every round in the weapons or the hold, shortest reach first.
-         "loaded ×N" = N fitted weapons hold it; ×quantity = what is in the cargo hold. Pill: reach vs lock range. -->
+         ×quantity = what is in the cargo hold; a round only loaded in the weapons shows no count. Pill: reach vs lock range. -->
     <div class="card">
       <h2 class="card-title">Ammunition</h2>
       <div class="ammo-head" aria-hidden="true">
@@ -1041,7 +1040,6 @@ a:not([class]) { color: var(--accent-2); }
             <span class="ammo-text">
               <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
               <span class="sheet-entry-qty">×2400</span>
-              <span class="ammo-loaded" title="Loaded in 2 weapons">loaded ×2</span>
             </span>
           </span>
           <span class="num sheet-range">38.2 km</span>

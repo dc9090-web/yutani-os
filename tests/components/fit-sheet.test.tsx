@@ -134,7 +134,7 @@ describe("FitSheet", () => {
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
     expect(row.querySelector(".sheet-entry-qty")).toHaveTextContent("×1000");
-    expect(row.querySelector(".ammo-loaded")).toHaveTextContent(/^loaded$/);   // one weapon holds it
+    expect(row.querySelector(".ammo-loaded")).toBeNull();   // no loaded tag on the row
     expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
     const pill = row.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-1");
@@ -149,11 +149,10 @@ describe("FitSheet", () => {
     expect(container.querySelectorAll(".range-pill")).toHaveLength(1);
   });
 
-  it("says loaded ×N when several weapons hold the round, and omits the hold count when none is spare", () => {
+  it("omits the hold count for a round that is only loaded in the weapons", () => {
     const { container } = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], quantity: 0, loadedIn: 4 }] }} />);
     const row = container.querySelector(".ammo-list li")!;
-    expect(row.querySelector(".ammo-loaded")).toHaveTextContent("loaded ×4");
-    expect(row.querySelector(".ammo-loaded")).toHaveAttribute("title", "Loaded in 4 weapons");
+    expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
     expect(row.querySelector(".sheet-entry-qty")).toBeNull();
   });
 

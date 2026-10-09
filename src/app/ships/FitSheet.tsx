@@ -46,7 +46,7 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
   );
 }
 
-/** Every round the ship carries: in its weapons ("loaded ×N" = N weapons) and in its hold (×quantity), shortest reach first. */
+/** Every round the ship carries, in its weapons or its hold (×quantity is what the hold has), shortest reach first. */
 function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
   return (
     <div className="card">
@@ -63,11 +63,6 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
               <span className="ammo-text">
                 <span className="sheet-entry-name">{row.name}</span>
                 {row.quantity === 0 ? null : <span className="sheet-entry-qty">×{row.quantity}</span>}
-                {row.loadedIn === 0 ? null : (
-                  <span className="ammo-loaded" title={`Loaded in ${row.loadedIn} weapon${row.loadedIn === 1 ? "" : "s"}`}>
-                    loaded{row.loadedIn === 1 ? "" : ` ×${row.loadedIn}`}
-                  </span>
-                )}
               </span>
             </span>
             <RangeCols range={row.range} />
