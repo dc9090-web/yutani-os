@@ -135,15 +135,15 @@ describe("range bands", () => {
     expect(modifierBand(1)).toMatchObject({ label: "Medium", level: 2 });
     expect(modifierBand(1.6)).toMatchObject({ label: "Long", level: 3, desc: "Long-range ammunition: +60% optimal on whatever gun loads it" });
   });
-  it("splits ammunition out of the hold into its own list", () => {
+  it("lists the hold's ammunition in the Ammunition panel and in the cargo list both", () => {
     const built = fitFromAssets(SHIP, [
       asset({ itemId: 1001, typeId: 2889, locationFlag: "HiSlot0", isSingleton: true }),
       asset({ itemId: 1031, typeId: 2456, locationFlag: "Cargo", quantity: 2 }),      // a drone in the hold: not ammo
       asset({ itemId: 1032, typeId: 12608, locationFlag: "Cargo", quantity: 500 }),   // Hail S: ammo
     ], ctx);
     const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
-    expect(view.ammo.map((e) => [e.name, e.quantity, e.loadedIn])).toEqual([["Hail S", 500, 0]]);
-    expect(view.cargo.map((e) => e.name)).toEqual(["Hobgoblin II"]);
+    expect(view.ammo.map((e) => [e.name, e.loadedIn])).toEqual([["Hail S", 0]]);
+    expect(view.cargo.map((e) => [e.name, e.quantity, e.value])).toEqual([["Hobgoblin II", 2, null], ["Hail S", 500, "50,000.00 ISK"]]);
   });
 
   it("lists loaded rounds too, and orders every round from the shortest reach to the longest", () => {
@@ -153,11 +153,12 @@ describe("range bands", () => {
       asset({ itemId: 1041, typeId: 27339, locationFlag: "Cargo", quantity: 10 }),      // torpedo: 13.0 km, nothing launches it
     ], ctx);
     const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
-    expect(view.ammo.map((e) => [e.key, e.name, e.quantity, e.loadedIn, e.order])).toEqual([
-      ["ammo:12608", "Hail S", 0, 1, 4857],                     // 600 + 4,257 m in the gun
-      ["ammo:27339", "Caldari Navy Mjolnir Torpedo", 10, 0, 12_960],
+    expect(view.ammo.map((e) => [e.key, e.name, e.loadedIn, e.order])).toEqual([
+      ["ammo:12608", "Hail S", 1, 4857],                     // 600 + 4,257 m in the gun
+      ["ammo:27339", "Caldari Navy Mjolnir Torpedo", 0, 12_960],
     ]);
-    expect(view.cargo).toEqual([]);
+    // A round only loaded in the weapons is not a cargo row; the torpedo is.
+    expect(view.cargo.map((e) => [e.name, e.quantity])).toEqual([["Caldari Navy Mjolnir Torpedo", 10]]);
   });
 });
 
@@ -169,7 +170,7 @@ describe("buildFitSheet", () => {
     expect(high.rows[0].range).toEqual({ optimal: "600 m", falloff: "4.3 km" });
     const hail = view.ammo.find((e) => e.typeId === 12608)!;
     expect(hail.range).toEqual({ optimal: "600 m", falloff: "4.3 km" });
-    expect([hail.quantity, hail.loadedIn]).toEqual([1500, 1]);   // two stacks in the hold, one gun holding it
+    expect(hail.loadedIn).toBe(1);   // one gun holding it; the hold's two stacks are a cargo row
     // 600 + 4,257 m of reach against the Rifter's lock range: a short-range round for this hull.
     expect(hail.band?.label).toBe("Short");
     expect(hail.band?.desc).toMatch(/^Reaches 4\.9 km of this ship's .* lock range$/);
@@ -272,9 +273,10 @@ describe("buildFitSheet", () => {
 
   it("lists cargo and drones one line per type, split stacks and singleton drones merged", () => {
     const view = sheet();
-    expect(view.ammo.map((e) => [e.key, e.name, e.quantity, e.loadedIn])).toEqual([["ammo:12608", "Hail S", 1500, 1]]);
-    expect(view.cargo).toEqual([]);
-    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 6, desc: "Light Scout Drone" }]);
+    expect(view.ammo.map((e) => [e.key, e.name, e.loadedIn])).toEqual([["ammo:12608", "Hail S", 1]]);
+    // The two stacks of Hail S merged into one cargo line, valued at 1,500 x the 100 ISK unit price.
+    expect(view.cargo).toEqual([{ key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1500, desc: "Hail is an attempt to combine penetration with versatility.\n\n25% reduced falloff.", value: "150,000.00 ISK" }]);
+    expect(view.drones).toEqual([{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 6, desc: "Light Scout Drone", value: null }]);
     expect(view.unfittable).toEqual([]);
     expect(view.unknown).toEqual([]);
   });

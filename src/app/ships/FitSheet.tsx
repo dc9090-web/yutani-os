@@ -1,6 +1,5 @@
 import { IconTargetOff } from "@tabler/icons-react";
 import type { FitSheetView, AmmoRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
-import { grouped } from "../../lib/view/format.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -41,19 +40,21 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
             {entry.nickname === null ? null : <span className="sheet-entry-nick">{entry.nickname}</span>}
             {entry.quantity === 1 ? null : <span className="sheet-entry-qty">×{entry.quantity}</span>}
           </span>
+          {/* Unit price × quantity; a dash for a type with no price. */}
+          <span className="num sheet-entry-value">{entry.value ?? "—"}</span>
         </li>
       ))}
     </ul>
   );
 }
 
-/** Every round the ship carries, in its weapons or its hold, shortest reach first; the Hold column is what the hold has. */
+/** Every round the ship carries, in its weapons or its hold, shortest reach first; how many is the cargo list's business. */
 function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
   return (
     <div className="card">
       <h2 className="card-title">Ammunition</h2>
       <div className="ammo-head" aria-hidden="true">
-        <span>Round</span><span>Hold</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
       </div>
       <ul className="entry-list ammo-list">
         {ammo.map((row) => (
@@ -65,8 +66,6 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
                 <span className="sheet-entry-name">{row.name}</span>
               </span>
             </span>
-            {/* What the hold has; a round that is only loaded in the weapons shows a dash. */}
-            <span className={`ammo-qty${row.quantity === 0 ? " none" : ""}`}>{row.quantity === 0 ? "—" : grouped(row.quantity)}</span>
             <RangeCols range={row.range} />
             <RangePill band={row.band} />
           </li>
@@ -79,6 +78,7 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
 /** Spec §4's fit sheet. Every value here was computed on the server by `buildFitSheet`. */
 export function FitSheet({ view }: { view: FitSheetView }) {
   const holdEmpty = view.cargo.length === 0 && view.drones.length === 0;
+  const anyEntries = !holdEmpty || view.unknown.length > 0 || view.unfittable.length > 0;
   return (
     <div className="fit-sheet">
       <div className="card fit-head fit-sheet-head">
@@ -159,6 +159,9 @@ export function FitSheet({ view }: { view: FitSheetView }) {
 
         <div className="card">
           <h2 className="card-title">Cargo &amp; drones</h2>
+          {anyEntries ? (
+            <div className="sheet-entry-head" aria-hidden="true"><span>Item</span><span>Value</span></div>
+          ) : null}
           {holdEmpty ? <p className="faint">Nothing in the cargo hold or drone bay.</p> : (
             <>
               {view.drones.length === 0 ? null : <><h3 className="slot-title">Drone bay</h3><EntryList entries={view.drones} /></>}

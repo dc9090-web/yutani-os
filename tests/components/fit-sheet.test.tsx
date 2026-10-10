@@ -56,11 +56,14 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", quantity: 1000, loadedIn: 1, range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
-  cargo: [{ key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null }],
-  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, desc: null }],
+  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
+  cargo: [
+    { key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, desc: "Hail is an attempt to combine penetration with versatility.", value: "100,000.00 ISK" },
+    { key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null, value: "25,000.00 ISK" },
+  ],
+  drones: [{ key: "DroneBay:2456:0", typeId: 2456, name: "Hobgoblin II", nickname: null, quantity: 5, desc: null, value: null }],
   unfittable: [],
-  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, desc: null }],
+  unknown: [{ key: "HiSlot1:99999:0", typeId: 99999, name: "Unknown type (99999)", nickname: null, quantity: 1, desc: null, value: null }],
   value: {
     total: "13,100,100.00 ISK",
     lines: [{ label: "Hull", value: "8,000,000.00 ISK" }, { label: "Cargo", value: "100,000.00 ISK" }],
@@ -127,40 +130,38 @@ describe("FitSheet", () => {
     expect(pill.querySelector(".range-pill-beyond")).toHaveAttribute("aria-label", "Further than this ship can lock");
   });
 
-  it("lists every round in an Ammunition panel above the hold: columns, loaded tag, range pill", () => {
+  it("lists every round in an Ammunition panel above the hold: columns, range cells, range pill", () => {
     const { container } = render(<FitSheet view={view} />);
     expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Cargo & drones"]);
-    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundHoldOptimalFalloffRange");
+    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundOptimalFalloffRange");
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
-    expect(row.querySelector(".ammo-qty")).toHaveTextContent("1,000");   // the hold count, as a pill in its own column
+    // No count here: how many rounds the hold has is the cargo list's business.
     expect(row.querySelector(".sheet-entry-qty")).toBeNull();
+    expect(row).not.toHaveTextContent("1,000");
     expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
     const pill = row.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-1");
     expect(pill).toHaveTextContent("Short");
     expect(pill).toHaveAttribute("data-desc", "Reaches 4.9 km of this ship's 22.5 km lock range");
     expect(pill.querySelector(".range-pill-beyond")).toBeNull();
-    // The hold itself lists only what is not ammunition, as plain rows.
+    // The hold lists the ammunition again, with the rest of the cargo, as plain rows with a value.
     const lists = container.querySelectorAll(".sheet-entries");
     expect(lists[0]).toHaveTextContent("Hobgoblin II");
+    expect(lists[1]).toHaveTextContent("Hail S");
     expect(lists[1]).toHaveTextContent("Tritanium");
     expect(container.querySelectorAll(".sheet-entries .sheet-range")).toHaveLength(0);
     expect(container.querySelectorAll(".range-pill")).toHaveLength(1);
-  });
-
-  it("shows a dash in the Hold column for a round that is only loaded in the weapons", () => {
-    const { container } = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], quantity: 0, loadedIn: 4 }] }} />);
-    const qty = container.querySelector(".ammo-list li .ammo-qty")!;
-    expect(qty).toHaveTextContent("—");
-    expect(qty).toHaveClass("none");
   });
 
   it("puts each item's description on the name as hover text, and none when the SDE has none", () => {
     const { container } = render(<FitSheet view={view} />);
     expect(container.querySelector(".sheet-mod")).toHaveAttribute("data-desc", "The 200mm is a powerful autocannon.");
     expect(container.querySelector(".sheet-mod-charge")).toHaveAttribute("data-desc", "Hail is an attempt to combine penetration with versatility.");
-    expect(screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")).toHaveAttribute("data-desc");
+    // Hail S is named twice below the modules: in the Ammunition panel and in the cargo list.
+    const hails = screen.getAllByText("Hail S", { selector: ".sheet-entry-name" });
+    expect(hails).toHaveLength(2);
+    for (const hail of hails) expect(hail.closest(".sheet-entry")).toHaveAttribute("data-desc");
     expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).not.toHaveAttribute("data-desc");
   });
 
@@ -197,18 +198,20 @@ describe("FitSheet", () => {
     expect(screen.getByText("0 → 1")).toBeInTheDocument();
   });
 
-  it("lists cargo, drones, unknown types and the estimated value, with icons and counts", () => {
+  it("lists cargo, drones, unknown types and the estimated value, with icons, counts and a Value column", () => {
     const { container } = render(<FitSheet view={view} />);
-    const cargo = screen.getByText("Hail S", { selector: ".sheet-entry-name" }).closest(".sheet-entry")!;
+    expect(container.querySelector(".sheet-entry-head")).toHaveTextContent("ItemValue");
+    const cargo = container.querySelector(".sheet-entries .sheet-entry[data-desc]")!;
     expect(cargo.querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/12608/icon?size=32");
-    expect(cargo).toHaveTextContent("Hail S");
-    expect(cargo.closest("li")!.querySelector(".ammo-qty")).toHaveTextContent("1,000");   // the hold count lives in its own column
+    expect(cargo).toHaveTextContent("Hail S×1000");   // the whole hold, ammunition included, with its count
+    expect(cargo.closest("li")!.querySelector(".sheet-entry-value")).toHaveTextContent("100,000.00 ISK");
     expect(screen.getByText("Hobgoblin II").closest(".sheet-entry")).toHaveTextContent("×5");
+    expect(screen.getByText("Hobgoblin II").closest("li")!.querySelector(".sheet-entry-value")).toHaveTextContent("—");   // unpriced
     // A single item is just its name, and a type the SDE lacks gets no icon.
     const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;
     expect(unknown).not.toHaveTextContent("×");
     expect(unknown.querySelector("img")).toBeNull();
-    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(3);   // Hail S, Tritanium, Hobgoblin; the unknown type has none
+    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(4);   // the ammo panel's Hail S, then Hobgoblin, Hail S and Tritanium in the hold; the unknown type has none
     expect(screen.getByText("13,100,100.00 ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
   });
@@ -221,6 +224,7 @@ describe("FitSheet", () => {
     expect(screen.getByText("No problems — this fit is legal.")).toBeInTheDocument();
     expect(screen.getByText("Every skill for this fit is trained.")).toBeInTheDocument();
     expect(screen.getByText("Nothing in the cargo hold or drone bay.")).toBeInTheDocument();
+    expect(document.querySelector(".sheet-entry-head")).toBeNull();   // no lists, no column head
   });
 });
 

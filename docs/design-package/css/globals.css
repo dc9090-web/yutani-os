@@ -390,16 +390,16 @@ body {
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .entry-list.sheet-entries li { align-items: center; padding: 4px 0; }
 /* The Ammunition panel: the same four columns as the module list, so Optimal and Falloff line up down the sheet. */
-.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 60px 66px 66px 104px; gap: 8px; align-items: center; padding: 5px 0; }
-.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 60px 66px 66px 104px; gap: 8px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 66px 66px 104px; gap: 8px; align-items: center; padding: 5px 0; }
+.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 66px 66px 104px; gap: 8px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .ammo-head span:not(:first-child) { text-align: right; }
 .card .ammo-head { font-size: 8px; letter-spacing: 1px; }   /* the narrow columns: tighter than the other column heads */
-/* One line per round: the name never wraps, and the four narrow columns leave it the room. */
+/* One line per round: the name never wraps, and the three narrow columns leave it the room. */
 .ammo-text { display: flex; align-items: center; min-width: 0; }
 .ammo-list .sheet-entry-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* The hold count as a pill, right-aligned under the Hold heading. */
-.ammo-qty { justify-self: end; min-width: 56px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-size: 11px; font-variant-numeric: tabular-nums; text-align: center; color: var(--text-2); white-space: nowrap; }
-.ammo-qty.none { color: var(--faint); }
+/* Cargo & drones: the item on the left, its value (unit price × quantity) on the right, under an Item · Value head. */
+.sheet-entry-head { display: flex; justify-content: space-between; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--faint); }
+.sheet-entry-value { flex: 0 0 auto; color: var(--muted); white-space: nowrap; }
 /* Range class: three ticks and a word. Short fills one, Medium two, Long three. */
 .range-pill { justify-self: end; display: inline-flex; align-items: center; gap: 3px; width: 104px; box-sizing: border-box; padding: 3px 8px; border: 1px solid var(--border); border-radius: 1px; background: var(--raised); font-family: var(--font-label); font-size: 8px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 .range-pill i { width: 4px; height: 8px; background: var(--border-hi); }
@@ -415,9 +415,9 @@ body {
 .state-pill.overload { background: rgba(255, 127, 80,.14); border-color: transparent; color: var(--warn); }
 .state-pill.offline { color: var(--faint); border-style: dashed; }
 @media (max-width: 480px) {
-  /* Phones: no column headers. Line 1 is the item with its state (or value) on the right; line 2
+  /* Phones: no column headers. Line 1 is the item with its state (or range pill) on the right; line 2
      holds the two range cells, each with its own label, and is skipped for rows that are not ammo. */
-  .sheet-slot-head, .ammo-head { display: none; }
+  .sheet-slot-head, .ammo-head, .sheet-entry-head { display: none; }
   .sheet-slot-row, .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
   .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
   .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
@@ -428,16 +428,9 @@ body {
   .sheet-range::before { font-family: var(--font-label); font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
   .sheet-range.opt::before { content: "optimal"; }
   .sheet-range.fall::before { content: "falloff"; }
-  /* Ammunition on a phone: line 1 is the round with its hold count on the right; line 2 is
-     optimal, falloff and the range pill on the right. */
-  .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; }
   .ammo-list .sheet-entry-name { white-space: normal; font-size: 13px; }
-  .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
-  .entry-list.ammo-list li .ammo-qty { grid-column: 4; grid-row: 1; justify-self: end; }
-  .entry-list.ammo-list li .sheet-range.opt { grid-row: 2; grid-column: 1; }
-  .entry-list.ammo-list li .sheet-range.fall { grid-row: 2; grid-column: 2; }
-  .entry-list.ammo-list li .range-pill { grid-row: 2; grid-column: 4; justify-self: end; }
   .sheet-entry-name { white-space: normal; }
+  .sheet-entry-value { font-size: 12px; }
   /* Names get the width back by wrapping rather than clipping at two words. */
   .sheet-mod-name, .sheet-mod-charge { white-space: normal; }
   .sheet-mod { grid-template-columns: 28px minmax(0, 1fr); column-gap: 10px; }
@@ -661,7 +654,7 @@ a:not([class]) { color: var(--accent-2); }
 .card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 .card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
 .slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
-.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .sheet-entry-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
 .attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
 .pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
 .ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }

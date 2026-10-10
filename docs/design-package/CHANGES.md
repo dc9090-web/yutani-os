@@ -129,8 +129,11 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   totals); its place is a ★`.range-pill` for ammo rows: three ticks and a word (`.level-1` Short, `.level-2` Medium,
   `.level-3` Long), classed against the hull's lock range; ammo that out-ranges the lock is still Long with a target-off glyph (★`.range-pill-beyond`, warning colour) at the pill's right edge; every pill is 104 px wide. Item thumbnails are ~30 % larger: module icons 36 px, the ammo thumbnail 26 px, cargo and drone icons 34 px.
 - **Ammunition panel** (`fit-sheet.html`, `FitSheet.tsx` `AmmoPanel`): a new card between Modules and Cargo & drones with
-  every round in the weapons or the hold, shortest reach first: ★`.ammo-head` (Round · Hold · Optimal · Falloff · Range),
-  ★`.ammo-list` rows on the module-list grid, the name on one line (12 px, ellipsis if it must) in ★`.ammo-text` beside the icon, the hold count as a ★`.ammo-qty` pill in its own column (`.none` = a dash for a round only loaded in the weapons), the
-  `.sheet-range` cells and the `.range-pill`. Cargo & drones is plain lists again (no head, no range cells, no pills);
-  `.sheet-entry-head` and `.sheet-entry-break` are gone.
+  every round in the weapons or the hold, shortest reach first: ★`.ammo-head` (Round · Optimal · Falloff · Range),
+  ★`.ammo-list` rows on the module-list grid, the name on one line (12 px, ellipsis if it must) in ★`.ammo-text` beside the icon, the
+  `.sheet-range` cells and the `.range-pill`. No counts: what the hold has of a round is a cargo row. `.sheet-entry-break` is gone.
+- **Cargo & drones** (`fit-sheet.html`, `FitSheet.tsx`): the whole hold again, ammunition included, as plain rows (no range
+  cells, no pills) with a Value column back: a two-cell `.sheet-entry-head` (Item · Value) at the top of the card and a
+  ★`.sheet-entry-value` (unit price × quantity, a dash when unpriced) at the right of every row, drones, unknown and
+  not-fitted lists included.
 - **Range cells** carry `.opt` / `.fall` classes now (the phone layout places and labels them by class, not position).

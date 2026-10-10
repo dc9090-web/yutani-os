@@ -72,7 +72,7 @@ export function problemText(p: Problem): string {
   return p.item === undefined ? p.detail : `${itemLabel(p.item)} — ${p.detail}`;
 }
 
-/** The two range columns of the Modules and Cargo & drones lists. `null` in a cell renders as a dash. */
+/** The two range columns of the Modules and Ammunition lists. `null` in a cell renders as a dash. */
 export interface RangeCells { optimal: string | null; falloff: string | null }
 
 export interface ModuleRowView {
@@ -107,17 +107,19 @@ export interface EntryView {
   /** The pilot's own name for the item, when it has one. */
   nickname: string | null;
   quantity: number; desc: string | null;
+  /** Unit price × quantity, formatted; null when the type has no price. */
+  value: string | null;
 }
 
 /**
  * One kind of ammunition the ship carries, in its weapons or its hold, for the Ammunition panel.
- * `quantity` is what sits in the cargo hold (0 when it is only loaded); `loadedIn` is how many
- * fitted weapons hold it. Reach comes from the weapon that holds it, else from the first fitted
- * weapon that would take it, else from the charge itself (`chargeRangeHint`).
+ * `loadedIn` is how many fitted weapons hold it; what the hold has of it is a cargo row. Reach
+ * comes from the weapon that holds it, else from the first fitted weapon that would take it,
+ * else from the charge itself (`chargeRangeHint`).
  */
 export interface AmmoRowView {
   key: string; typeId: number; name: string; desc: string | null;
-  quantity: number; loadedIn: number;
+  loadedIn: number;
   range: RangeCells | null; band: RangeBand | null;
   /** Sort key: reach in metres; ammo nothing fitted can load sorts after by its modifier. */
   order: number;
@@ -195,7 +197,7 @@ export interface FitSheetView {
   problems: ProblemView[]; missing: MissingSkillView[];
   /** Every round in the weapons or the hold, shortest reach first. */
   ammo: AmmoRowView[];
-  /** The hold without its ammunition. */
+  /** The whole hold, ammunition included: the Ammunition panel says what a round does, this says how many and what they are worth. */
   cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
   value: { total: string; lines: ValueLineView[]; unpriced: string | null };
 }
@@ -375,18 +377,22 @@ function mergeEntries(entries: FitEntry[]): FitEntry[] {
   return [...merged.values()];
 }
 
-function entryViews(entries: FitEntry[], data: DogmaData, descriptions: ReadonlyMap<number, string>): EntryView[] {
-  return mergeEntries(entries).map((entry, index) => ({
-    key: `${entry.flag}:${entry.typeId}:${index}`,
-    typeId: entry.typeId,
-    // The type name is the label; spec §6's "Unknown type (id)" when this SDE build lacks the type.
-    // A custom nickname rides alongside rather than replacing it, so a container called "Ammo"
-    // still says what kind of container it is.
-    name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
-    nickname: entry.name,
-    quantity: entry.quantity,
-    desc: descriptions.get(entry.typeId) ?? null,
-  }));
+function entryViews(entries: FitEntry[], data: DogmaData, prices: ReadonlyMap<number, Price>, descriptions: ReadonlyMap<number, string>): EntryView[] {
+  return mergeEntries(entries).map((entry, index) => {
+    const unit = priceOf(prices.get(entry.typeId));
+    return {
+      key: `${entry.flag}:${entry.typeId}:${index}`,
+      typeId: entry.typeId,
+      // The type name is the label; spec §6's "Unknown type (id)" when this SDE build lacks the type.
+      // A custom nickname rides alongside rather than replacing it, so a container called "Ammo"
+      // still says what kind of container it is.
+      name: data.types.get(entry.typeId)?.name ?? `Unknown type (${entry.typeId})`,
+      nickname: entry.name,
+      quantity: entry.quantity,
+      desc: descriptions.get(entry.typeId) ?? null,
+      value: unit === null ? null : isk(unit * entry.quantity),
+    };
+  });
 }
 
 interface AmmoReach { range: RangeCells; band: RangeBand; order: number }
@@ -394,10 +400,9 @@ const UNLOADABLE_ORDER_BASE = 1e9;
 
 /**
  * The Ammunition panel: one row per charge type found loaded in a weapon or lying in the hold,
- * shortest reach first. A charge that deals no damage (a probe, a script) is not ammunition and
- * stays in the cargo list.
+ * shortest reach first. A charge that deals no damage (a probe, a script) is not ammunition.
  */
-function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyMap<number, string>): { ammo: AmmoRowView[]; ammoTypeIds: Set<number> } {
+function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyMap<number, string>): AmmoRowView[] {
   const fit = built.fit;
   const lockRange = perf.maxTargetRange;
   const reachOf = (wr: WeaponRange): AmmoReach => {
@@ -416,13 +421,9 @@ function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyM
     const wr = weaponRange(fit, item);
     loaded.set(item.charge.typeId, { count: 1, reach: wr === null ? null : reachOf(wr) });
   }
-  // Rounds in the hold, merged per type.
-  const held = new Map<number, number>();
-  for (const entry of built.cargo) {
-    if (!isAmmo(entry.typeId)) continue;
-    held.set(entry.typeId, (held.get(entry.typeId) ?? 0) + entry.quantity);
-  }
-  const ammoTypeIds = new Set<number>([...loaded.keys(), ...held.keys()]);
+  // Rounds in the hold.
+  const held = built.cargo.filter((entry) => isAmmo(entry.typeId)).map((entry) => entry.typeId);
+  const ammoTypeIds = new Set<number>([...loaded.keys(), ...held]);
 
   // Reach for a round nothing holds: the first fitted weapon that takes it, else the charge itself.
   const unloadedReach = (typeId: number): AmmoReach | null => {
@@ -448,7 +449,6 @@ function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyM
       key: `ammo:${typeId}`, typeId,
       name: fit.data.types.get(typeId)?.name ?? `Unknown type (${typeId})`,
       desc: descriptions.get(typeId) ?? null,
-      quantity: held.get(typeId) ?? 0,
       loadedIn: inWeapons?.count ?? 0,
       range: reach?.range ?? null, band: reach?.band ?? null,
       order: reach?.order ?? Number.MAX_SAFE_INTEGER,
@@ -456,7 +456,7 @@ function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyM
   });
   // Shortest reach first; ties by name so the order never depends on Map insertion.
   ammo.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  return { ammo, ammoTypeIds };
+  return ammo;
 }
 
 export function buildFitSheet(input: FitSheetInput): FitSheetView {
@@ -501,7 +501,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
   // Spec §4: ship + fitted + charges + drones + cargo, from the one walk `fitValueEntries` also
   // reads (`fitValueGroups`) — the per-group sums add up to exactly rollUpValue(fitValueEntries(built))
   // by construction, and a test pins that.
-  const { ammo, ammoTypeIds } = ammoRows(built, input.perf, descriptions);
+  const ammo = ammoRows(built, input.perf, descriptions);
 
   const groups = fitValueGroups(built);
   let total = 0;
@@ -533,10 +533,10 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
     ammo,
-    cargo: entryViews(built.cargo.filter((e) => !ammoTypeIds.has(e.typeId)), fit.data, descriptions),
-    drones: entryViews(built.drones, fit.data, descriptions),
-    unfittable: entryViews(built.unfittable, fit.data, descriptions),
-    unknown: entryViews(built.unknown, fit.data, descriptions),
+    cargo: entryViews(built.cargo, fit.data, prices, descriptions),
+    drones: entryViews(built.drones, fit.data, prices, descriptions),
+    unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),
+    unknown: entryViews(built.unknown, fit.data, prices, descriptions),
     value: { total: isk(total), lines, unpriced: unpricedNote(unpriced) },
   };
 }
