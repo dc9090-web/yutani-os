@@ -185,6 +185,20 @@
    "highIsGood": true
   },
   {
+   "id": 67,
+   "name": "capacitorBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 68,
+   "name": "shieldBonus",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": true
+  },
+  {
    "id": 70,
    "name": "agility",
    "defaultValue": 0,
@@ -702,6 +716,13 @@
    "highIsGood": true
   },
   {
+   "id": 314,
+   "name": "capRechargeBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 315,
    "name": "velocityBonus",
    "defaultValue": 0,
@@ -754,6 +775,13 @@
    "id": 328,
    "name": "barrageFalloff",
    "defaultValue": 75,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 330,
+   "name": "boosterDuration",
+   "defaultValue": 0,
    "stackable": true,
    "highIsGood": true
   },
@@ -905,6 +933,13 @@
    "highIsGood": true
   },
   {
+   "id": 548,
+   "name": "shieldBoostMultiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 552,
    "name": "signatureRadius",
    "defaultValue": 100,
@@ -1000,6 +1035,20 @@
    "name": "warpSpeedMultiplier",
    "defaultValue": 3,
    "stackable": false,
+   "highIsGood": true
+  },
+  {
+   "id": 602,
+   "name": "launcherGroup2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 603,
+   "name": "launcherGroup3",
+   "defaultValue": 0,
+   "stackable": true,
    "highIsGood": true
   },
   {
@@ -1115,6 +1164,13 @@
    "highIsGood": false
   },
   {
+   "id": 670,
+   "name": "areaOfEffectBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 738,
    "name": "shipBonusGD1",
    "defaultValue": 0,
@@ -1186,6 +1242,13 @@
    "highIsGood": true
   },
   {
+   "id": 895,
+   "name": "armorDamageAmountBonus",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 974,
    "name": "hullEmDamageResonance",
    "defaultValue": 1,
@@ -1216,6 +1279,13 @@
    "stackable": true,
    "highIsGood": false,
    "maxAttributeId": 1529
+  },
+  {
+   "id": 978,
+   "name": "maxGroupOnline",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
   },
   {
    "id": 983,
@@ -1288,6 +1358,48 @@
    "highIsGood": true
   },
   {
+   "id": 1087,
+   "name": "boosterness",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1089,
+   "name": "boosterEffectChance1",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1090,
+   "name": "boosterEffectChance2",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1091,
+   "name": "boosterEffectChance3",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1092,
+   "name": "boosterEffectChance4",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1093,
+   "name": "boosterEffectChance5",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 1132,
    "name": "upgradeCapacity",
    "defaultValue": 0,
@@ -1305,6 +1417,34 @@
    "id": 1138,
    "name": "drawback",
    "defaultValue": 10,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1141,
+   "name": "boosterArmorHPPenalty",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1145,
+   "name": "boosterTurretTrackingPenalty",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1149,
+   "name": "boosterMissileAOECloudPenalty",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1150,
+   "name": "boosterCapacitorCapacityPenalty",
+   "defaultValue": 0,
    "stackable": true,
    "highIsGood": true
   },
@@ -1750,8 +1890,22 @@
    "highIsGood": true
   },
   {
+   "id": 1882,
+   "name": "warfareLinkCPUAdd",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 1886,
    "name": "chargedArmorDamageMultiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 1920,
+   "name": "disallowActivateInForcefield",
    "defaultValue": 0,
    "stackable": true,
    "highIsGood": true
@@ -1787,6 +1941,13 @@
   {
    "id": 2065,
    "name": "canFitShipGroup09",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2067,
+   "name": "mjfgRadius",
    "defaultValue": 0,
    "stackable": true,
    "highIsGood": true
@@ -1834,6 +1995,20 @@
    "highIsGood": true
   },
   {
+   "id": 2343,
+   "name": "disallowTethering",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2354,
+   "name": "disallowDocking",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 2396,
    "name": "canFitShipGroup10",
    "defaultValue": 0,
@@ -1843,6 +2018,48 @@
   {
    "id": 2463,
    "name": "canFitShipType7",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2468,
+   "name": "warfareBuff1ID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2469,
+   "name": "warfareBuff1Value",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2470,
+   "name": "warfareBuff2ID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2471,
+   "name": "warfareBuff2Value",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2472,
+   "name": "warfareBuff3ID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2473,
+   "name": "warfareBuff3Value",
    "defaultValue": 0,
    "stackable": true,
    "highIsGood": true
@@ -1939,6 +2156,55 @@
    "highIsGood": true
   },
   {
+   "id": 2535,
+   "name": "buffDuration",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2536,
+   "name": "warfareBuff4ID",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2537,
+   "name": "warfareBuff4Value",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2596,
+   "name": "warfareBuff1Multiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2597,
+   "name": "warfareBuff2Multiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2598,
+   "name": "warfareBuff3Multiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 2599,
+   "name": "warfareBuff4Multiplier",
+   "defaultValue": 0,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
    "id": 2608,
    "name": "minVelocityActivationLimit",
    "defaultValue": 0,
@@ -1995,6 +2261,34 @@
    "highIsGood": true
   },
   {
+   "id": 2832,
+   "name": "mjdShipJumpCap",
+   "defaultValue": 1,
+   "stackable": true,
+   "highIsGood": true
+  },
+  {
+   "id": 3025,
+   "name": "ActiveSystemJump",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 3026,
+   "name": "FilamentDescriptionMessageID",
+   "defaultValue": 561098,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 3096,
+   "name": "locationListID",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
    "id": 3320,
    "name": "isBlackOpsJumpPortalPassenger",
    "defaultValue": 0,
@@ -2032,6 +2326,13 @@
   {
    "id": 5599,
    "name": "allowInFullyCorruptedLowSec",
+   "defaultValue": 0,
+   "stackable": false,
+   "highIsGood": false
+  },
+  {
+   "id": 5783,
+   "name": "filamentSpoolupTimeSeconds",
    "defaultValue": 0,
    "stackable": false,
    "highIsGood": false
@@ -2119,6 +2420,12 @@
    "id": 42,
    "categoryId": 0,
    "state": 1,
+   "modifiers": []
+  },
+  {
+   "id": 48,
+   "categoryId": 1,
+   "state": 3,
    "modifiers": []
   },
   {
@@ -2294,6 +2601,20 @@
      "func": "ItemModifier",
      "domain": "self",
      "modifiedAttrId": 313,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 220,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 314,
      "modifyingAttrId": 280,
      "operation": 2
     }
@@ -2703,6 +3024,20 @@
    ]
   },
   {
+   "id": 485,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 55,
+     "modifyingAttrId": 314,
+     "operation": 9
+    }
+   ]
+  },
+  {
    "id": 490,
    "categoryId": 0,
    "state": 1,
@@ -2961,6 +3296,20 @@
      "modifyingAttrId": 557,
      "operation": 9,
      "skillTypeId": 3319
+    }
+   ]
+  },
+  {
+   "id": 804,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 6,
+     "modifyingAttrId": 317,
+     "operation": 9
     }
    ]
   },
@@ -3335,6 +3684,68 @@
    ]
   },
   {
+   "id": 2735,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 265,
+     "modifyingAttrId": 1141,
+     "operation": 9
+    }
+   ],
+   "fittingUsageChanceAttrId": 1091
+  },
+  {
+   "id": 2745,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "ship",
+     "modifiedAttrId": 482,
+     "modifyingAttrId": 1150,
+     "operation": 9
+    }
+   ],
+   "fittingUsageChanceAttrId": 1090
+  },
+  {
+   "id": 2747,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 160,
+     "modifyingAttrId": 1145,
+     "operation": 9,
+     "skillTypeId": 3300
+    }
+   ],
+   "fittingUsageChanceAttrId": 1092
+  },
+  {
+   "id": 2791,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "OwnerRequiredSkillModifier",
+     "domain": "character",
+     "modifiedAttrId": 654,
+     "modifyingAttrId": 1149,
+     "operation": 9,
+     "skillTypeId": 3452
+    }
+   ],
+   "fittingUsageChanceAttrId": 1093
+  },
+  {
    "id": 2795,
    "categoryId": 0,
    "state": 1,
@@ -3410,6 +3821,35 @@
      "modifyingAttrId": 767,
      "operation": 9,
      "skillTypeId": 3300
+    }
+   ]
+  },
+  {
+   "id": 2866,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationGroupModifier",
+     "domain": "character",
+     "modifiedAttrId": 330,
+     "modifyingAttrId": 66,
+     "operation": 9,
+     "groupId": 303
+    }
+   ]
+  },
+  {
+   "id": 3002,
+   "categoryId": 5,
+   "state": 4,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 73,
+     "modifyingAttrId": 1206,
+     "operation": 9
     }
    ]
   },
@@ -3639,6 +4079,43 @@
    ]
   },
   {
+   "id": 4951,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 68,
+     "modifyingAttrId": 548,
+     "operation": 9,
+     "skillTypeId": 21802
+    },
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 68,
+     "modifyingAttrId": 548,
+     "operation": 9,
+     "skillTypeId": 3416
+    }
+   ]
+  },
+  {
+   "id": 5264,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 50,
+     "modifyingAttrId": 1882,
+     "operation": 4
+    }
+   ]
+  },
+  {
    "id": 5275,
    "categoryId": 1,
    "state": 3,
@@ -3669,6 +4146,29 @@
      "modifiedAttrId": 739,
      "modifyingAttrId": 280,
      "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 5364,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 84,
+     "modifyingAttrId": 895,
+     "operation": 9,
+     "skillTypeId": 3393
+    },
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 84,
+     "modifyingAttrId": 895,
+     "operation": 9,
+     "skillTypeId": 21803
     }
    ]
   },
@@ -3712,6 +4212,119 @@
    "categoryId": 1,
    "state": 3,
    "modifiers": []
+  },
+  {
+   "id": 6734,
+   "categoryId": 1,
+   "state": 3,
+   "modifiers": []
+  },
+  {
+   "id": 6737,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2468,
+     "modifyingAttrId": 2468,
+     "operation": 10
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2469,
+     "modifyingAttrId": 2596,
+     "operation": 6
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2470,
+     "modifyingAttrId": 2470,
+     "operation": 10
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2471,
+     "modifyingAttrId": 2597,
+     "operation": 6
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2472,
+     "modifyingAttrId": 2472,
+     "operation": 10
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2473,
+     "modifyingAttrId": 2598,
+     "operation": 6
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2536,
+     "modifyingAttrId": 2536,
+     "operation": 10
+    },
+    {
+     "func": "ItemModifier",
+     "domain": "other",
+     "modifiedAttrId": 2537,
+     "modifyingAttrId": 2599,
+     "operation": 6
+    }
+   ]
+  },
+  {
+   "id": 6768,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "ItemModifier",
+     "domain": "self",
+     "modifiedAttrId": 670,
+     "modifyingAttrId": 280,
+     "operation": 2
+    }
+   ]
+  },
+  {
+   "id": 6769,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 54,
+     "modifyingAttrId": 670,
+     "operation": 9,
+     "skillTypeId": 3348
+    }
+   ]
+  },
+  {
+   "id": 6773,
+   "categoryId": 0,
+   "state": 1,
+   "modifiers": [
+    {
+     "func": "LocationRequiredSkillModifier",
+     "domain": "ship",
+     "modifiedAttrId": 2535,
+     "modifyingAttrId": 66,
+     "operation": 9,
+     "skillTypeId": 3349
+    }
+   ]
   },
   {
    "id": 6998,
@@ -6856,6 +7469,104 @@
    ]
   },
   {
+   "id": 3568,
+   "groupId": 76,
+   "categoryId": 7,
+   "name": "Small Capacitor Booster II",
+   "attrs": [
+    [
+     9,
+     40
+    ],
+    [
+     30,
+     5
+    ],
+    [
+     38,
+     15
+    ],
+    [
+     50,
+     15
+    ],
+    [
+     56,
+     1
+    ],
+    [
+     73,
+     12000
+    ],
+    [
+     161,
+     5
+    ],
+    [
+     182,
+     3417
+    ],
+    [
+     277,
+     3
+    ],
+    [
+     422,
+     2
+    ],
+    [
+     604,
+     87
+    ],
+    [
+     633,
+     5
+    ],
+    [
+     978,
+     10
+    ],
+    [
+     1180,
+     0.02
+    ],
+    [
+     1206,
+     -20
+    ],
+    [
+     1211,
+     5.3
+    ],
+    [
+     1212,
+     1
+    ],
+    [
+     1795,
+     10000
+    ]
+   ],
+   "effects": [
+    [
+     13,
+     false
+    ],
+    [
+     16,
+     false
+    ],
+    [
+     48,
+     true
+    ],
+    [
+     3002,
+     false
+    ]
+   ]
+  },
+  {
    "id": 4256,
    "groupId": 862,
    "categoryId": 7,
@@ -7918,6 +8629,104 @@
    ]
   },
   {
+   "id": 15479,
+   "groupId": 303,
+   "categoryId": 20,
+   "name": "Standard Exile Booster",
+   "attrs": [
+    [
+     4,
+     1
+    ],
+    [
+     161,
+     1
+    ],
+    [
+     182,
+     3405
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     330,
+     1800000
+    ],
+    [
+     633,
+     3
+    ],
+    [
+     895,
+     20
+    ],
+    [
+     1087,
+     1
+    ],
+    [
+     1089,
+     0.2
+    ],
+    [
+     1090,
+     0.2
+    ],
+    [
+     1091,
+     0.2
+    ],
+    [
+     1092,
+     0.2
+    ],
+    [
+     1093,
+     0.2
+    ],
+    [
+     1141,
+     -20
+    ],
+    [
+     1145,
+     -20
+    ],
+    [
+     1149,
+     20
+    ],
+    [
+     1150,
+     -20
+    ]
+   ],
+   "effects": [
+    [
+     2735,
+     false
+    ],
+    [
+     2745,
+     false
+    ],
+    [
+     2747,
+     false
+    ],
+    [
+     2791,
+     false
+    ],
+    [
+     5364,
+     false
+    ]
+   ]
+  },
+  {
    "id": 24241,
    "groupId": 273,
    "categoryId": 16,
@@ -8194,6 +9003,27 @@
    ]
   },
   {
+   "id": 28668,
+   "groupId": 916,
+   "categoryId": 8,
+   "name": "Nanite Repair Paste",
+   "attrs": [
+    [
+     4,
+     2500
+    ],
+    [
+     9,
+     1
+    ],
+    [
+     161,
+     0.01
+    ]
+   ],
+   "effects": []
+  },
+  {
    "id": 31682,
    "groupId": 777,
    "categoryId": 7,
@@ -8375,6 +9205,102 @@
     ],
     [
      2795,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 31982,
+   "groupId": 87,
+   "categoryId": 8,
+   "name": "Navy Cap Booster 100",
+   "attrs": [
+    [
+     4,
+     10
+    ],
+    [
+     67,
+     100
+    ],
+    [
+     128,
+     1
+    ],
+    [
+     137,
+     76
+    ],
+    [
+     161,
+     3
+    ],
+    [
+     317,
+     -100
+    ],
+    [
+     602,
+     1156
+    ],
+    [
+     1692,
+     4
+    ]
+   ],
+   "effects": [
+    [
+     804,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 32006,
+   "groupId": 87,
+   "categoryId": 8,
+   "name": "Navy Cap Booster 400",
+   "attrs": [
+    [
+     4,
+     40
+    ],
+    [
+     67,
+     400
+    ],
+    [
+     128,
+     3
+    ],
+    [
+     137,
+     76
+    ],
+    [
+     161,
+     12
+    ],
+    [
+     317,
+     -100
+    ],
+    [
+     602,
+     1156
+    ],
+    [
+     603,
+     2013
+    ],
+    [
+     1692,
+     4
+    ]
+   ],
+   "effects": [
+    [
+     804,
      false
     ]
    ]
@@ -8562,6 +9488,382 @@
      false
     ]
    ]
+  },
+  {
+   "id": 42530,
+   "groupId": 1770,
+   "categoryId": 7,
+   "name": "Skirmish Command Burst I",
+   "attrs": [
+    [
+     6,
+     25
+    ],
+    [
+     9,
+     40
+    ],
+    [
+     30,
+     100
+    ],
+    [
+     38,
+     3
+    ],
+    [
+     50,
+     50
+    ],
+    [
+     54,
+     15000
+    ],
+    [
+     56,
+     1
+    ],
+    [
+     73,
+     60000
+    ],
+    [
+     161,
+     60
+    ],
+    [
+     182,
+     3348
+    ],
+    [
+     183,
+     3349
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     278,
+     1
+    ],
+    [
+     422,
+     1
+    ],
+    [
+     604,
+     1772
+    ],
+    [
+     633,
+     0
+    ],
+    [
+     763,
+     1
+    ],
+    [
+     978,
+     1
+    ],
+    [
+     1298,
+     1534
+    ],
+    [
+     1299,
+     963
+    ],
+    [
+     1300,
+     419
+    ],
+    [
+     1301,
+     540
+    ],
+    [
+     1302,
+     89808
+    ],
+    [
+     1795,
+     60000
+    ],
+    [
+     1872,
+     941
+    ],
+    [
+     1879,
+     883
+    ],
+    [
+     1880,
+     547
+    ],
+    [
+     1881,
+     1538
+    ],
+    [
+     1882,
+     0
+    ],
+    [
+     1920,
+     1
+    ],
+    [
+     2065,
+     659
+    ],
+    [
+     2343,
+     1
+    ],
+    [
+     2354,
+     1
+    ],
+    [
+     2396,
+     30
+    ],
+    [
+     2469,
+     1
+    ],
+    [
+     2471,
+     1
+    ],
+    [
+     2473,
+     1
+    ],
+    [
+     2476,
+     4902
+    ],
+    [
+     2477,
+     5120
+    ],
+    [
+     2535,
+     60000
+    ],
+    [
+     2537,
+     1
+    ]
+   ],
+   "effects": [
+    [
+     12,
+     false
+    ],
+    [
+     16,
+     false
+    ],
+    [
+     5264,
+     false
+    ],
+    [
+     6734,
+     true
+    ]
+   ]
+  },
+  {
+   "id": 42840,
+   "groupId": 1772,
+   "categoryId": 8,
+   "name": "Rapid Deployment Charge",
+   "attrs": [
+    [
+     4,
+     0.01
+    ],
+    [
+     137,
+     1770
+    ],
+    [
+     161,
+     0.01
+    ],
+    [
+     182,
+     3349
+    ],
+    [
+     183,
+     3348
+    ],
+    [
+     277,
+     1
+    ],
+    [
+     278,
+     1
+    ],
+    [
+     2468,
+     22
+    ],
+    [
+     2470,
+     0
+    ],
+    [
+     2472,
+     0
+    ],
+    [
+     2536,
+     0
+    ],
+    [
+     2596,
+     12
+    ],
+    [
+     2597,
+     0
+    ],
+    [
+     2598,
+     0
+    ],
+    [
+     2599,
+     0
+    ]
+   ],
+   "effects": [
+    [
+     6737,
+     true
+    ]
+   ]
+  },
+  {
+   "id": 46002,
+   "groupId": 303,
+   "categoryId": 20,
+   "name": "Agency 'Hardshell' TB5 Dose II",
+   "attrs": [
+    [
+     4,
+     1
+    ],
+    [
+     161,
+     1
+    ],
+    [
+     330,
+     1800000
+    ],
+    [
+     548,
+     5
+    ],
+    [
+     633,
+     3
+    ],
+    [
+     895,
+     5
+    ],
+    [
+     1087,
+     11
+    ]
+   ],
+   "effects": [
+    [
+     4951,
+     false
+    ],
+    [
+     5364,
+     false
+    ]
+   ]
+  },
+  {
+   "id": 53984,
+   "groupId": 4041,
+   "categoryId": 17,
+   "name": "Signal-5 'Needlejack' Filament",
+   "attrs": [
+    [
+     161,
+     0.1
+    ],
+    [
+     2067,
+     6000
+    ],
+    [
+     2832,
+     5
+    ],
+    [
+     3025,
+     1
+    ],
+    [
+     3026,
+     561098
+    ],
+    [
+     5783,
+     30
+    ]
+   ],
+   "effects": []
+  },
+  {
+   "id": 56076,
+   "groupId": 4087,
+   "categoryId": 17,
+   "name": "Border-5 'Pochven' Filament",
+   "attrs": [
+    [
+     161,
+     0.1
+    ],
+    [
+     2067,
+     6000
+    ],
+    [
+     2832,
+     5
+    ],
+    [
+     3026,
+     569135
+    ],
+    [
+     3096,
+     4513
+    ],
+    [
+     5783,
+     30
+    ]
+   ],
+   "effects": []
   }
  ],
  "groups": [
@@ -8606,6 +9908,16 @@
    "categoryId": 7
   },
   {
+   "id": 76,
+   "name": "Capacitor Booster",
+   "categoryId": 7
+  },
+  {
+   "id": 87,
+   "name": "Capacitor Booster Charge",
+   "categoryId": 8
+  },
+  {
    "id": 89,
    "name": "Torpedo",
    "categoryId": 8
@@ -8631,6 +9943,11 @@
    "categoryId": 16
   },
   {
+   "id": 258,
+   "name": "Fleet Support",
+   "categoryId": 16
+  },
+  {
    "id": 270,
    "name": "Science",
    "categoryId": 16
@@ -8649,6 +9966,11 @@
    "id": 275,
    "name": "Navigation",
    "categoryId": 16
+  },
+  {
+   "id": 303,
+   "name": "Booster",
+   "categoryId": 20
   },
   {
    "id": 372,
@@ -8681,6 +10003,11 @@
    "categoryId": 7
   },
   {
+   "id": 916,
+   "name": "Nanite Repair Paste",
+   "categoryId": 8
+  },
+  {
    "id": 1199,
    "name": "Ancillary Armor Repairer",
    "categoryId": 7
@@ -8704,6 +10031,26 @@
    "id": 1220,
    "name": "Neural Enhancement",
    "categoryId": 16
+  },
+  {
+   "id": 1770,
+   "name": "Command Burst",
+   "categoryId": 7
+  },
+  {
+   "id": 1772,
+   "name": "Skirmish Command Burst Charges",
+   "categoryId": 8
+  },
+  {
+   "id": 4041,
+   "name": "Jump Filaments",
+   "categoryId": 17
+  },
+  {
+   "id": 4087,
+   "name": "Triglavian Space Filaments",
+   "categoryId": 17
   }
  ]
 }

@@ -5,7 +5,9 @@ import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
 import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
 import { bonusLabel, fitValueGroups, gauge, type GaugeView, rangeText, hintText, dist, pct } from "./ships.js";
+import { consumableRows, type ConsumableRowView } from "./consumables.js";
 export { hintText, rangeText };
+export type { ConsumableRowView, ConsumableKind } from "./consumables.js";
 
 const SLOT_TITLES: Record<SlotKind, string> = {
   high: "High", mid: "Mid", low: "Low", rig: "Rigs", subsystem: "Subsystems",
@@ -197,6 +199,8 @@ export interface FitSheetView {
   problems: ProblemView[]; missing: MissingSkillView[];
   /** Every round in the weapons or the hold, shortest reach first. */
   ammo: AmmoRowView[];
+  /** What the hold carries that the ship uses up and is not ammunition, with what each does and how this ship uses it. */
+  consumables: ConsumableRowView[];
   /** The whole hold, ammunition included: the Ammunition panel says what a round does, this says how many and what they are worth. */
   cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
   value: { total: string; lines: ValueLineView[]; unpriced: string | null };
@@ -533,6 +537,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     problems: input.problems.map((p) => ({ kind: p.kind, label: PROBLEM_LABELS[p.kind], text: problemText(p) })),
     missing,
     ammo,
+    consumables: consumableRows(built, descriptions),
     cargo: entryViews(built.cargo, fit.data, prices, descriptions),
     drones: entryViews(built.drones, fit.data, prices, descriptions),
     unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),

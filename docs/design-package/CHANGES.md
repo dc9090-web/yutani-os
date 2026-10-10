@@ -137,3 +137,13 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   ★`.sheet-entry-value` (unit price × quantity, a dash when unpriced) at the right of every row, drones, unknown and
   not-fitted lists included.
 - **Range cells** carry `.opt` / `.fall` classes now (the phone layout places and labels them by class, not position).
+- **Consumables panel** (`fit-sheet.html`, `FitSheet.tsx` `ConsumablesPanel`): a card under Ammunition for what the hold
+  carries that the ship uses up, ammunition aside — cap booster charges, nanite paste, boosters, command burst charges,
+  filaments: ★`.consumable-head` (Consumable · Effect · Use) and ★`.consumable-list` rows on a three-column grid, the
+  item with its icon, ★`.consumable-effect` (what it does) and ★`.consumable-use` (the fitted module that loads it and
+  how many per load, a booster's slot and duration, a filament's ship cap and spool-up; a dash when there is nothing to
+  say). On a phone the three stack. The rows stay in the cargo list too.
+- **Hover text** (`[data-desc]:hover::after`) is in the body font at 12 px whatever it hangs off (no more label font,
+  uppercase or letter-spacing leaking in from a pill); the card being hovered in is lifted above its neighbours
+  (`.card:has([data-desc]:hover)`), since every card's blur makes it a stacking layer; a `.range-pill`'s text hangs
+  leftwards so it stays inside the card.

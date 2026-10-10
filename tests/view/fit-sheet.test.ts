@@ -176,6 +176,21 @@ describe("buildFitSheet", () => {
     expect(hail.band?.desc).toMatch(/^Reaches 4\.9 km of this ship's .* lock range$/);
   });
 
+  it("carries the hold's consumables, which stay cargo rows too", () => {
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 1001, typeId: 33076, locationFlag: "LoSlot0", isSingleton: true }),   // Small Ancillary Armor Repairer
+      asset({ itemId: 1051, typeId: 28668, locationFlag: "Cargo", quantity: 200 }),         // Nanite Repair Paste
+      asset({ itemId: 1052, typeId: 46002, locationFlag: "Cargo", quantity: 2 }),           // a Hardshell booster
+    ], ctx);
+    const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
+    expect(view.consumables.map((e) => [e.name, e.effect, e.use])).toEqual([
+      ["Nanite Repair Paste", "×3 armor repair", "Small Ancillary Armor Repairer, 8 per load"],
+      ["Agency 'Hardshell' TB5 Dose II", "+5% shield boost, +5% armor repair", "Slot 11 · 30 min"],
+    ]);
+    expect(view.cargo.map((e) => [e.name, e.quantity])).toEqual([["Nanite Repair Paste", 200], ["Agency 'Hardshell' TB5 Dose II", 2]]);
+    expect(view.ammo).toEqual([]);
+  });
+
   it("labels a nicknamed item with its type name and keeps the nickname beside it", () => {
     const built = fitFromAssets(SHIP, [
       asset({ itemId: 1021, typeId: 2456, locationFlag: "Cargo", quantity: 1, isSingleton: true, name: "Lucky" }),

@@ -397,6 +397,14 @@ body {
 /* One line per round: the name never wraps, and the three narrow columns leave it the room. */
 .ammo-text { display: flex; align-items: center; min-width: 0; }
 .ammo-list .sheet-entry-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The Consumables panel: the item, what it does and how this ship uses it, three columns under a head like the ammo list's. */
+.entry-list.consumable-list li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.9fr); gap: 12px; align-items: center; padding: 5px 0; }
+.consumable-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.9fr); gap: 12px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--faint); }
+.consumable-head span:last-child { text-align: right; }
+.card .consumable-head { font-size: 8px; letter-spacing: 1px; }
+.consumable-list .sheet-entry-name { font-size: 12px; white-space: normal; }
+.consumable-effect, .consumable-use { font-size: 12px; line-height: 1.35; color: var(--muted); }
+.consumable-use { text-align: right; }
 /* Cargo & drones: the item on the left, its value (unit price × quantity) on the right, under an Item · Value head. */
 .sheet-entry-head { display: flex; justify-content: space-between; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--faint); }
 .sheet-entry-value { flex: 0 0 auto; color: var(--muted); white-space: nowrap; }
@@ -417,7 +425,10 @@ body {
 @media (max-width: 480px) {
   /* Phones: no column headers. Line 1 is the item with its state (or range pill) on the right; line 2
      holds the two range cells, each with its own label, and is skipped for rows that are not ammo. */
-  .sheet-slot-head, .ammo-head, .sheet-entry-head { display: none; }
+  .sheet-slot-head, .ammo-head, .sheet-entry-head, .consumable-head { display: none; }
+  /* Consumables on a phone: the item, then what it does, then how it is used, one line each. */
+  .entry-list.consumable-list li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .consumable-use { text-align: left; }
   .sheet-slot-row, .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
   .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
   .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
@@ -660,7 +671,7 @@ a:not([class]) { color: var(--accent-2); }
 .card-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-hi), transparent); }
 .card-problems .card-title .neg { margin-left: 0; vertical-align: baseline; }
 .slot-section-title, .slot-title, .stat-section-head, .skill-group-flat .group-head { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .8px; font-size: 12px; }
-.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .sheet-entry-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
+.ov-row dt, .ov-sp-label, .stat-label, .attr-label, .gauge-label, .ship-stat dt, .table th, .slot-head, .sheet-slot-head, .ammo-head, .sheet-entry-head, .consumable-head, .resist-head, .popover-title, .month-label, .ov-race { font-family: var(--font-label); font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; }
 .attr, .ship-stat, .counter, .clone-list li, .popover, .modal, .filter-input, .fit-select, .qty-input, .eft-text, .fit-name-input, .slot-main, .browser-row, .skill-picker-row, .menu-link-item { border-radius: 2px; }
 .pill, .badge, .state-pill, .level-box, .item-icon, .module-icon, .ov-portrait, .ship-render, .fit-render, .fit-hull-render, .resist-cell { border-radius: 1px; }
 .ov-portrait, .ship-render, .fit-render, .fit-hull-render { border-color: var(--border-hi); }

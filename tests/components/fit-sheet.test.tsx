@@ -57,6 +57,10 @@ const view: FitSheetView = {
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
   ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
+  consumables: [
+    { key: "consumable:32006", typeId: 32006, name: "Navy Cap Booster 400", desc: "Provides a quick injection of power into your capacitor.", kind: "capBooster", effect: "+400 GJ per charge", use: "Small Capacitor Booster II, 1 per load" },
+    { key: "consumable:28668", typeId: 28668, name: "Nanite Repair Paste", desc: null, kind: "paste", effect: "Overheat repair", use: null },
+  ],
   cargo: [
     { key: "Cargo:12608:0", typeId: 12608, name: "Hail S", nickname: null, quantity: 1000, desc: "Hail is an attempt to combine penetration with versatility.", value: "100,000.00 ISK" },
     { key: "Cargo:34:1", typeId: 34, name: "Tritanium", nickname: null, quantity: 5000, desc: null, value: "25,000.00 ISK" },
@@ -132,7 +136,7 @@ describe("FitSheet", () => {
 
   it("lists every round in an Ammunition panel above the hold: columns, range cells, range pill", () => {
     const { container } = render(<FitSheet view={view} />);
-    expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Cargo & drones"]);
+    expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Consumables", "Cargo & drones"]);
     expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundOptimalFalloffRange");
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
@@ -152,6 +156,23 @@ describe("FitSheet", () => {
     expect(lists[1]).toHaveTextContent("Tritanium");
     expect(container.querySelectorAll(".sheet-entries .sheet-range")).toHaveLength(0);
     expect(container.querySelectorAll(".range-pill")).toHaveLength(1);
+  });
+
+  it("lists the consumables under the ammunition: what each does and how the ship uses it, a dash when it has no use to show", () => {
+    const { container } = render(<FitSheet view={view} />);
+    expect(container.querySelector(".consumable-head")).toHaveTextContent("ConsumableEffectUse");
+    const rows = container.querySelectorAll(".consumable-list li");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].querySelector(".sheet-entry")).toHaveAttribute("data-desc", "Provides a quick injection of power into your capacitor.");
+    expect(rows[0].querySelector("img")).toHaveAttribute("src", "https://images.evetech.net/types/32006/icon?size=32");
+    expect(rows[0].querySelector(".sheet-entry-name")).toHaveTextContent("Navy Cap Booster 400");
+    expect(rows[0].querySelector(".consumable-effect")).toHaveTextContent("+400 GJ per charge");
+    expect(rows[0].querySelector(".consumable-use")).toHaveTextContent("Small Capacitor Booster II, 1 per load");
+    expect(rows[1].querySelector(".consumable-effect")).toHaveTextContent("Overheat repair");
+    expect(rows[1].querySelector(".consumable-use")).toHaveTextContent("—");
+    // No panel at all when the hold has nothing consumable.
+    const { container: bare } = render(<FitSheet view={{ ...view, consumables: [] }} />);
+    expect([...bare.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Cargo & drones"]);
   });
 
   it("puts each item's description on the name as hover text, and none when the SDE has none", () => {
@@ -211,7 +232,7 @@ describe("FitSheet", () => {
     const unknown = screen.getByText("Unknown type (99999)").closest(".sheet-entry")!;
     expect(unknown).not.toHaveTextContent("×");
     expect(unknown.querySelector("img")).toBeNull();
-    expect(container.querySelectorAll(".sheet-entry img")).toHaveLength(4);   // the ammo panel's Hail S, then Hobgoblin, Hail S and Tritanium in the hold; the unknown type has none
+    expect(container.querySelectorAll(".sheet-entries .sheet-entry img")).toHaveLength(3);   // Hobgoblin, Hail S and Tritanium in the hold; the unknown type has none
     expect(screen.getByText("13,100,100.00 ISK")).toBeInTheDocument();
     expect(screen.getByText("1 item unpriced")).toBeInTheDocument();
   });

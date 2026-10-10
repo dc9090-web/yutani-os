@@ -275,6 +275,50 @@
       </ul>
     </div>
 
+    <!-- Consumables panel (FitSheet.tsx ConsumablesPanel): what the hold carries that the ship uses up, ammunition aside.
+         Effect = what it does; Use = the fitted module that loads it and how many per load, a booster's slot and duration,
+         a filament's ship cap and spool-up; a dash when nothing fitted takes it. These rows stay in the cargo list below. -->
+    <div class="card">
+      <h2 class="card-title">Consumables</h2>
+      <div class="consumable-head" aria-hidden="true">
+        <span>Consumable</span><span>Effect</span><span>Use</span>
+      </div>
+      <ul class="entry-list consumable-list">
+        <li>
+          <span class="sheet-entry" data-desc="Navy Cap Booster 400 — Capacitor Booster Charge">
+            <img class="module-icon" src="https://images.evetech.net/types/32006/icon?size=32" alt="">
+            <span class="sheet-entry-name">Navy Cap Booster 400</span>
+          </span>
+          <span class="consumable-effect">+400 GJ per charge</span>
+          <span class="consumable-use">—</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Nanite Repair Paste — Nanite Repair Paste">
+            <img class="module-icon" src="https://images.evetech.net/types/28668/icon?size=32" alt="">
+            <span class="sheet-entry-name">Nanite Repair Paste</span>
+          </span>
+          <span class="consumable-effect">Overheat repair</span>
+          <span class="consumable-use">—</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Agency 'Hardshell' TB5 Dose II — Booster">
+            <img class="module-icon" src="https://images.evetech.net/types/46002/icon?size=32" alt="">
+            <span class="sheet-entry-name">Agency 'Hardshell' TB5 Dose II</span>
+          </span>
+          <span class="consumable-effect">+5% shield boost, +5% armor repair</span>
+          <span class="consumable-use">Slot 11 · 30 min</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Signal-5 'Needlejack' Filament — Jump Filaments">
+            <img class="module-icon" src="https://images.evetech.net/types/53984/icon?size=32" alt="">
+            <span class="sheet-entry-name">Signal-5 'Needlejack' Filament</span>
+          </span>
+          <span class="consumable-effect">Jump to a random null-sec system</span>
+          <span class="consumable-use">up to 5 ships · 30 s spool-up</span>
+        </li>
+      </ul>
+    </div>
+
     <div class="card">
       <h2 class="card-title">Cargo &amp; drones</h2>
       <!-- Item · Value head; every row below carries a .sheet-entry-value (unit price × quantity, a dash when unpriced) -->
@@ -323,6 +367,30 @@
             <span class="sheet-entry-qty">×2400</span>
           </span>
           <span class="num sheet-entry-value">4,272,000.00 ISK</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Navy Cap Booster 400 — Capacitor Booster Charge">
+            <img class="module-icon" src="https://images.evetech.net/types/32006/icon?size=32" alt="">
+            <span class="sheet-entry-name">Navy Cap Booster 400</span>
+            <span class="sheet-entry-qty">×19</span>
+          </span>
+          <span class="num sheet-entry-value">1,045,000.00 ISK</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Agency 'Hardshell' TB5 Dose II — Booster">
+            <img class="module-icon" src="https://images.evetech.net/types/46002/icon?size=32" alt="">
+            <span class="sheet-entry-name">Agency 'Hardshell' TB5 Dose II</span>
+            <span class="sheet-entry-qty">×2</span>
+          </span>
+          <span class="num sheet-entry-value">9,800,000.00 ISK</span>
+        </li>
+        <li>
+          <span class="sheet-entry" data-desc="Signal-5 'Needlejack' Filament — Jump Filaments">
+            <img class="module-icon" src="https://images.evetech.net/types/53984/icon?size=32" alt="">
+            <span class="sheet-entry-name">Signal-5 'Needlejack' Filament</span>
+            <span class="sheet-entry-qty">×3</span>
+          </span>
+          <span class="num sheet-entry-value">36,000,000.00 ISK</span>
         </li>
         <li>
           <span class="sheet-entry" data-desc="Nanite Repair Paste — Nanite Repair Paste">

@@ -8,7 +8,12 @@ describe("rifter.json", () => {
   const data = fixtureData("rifter");
 
   it("holds the seed types and their required-skill closure", () => {
-    expect(data.types.size).toBe(53);
+    // 53 from the seeds and their closure, plus the ten consumable types and modules merged in on
+    // 2026-10-10 from SDE build 3586130 (their skills left out, so the "all skills V" fixtures hold).
+    expect(data.types.size).toBe(63);
+    for (const id of [3568, 31982, 32006, 28668, 46002, 15479, 53984, 56076, 42840, 42530]) {
+      expect(data.types.has(id)).toBe(true);
+    }
     for (const id of [587, 2889, 2048, 519, 440, 380, 33076, 31686, 31682, 31724, 484, 5443, 12608,
                       27339, 4256, 12034, 27143, 2456, 626, 3426, 3413, 3318, 11207]) {
       expect(data.types.has(id)).toBe(true);

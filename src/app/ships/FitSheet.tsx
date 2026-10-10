@@ -1,5 +1,5 @@
 import { IconTargetOff } from "@tabler/icons-react";
-import type { FitSheetView, AmmoRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
+import type { FitSheetView, AmmoRowView, ConsumableRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -68,6 +68,32 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
             </span>
             <RangeCols range={row.range} />
             <RangePill band={row.band} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** What the hold carries that the ship uses up, ammunition aside: what each does, and how this ship uses it. */
+function ConsumablesPanel({ consumables }: { consumables: ConsumableRowView[] }) {
+  return (
+    <div className="card">
+      <h2 className="card-title">Consumables</h2>
+      <div className="consumable-head" aria-hidden="true">
+        <span>Consumable</span><span>Effect</span><span>Use</span>
+      </div>
+      <ul className="entry-list consumable-list">
+        {consumables.map((row) => (
+          <li key={row.key}>
+            <span className="sheet-entry" data-desc={row.desc ?? undefined}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
+              <span className="sheet-entry-name">{row.name}</span>
+            </span>
+            <span className="consumable-effect">{row.effect}</span>
+            {/* A dash when no fitted module takes it and it has no slot or duration to show. */}
+            <span className="consumable-use">{row.use ?? "—"}</span>
           </li>
         ))}
       </ul>
@@ -156,6 +182,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
         </div>
 
         {view.ammo.length === 0 ? null : <AmmoPanel ammo={view.ammo} />}
+        {view.consumables.length === 0 ? null : <ConsumablesPanel consumables={view.consumables} />}
 
         <div className="card">
           <h2 className="card-title">Cargo &amp; drones</h2>
