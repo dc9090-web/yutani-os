@@ -56,7 +56,7 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
+  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, dps: "21.7", dpsDesc: "21.7 dps from 1 × 200mm AutoCannon II loaded with it", range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
   consumables: [
     { key: "consumable:32006", typeId: 32006, name: "Navy Cap Booster 400", desc: "Provides a quick injection of power into your capacitor.", kind: "capBooster", effect: "+400 GJ per charge", use: "Small Capacitor Booster II, 1 per load" },
     { key: "consumable:28668", typeId: 28668, name: "Nanite Repair Paste", desc: null, kind: "paste", effect: "Overheat repair", use: null },
@@ -137,13 +137,18 @@ describe("FitSheet", () => {
   it("lists every round in an Ammunition panel above the hold: columns, range cells, range pill", () => {
     const { container } = render(<FitSheet view={view} />);
     expect([...container.querySelectorAll(".fit-sheet-main .card-title")].map((h) => h.textContent)).toEqual(["Modules", "Ammunition", "Consumables", "Cargo & drones"]);
-    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundOptimalFalloffRange");
+    expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundDPSOptimalFalloffRange");
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
     // No count here: how many rounds the hold has is the cargo list's business.
     expect(row.querySelector(".sheet-entry-qty")).toBeNull();
     expect(row).not.toHaveTextContent("1,000");
-    expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["600 m", "4.3 km"]);
+    expect([...row.querySelectorAll(".sheet-range")].map((c) => c.textContent)).toEqual(["21.7", "600 m", "4.3 km"]);
+    // The DPS cell says which weapons it counts; a round nothing fitted fires gets a dash and no hover text.
+    expect(row.querySelector(".sheet-range.dps")).toHaveAttribute("data-desc", "21.7 dps from 1 × 200mm AutoCannon II loaded with it");
+    const unfired = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], dps: null, dpsDesc: null }] }} />).container.querySelector(".ammo-list li .sheet-range.dps")!;
+    expect(unfired).toHaveTextContent("—");
+    expect(unfired).not.toHaveAttribute("data-desc");
     const pill = row.querySelector(".range-pill")!;
     expect(pill).toHaveClass("level-1");
     expect(pill).toHaveTextContent("Short");

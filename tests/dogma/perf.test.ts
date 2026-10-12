@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, PROP_EFFECT, chargeRangeHint, fitPerformance, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, PROP_EFFECT, chargeRangeHint, fitPerformance, weaponDps, weaponDpsWith, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -225,6 +225,45 @@ describe("damage", () => {
       modules: [[jammed, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]),
     });
     expect(fitPerformance(fit)).toMatchObject({ dps: null, volley: null });
+  });
+});
+
+describe("weapon dps", () => {
+  it("is one weapon's share of the fit's dps, whatever state the module is in", () => {
+    const b = bench();
+    // 100 damage × 2 = 200 a shot; a 5 s cycle → 40 dps.
+    const gun = b.turret([[PERF_ATTR.damageMultiplier, 2], [PERF_ATTR.speed, 5000]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[gun, "high", 0]], charges: new Map([[0, b.charge(SHELL)]]) });
+    const item = fit.modules[0].item;
+    expect(weaponDps(fit, item)).toBe(40);
+    item.state = State.Offline;
+    clearMemo(fit);
+    expect(weaponDps(fit, item)).toBe(40);   // the panel says what the round does in this gun, not whether it is firing
+    expect(fitPerformance(fit).dps).toBeNull();
+  });
+
+  it("is null for an empty launcher, a module with no hardpoint, and a gun with no cycle time", () => {
+    const b = bench();
+    const fit = buildFit(b.data, b.hull(HULL), {
+      modules: [[b.launcher([]), "high", 0], [b.active([]), "mid", 0], [b.turret([[PERF_ATTR.damageMultiplier, 2]]), "high", 1]],
+      charges: new Map([[1, b.charge(SHELL)], [2, b.charge(SHELL)]]),
+    });
+    expect(fit.modules.map(({ item }) => weaponDps(fit, item))).toEqual([null, null, null]);
+  });
+
+  it("answers for another charge without leaving it loaded", () => {
+    const b = bench();
+    const gun = b.turret([[PERF_ATTR.damageMultiplier, 2], [PERF_ATTR.speed, 5000]]);
+    const light = b.charge(SHELL);                                                 // 100 a shot → 40 dps
+    const heavy = b.charge([[PERF_ATTR.emDamage, 150], [PERF_ATTR.kineticDamage, 100]]);   // 250 a shot → 100 dps
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[gun, "high", 0]], charges: new Map([[0, light]]) });
+    const item = fit.modules[0].item;
+    expect(weaponDpsWith(fit, item, heavy)).toBe(100);
+    expect(item.charge?.typeId).toBe(light);
+    expect(weaponDps(fit, item)).toBe(40);
+    const empty = buildFit(b.data, b.hull(HULL), { modules: [[gun, "high", 0]] });
+    expect(weaponDpsWith(empty, empty.modules[0].item, heavy)).toBe(100);
+    expect(empty.modules[0].item.charge).toBeUndefined();
   });
 });
 

@@ -395,8 +395,8 @@ body {
 .sheet-mod-name, .sheet-mod-charge { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .entry-list.sheet-entries li { align-items: center; padding: 4px 0; }
 /* The Ammunition panel: the same four columns as the module list, so Optimal and Falloff line up down the sheet. */
-.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 66px 66px 104px; gap: 8px; align-items: center; padding: 5px 0; }
-.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 66px 66px 104px; gap: 8px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
+.entry-list.ammo-list li { display: grid; grid-template-columns: minmax(0, 1fr) 52px 66px 66px 104px; gap: 8px; align-items: center; padding: 5px 0; }
+.ammo-head { display: grid; grid-template-columns: minmax(0, 1fr) 52px 66px 66px 104px; gap: 8px; padding: 0 0 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: var(--faint); }
 .ammo-head span:not(:first-child) { text-align: right; }
 .card .ammo-head { font-size: 8px; letter-spacing: 1px; }   /* the narrow columns: tighter than the other column heads */
 /* One line per round: the name never wraps, and the three narrow columns leave it the room. */
@@ -437,11 +437,15 @@ body {
   .sheet-slot-row, .entry-list.ammo-list li { grid-template-columns: auto auto minmax(0, 1fr) auto; gap: 4px 12px; }
   .sheet-slot-row .sheet-mod, .entry-list.ammo-list li .sheet-entry { grid-column: 1 / 4; grid-row: 1; }
   .sheet-slot-row .state-pill, .entry-list.ammo-list li .range-pill { grid-column: 4; grid-row: 1; align-self: center; }
+  .sheet-slot-row .sheet-range.opt { grid-column: 1; }
+  .sheet-slot-row .sheet-range.fall { grid-column: 2; }
   .sheet-range { grid-row: 2; text-align: left; white-space: nowrap; }
-  .sheet-range.opt { grid-column: 1; }
-  .sheet-range.fall { grid-column: 2; }
+  .sheet-range.dps { grid-column: 1; }
+  .sheet-range.opt { grid-column: 2; }
+  .sheet-range.fall { grid-column: 3; }
   .sheet-range:empty { display: none; }
   .sheet-range::before { font-family: var(--font-label); font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
+  .sheet-range.dps::before { content: "dps"; }
   .sheet-range.opt::before { content: "optimal"; }
   .sheet-range.fall::before { content: "falloff"; }
   .ammo-list .sheet-entry-name { white-space: normal; font-size: 13px; }
@@ -523,8 +527,8 @@ li.slot-row, .slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 54
 /* Every card is its own stacking layer (the glass blur), so a later card would paint over hover text
    that spills past the card's bottom edge: lift the card being hovered in above its neighbours. */
 .card:has([data-desc]:hover) { position: relative; z-index: 5; }
-/* A pill at the card's right edge hangs its text leftwards, so it stays inside the card. */
-.range-pill[data-desc]:hover::after { left: auto; right: 0; }
+/* A pill at the card's right edge, or the DPS cell beside it, hangs its text leftwards, so it stays inside the card. */
+.range-pill[data-desc]:hover::after, .sheet-range.dps[data-desc]:hover::after { left: auto; right: 0; }
 li.slot-row:last-child { border-bottom: 0; }
 .slot-row.selected { background: var(--raised); box-shadow: inset 2px 0 0 var(--accent); }
 .slot-row.empty .slot-main { color: var(--faint); }

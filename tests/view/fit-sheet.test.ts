@@ -174,6 +174,25 @@ describe("buildFitSheet", () => {
     // 600 + 4,257 m of reach against the Rifter's lock range: a short-range round for this hull.
     expect(hail.band?.label).toBe("Short");
     expect(hail.band?.desc).toMatch(/^Reaches 4\.9 km of this ship's .* lock range$/);
+    // Hail's 13.9 + 3.8 damage x the 200mm's 3.465 x the Gyrostabilizer's 1.1, every 3.75 s less the
+    // Rifter's 7.5 % and the gyro's 10.5 %: 67.46 / 3.105 s, from the one gun that takes it.
+    expect(hail.dps).toBe("21.7");
+    expect(hail.dpsDesc).toBe("21.7 dps from 1 × 200mm AutoCannon II loaded with it");
+  });
+
+  it("sums the dps of a round over every fitted weapon that takes it, and has none for a round nothing fires", () => {
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 1001, typeId: 2889, locationFlag: "HiSlot0", isSingleton: true }),
+      asset({ itemId: 1002, typeId: 12608, locationFlag: "HiSlot0", quantity: 400 }),   // Hail S loaded in one gun
+      asset({ itemId: 1003, typeId: 2889, locationFlag: "HiSlot1", isSingleton: true }),   // a second gun, empty
+      asset({ itemId: 1041, typeId: 27339, locationFlag: "Cargo", quantity: 10 }),      // a torpedo nothing launches
+    ], ctx);
+    const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
+    expect(view.ammo.map((e) => [e.name, e.dps, e.dpsDesc])).toEqual([
+      // 17.7 x 3.465 every 3.47 s = 17.7 dps a gun, from both guns as if both held it.
+      ["Hail S", "35.4", "35.4 dps from 2 × 200mm AutoCannon II loaded with it"],
+      ["Caldari Navy Mjolnir Torpedo", null, null],
+    ]);
   });
 
   it("carries the hold's consumables, which stay cargo rows too", () => {

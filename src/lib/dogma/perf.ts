@@ -297,6 +297,33 @@ export function weaponRangeWith(fit: Fit, weapon: Item, chargeTypeId: number): W
 }
 
 /**
+ * One weapon's damage per second with what it holds: the charge's four damage figures x the gun's
+ * `damageMultiplier`, every cycle. The same arithmetic `weaponDamage` sums for the fit, but with no
+ * regard to the module's state — the Ammunition panel says what a round does in this gun, not
+ * whether the gun is firing. `null` for anything that is not a weapon, a weapon holding nothing, a
+ * charge that deals no damage, or a gun with no cycle time.
+ */
+export function weaponDps(fit: Fit, weapon: Item): number | null {
+  if (hardpointOf(weapon) === null || weapon.charge === undefined) return null;
+  const shot = shotDamage(fit, weapon, weapon.charge);
+  return shot === null ? null : shot.perShot / shot.cycle;
+}
+
+/** `weaponDps` as if `weapon` held `chargeTypeId`; the swap is undone before returning, as in `weaponRangeWith`. */
+export function weaponDpsWith(fit: Fit, weapon: Item, chargeTypeId: number): number | null {
+  const current = weapon.charge;
+  attachCharge(weapon, makeItem(fit.data, chargeTypeId));
+  clearMemo(fit);
+  try {
+    return weaponDps(fit, weapon);
+  } finally {
+    if (current === undefined) delete weapon.charge;
+    else attachCharge(weapon, current);
+    clearMemo(fit);
+  }
+}
+
+/**
  * Every performance number for `fit`, all of them modified values.
  *
  * A field is `null` — never `NaN` or `Infinity` — whenever the inputs it needs are absent: the
@@ -446,23 +473,21 @@ function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: numbe
     if (hardpointOf(item) === null) continue;
     const charge = item.charge;
     if (!charge) continue;
-    const perShot = sumDamage(fit, charge) * attrOr(fit, item, PERF_ATTR.damageMultiplier, 1);
-    const cycle = cycleSeconds(fit, item);
-    if (perShot <= 0 || cycle === null) continue;
+    const shot = shotDamage(fit, item, charge);
+    if (shot === null) continue;
     armed = true;
-    volley += perShot;
-    dps += perShot / cycle;
-    weaponDps += perShot / cycle;
+    volley += shot.perShot;
+    dps += shot.perShot / shot.cycle;
+    weaponDps += shot.perShot / shot.cycle;
   }
 
   for (const drone of fit.drones) {
-    const perShot = sumDamage(fit, drone) * attrOr(fit, drone, PERF_ATTR.damageMultiplier, 1);
-    const cycle = cycleSeconds(fit, drone);
-    if (perShot <= 0 || cycle === null) continue;
+    const shot = shotDamage(fit, drone, drone);
+    if (shot === null) continue;
     armed = true;
-    volley += perShot;
-    dps += perShot / cycle;
-    droneDps += perShot / cycle;
+    volley += shot.perShot;
+    dps += shot.perShot / shot.cycle;
+    droneDps += shot.perShot / shot.cycle;
   }
 
   return armed ? { dps, volley, weaponDps, droneDps } : null;
@@ -561,6 +586,16 @@ function maxTargets(fit: Fit): number | null {
   if (ship === null) return null;
   const character = attrOr(fit, fit.character, PERF_ATTR.maxLockedTargets, 0);
   return Math.floor(character > 0 ? Math.min(ship, character) : ship);
+}
+
+/**
+ * What `shooter` does per shot with `source`'s damage figures (the charge it holds, or the drone
+ * itself), and how many seconds a shot takes. `null` when it deals nothing or has no cycle time.
+ */
+function shotDamage(fit: Fit, shooter: Item, source: Item): { perShot: number; cycle: number } | null {
+  const perShot = sumDamage(fit, source) * attrOr(fit, shooter, PERF_ATTR.damageMultiplier, 1);
+  const cycle = cycleSeconds(fit, shooter);
+  return perShot <= 0 || cycle === null ? null : { perShot, cycle };
 }
 
 /** The four damage attributes of a charge or a drone, summed as its modified values. */

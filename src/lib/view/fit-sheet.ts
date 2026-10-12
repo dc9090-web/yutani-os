@@ -1,5 +1,5 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type WeaponRange,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponDpsWith, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type WeaponRange,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
@@ -117,11 +117,14 @@ export interface EntryView {
  * One kind of ammunition the ship carries, in its weapons or its hold, for the Ammunition panel.
  * `loadedIn` is how many fitted weapons hold it; what the hold has of it is a cargo row. Reach
  * comes from the weapon that holds it, else from the first fitted weapon that would take it,
- * else from the charge itself (`chargeRangeHint`).
+ * else from the charge itself (`chargeRangeHint`). `dps` is what every fitted weapon that takes the
+ * round would do together, all of them loaded with it, so one row compares with the next like for
+ * like; `dpsDesc` names those weapons. Both null for a round nothing fitted can fire.
  */
 export interface AmmoRowView {
   key: string; typeId: number; name: string; desc: string | null;
   loadedIn: number;
+  dps: string | null; dpsDesc: string | null;
   range: RangeCells | null; band: RangeBand | null;
   /** Sort key: reach in metres; ammo nothing fitted can load sorts after by its modifier. */
   order: number;
@@ -446,14 +449,40 @@ function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyM
     return { range: hintCells(hint)!, band: modifierBand(hint.optimal), order: UNLOADABLE_ORDER_BASE * hint.optimal };
   };
 
+  // Damage: every fitted weapon that takes the round, as if each held it, summed; the hover text
+  // counts them by type. Weapons are summed whatever their state — the row says what the round
+  // does in these guns, which is what the pilot is choosing between.
+  const damageOf = (typeId: number): { dps: string; desc: string } | null => {
+    const chargeType = fit.data.types.get(typeId);
+    if (chargeType === undefined) return null;
+    let total = 0;
+    const byWeapon = new Map<string, number>();
+    for (const { item } of fit.modules) {
+      if (hardpointOf(item) === null) continue;
+      const weaponType = fit.data.types.get(item.typeId);
+      if (weaponType === undefined || !chargeFits(weaponType, chargeType)) continue;
+      const dps = weaponDpsWith(fit, item, typeId);
+      if (dps === null) continue;
+      total += dps;
+      const name = weaponType.name ?? `Unknown type (${item.typeId})`;
+      byWeapon.set(name, (byWeapon.get(name) ?? 0) + 1);
+    }
+    if (byWeapon.size === 0) return null;
+    const dps = fmtNum(total, 1);
+    const weapons = [...byWeapon].map(([name, count]) => `${count} × ${name}`).join(", ");
+    return { dps, desc: `${dps} dps from ${weapons} loaded with it` };
+  };
+
   const ammo: AmmoRowView[] = [...ammoTypeIds].map((typeId) => {
     const inWeapons = loaded.get(typeId);
     const reach = inWeapons?.reach ?? unloadedReach(typeId);
+    const damage = damageOf(typeId);
     return {
       key: `ammo:${typeId}`, typeId,
       name: fit.data.types.get(typeId)?.name ?? `Unknown type (${typeId})`,
       desc: descriptions.get(typeId) ?? null,
       loadedIn: inWeapons?.count ?? 0,
+      dps: damage?.dps ?? null, dpsDesc: damage?.desc ?? null,
       range: reach?.range ?? null, band: reach?.band ?? null,
       order: reach?.order ?? Number.MAX_SAFE_INTEGER,
     };

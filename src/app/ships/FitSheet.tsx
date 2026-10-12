@@ -54,7 +54,7 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
     <div className="card">
       <h2 className="card-title">Ammunition</h2>
       <div className="ammo-head" aria-hidden="true">
-        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+        <span>Round</span><span>DPS</span><span>Optimal</span><span>Falloff</span><span>Range</span>
       </div>
       <ul className="entry-list ammo-list">
         {ammo.map((row) => (
@@ -66,6 +66,8 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
                 <span className="sheet-entry-name">{row.name}</span>
               </span>
             </span>
+            {/* What every fitted weapon that takes the round would do with it; a dash for a round nothing fitted fires. */}
+            <span className="num sheet-range dps" data-desc={row.dpsDesc ?? undefined}>{row.dps ?? "—"}</span>
             <RangeCols range={row.range} />
             <RangePill band={row.band} />
           </li>

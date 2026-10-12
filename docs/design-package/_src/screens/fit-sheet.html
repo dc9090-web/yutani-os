@@ -254,11 +254,13 @@
     </div>
 
     <!-- Ammunition panel (FitSheet.tsx AmmoPanel): every round in the weapons or the hold, shortest reach first.
-         No counts here: the hold's rounds are cargo rows below, with a value. Pill: reach vs lock range. -->
+         No counts here: the hold's rounds are cargo rows below, with a value. DPS: what every fitted weapon that
+         takes the round would do with it, summed (hover names the weapons); a dash for a round nothing fitted fires.
+         Pill: reach vs lock range. -->
     <div class="card">
       <h2 class="card-title">Ammunition</h2>
       <div class="ammo-head" aria-hidden="true">
-        <span>Round</span><span>Optimal</span><span>Falloff</span><span>Range</span>
+        <span>Round</span><span>DPS</span><span>Optimal</span><span>Falloff</span><span>Range</span>
       </div>
       <ul class="entry-list ammo-list">
         <li>
@@ -268,6 +270,7 @@
               <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
             </span>
           </span>
+          <span class="num sheet-range dps" data-desc="184.6 dps from 3 × Rapid Light Missile Launcher II loaded with it">184.6</span>
           <span class="num sheet-range opt">38.2 km</span>
           <span class="num sheet-range fall">—</span>
           <span class="range-pill level-2" data-desc="Reaches 38.2 km of this ship's 68.8 km lock range"><i></i><i></i><i></i><span class="range-pill-label">Medium</span></span>

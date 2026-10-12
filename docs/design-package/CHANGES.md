@@ -136,6 +136,11 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   cells, no pills) with a Value column back: a two-cell `.sheet-entry-head` (Item · Value) at the top of the card and a
   ★`.sheet-entry-value` (unit price × quantity, a dash when unpriced) at the right of every row, drones, unknown and
   not-fitted lists included.
+- **Ammunition panel, DPS column** (`fit-sheet.html`, `FitSheet.tsx` `AmmoPanel`): a fifth column between Round and
+  Optimal — `.ammo-head` reads Round · DPS · Optimal · Falloff · Range and the row grid is `1fr 52px 66px 66px 104px`.
+  The cell is a `.sheet-range.dps` (same type as the range cells): what every fitted weapon that takes the round would do
+  with it, all of them loaded, one decimal; hover names the weapons ("184.6 dps from 3 × Rapid Light Missile Launcher II
+  loaded with it"); a dash for a round nothing fitted fires. On a phone it is the first labelled cell of line 2 ("dps").
 - **Range cells** carry `.opt` / `.fall` classes now (the phone layout places and labels them by class, not position).
 - **Consumables panel** (`fit-sheet.html`, `FitSheet.tsx` `ConsumablesPanel`): a card under Ammunition for what the hold
   carries that the ship uses up, ammunition aside — cap booster charges, nanite paste, boosters, command burst charges,
