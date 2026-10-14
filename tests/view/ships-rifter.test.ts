@@ -120,7 +120,18 @@ describe("shipWeapons", () => {
     ]);
   });
 
-  it("is empty for a fit with no turrets or launchers", () => {
+  it("lists modules that reach a target after the weapons, with their range", () => {
+    const built = fitFromAssets(SHIP, [
+      ...CHILDREN,
+      asset({ itemId: 1021, typeId: 5443, locationFlag: "MedSlot0", isSingleton: true }),   // Faint Epsilon Scoped Warp Scrambler
+    ], ctx);
+    expect(shipWeapons(built.fit)).toEqual([
+      { key: "2889:12608", name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
+      { key: "5443:", name: "Faint Epsilon Scoped Warp Scrambler", count: 1, charge: null, range: "range 8.3 km" },
+    ]);
+  });
+
+  it("is empty for a fit with no turrets, launchers or ranged modules", () => {
     const built = fitFromAssets(SHIP, [asset({ itemId: 1003, typeId: 519, locationFlag: "LoSlot0", isSingleton: true })], ctx);
     expect(shipWeapons(built.fit)).toEqual([]);
   });

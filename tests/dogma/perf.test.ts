@@ -6,7 +6,7 @@
 import { describe, it, expect } from "vitest";
 import { ATTR, CATEGORY, EFFECT, State, type AttrId, type TypeId } from "../../src/lib/dogma/data.js";
 import { clearMemo } from "../../src/lib/dogma/calc.js";
-import { PERF_ATTR, PROP_EFFECT, chargeRangeHint, fitPerformance, weaponDps, weaponDpsWith, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
+import { PERF_ATTR, PROP_EFFECT, chargeRangeHint, fitPerformance, moduleRange, weaponDps, weaponDpsWith, weaponRange, weaponRangeWith, type CapStability } from "../../src/lib/dogma/perf.js";
 import { world } from "./synthetic.js";
 import { buildFit } from "./build-fit.js";
 
@@ -67,6 +67,9 @@ const PERF_ATTRS: readonly (readonly [AttrId, string, number, boolean, boolean])
   [567, "speedBoostFactor", 0, true, true],
   [796, "massAddition", 0, true, false],
   [554, "signatureRadiusBonus", 0, true, false],
+  // Not in the rifter snapshot; copied from the live SDE's sde_dogma_attributes.
+  [2044, "falloffEffectiveness", 0, false, true],
+  [142, "ecmBurstRange", 0, true, true],
 ];
 
 type Attrs = readonly (readonly [AttrId, number])[];
@@ -303,6 +306,33 @@ describe("weapon range", () => {
     const empty = buildFit(b.data, b.hull(HULL), { modules: [[launcher, "high", 0]] });
     expect(weaponRangeWith(empty, empty.modules[0].item, fast)).toEqual({ kind: "missile", range: 10_000 });
     expect(empty.modules[0].item.charge).toBeUndefined();
+  });
+});
+
+describe("module range", () => {
+  it("reads a disruptor's optimal and falloffEffectiveness, and a scrambler's optimal alone", () => {
+    const b = bench();
+    const disruptor = b.active([[PERF_ATTR.maxRange, 40_000], [2044, 15_000]]);
+    const scram = b.active([[PERF_ATTR.maxRange, 9_000]]);
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[disruptor, "mid", 0], [scram, "mid", 1]] });
+    expect(fit.modules.map(({ item }) => moduleRange(fit, item))).toEqual([
+      { optimal: 40_000, falloff: 15_000 },
+      { optimal: 9_000, falloff: 0 },
+    ]);
+  });
+
+  it("reads an ECM burst by its radius", () => {
+    const b = bench();
+    const fit = buildFit(b.data, b.hull(HULL), { modules: [[b.active([[142, 6_000]]), "mid", 0]] });
+    expect(moduleRange(fit, fit.modules[0].item)).toEqual({ optimal: 6_000, falloff: 0 });
+  });
+
+  it("is null for a weapon and for a module with no reach", () => {
+    const b = bench();
+    const fit = buildFit(b.data, b.hull(HULL), {
+      modules: [[b.turret([[PERF_ATTR.maxRange, 1200]]), "high", 0], [b.active([]), "mid", 0], [b.active([[PERF_ATTR.maxRange, 0]]), "mid", 1]],
+    });
+    expect(fit.modules.map(({ item }) => moduleRange(fit, item))).toEqual([null, null, null]);
   });
 });
 

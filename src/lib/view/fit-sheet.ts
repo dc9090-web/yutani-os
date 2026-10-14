@@ -1,5 +1,5 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, weaponDpsWith, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type WeaponRange,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, moduleRange, weaponDpsWith, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type ModuleRange, type WeaponRange,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
@@ -85,7 +85,8 @@ export interface ModuleRowView {
   desc: string | null; chargeDesc: string | null;
   /** The charge was loaded by the app from the cargo hold (`assumeCargoAmmo`), not by the pilot. */
   chargeAssumed: boolean;
-  /** Optimal + falloff for a loaded turret, flight range for a loaded launcher; null for anything else. */
+  /** Optimal + falloff for a loaded turret, flight range for a loaded launcher, optimal + falloff for
+   *  a module that reaches out (a disruptor, a web, a neut); null for anything else. */
   range: RangeCells | null;
 }
 export interface SlotColumnView { slot: SlotKind; title: string; used: number; total: number; rows: ModuleRowView[] }
@@ -156,6 +157,11 @@ export function rangeCells(range: WeaponRange | null): RangeCells | null {
   if (range === null) return null;
   if (range.kind === "missile") return { optimal: dist(range.range), falloff: null };
   return { optimal: dist(range.optimal), falloff: range.falloff > 1 ? dist(range.falloff) : null };
+}
+/** A non-weapon module's reach as the two cells; a module with no falloff (a scrambler) shows the dash. */
+export function moduleRangeCells(range: ModuleRange | null): RangeCells | null {
+  if (range === null) return null;
+  return { optimal: dist(range.optimal), falloff: range.falloff > 0 ? dist(range.falloff) : null };
 }
 /** Unloadable ammo as the two cells: a missile's own range, or a turret charge's multipliers. */
 export function hintCells(hint: ChargeRangeHint | null): RangeCells | null {
@@ -362,7 +368,8 @@ function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number,
     desc: descriptions.get(stat.item.typeId) ?? null,
     chargeDesc: stat.item.charge === undefined ? null : descriptions.get(stat.item.charge.typeId) ?? null,
     chargeAssumed: stat.item.charge?.assumed === true,
-    range: stat.item.charge === undefined ? null : rangeCells(weaponRange(fit, stat.item)),
+    range: hardpointOf(stat.item) === null ? moduleRangeCells(moduleRange(fit, stat.item))
+      : stat.item.charge === undefined ? null : rangeCells(weaponRange(fit, stat.item)),
     state: stateLabel(stat.state),
   };
 }

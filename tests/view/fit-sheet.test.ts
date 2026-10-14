@@ -236,6 +236,16 @@ describe("buildFitSheet", () => {
     expect(built.fit.modules[0].item.charge).toBeUndefined();
   });
 
+  it("shows the reach of a module that is not a weapon, with a dash for a falloff it has none of", () => {
+    const built = fitFromAssets(SHIP, [
+      asset({ itemId: 1061, typeId: 5443, locationFlag: "MedSlot0", isSingleton: true }),   // Faint Epsilon Scoped Warp Scrambler
+    ], ctx);
+    const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });
+    const scram = view.slots.find((c) => c.slot === "mid")!.rows[0];
+    expect(scram.charge).toBeNull();
+    expect(scram.range).toEqual({ optimal: "8.3 km", falloff: null });   // 8,250 m, no falloff
+  });
+
   it("describes turret ammo on an unarmed hull by what it does to a gun's range", () => {
     const built = fitFromAssets(SHIP, [asset({ itemId: 1005, typeId: 12608, locationFlag: "Cargo", quantity: 1000 })], ctx);
     const view = sheet({ built, stats: fitStats(built.fit), problems: validateFit(built.fit), perf: fitPerformance(built.fit) });

@@ -7,8 +7,8 @@ import type { FittingRow } from "../db/character-fittings.js";
 import {
   CATEGORY, fitFromAssets, fitFromFitting, fitStats, validateFit,
   type BuiltFit, type DogmaData, type FitContext, type FitStats, type Problem,
-  assumeCargoAmmo, fitPerformance, hardpointOf, weaponRange,
-  type AssumedAmmo, type ChargeRangeHint, type Fit, type FitPerformance, type WeaponRange,
+  assumeCargoAmmo, fitPerformance, hardpointOf, moduleRange, weaponRange,
+  type AssumedAmmo, type ChargeRangeHint, type Fit, type FitPerformance, type ModuleRange, type WeaponRange,
 } from "../dogma/index.js";
 import { iskShort, rollUpValue, unpricedNote, type Price, type ValuedEntry } from "./price.js";
 import { clock, grouped } from "./format.js";
@@ -24,6 +24,12 @@ export function rangeText(range: WeaponRange | null): string | null {
   if (range === null) return null;
   if (range.kind === "missile") return `range ${dist(range.range)}`;
   return range.falloff > 1 ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `optimal ${dist(range.optimal)}`;
+}
+
+/** "optimal 40.0 km · falloff 15.0 km" for a disruptor or a web, "range 8.3 km" for a module with no falloff (a scrambler). */
+export function moduleRangeText(range: ModuleRange | null): string | null {
+  if (range === null) return null;
+  return range.falloff > 0 ? `optimal ${dist(range.optimal)} · falloff ${dist(range.falloff)}` : `range ${dist(range.optimal)}`;
 }
 
 /** "+60%" / "−50%" for a range multiplier. */
@@ -45,11 +51,20 @@ export function hintText(hint: ChargeRangeHint | null): string | null {
 /** One line of a ship card's weapons list: identical weapon + charge pairs are counted together. */
 export interface ShipWeaponView { key: string; name: string; count: number; charge: string | null; range: string | null }
 
-/** The fit's turrets and launchers in slot order, grouped by weapon type and loaded charge. */
+/**
+ * The fit's turrets and launchers in slot order, grouped by weapon type and loaded charge, then every
+ * other module that reaches out to a target (a disruptor, a scrambler, a web, a neut) with its range.
+ */
 export function shipWeapons(fit: Fit): ShipWeaponView[] {
+  return [...shipModuleLines(fit, true), ...shipModuleLines(fit, false)];
+}
+
+function shipModuleLines(fit: Fit, weapons: boolean): ShipWeaponView[] {
   const out = new Map<string, ShipWeaponView>();
   for (const { item } of fit.modules) {
-    if (hardpointOf(item) === null) continue;
+    if ((hardpointOf(item) !== null) !== weapons) continue;
+    const range = weapons ? rangeText(weaponRange(fit, item)) : moduleRangeText(moduleRange(fit, item));
+    if (!weapons && range === null) continue;
     const chargeId = item.charge?.typeId ?? null;
     const key = `${item.typeId}:${chargeId ?? ""}`;
     const seen = out.get(key);
@@ -59,7 +74,7 @@ export function shipWeapons(fit: Fit): ShipWeaponView[] {
       name: fit.data.types.get(item.typeId)?.name ?? `Unknown type (${item.typeId})`,
       count: 1,
       charge: chargeId === null ? null : fit.data.types.get(chargeId)?.name ?? `Unknown type (${chargeId})`,
-      range: rangeText(weaponRange(fit, item)),
+      range,
     });
   }
   return [...out.values()];

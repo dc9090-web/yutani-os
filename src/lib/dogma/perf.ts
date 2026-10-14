@@ -252,6 +252,40 @@ export function weaponRange(fit: Fit, weapon: Item): WeaponRange | null {
   return null;
 }
 
+/** How far a module that is not a weapon reaches. Metres; `falloff` is 0 for a module with none. */
+export interface ModuleRange { optimal: number; falloff: number }
+
+/**
+ * The range of a module that is not a weapon — a warp disruptor or scrambler, a web, a weapon or
+ * sensor disruptor, ECM, a target painter, a neut — as the module's show-info gives it: optimal
+ * plus `falloffEffectiveness`. A handful of modules spell their reach differently (an ECM burst's
+ * radius, a cargo or ship scanner, a micro jump drive's jump) and are read through the same lens.
+ * Read through `getAttr`, so a hull's range bonus, a script and overheating are folded in. `null`
+ * for a weapon (that is `weaponRange`'s question) and for a module the SDE gives no reach.
+ */
+export function moduleRange(fit: Fit, item: Item): ModuleRange | null {
+  if (hardpointOf(item) !== null) return null;
+  const carried = (attrId: AttrId): boolean => fit.data.attributes.has(attrId) && item.attrs.has(attrId);
+  const optimalAttr = MODULE_RANGE_ATTRS.find(carried);
+  if (optimalAttr === undefined) return null;
+  const optimal = getAttr(fit, item, optimalAttr);
+  if (optimal <= 0) return null;
+  const falloffAttr = MODULE_FALLOFF_ATTRS.find(carried);
+  return { optimal, falloff: falloffAttr === undefined ? 0 : Math.max(0, getAttr(fit, item, falloffAttr)) };
+}
+// Verified by name against the live SDE (sde_dogma_attributes), 2026-10-14.
+const MODULE_RANGE_ATTRS: readonly AttrId[] = [
+  PERF_ATTR.maxRange,
+  142,   // ecmBurstRange
+  126,   // cargoScanRange
+  125,   // shipScanRange
+  2066,  // mjdJumpRange
+];
+const MODULE_FALLOFF_ATTRS: readonly AttrId[] = [
+  2044,  // falloffEffectiveness
+  510,   // shipScanFalloff
+];
+
 /**
  * What a charge says about range by itself, for ammo in the hold that nothing fitted can load. A
  * missile flies `maxVelocity x explosionDelay` wherever it is launched from, and the missile skills
