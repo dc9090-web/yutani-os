@@ -127,8 +127,36 @@ export interface AmmoRowView {
   loadedIn: number;
   dps: string | null; dpsDesc: string | null;
   range: RangeCells | null; band: RangeBand | null;
+  /** The damage types the round deals, most first; `desc` gives each one's share. */
+  damage: { types: DamageTypeView[]; desc: string } | null;
   /** Sort key: reach in metres; ammo nothing fitted can load sorts after by its modifier. */
   order: number;
+}
+
+export type DamageKind = "em" | "thermal" | "kinetic" | "explosive";
+export interface DamageTypeView { kind: DamageKind; label: string; share: number }
+
+/** em, thermal, kinetic, explosive: the charge's damage attributes, in EVE's order. */
+const DAMAGE_TYPES: readonly { kind: DamageKind; label: string; attrId: number }[] = [
+  { kind: "em", label: "EM", attrId: 114 },
+  { kind: "thermal", label: "Thermal", attrId: 118 },
+  { kind: "kinetic", label: "Kinetic", attrId: 117 },
+  { kind: "explosive", label: "Explosive", attrId: 116 },
+];
+/**
+ * A round's damage split from its own type attributes, unmodified: what the round is, not what this
+ * ship's bonuses make of it (a kinetic-bonused hull would otherwise tilt a mixed round). Types that
+ * deal nothing are left out; the largest comes first, ties in EVE's order. `null` for no damage.
+ */
+export function damageMix(attrs: ReadonlyMap<number, number>): { types: DamageTypeView[]; desc: string } | null {
+  const amounts = DAMAGE_TYPES.map((t) => ({ ...t, amount: attrs.get(t.attrId) ?? 0 })).filter((t) => t.amount > 0);
+  const total = amounts.reduce((sum, t) => sum + t.amount, 0);
+  if (total <= 0) return null;
+  const types = amounts
+    .map(({ kind, label, amount }) => ({ kind, label, share: amount / total }))
+    .sort((a, b) => b.share - a.share);
+  const desc = types.map((t) => `${t.label} ${Math.round(t.share * 100)}%`).join(" · ") + ` of ${fmtNum(total, 1)} base damage per shot`;
+  return { types, desc };
 }
 
 const BAND_ABSOLUTE_SHORT_M = 10_000;
@@ -491,6 +519,7 @@ function ammoRows(built: BuiltFit, perf: FitPerformance, descriptions: ReadonlyM
       loadedIn: inWeapons?.count ?? 0,
       dps: damage?.dps ?? null, dpsDesc: damage?.desc ?? null,
       range: reach?.range ?? null, band: reach?.band ?? null,
+      damage: damageMix(fit.data.types.get(typeId)?.attrs ?? new Map()),
       order: reach?.order ?? Number.MAX_SAFE_INTEGER,
     };
   });

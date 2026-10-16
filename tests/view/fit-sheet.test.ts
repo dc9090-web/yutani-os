@@ -157,6 +157,12 @@ describe("range bands", () => {
       ["ammo:12608", "Hail S", 1, 4857],                     // 600 + 4,257 m in the gun
       ["ammo:27339", "Caldari Navy Mjolnir Torpedo", 0, 12_960],
     ]);
+    // Each round's damage types from its own attributes, most first.
+    expect(view.ammo.map((e) => e.damage?.types.map((t) => [t.kind, Math.round(t.share * 100)]))).toEqual([
+      [["explosive", 79], ["kinetic", 21]],               // Hail S: 13.9 explosive, 3.8 kinetic
+      [["em", 100]],                                      // Mjolnir: all EM
+    ]);
+    expect(view.ammo[0].damage?.desc).toBe("Explosive 79% · Kinetic 21% of 17.7 base damage per shot");
     // A round only loaded in the weapons is not a cargo row; the torpedo is.
     expect(view.cargo.map((e) => [e.name, e.quantity])).toEqual([["Caldari Navy Mjolnir Torpedo", 10]]);
   });

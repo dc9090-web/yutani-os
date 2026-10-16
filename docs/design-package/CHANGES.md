@@ -141,6 +141,11 @@ Removed from the design (but left in the stylesheet): `.logo-text`, `.wordmark`,
   The cell is a `.sheet-range.dps` (same type as the range cells): what every fitted weapon that takes the round would do
   with it, all of them loaded, one decimal; hover names the weapons ("184.6 dps from 3 × Rapid Light Missile Launcher II
   loaded with it"); a dash for a round nothing fitted fires. On a phone it is the first labelled cell of line 2 ("dps").
+- **Ammunition panel, damage types** (`fit-sheet.html`, `FitSheet.tsx` `DamageTypes`): under each round's name a
+  `.damage-types` line (`.ammo-text` is now a column) lists the damage the round deals, largest first, each a
+  `.damage-type.<em|thermal|kinetic|explosive>` with a Tabler glyph (bolt, flame, meteor, bomb) and the word, coloured
+  like the Defense resist heads. The split comes from the charge's own attributes, not this ship's bonuses; the
+  shares ("Explosive 79% · Kinetic 21% of 17.7 base damage per shot") lead the round's hover text.
 - **Range cells** carry `.opt` / `.fall` classes now (the phone layout places and labels them by class, not position).
 - **Consumables panel** (`fit-sheet.html`, `FitSheet.tsx` `ConsumablesPanel`): a card under Ammunition for what the hold
   carries that the ship uses up, ammunition aside — cap booster charges, nanite paste, boosters, command burst charges,

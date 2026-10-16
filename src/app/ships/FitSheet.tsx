@@ -1,5 +1,5 @@
-import { IconTargetOff } from "@tabler/icons-react";
-import type { FitSheetView, AmmoRowView, ConsumableRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
+import { IconBolt, IconFlame, IconMeteor, IconBomb, IconTargetOff, type Icon } from "@tabler/icons-react";
+import type { FitSheetView, AmmoRowView, DamageKind, ConsumableRowView, EntryView, RangeBand, RangeCells } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Gauge } from "./Gauge.js";
 import { ShipStats } from "./ShipStats.js";
@@ -48,6 +48,21 @@ function EntryList({ entries, icons = true }: { entries: EntryView[]; icons?: bo
   );
 }
 
+const DAMAGE_ICON: Record<DamageKind, Icon> = { em: IconBolt, thermal: IconFlame, kinetic: IconMeteor, explosive: IconBomb };
+
+/** The round's damage types under its name, most first, each an icon and word in the resist table's colours; the shares are in the round's hover text. */
+function DamageTypes({ damage }: { damage: AmmoRowView["damage"] }) {
+  if (damage === null) return null;
+  return (
+    <span className="damage-types">
+      {damage.types.map(({ kind, label }) => {
+        const Glyph = DAMAGE_ICON[kind];
+        return <span key={kind} className={`damage-type ${kind}`}><Glyph size={11} stroke={2} aria-hidden="true" />{label}</span>;
+      })}
+    </span>
+  );
+}
+
 /** Every round the ship carries, in its weapons or its hold, shortest reach first; how many is the cargo list's business. */
 function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
   return (
@@ -59,11 +74,12 @@ function AmmoPanel({ ammo }: { ammo: AmmoRowView[] }) {
       <ul className="entry-list ammo-list">
         {ammo.map((row) => (
           <li key={row.key}>
-            <span className="sheet-entry" data-desc={row.desc ?? undefined}>
+            <span className="sheet-entry" data-desc={[row.damage?.desc, row.desc].filter(Boolean).join("\n\n") || undefined}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="module-icon" src={`https://images.evetech.net/types/${row.typeId}/icon?size=32`} alt="" />
               <span className="ammo-text">
                 <span className="sheet-entry-name">{row.name}</span>
+                <DamageTypes damage={row.damage} />
               </span>
             </span>
             {/* What every fitted weapon that takes the round would do with it; a dash for a round nothing fitted fires. */}

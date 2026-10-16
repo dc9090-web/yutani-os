@@ -256,7 +256,8 @@
     <!-- Ammunition panel (FitSheet.tsx AmmoPanel): every round in the weapons or the hold, shortest reach first.
          No counts here: the hold's rounds are cargo rows below, with a value. DPS: what every fitted weapon that
          takes the round would do with it, summed (hover names the weapons); a dash for a round nothing fitted fires.
-         Pill: reach vs lock range. -->
+         Pill: reach vs lock range. Under the name: the round's damage types, most first (icon + word in the resist
+         table's colours: EM bolt, Thermal flame, Kinetic meteor, Explosive bomb); the shares lead the round's hover text. -->
     <div class="card">
       <h2 class="card-title">Ammunition</h2>
       <div class="ammo-head" aria-hidden="true">
@@ -264,10 +265,11 @@
       </div>
       <ul class="entry-list ammo-list">
         <li>
-          <span class="sheet-entry" data-desc="Caldari Navy Scourge Light Missile — Light Missile">
+          <span class="sheet-entry" data-desc="Kinetic 100% of 101.3 base damage per shot&#10;&#10;Caldari Navy Scourge Light Missile — Light Missile">
             <img class="module-icon" src="https://images.evetech.net/types/27361/icon?size=32" alt="">
             <span class="ammo-text">
               <span class="sheet-entry-name">Caldari Navy Scourge Light Missile</span>
+              <span class="damage-types"><span class="damage-type kinetic"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3l-5 9h5l-6.891 7.086a6.5 6.5 0 1 1 -8.855 -9.506l7.746 -6.58l-1 5l9 -5"/><path d="M7 14.5a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0 -5 0"/></svg>Kinetic</span></span>
             </span>
           </span>
           <span class="num sheet-range dps" data-desc="184.6 dps from 3 × Rapid Light Missile Launcher II loaded with it">184.6</span>

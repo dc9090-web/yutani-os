@@ -56,7 +56,7 @@ const view: FitSheetView = {
     { kind: "skill", label: "Skill", text: "200mm AutoCannon II — Small Autocannon Specialization I required" },
   ],
   missing: [{ skillTypeId: 3329, name: "Minmatar Frigate", have: 0, need: 1 }],
-  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, dps: "21.7", dpsDesc: "21.7 dps from 1 × 200mm AutoCannon II loaded with it", range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, order: 4857 }],
+  ammo: [{ key: "ammo:12608", typeId: 12608, name: "Hail S", desc: "Hail is an attempt to combine penetration with versatility.", loadedIn: 1, dps: "21.7", dpsDesc: "21.7 dps from 1 × 200mm AutoCannon II loaded with it", range: { optimal: "600 m", falloff: "4.3 km" }, band: { label: "Short", level: 1, beyond: false, desc: "Reaches 4.9 km of this ship's 22.5 km lock range" }, damage: { types: [{ kind: "explosive", label: "Explosive", share: 0.7 }, { kind: "kinetic", label: "Kinetic", share: 0.3 }], desc: "Explosive 70% · Kinetic 30% of 17.7 base damage per shot" }, order: 4857 }],
   consumables: [
     { key: "consumable:32006", typeId: 32006, name: "Navy Cap Booster 400", desc: "Provides a quick injection of power into your capacitor.", kind: "capBooster", effect: "+400 GJ per charge", use: "Small Capacitor Booster II, 1 per load" },
     { key: "consumable:28668", typeId: 28668, name: "Nanite Repair Paste", desc: null, kind: "paste", effect: "Overheat repair", use: null },
@@ -140,6 +140,14 @@ describe("FitSheet", () => {
     expect(container.querySelector(".ammo-head")).toHaveTextContent("RoundDPSOptimalFalloffRange");
     const row = container.querySelector(".ammo-list li")!;
     expect(row.querySelector(".sheet-entry-name")).toHaveTextContent("Hail S");
+    // Under the name, the damage types most first, each with its icon and its colour class; the shares lead the hover text.
+    expect([...row.querySelectorAll(".damage-type")].map((t) => [t.className, t.textContent, t.querySelector("svg") !== null])).toEqual([
+      ["damage-type explosive", "Explosive", true], ["damage-type kinetic", "Kinetic", true],
+    ]);
+    expect(row.querySelector(".sheet-entry")).toHaveAttribute("data-desc", "Explosive 70% · Kinetic 30% of 17.7 base damage per shot\n\nHail is an attempt to combine penetration with versatility.");
+    const harmless = render(<FitSheet view={{ ...view, ammo: [{ ...view.ammo[0], damage: null }] }} />).container.querySelector(".ammo-list li")!;
+    expect(harmless.querySelector(".damage-types")).toBeNull();
+    expect(harmless.querySelector(".sheet-entry")).toHaveAttribute("data-desc", "Hail is an attempt to combine penetration with versatility.");
     // No count here: how many rounds the hold has is the cargo list's business.
     expect(row.querySelector(".sheet-entry-qty")).toBeNull();
     expect(row).not.toHaveTextContent("1,000");

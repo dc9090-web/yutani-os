@@ -400,7 +400,12 @@ body {
 .ammo-head span:not(:first-child) { text-align: right; }
 .card .ammo-head { font-size: 8px; letter-spacing: 1px; }   /* the narrow columns: tighter than the other column heads */
 /* One line per round: the name never wraps, and the three narrow columns leave it the room. */
-.ammo-text { display: flex; align-items: center; min-width: 0; }
+.ammo-text { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+/* Under the round's name: its damage types, most first, in the resist table's colours. */
+.damage-types { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-top: 1px; font-size: 10px; line-height: 1.3; }
+.damage-type { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.damage-type.em { color: var(--accent); } .damage-type.thermal { color: var(--neg); }
+.damage-type.kinetic { color: var(--muted); } .damage-type.explosive { color: var(--warn); }
 .ammo-list .sheet-entry-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* The Consumables panel: the item, what it does and how this ship uses it, three columns under a head like the ammo list's. */
 .entry-list.consumable-list li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 0.9fr); gap: 12px; align-items: center; padding: 5px 0; }
