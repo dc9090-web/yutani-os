@@ -106,32 +106,46 @@ export default async function SkillsPage() {
   return (<>
     <h1 className="page-title">Skills</h1>
     <p className="page-sub">{character.name}</p>
-    <div className="card-stack">
-      <SkillSummaryCard
-        totalSp={summary === null ? null : sp(summary.totalSp)}
-        unallocatedSp={summary?.unallocatedSp == null ? null : sp(summary.unallocatedSp)}
-        attributes={attributes === null ? [] : attributeViews(attributes, implantAttributes)}
-      />
-      <TrainingOverview characters={overview} />
-      <div className="card">
-        <SkillTabs
-          queue={<>
-            {entries.length > 0 ? (
-              <QueueCountdown
-                finishAt={finalFinish === null ? null : finalFinish.getTime()}
-                initial={queueEtaMs === null ? "—" : countdown(queueEtaMs)}
-              />
-            ) : null}
-            <QueueTable entries={entries} />
-          </>}
-          trained={<TrainedSkills groups={groupProps} />}
-        />
-      </div>
-      <PlansCard
-        characterId={character.id}
-        plans={planRows}
-        templates={templates.map((t) => ({ id: t.id, name: t.name ?? `Plan ${t.id}` }))}
-      />
-    </div>
+    <SkillTabs tabs={[
+      {
+        id: "skills", label: "Skills",
+        content: (
+          <div className="card-stack">
+            <SkillSummaryCard
+              totalSp={summary === null ? null : sp(summary.totalSp)}
+              unallocatedSp={summary?.unallocatedSp == null ? null : sp(summary.unallocatedSp)}
+              attributes={attributes === null ? [] : attributeViews(attributes, implantAttributes)}
+            />
+            <div className="card">
+              <h2 className="card-title">Trained skills</h2>
+              <TrainedSkills groups={groupProps} />
+            </div>
+          </div>
+        ),
+      },
+      {
+        id: "training", label: "Training",
+        content: (
+          <div className="card-stack">
+            <div className="card">
+              <h2 className="card-title">Training queue</h2>
+              {entries.length > 0 ? (
+                <QueueCountdown
+                  finishAt={finalFinish === null ? null : finalFinish.getTime()}
+                  initial={queueEtaMs === null ? "—" : countdown(queueEtaMs)}
+                />
+              ) : null}
+              <QueueTable entries={entries} />
+            </div>
+            <PlansCard
+              characterId={character.id}
+              plans={planRows}
+              templates={templates.map((t) => ({ id: t.id, name: t.name ?? `Plan ${t.id}` }))}
+            />
+          </div>
+        ),
+      },
+      { id: "multiview", label: "Multiview", content: <TrainingOverview characters={overview} /> },
+    ]} />
   </>);
 }

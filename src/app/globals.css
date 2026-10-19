@@ -781,3 +781,7 @@ a:not([class]) { color: var(--accent-2); }
 .tq-empty { margin: 6px 0; font-size: 12px; }
 .tq-more { margin: 4px 0 0; font-size: 11px; color: var(--faint); }
 .tq-more a { color: var(--accent-2); }
+
+/* ---------- Skills page tabs ---------- */
+.page-tabs { margin: -12px 0 20px; }
+.page-tabs .combat-tab { padding: 10px 20px; font-size: 10px; }
