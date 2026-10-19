@@ -38,3 +38,15 @@ export function pickActive<T extends { id: number }>(characters: T[], activeId: 
 export function overviewCharacters<T extends { id: number }>(characters: readonly T[], ids: ReadonlySet<number>): T[] {
   return ids.size === 0 ? [...characters] : characters.filter((c) => ids.has(c.id));
 }
+
+/**
+ * The Skills page's Multiview tab: the saved list in its saved order (characters since removed are
+ * skipped), or the Overview's set when nothing has been saved yet.
+ */
+export function multiviewCharacters<T extends { id: number }>(
+  characters: readonly T[], saved: readonly number[], overviewIds: ReadonlySet<number>,
+): T[] {
+  if (saved.length === 0) return overviewCharacters(characters, overviewIds);
+  const byId = new Map(characters.map((c) => [c.id, c]));
+  return saved.flatMap((id) => byId.get(id) ?? []);
+}

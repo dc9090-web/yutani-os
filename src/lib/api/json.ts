@@ -22,6 +22,17 @@ export function parseTagIds(body: unknown): number[] | null {
   }
   return ids;
 }
+/** `{ characterIds: number[] }` — positive integers, no repeats, order kept; null on anything else. */
+export function parseCharacterIds(body: unknown): number[] | null {
+  const raw = (body as { characterIds?: unknown } | null)?.characterIds;
+  if (!Array.isArray(raw) || raw.length > 100) return null;
+  const ids = new Set<number>();
+  for (const v of raw) {
+    if (typeof v !== "number" || !Number.isInteger(v) || v <= 0 || ids.has(v)) return null;
+    ids.add(v);
+  }
+  return [...ids];
+}
 export function parseAccountId(body: unknown): number | null | undefined {
   if (!body || typeof body !== "object" || !("accountId" in body)) return undefined;
   const v = (body as { accountId: unknown }).accountId;

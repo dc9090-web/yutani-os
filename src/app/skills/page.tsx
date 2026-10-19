@@ -3,9 +3,10 @@ import { listCharacters } from "../../lib/db/characters.js";
 import { getAttributes, getSkillSummary, listSkillQueue, listSkills } from "../../lib/db/character-skills.js";
 import { listImplants } from "../../lib/db/character-clones.js";
 import { listPlans } from "../../lib/db/skill-plans.js";
+import { listMultiview } from "../../lib/db/multiview.js";
 import { getGroups, getTypeAttributes, getTypes, listCareerPlans } from "../../lib/sde/repo.js";
 import { summarisePlans } from "../../lib/skills/load.js";
-import { overviewCharacters, pickActive } from "../../lib/view/characters.js";
+import { multiviewCharacters, pickActive } from "../../lib/view/characters.js";
 import { getConfig } from "../../lib/config.js";
 import { countdown, duration, sp, stamp, typeDescription } from "../../lib/view/format.js";
 import { attributeViews, groupSkills, liveQueue, queueProgress } from "../../lib/view/skills.js";
@@ -26,7 +27,7 @@ export default async function SkillsPage() {
   if (character === null) return <NoCharacter title="Skills" />;
 
   const now = new Date();
-  const [summary, attributes, storedQueue, skills, implantIds, storedPlans, templates] = await Promise.all([
+  const [summary, attributes, storedQueue, skills, implantIds, storedPlans, templates, multiview] = await Promise.all([
     getSkillSummary(character.id),
     getAttributes(character.id),
     listSkillQueue(character.id),
@@ -34,12 +35,13 @@ export default async function SkillsPage() {
     listImplants(character.id),
     listPlans(character.id),
     listCareerPlans(),
+    listMultiview(),
   ]);
   const queue = liveQueue(storedQueue, now);
 
-  // The Training overview reads each configured character's queue, summary (synced or not) and
+  // The Multiview tab reads each chosen character's queue, summary (synced or not) and
   // online flag — three repo reads per character, all in flight together, like the Overview page.
-  const others = await Promise.all(overviewCharacters(characters, getConfig().overviewCharacterIds).map(async (c) => {
+  const others = await Promise.all(multiviewCharacters(characters, multiview, getConfig().overviewCharacterIds).map(async (c) => {
     const [otherQueue, otherSummary, location] = c.id === character.id
       ? [storedQueue, summary, await getLocation(c.id)]
       : await Promise.all([listSkillQueue(c.id), getSkillSummary(c.id), getLocation(c.id)]);
@@ -145,7 +147,7 @@ export default async function SkillsPage() {
           </div>
         ),
       },
-      { id: "multiview", label: "Multiview", content: <TrainingOverview characters={overview} /> },
+      { id: "multiview", label: "Multiview", content: <TrainingOverview characters={overview} all={characters.map((c) => ({ id: c.id, name: c.name }))} /> },
     ]} />
   </>);
 }

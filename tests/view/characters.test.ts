@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { groupByAccount, portraitUrl, toCharacterView, pickActive, overviewCharacters } from "../../src/lib/view/characters.js";
+import { groupByAccount, portraitUrl, toCharacterView, pickActive, overviewCharacters, multiviewCharacters } from "../../src/lib/view/characters.js";
 
 const c = (id: number, accountId: number | null) => ({ id, name: `c${id}`, accountId, corporationName: null, allianceName: null, tokenStatus: "ok" as const });
 
@@ -62,5 +62,18 @@ describe("overviewCharacters", () => {
   });
   it("shows everyone when no list is configured", () => {
     expect(overviewCharacters([c(1, null), c(2, null)], new Set()).map((x) => x.id)).toEqual([1, 2]);
+  });
+});
+
+describe("multiviewCharacters", () => {
+  const all = [c(1, null), c(2, null), c(3, null)];
+  it("uses the saved list in its saved order", () => {
+    expect(multiviewCharacters(all, [3, 1], new Set([2])).map((x) => x.id)).toEqual([3, 1]);
+  });
+  it("skips saved ids whose character is gone", () => {
+    expect(multiviewCharacters(all, [9, 2], new Set()).map((x) => x.id)).toEqual([2]);
+  });
+  it("falls back to the overview set when nothing is saved", () => {
+    expect(multiviewCharacters(all, [], new Set([3, 2])).map((x) => x.id)).toEqual([2, 3]);
   });
 });

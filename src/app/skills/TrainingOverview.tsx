@@ -1,6 +1,7 @@
 import { portraitUrl } from "../../lib/view/characters.js";
 import type { TrainingQueueView } from "../../lib/view/training-overview.js";
 import { LevelBoxes } from "./QueueTable.js";
+import { MultiviewEditor } from "./MultiviewEditor.js";
 
 function Status({ view }: { view: TrainingQueueView }) {
   switch (view.status.kind) {
@@ -53,15 +54,25 @@ function QueueCard({ view }: { view: TrainingQueueView }) {
 /**
  * Every authorised character's training queue side by side (design hand-back 2026-10-01,
  * `TrainingOverview.tsx`): portrait, name, time to the end of the queue, the head skill's
- * progress, then the first twenty entries with level boxes and time remaining.
+ * progress, then the first twenty entries with level boxes and time remaining. With `all`, an Edit
+ * button lets the user pick which characters show and in what order (`MultiviewEditor`).
  */
-export function TrainingOverview({ characters }: { characters: TrainingQueueView[] }) {
+export function TrainingOverview({ characters, all }: {
+  characters: TrainingQueueView[];
+  /** Every stored character, for the edit mode's picker; leave out for a read-only card. */
+  all?: { id: number; name: string }[];
+}) {
+  const grid = (
+    <div className="tq-grid">
+      {characters.map((view) => <QueueCard key={view.id} view={view} />)}
+    </div>
+  );
   return (
     <div className="card">
       <h2 className="card-title">Training overview</h2>
-      <div className="tq-grid">
-        {characters.map((view) => <QueueCard key={view.id} view={view} />)}
-      </div>
+      {all === undefined ? grid : (
+        <MultiviewEditor all={all} selected={characters.map((c) => c.id)}>{grid}</MultiviewEditor>
+      )}
     </div>
   );
 }

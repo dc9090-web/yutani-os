@@ -399,3 +399,10 @@ CREATE TABLE IF NOT EXISTS character_tag_map (
   tag_id        int NOT NULL REFERENCES character_tags(id) ON DELETE CASCADE,
   PRIMARY KEY (character_id, tag_id)
 );
+
+-- The Skills page's Multiview tab: which characters it shows, in this order. Empty means "not set
+-- up yet" and the tab falls back to OVERVIEW_CHARACTER_IDS.
+CREATE TABLE IF NOT EXISTS multiview_characters (
+  character_id  bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
+  position      int NOT NULL
+);
