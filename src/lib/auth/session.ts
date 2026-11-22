@@ -2,10 +2,11 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 
 export const SESSION_COOKIE = "eve_session";
 export const OAUTH_COOKIE = "eve_oauth";
+export const GOOGLE_OAUTH_COOKIE = "eve_goauth";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 30;
 export const OAUTH_MAX_AGE = 600;
-export interface SessionPayload { activeCharacterId: number | null; iat: number }
-export interface OauthPayload { state: string; verifier: string; iat: number }
+export interface SessionPayload { sub: string; email: string; activeCharacterId: number | null; iat: number }
+export interface OauthPayload { state: string; verifier: string; nonce?: string; iat: number }
 
 const mac = (data: string, secret: string) => createHmac("sha256", secret).update(data).digest("base64url");
 
@@ -27,6 +28,19 @@ export function verifyPayload<T>(token: string | undefined, secret: string, maxA
   } catch { return null; }
 }
 
+const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.length > 0;
+
+/** A session is a signed cookie that names a Google account. A cookie from before Google sign-in (no `sub`) is signed out. */
+export function verifySession(token: string | undefined, secret: string, now = Math.floor(Date.now() / 1000)): SessionPayload | null {
+  const payload = verifyPayload<Partial<SessionPayload>>(token, secret, SESSION_MAX_AGE, now);
+  if (!payload || !nonEmpty(payload.sub) || !nonEmpty(payload.email)) return null;
+  return payload as SessionPayload;
+}
+
+export function withActiveCharacter(session: SessionPayload, activeCharacterId: number | null, now = Math.floor(Date.now() / 1000)): SessionPayload {
+  return { sub: session.sub, email: session.email, activeCharacterId, iat: now };
+}
+
 export function cookieOptions(maxAge: number) {
   return { httpOnly: true as const, sameSite: "lax" as const, secure: process.env.NODE_ENV === "production", path: "/" as const, maxAge };
 }
@@ -35,5 +49,5 @@ export async function readSession(): Promise<SessionPayload | null> {
   const { cookies } = await import("next/headers");
   const { getConfig } = await import("../config.js");
   const jar = await cookies();
-  return verifyPayload<SessionPayload>(jar.get(SESSION_COOKIE)?.value, getConfig().sessionSecret, SESSION_MAX_AGE);
+  return verifySession(jar.get(SESSION_COOKIE)?.value, getConfig().sessionSecret);
 }

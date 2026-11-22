@@ -5,10 +5,10 @@ import { SESSION_COOKIE, signPayload } from "../src/lib/auth/session.js";
 
 describe("isPublicPath", () => {
   it("allows login, auth, health, static", () => {
-    for (const p of ["/login", "/auth/start", "/auth/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/icon.svg", "/eve-mark.svg", "/yutani/wordmark-white.png", "/yutani/kana-white.png"]) expect(isPublicPath(p)).toBe(true);
+    for (const p of ["/login", "/auth/google/start", "/auth/google/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/icon.svg", "/eve-mark.svg", "/yutani/wordmark-white.png", "/yutani/kana-white.png"]) expect(isPublicPath(p)).toBe(true);
   });
   it("guards everything else", () => {
-    for (const p of ["/", "/settings", "/yutani", "/yutanix/x.png", "/api/accounts", "/ships/1", "/login-history", "/api/healthz"]) expect(isPublicPath(p)).toBe(false);
+    for (const p of ["/", "/settings", "/yutani", "/yutanix/x.png", "/api/accounts", "/ships/1", "/login-history", "/api/healthz", "/auth/start", "/auth/callback?code=1", "/auth/googlex", "/auth/switch"]) expect(isPublicPath(p)).toBe(false);
   });
 
   it("guards the wallet JSON route like every other API route", () => {
@@ -32,11 +32,18 @@ describe("proxy", () => {
 
   it("passes through with a valid signed session cookie", () => {
     process.env.SESSION_SECRET = "s".repeat(32);
-    const cookie = signPayload({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET);
+    const cookie = signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET);
     const req = new NextRequest("https://eve.example.com/settings");
     req.cookies.set(SESSION_COOKIE, cookie);
     const res = proxy(req);
     expect(res.status).toBe(200);
     expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("sends a pre-Google session cookie to /login", () => {
+    process.env.SESSION_SECRET = "s".repeat(32);
+    const req = new NextRequest("https://eve.example.com/settings");
+    req.cookies.set(SESSION_COOKIE, signPayload({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET));
+    expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
   });
 });

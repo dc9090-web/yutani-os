@@ -24,7 +24,7 @@ vi.mock("../../src/lib/auth/flow.js", () => ({
 
 vi.mock("../../src/lib/auth/session.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../src/lib/auth/session.js")>();
-  return { ...actual, readSession: vi.fn(async () => ({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) })) };
+  return { ...actual, readSession: vi.fn(async () => ({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) })) };
 });
 
 // These regular imports run after the mocks above because vitest hoists vi.mock() calls to the top of the file.
@@ -41,7 +41,7 @@ function req(): NextRequest {
 describe("auth callback", () => {
   beforeEach(() => {
     vi.mocked(completeLogin).mockResolvedValue({ characterId: 2, name: "x" });
-    vi.mocked(readSession).mockResolvedValue({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) });
+    vi.mocked(readSession).mockResolvedValue({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) });
   });
 
   it("redirects to /settings and keeps the existing active character when a session exists", async () => {

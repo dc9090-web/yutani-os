@@ -10,7 +10,8 @@ export async function GET(req: NextRequest) {
     const { characterId } = await completeLogin(
       { code: url.searchParams.get("code"), state: url.searchParams.get("state"), oauthCookie: req.cookies.get(OAUTH_COOKIE)?.value }, config);
     const existing = await readSession();
-    const payload: SessionPayload = { activeCharacterId: existing?.activeCharacterId ?? characterId, iat: Math.floor(Date.now() / 1000) };
+    // Temporary until the EVE callback becomes add-character only: keep the Google account of the existing session.
+    const payload: SessionPayload = { sub: existing?.sub ?? "", email: existing?.email ?? "", activeCharacterId: existing?.activeCharacterId ?? characterId, iat: Math.floor(Date.now() / 1000) };
     const res = NextResponse.redirect(new URL(existing ? "/settings" : "/", config.siteOrigin));
     res.cookies.set(SESSION_COOKIE, signPayload(payload, config.sessionSecret), cookieOptions(SESSION_MAX_AGE));
     res.cookies.delete(OAUTH_COOKIE);

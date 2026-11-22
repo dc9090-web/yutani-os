@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getConfig } from "../../../lib/config.js";
 import { getCharacter } from "../../../lib/db/characters.js";
 import { safeNextPath } from "../../../lib/auth/flow.js";
-import { SESSION_COOKIE, SESSION_MAX_AGE, cookieOptions, readSession, signPayload } from "../../../lib/auth/session.js";
+import { SESSION_COOKIE, SESSION_MAX_AGE, cookieOptions, readSession, signPayload, withActiveCharacter } from "../../../lib/auth/session.js";
 
 export async function POST(req: NextRequest) {
   const { siteOrigin, sessionSecret } = getConfig();
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (!Number.isInteger(id) || id <= 0) return res;
   const character = await getCharacter(id);
   if (character) {
-    res.cookies.set(SESSION_COOKIE, signPayload({ activeCharacterId: id, iat: Math.floor(Date.now() / 1000) }, sessionSecret), cookieOptions(SESSION_MAX_AGE));
+    res.cookies.set(SESSION_COOKIE, signPayload(withActiveCharacter(session, id), sessionSecret), cookieOptions(SESSION_MAX_AGE));
   }
   return res;
 }
