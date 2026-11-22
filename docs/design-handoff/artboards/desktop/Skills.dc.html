@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Skills</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+@keyframes yo-throb{0%,100%{opacity:1}50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.yo-box{animation:none !important}}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 36px; padding: 0 32px; border-bottom: 1px solid #1C2128">
+<a href="Main.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 60px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="display: flex; flex-wrap: wrap; gap: 2px; font-size: 13px; font-weight: 500">
+<a href="Main.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Overview</a>
+<a href="#" aria-current="page" style="display: flex; align-items: center; height: 60px; padding: 0 14px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Skills</a>
+<a href="Clones.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Clones</a>
+<a href="Ships.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Ships</a>
+<a href="Assets.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Assets</a>
+<a href="Wallet.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 28px; padding: 9px 32px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 40px 32px 56px; display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.01em; line-height: 1.15">Skills</h1>
+<sc-if value="{{perChar}}" hint-placeholder-val="{{false}}">
+<div style="position: relative; margin-top: 6px">
+<button type="button" onClick="{{toggleChars}}" aria-haspopup="listbox" aria-expanded="{{charsOpenAttr}}" aria-label="Character: {{charName}}" style="display: flex; align-items: center; gap: 10px; height: 44px; min-width: 240px; padding: 0 12px 0 6px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{charInitials}}</span>
+<span style="flex: 1; min-width: 0">{{charName}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{charsOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Characters" style="position: absolute; top: 50px; left: 0; z-index: 10; box-sizing: border-box; min-width: 320px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #111418; border: 1px solid #2A313B; border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55)">
+<sc-for list="{{chars}}" as="c" hint-placeholder-count="6">
+<button type="button" role="option" aria-selected="{{c.selAttr}}" onClick="{{c.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 5px; background: {{c.bg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{c.initials}}</span>
+<span style="flex: 1; min-width: 0">{{c.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.1em; color: #7C8794">{{c.tag}}</span>
+<span style="flex: none; width: 56px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: #9AA3AE">{{c.sp}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+<sc-if value="{{isOverview}}" hint-placeholder-val="{{true}}">
+<p style="margin: 0; font-size: 14px; color: #9AA3AE">All characters</p>
+</sc-if>
+</div>
+<div role="tablist" aria-label="Skills views" style="display: flex; gap: 2px; padding: 3px; background: #0E1114; border: 1px solid #1C2128; border-radius: 8px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{t.selAttr}}" onClick="{{t.pick}}" style="height: 44px; padding: 0 18px; border: 0; border-radius: 5px; background: {{t.bg}}; color: {{t.color}}; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">{{t.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{isOverview}}" hint-placeholder-val="{{true}}">
+<section aria-label="Training overview" style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; font-size: 12px; color: #9AA3AE">
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span>Trained</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{accent}}; background: {{trainingBg}}"></span>Training now</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{queuedBorder}}"></span>Queued</span>
+<button type="button" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; background: transparent; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<svg aria-hidden="true" width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="#9AA3AE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2.5l2 2L5 11l-2.6.6L3 9z"></path></svg>
+Edit
+</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 16px">
+<sc-for list="{{queues}}" as="q" hint-placeholder-count="6">
+<article style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 20px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: flex-start; gap: 14px">
+<div role="img" aria-label="Portrait placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 6px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{q.initials}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 17px; line-height: 1.25">{{q.name}}</h2>
+<span style="font-size: 13px; color: #9AA3AE">Done in <span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #E6E9ED">{{q.done}}</span></span>
+</div>
+<div style="flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">In queue</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500; line-height: 1">{{q.count}}</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: none; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Current skill</span>
+<div role="img" aria-label="Current skill progress {{q.pct}}" style="flex: 1; height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{q.pct}}; background: repeating-linear-gradient(90deg, {{accent}} 0 6px, transparent 6px 8px)"></div>
+</div>
+<span style="flex: none; width: 32px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">{{q.pct}}</span>
+</div>
+<ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{q.rows}}" as="r" hint-placeholder-count="10">
+<li style="display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 4px 0; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span style="flex: none; width: 16px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #7C8794">{{r.n}}</span>
+<span role="img" aria-label="Training to level {{r.target}}" style="flex: none; display: flex; gap: 3px; width: 62px; height: 10px">
+<sc-for list="{{r.boxes}}" as="b" hint-placeholder-count="5">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}; animation: {{b.anim}}" class="yo-box"></span>
+</sc-for>
+</span>
+<span aria-hidden="true" style="flex: none; width: 10px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">{{r.target}}</span>
+<span style="flex: 1; min-width: 0; margin-left: 4px; font-size: 13.5px">{{r.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{r.time}}</span>
+</li>
+</sc-for>
+</ol>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: #7C8794">+{{q.more}} more in queue</span>
+</article>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{isSkills}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px">
+
+<sc-if value="{{showRail}}" hint-placeholder-val="{{true}}">
+<nav aria-label="Skill groups" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 8px; background: #0E1114; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; justify-content: space-between; padding: 8px 12px 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">
+<span>Group</span>
+<span>SP</span>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="24">
+<button type="button" onClick="{{g.pick}}" aria-pressed="{{g.pressed}}" style="display: flex; flex-direction: column; justify-content: center; gap: 7px; min-height: 44px; padding: 6px 12px; border: 0; border-radius: 5px; background: {{g.bg}}; color: {{g.color}}; font-family: Inter, system-ui, sans-serif; text-align: left; cursor: pointer">
+<span style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="min-width: 0; font-size: 13.5px; font-weight: 500">{{g.name}} <span style="margin-left: 6px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #7C8794">{{g.count}}</span><sc-if value="{{g.hasQueue}}" hint-placeholder-val="{{false}}"><span title="Levels queued for training" style="margin-left: 8px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: {{accent}}">+{{g.queued}}</span></sc-if></span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px">{{g.sp}}</span>
+</span>
+<span aria-hidden="true" style="display: block; height: 2px; background: #1C2128">
+<span style="display: block; height: 2px; width: {{g.share}}; background: {{g.barColor}}"></span>
+</span>
+</button>
+</sc-for>
+</nav>
+</sc-if>
+
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; font-size: 12px; color: #9AA3AE">
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span>Trained</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{accent}}; background: {{trainingBg}}"></span>Training now</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{queuedBorder}}"></span>Queued</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #333B46"></span>Untrained</span>
+<span style="margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px">144 levels in queue</span>
+</div>
+<sc-for list="{{shown}}" as="s" hint-placeholder-count="1">
+<section style="display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 24px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; padding-bottom: 14px; border-bottom: 1px solid #1C2128">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25">{{s.name}}</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #9AA3AE">{{s.count}} skills · {{s.sp}} SP<sc-if value="{{s.hasQueue}}" hint-placeholder-val="{{true}}"><span style="color: {{accent}}"> · {{s.queued}} levels queued</span></sc-if></span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 0 40px">
+<sc-for list="{{s.skills}}" as="k" hint-placeholder-count="12">
+<div style="min-width: 0; border-bottom: 1px solid #171B21">
+<div style="display: flex; align-items: center; gap: 10px; min-height: 36px">
+<span role="img" aria-label="Level {{k.level}} of 5" style="flex: none; display: flex; gap: 3px; width: 62px; height: 10px">
+<sc-for list="{{k.boxes}}" as="b" hint-placeholder-count="5">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}; animation: {{b.anim}}" class="yo-box"></span>
+</sc-for>
+</span>
+<span aria-hidden="true" style="flex: none; width: 10px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{k.level}}</span>
+<span style="flex: 0 1 auto; min-width: 0; margin-left: 4px; font-size: 13.5px; color: {{k.color}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{k.name}}</span>
+<button type="button" onClick="{{k.toggleInfo}}" aria-label="About {{k.name}}" aria-expanded="{{k.openAttr}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: -6px; padding: 0; border: 0; border-radius: 4px; background: {{k.infoBg}}; color: {{k.infoColor}}; cursor: pointer">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.6"></circle><path d="M7 6.4v3.4"></path><path d="M7 4.3v.1"></path></svg>
+</button>
+<sc-if value="{{k.training}}" hint-placeholder-val="{{false}}">
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; color: {{accent}}">TRAINING</span>
+</sc-if>
+</div>
+<sc-if value="{{k.open}}" hint-placeholder-val="{{false}}">
+<p style="box-sizing: border-box; margin: 2px 0 10px; padding: 10px 12px; background: #0E1114; border: 1px solid #1C2128; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #C9CED6">{{k.desc}}</p>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{isTraining}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px">
+
+<section aria-label="Training queue" style="flex: 999 1 560px; min-width: 0; max-width: 940px; display: flex; flex-direction: column; gap: 16px; padding: 20px 24px 24px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25">Training queue</h2>
+<span style="font-size: 13px; color: #9AA3AE">144 skills · all trained in <span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #E6E9ED">1184d 5h 39m</span></span>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; font-size: 12px; color: #9AA3AE">
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span>Trained</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{accent}}; background: {{trainingBg}}"></span>Training now</span>
+<span style="display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{queuedBorder}}"></span>Queued</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid #1C2128; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">
+<span style="flex: none; width: 28px">#</span>
+<span style="flex: none; width: 86px">Level</span>
+<span style="flex: 1; min-width: 0">Skill</span>
+<span style="flex: none">Time remaining</span>
+</div>
+<ol style="list-style: none; margin: -16px 0 0; padding: 0; display: flex; flex-direction: column">
+<sc-for list="{{trainingRows}}" as="r" hint-placeholder-count="20">
+<li style="border-bottom: 1px solid #171B21">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-height: 36px; padding: 4px 0; box-sizing: border-box">
+<span style="flex: none; width: 28px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #7C8794">{{r.n}}</span>
+<span role="img" aria-label="Training to level {{r.target}}" style="flex: none; display: flex; gap: 3px; width: 62px; height: 10px">
+<sc-for list="{{r.boxes}}" as="b" hint-placeholder-count="5">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}; animation: {{b.anim}}" class="yo-box"></span>
+</sc-for>
+</span>
+<span aria-hidden="true" style="flex: none; width: 10px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">{{r.target}}</span>
+<span style="flex: 0 1 auto; min-width: 0; margin-left: 4px; font-size: 13.5px">{{r.name}}</span>
+<button type="button" onClick="{{r.toggleInfo}}" aria-label="About {{r.name}}" aria-expanded="{{r.openAttr}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: -6px; padding: 0; border: 0; border-radius: 4px; background: {{r.infoBg}}; color: {{r.infoColor}}; cursor: pointer">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.6"></circle><path d="M7 6.4v3.4"></path><path d="M7 4.3v.1"></path></svg>
+</button>
+<span aria-hidden="true" style="flex: 1"></span>
+<sc-if value="{{r.active}}" hint-placeholder-val="{{false}}">
+<span style="flex: none; display: flex; align-items: center; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; color: {{accent}}">TRAINING</span>
+<span role="img" aria-label="Progress 84%" style="display: block; width: 120px; height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<span style="display: block; height: 4px; width: 84%; background: repeating-linear-gradient(90deg, {{accent}} 0 6px, transparent 6px 8px)"></span>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">84%</span>
+</span>
+</sc-if>
+<span style="flex: none; width: 96px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{r.time}}</span>
+</div>
+<sc-if value="{{r.open}}" hint-placeholder-val="{{false}}">
+<p style="box-sizing: border-box; margin: 2px 0 10px 38px; padding: 10px 12px; background: #0E1114; border: 1px solid #1C2128; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #C9CED6">{{r.desc}}</p>
+</sc-if>
+</li>
+</sc-for>
+</ol>
+</section>
+
+
+</div>
+</sc-if>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"view":{"editor":"enum","default":"All groups","options":["Browse by group","All groups"]},"$preview":{"width":1440,"height":1660}}'>
+class Component extends DCLogic {
+renderVals() {
+var self = this;
+var accent = this.props.accent ?? '#F5A524';
+var all = (this.props.view ?? 'All groups') === 'All groups';
+var data = [
+['Armor', '6.1M', '55555555555', 'Advanced Armor Layering|Armor Layering|EM Armor Compensation|Explosive Armor Compensation|Hull Upgrades|Kinetic Armor Compensation|Mechanics|Remote Armor Repair Systems|Remote Hull Repair Systems|Repair Systems|Thermal Armor Compensation'],
+['Corporation Management', '8k', '3', 'Corporation Management'],
+['Drones', '12.1M', '5555555550555552203', 'Advanced Drone Avionics|Amarr Drone Specialization|Caldari Drone Specialization|Drone Avionics|Drone Durability|Drone Interfacing|Drone Navigation|Drone Sharpshooting|Drones|Fighters|Gallente Drone Specialization|Heavy Drone Operation|Light Drone Operation|Medium Drone Operation|Minmatar Drone Specialization|Mutated Drone Specialization|Salvage Drone Operation|Salvage Drone Specialization|Sentry Drone Interfacing'],
+['Electronic Systems', '7.7M', '355445544540445', 'Burst Projector Operation|Cloaking|Electronic Warfare|Frequency Modulation|Long Distance Jamming|Propulsion Jamming|Sensor Linking|Signal Dispersion|Signal Suppression|Signature Focusing|Signature Masking|Tactical Logistics Reconfiguration|Target Painting|Weapon Destabilization|Weapon Disruption'],
+['Engineering', '7.4M', '555515554555455', 'Advanced Weapon Upgrades|Capacitor Emission Systems|Capacitor Management|Capacitor Systems Operation|Capital Capacitor Emission Systems|CPU Management|Electronics Upgrades|Energy Grid Upgrades|Energy Pulse Weapons|Nanite Interfacing|Nanite Operation|Power Grid Management|Resistance Phasing|Thermodynamics|Weapon Upgrades'],
+['Fleet Support', '4.8M', '524515350353554', 'Armored Command|Armored Command Specialist|Command Burst Specialist|Expedition Command|Expedition Command Specialist|Information Command|Information Command Specialist|Leadership|Mining Director|Mining Foreman|Shield Command|Shield Command Specialist|Skirmish Command|Skirmish Command Specialist|Wing Command'],
+['Gunnery', '13.5M', '5500002202004454055253455545540553545525', 'Controlled Bursts|Gunnery|Large Artillery Specialization|Large Autocannon Specialization|Large Beam Laser Specialization|Large Blaster Specialization|Large Energy Turret|Large Hybrid Turret|Large Precursor Weapon|Large Projectile Turret|Large Pulse Laser Specialization|Large Railgun Specialization|Medium Artillery Specialization|Medium Autocannon Specialization|Medium Beam Laser Specialization|Medium Blaster Specialization|Medium Disintegrator Specialization|Medium Energy Turret|Medium Hybrid Turret|Medium Precursor Weapon|Medium Projectile Turret|Medium Pulse Laser Specialization|Medium Railgun Specialization|Motion Prediction|Rapid Firing|Sharpshooter|Small Artillery Specialization|Small Autocannon Specialization|Small Beam Laser Specialization|Small Blaster Specialization|Small Disintegrator Specialization|Small Energy Turret|Small Hybrid Turret|Small Precursor Weapon|Small Projectile Turret|Small Pulse Laser Specialization|Small Railgun Specialization|Surgical Strike|Tactical Weapon Reconfiguration|Trajectory Analysis'],
+['Missiles', '12.1M', '24223222355555555555555035', 'Auto-Targeting Missiles|Bomb Deployment|Breacher Pod Clone Efficacity|Breacher Pod Clone Longevity|Breacher Pod Launcher Operation|Breacher Pod Projection|Breacher Pod Rapid Firing|Cruise Missiles|Defender Missiles|Guided Missile Precision|Heavy Assault Missile Specialization|Heavy Assault Missiles|Heavy Missile Specialization|Heavy Missiles|Light Missile Specialization|Light Missiles|Missile Bombardment|Missile Launcher Operation|Missile Projection|Rapid Launch|Rocket Specialization|Rockets|Target Navigation Prediction|Torpedo Specialization|Torpedoes|Warhead Upgrades'],
+['Navigation', '4.2M', '55355503355', 'Acceleration Control|Afterburner|Cynosural Field Theory|Evasive Maneuvering|Fuel Conservation|High Speed Maneuvering|Jump Drive Calibration|Jump Drive Operation|Micro Jump Drive Operation|Navigation|Warp Drive Operation'],
+['Neural Enhancement', '1.9M', '450505444', 'Advanced Infomorph Psychology|Biology|Cloning Facility Operation|Cybernetics|Elite Infomorph Psychology|Infomorph Psychology|Infomorph Synchronizing|Neurotoxin Control|Neurotoxin Recovery'],
+['Planet Management', '17k', '00223', 'Advanced Planetology|Command Center Upgrades|Interplanetary Consolidation|Planetology|Remote Sensing'],
+['Production', '346k', '054', 'Advanced Mass Production|Industry|Mass Production'],
+['Resource Processing', '1.7M', '4050105530', 'Astrogeology|Deep Core Mining|Gas Cloud Harvesting|Gas Decompression Efficiency|Ice Harvesting|Industrial Reconfiguration|Mining|Mining Upgrades|Salvaging|Shipboard Compression Technology'],
+['Rigging', '6.8M', '55555455551', 'Armor Rigging|Astronautics Rigging|Drones Rigging|Electronic Superiority Rigging|Energy Weapon Rigging|Hybrid Weapon Rigging|Jury Rigging|Launcher Rigging|Projectile Weapon Rigging|Shield Rigging|Synchronization Rigging'],
+['Scanning', '7.2M', '5555555', 'Archaeology|Astrometric Acquisition|Astrometric Pinpointing|Astrometric Rangefinding|Astrometrics|Hacking|Survey'],
+['Science', '272k', '102035', 'Caldari Encryption Methods|Core Subsystem Technology|Graviton Physics|High Energy Physics|Research|Science'],
+['Sequencing', '1k', '20', 'Basic Induction|Induction Efficiency'],
+['Shields', '5.6M', '25555555555', 'Capital Shield Operation|EM Shield Compensation|Explosive Shield Compensation|Kinetic Shield Compensation|Shield Compensation|Shield Emission Systems|Shield Management|Shield Operation|Shield Upgrades|Tactical Shield Manipulation|Thermal Shield Compensation'],
+['Social', '74k', '2122224', 'Connections|Criminal Connections|Diplomacy|Fast Talk|Freelancing|Negotiation|Social'],
+['Spaceship Command', '14.9M', '34155554303355532401250231241555242002311154253553333332511', 'Advanced Spaceship Command|Amarr Battlecruiser|Amarr Battleship|Amarr Cruiser|Amarr Destroyer|Amarr Frigate|Amarr Strategic Cruiser|Amarr Tactical Destroyer|Assault Frigates|Black Ops|Caldari Battlecruiser|Caldari Battleship|Caldari Cruiser|Caldari Destroyer|Caldari Frigate|Caldari Hauler|Caldari Strategic Cruiser|Caldari Tactical Destroyer|Capital Ships|Command Destroyers|Command Ships|Covert Ops|EDENCOM Cruiser|EDENCOM Frigate|Electronic Attack Ships|Expedition Command Ships|Expedition Frigates|Gallente Battlecruiser|Gallente Battleship|Gallente Cruiser|Gallente Destroyer|Gallente Frigate|Gallente Strategic Cruiser|Gallente Tactical Destroyer|Heavy Assault Cruisers|Heavy Interdiction Cruisers|Industrial Command Ships|Interceptors|Interdictors|Logistics Cruisers|Logistics Frigates|Marauders|Mining Frigate|Minmatar Battlecruiser|Minmatar Battleship|Minmatar Cruiser|Minmatar Destroyer|Minmatar Frigate|Minmatar Strategic Cruiser|ORE Hauler|Precursor Battlecruiser|Precursor Battleship|Precursor Cruiser|Precursor Destroyer|Precursor Frigate|Recon Ships|Spaceship Command|Transport Ships|Upwell Hauler'],
+['Structure Management', '4k', '2', 'Anchoring'],
+['Subsystems', '2.1M', '5555333333335555', 'Amarr Core Systems|Amarr Defensive Systems|Amarr Offensive Systems|Amarr Propulsion Systems|Caldari Core Systems|Caldari Defensive Systems|Caldari Offensive Systems|Caldari Propulsion Systems|Gallente Core Systems|Gallente Defensive Systems|Gallente Offensive Systems|Gallente Propulsion Systems|Minmatar Core Systems|Minmatar Defensive Systems|Minmatar Offensive Systems|Minmatar Propulsion Systems'],
+['Targeting', '3.2M', '45555555', 'Advanced Target Management|Gravimetric Sensor Compensation|Ladar Sensor Compensation|Long Range Targeting|Magnetometric Sensor Compensation|Radar Sensor Compensation|Signature Analysis|Target Management'],
+['Trade', '390k', '333024443', 'Accounting|Broker Relations|Contracting|Customs Code Expertise|Daytrading|Marketing|Procurement|Trade|Visibility']
+];
+var trainingSkill = 'Medium Blaster Specialization';
+var queue = {'Medium Blaster Specialization':1,'Torpedoes':2,'Medium Autocannon Specialization':1,'Heavy Assault Cruisers':2,'Caldari Battlecruiser':2,'Minmatar Battlecruiser':1,'Amarr Battlecruiser':1,'Gallente Battlecruiser':1,'Assault Frigates':1,'Minmatar Destroyer':2,'Medium Artillery Specialization':1,'Medium Railgun Specialization':1,'Hybrid Weapon Rigging':1,'Weapon Destabilization':1,'Interdictors':2,'Graviton Physics':2,'Armored Command Specialist':3,'Caldari Tactical Destroyer':1,'Shield Command Specialist':2,'Medium Pulse Laser Specialization':2,'Small Blaster Specialization':1,'Small Artillery Specialization':1,'Small Pulse Laser Specialization':1,'Target Painting':1,'Burst Projector Operation':2,'Command Ships':2,'Infomorph Synchronizing':1,'Advanced Infomorph Psychology':1,'Elite Infomorph Psychology':4,'Energy Pulse Weapons':1,'Breacher Pod Clone Longevity':1,'Breacher Pod Clone Efficacity':1,'Breacher Pod Projection':1,'Breacher Pod Rapid Firing':1,'Long Distance Jamming':1,'Signal Suppression':1,'Signal Dispersion':1,'Frequency Modulation':1,'Marauders':4,'Gallente Battleship':4,'Large Hybrid Turret':3,'Large Blaster Specialization':5,'Large Railgun Specialization':5,'Minmatar Battleship':3,'Large Projectile Turret':3,'Large Autocannon Specialization':5,'Large Artillery Specialization':5,'Large Energy Turret':3,'Sentry Drone Interfacing':2,'Interceptors':3,'Torpedo Specialization':5,'Amarr Tactical Destroyer':1,'Tactical Weapon Reconfiguration':3,'Information Command Specialist':2,'Advanced Target Management':1,'Resistance Phasing':1,'Micro Jump Drive Operation':1,'Command Burst Specialist':1,'Signature Masking':1,'Neurotoxin Control':1,'Neurotoxin Recovery':1,'Electronic Attack Ships':1,'Mutated Drone Specialization':2,'Amarr Battleship':4,'Caldari Strategic Cruiser':3,'Caldari Propulsion Systems':2,'Caldari Offensive Systems':2,'Caldari Core Systems':2,'Caldari Defensive Systems':2,'Astrogeology':1,'EDENCOM Frigate':2,'Advanced Spaceship Command':2,'Capital Ships':1,'Jump Drive Operation':1,'Cynosural Field Theory':1,'Salvaging':2};
+function toNumber(sp) {
+var n = parseFloat(sp);
+if (sp.indexOf('M') > -1) { return n * 1000000; }
+if (sp.indexOf('k') > -1) { return n * 1000; }
+return n;
+}
+var max = 0;
+data.forEach(function (d) { max = Math.max(max, toNumber(d[1])); });
+var picked = (this.state && this.state.picked) || 'Gunnery';
+var descriptions = {"Advanced Armor Layering": "Advanced skill at installing upgraded armor plates efficiently and securely, reducing the impact they have on agility and speed. Grants a 2% reduction to armor plate mass penalty per level.", "Armor Layering": "Skill at installing upgraded armor plates efficiently and securely, reducing the impact they have on agility and speed. Grants a 5% reduction to armor plate mass penalty per level.", "EM Armor Compensation": "5% bonus to EM resistance per level for Armor Coatings and Energized Membranes.", "Explosive Armor Compensation": "5% bonus to explosive resistance per level for Armor Coatings and Energized Membranes.", "Hull Upgrades": "Skill at maintaining your ship's armor and installing hull upgrades like expanded cargoholds and inertial stabilizers. Grants a 5% bonus to armor hit points per skill level.", "Kinetic Armor Compensation": "5% bonus to kinetic resistance per level for Armor Coatings and Energized Membranes.", "Mechanics": "Skill at maintaining the mechanical components and structural integrity of a spaceship. 5% bonus to structure hit points per skill level.", "Remote Armor Repair Systems": "Operation of remote armor repair systems. 5% reduced capacitor need for remote armor repair system modules per skill level.", "Remote Hull Repair Systems": "Operation of remote hull repair systems. 5% reduced capacitor need for remote hull repair system modules per skill level.", "Repair Systems": "Operation of armor/hull repair modules. 5% reduction in repair systems duration per skill level. Note: Has no effect on capital sized modules.", "Thermal Armor Compensation": "5% bonus to thermal resistance per level for Armor Coatings and Energized Membranes.", "Corporation Management": "Basic corporation operation. +20 corporation members allowed per level. Note: The CEO must update their corporation through the corporation user interface before the skill takes effect", "Advanced Drone Avionics": "This skill is required for the operation of Electronic Warfare Drones but also gives a bonus to the control range of all drones. 3,000m bonus drone control range per level.", "Amarr Drone Specialization": "Specialization in the operation of advanced Amarr drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Amarr Drone Specialization.", "Caldari Drone Specialization": "Specialization in the operation of advanced Caldari drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Caldari Drone Specialization.", "Drone Avionics": "Skill at control range for all drones. Bonus: Drone control range increased by 5000 meters per skill level.", "Drone Durability": "Increases drone and fighter hit points. 5% bonus to drone shield, armor and hull hit points per level. 5% bonus to fighter hit points per level.", "Drone Interfacing": "Improves damage and mining yield for drones and fighters under your control. 10% bonus to drone damage and drone mining yield per level. 10% bonus to fighter damage per level.", "Drone Navigation": "Skill at controlling drones at high speeds. 5% increase in drone max velocity per level. 5% increase in fighter max velocity per level.", "Drone Sharpshooting": "Increases the weapon range of drones and fighters. 5% bonus to drone optimal range per level. 5% bonus to fighter optimal range per level.", "Drones": "Skill at remote controlling drones. Can operate 1 drone per skill level.", "Fighters": "Allows operation of fighter craft. 5% increase in fighter damage per level.", "Gallente Drone Specialization": "Specialization in the operation of advanced Gallente drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Gallente Drone Specialization.", "Heavy Drone Operation": "Skill at controlling heavy combat drones. 5% bonus to heavy drone damage per level.", "Light Drone Operation": "Skill at controlling light combat drones. 5% bonus to damage of light drones per level.", "Medium Drone Operation": "Skill at controlling medium combat drones. 5% bonus to damage of medium drones per level.", "Minmatar Drone Specialization": "Specialization in the operation of advanced Minmatar drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Minmatar Drone Specialization.", "Mutated Drone Specialization": "Specialization in the operation of mutated drones created using rogue drone and Triglavian technology, applying techniques developed by ORE to pacify and control rogue drones. Users are recommended to update their information warfare countermeasures, wetware-nanotech interface security, and intrusion response hunter-killer programs regularly. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Mutated Drone Specialization. 2% bonus to the mining yield of drones requiring Mutated Drone Specialization per level.", "Salvage Drone Operation": "Skill at controlling salvage drones. 2% increased salvage chance per level.", "Salvage Drone Specialization": "Advanced proficiency at controlling salvage drones. 2% bonus to the max velocity and salvage chance of drones requiring Salvage Drone Specialization per level.", "Sentry Drone Interfacing": "Skill at controlling sentry drones. 5% bonus to Sentry Drone damage per level.", "Burst Projector Operation": "Operation of Burst Projector systems. Each skill level gives a 5% reduction in module activation time.", "Frequency Modulation": "Advanced understanding of signal waves. 10% bonus to falloff for ECM, Remote Sensor Dampeners, Weapon Disruptors, Remote Tracking Computers, Remote Sensor Boosters and Target Painters per skill level.", "Long Distance Jamming": "Skill at the long-range operation of electronic warfare systems. 10% bonus to optimal range of ECM, Remote Sensor Dampeners, Weapon Disruptors, Remote Tracking Computers, Remote Sensor Boosters and Target Painters per skill level.", "Signal Dispersion": "Skill at the operation of target jamming equipment. 5% bonus to strength of all ECM jammers per skill level.", "Signal Suppression": "Skill at the operation of Remote Sensor Dampeners. 5% bonus to Remote Sensor Dampeners' scan resolution and targeting range suppression per skill level.", "Signature Masking": "Improves the active masking mode of Signature Radius Suppressors, resulting in more efficient masking that can be maintained for longer periods of time. Increases duration time of Signature Radius Suppressor active mode by 5% per level.", "Target Painting": "Skill at using target painters. 5% less capacitor need for target painters per skill level.", "Weapon Destabilization": "Advanced understanding of weapon disruption technology. 5% bonus to the effectiveness of Weapon Disruptor modules per skill level.", "Energy Pulse Weapons": "Skill at using smartbombs. 5% decrease in smartbomb duration per skill level.", "Resistance Phasing": "Improves control over, and flow between, nano membranes that react to damage by shifting resistances. Reduces cycle time of Reactive Armor Hardeners, Flex Armor Hardeners and Flex Shield Hardeners by 10% per level and capacitor need by 15% per level.", "Armored Command Specialist": "Advanced proficiency at boosting the armor defenses of allied ships. Increases the strength of Armored Command Burst effects by 10% per skill level.", "Command Burst Specialist": "Improved fleet support flexibility. Reduces reload duration of all Command Burst and Mining Foreman Burst modules by 10% per level.", "Information Command Specialist": "Advanced proficiency at boosting the sensors and electronic warfare systems of allied ships. Increases the strength of Information Command Burst effects by 10% per skill level.", "Shield Command Specialist": "Advanced proficiency at boosting the shield defenses of allied ships. Increases the strength of Shield Command Burst effects by 10% per skill level.", "Large Artillery Specialization": "Specialist training in the operation of advanced large artillery. 2% bonus per skill level to the damage of large turrets requiring Large Artillery Specialization.", "Large Autocannon Specialization": "Specialist training in the operation of advanced large autocannons. 2% Bonus per skill level to the damage of large turrets requiring Large Autocannon Specialization.", "Large Blaster Specialization": "Specialist training in the operation of advanced large blasters. 2% Bonus per skill level to the damage of large turrets requiring Large Blaster Specialization.", "Large Energy Turret": "Operation of large energy turrets. 5% Bonus to large energy turret damage per level.", "Large Hybrid Turret": "Operation of large hybrid turret. 5% Bonus to large hybrid turret damage per level.", "Large Projectile Turret": "Operation of large projectile turret. 5% Bonus to large projectile turret damage per level.", "Large Railgun Specialization": "Specialist training in the operation of advanced large railguns. 2% bonus per skill level to the damage of large turrets requiring Large Railgun Specialization.", "Medium Artillery Specialization": "Specialist training in the operation of advanced medium artillery. 2% bonus per skill level to the damage of medium turrets requiring Medium Artillery Specialization.", "Medium Autocannon Specialization": "Specialist training in the operation of advanced medium autocannons. 2% bonus per skill level to the damage of medium turrets requiring Medium Autocannon Specialization.", "Medium Blaster Specialization": "Specialist training in the operation of advanced medium blasters. 2% bonus per skill level to the damage of medium turrets requiring Medium Blaster Specialization.", "Medium Pulse Laser Specialization": "Specialist training in the operation of advanced medium pulse lasers. 2% bonus per skill level to the damage of medium turrets requiring Medium Pulse Laser Specialization.", "Medium Railgun Specialization": "Specialist training in the operation of advanced medium railguns. 2% bonus per skill level to the damage of medium turrets requiring Medium Railgun Specialization.", "Small Artillery Specialization": "Specialist training in the operation of advanced small artillery. 2% bonus per skill level to the damage of small turrets requiring Small Artillery Specialization.", "Small Blaster Specialization": "Specialist training in the operation of advanced small blasters. 2% bonus per skill level to the damage of small turrets requiring Small Blaster Specialization.", "Small Pulse Laser Specialization": "Specialist training in the operation of small pulse lasers. 2% bonus per skill level to the damage of small turrets requiring Small Pulse Laser Specialization.", "Tactical Weapon Reconfiguration": "Skill at the operation of siege modules. 25-unit reduction in strontium clathrate consumption amount for module activation per skill level.", "Breacher Pod Clone Efficacity": "Specialist combat training of Breacher Pod clones. +5% to the maximum damage per second cap per skill level.", "Breacher Pod Clone Longevity": "Specialist research on extending the short lifespans of Breacher Pod clones. +10% to damage effect duration per skill level.", "Breacher Pod Projection": "Specialist training in the operation of Breacher Pod Launchers. +10% to Breacher Pod maximum velocity per skill level.", "Breacher Pod Rapid Firing": "Specialist training in the preparation of Breacher Pods. -10% to Breacher Pod Launcher cycle time per skill level.", "Torpedo Specialization": "Specialist training in the operation of advanced siege launchers. 2% bonus per level to the rate of fire of modules requiring Torpedo Specialization.", "Torpedoes": "Skill at the handling and firing of torpedoes. 5% bonus to torpedo damage per skill level.", "Cynosural Field Theory": "Skill at creating effective cynosural fields. 10% reduction in liquid ozone consumption for module activation per skill level.", "Jump Drive Operation": "Skill at using Jump Drives. 5% reduction in capacitor need of initiating a jump per skill level.", "Micro Jump Drive Operation": "Skill at using Micro Jump Drives. 5% reduction in activation time per skill level.", "Advanced Infomorph Psychology": "Advanced training for those Capsuleers who want to push clone technology to its limits. Allows 1 additional jump clone per level. Note: Clones can only be installed in stations with medical facilities or in ships with clone vat bays. Installed clones are listed in the character sheet.", "Elite Infomorph Psychology": "Advanced training for those Capsuleers who want to push clone technology to its limits. Allows 1 additional jump clone per level. Note: Clones can only be installed in stations with medical facilities or in ships with clone vat bays. Installed clones are listed in the character sheet.", "Infomorph Synchronizing": "Psychological training that strengthens the pilot's mental tenacity. Improved ability to synchronize with new clones allows pilots to jump-clone more frequently without risk of neural damage. Reduced time between clone jumps by 1 hour per level. Note: Clones can only be installed in stations with medical facilities or in ships with clone vat bays. Installed clones are listed in the character sheet.", "Neurotoxin Control": "Proficiency at reducing the severity of the side effects experienced upon injection of combat boosters.", "Neurotoxin Recovery": "Proficiency at biofeedback techniques intended to negate the side effects typically experienced upon injection of combat boosters.", "Astrogeology": "Skill at analyzing the content of celestial objects with the intent of mining them. 5% bonus to mining turret yield per skill level.", "Salvaging": "Proficiency at salvaging ship wrecks. Required skill for the use of salvager modules. 100% increase in chance of salvage retrieval per additional level.", "Hybrid Weapon Rigging": "Advanced understanding of the interface between hybrid weapons and the numerous ship systems. Allows makeshift modifications to ship system architecture through the use of rigs. 10% reduction in Hybrid Weapon Rig drawbacks per level.", "Graviton Physics": "Skill and knowledge of Graviton physics and its use in the development of advanced technology. Used primarily in the research of Cloaking and other spatial distortion devices as well as Graviton based missiles and smartbombs. Allows Graviton Physics research to be performed with the help of a research agent. Needed for all research and manufacturing operations on related blueprints. 1% reduction in manufacturing time for all items requiring Graviton Physics per level.", "Advanced Spaceship Command": "The advanced operation of spaceships. Grants a 5% Bonus per skill level to the agility of ships requiring Advanced Spaceship Command.", "Amarr Battlecruiser": "Skill at operating Amarr battlecruisers.", "Amarr Battleship": "Skill at operating Amarr battleships.", "Amarr Tactical Destroyer": "Skill at operating Amarr Tactical Destroyers.", "Assault Frigates": "Skill for operation of the Assault Frigates.", "Caldari Battlecruiser": "Skill at operating Caldari battlecruisers.", "Caldari Strategic Cruiser": "Skill at operating Caldari Strategic Cruisers.", "Caldari Tactical Destroyer": "Skill at operating Caldari Tactical Destroyers.", "Capital Ships": "Skill for the operation of capital ships. Grants a 5% bonus per skill level to the agility of ships requiring the Capital Ships skill.", "Command Ships": "Skill for the operation of Command Ships.", "EDENCOM Frigate": "Skill at operating ship designs commissioned as EDENCOM frigates.", "Electronic Attack Ships": "Skill for the operation of Electronic Attack Frigates.", "Gallente Battlecruiser": "Skill at operating Gallente battlecruisers.", "Gallente Battleship": "Skill at operating Gallente battleships.", "Heavy Assault Cruisers": "Skill for operation of Heavy Assault Cruisers.", "Interceptors": "Skill for operation of Interceptors.", "Interdictors": "Skill for operation of Interdictors.", "Marauders": "Skill for the operation of Marauders.", "Minmatar Battlecruiser": "Skill at operating Minmatar battlecruisers.", "Minmatar Battleship": "Skill at operating Minmatar battleships.", "Minmatar Destroyer": "Skill at operating Minmatar destroyers.", "Caldari Core Systems": "Skill in the operation of Caldari Core Subsystems used on Tech III ships.", "Caldari Defensive Systems": "Skill in the operation of Caldari Defensive Subsystems used on Tech III ships.", "Caldari Offensive Systems": "Skill in the operation of Caldari Offensive Subsystems used on Tech III ships.", "Caldari Propulsion Systems": "Skill in the operation of Caldari Propulsion Subsystems used on Tech III ships.", "Advanced Target Management": "Skill at targeting multiple targets. +1 extra target per skill level, up to the ship's maximum allowed number of targets locked."};
+var infoName = (this.state && this.state.info !== undefined) ? this.state.info : 'Advanced Armor Layering';
+var built = data.map(function (d) {
+var names = d[3].split('|');
+var selected = !all && d[0] === picked;
+var queuedLevels = 0;
+var skills = names.map(function (n, i) {
+var level = parseInt(d[2].charAt(i), 10);
+var training = n === trainingSkill;
+var q = queue[n] || 0;
+queuedLevels += q;
+var boxes = [0, 1, 2, 3, 4].map(function (b) {
+if (b < level) { return { border: '#C9CED6', bg: '#C9CED6', anim: 'none' }; }
+if (training && b === level) { return { border: accent, bg: 'color-mix(in srgb, ' + accent + ' 40%, transparent)', anim: 'yo-throb 1.6s ease-in-out infinite' }; }
+if (b < level + q) { return { border: 'color-mix(in srgb, ' + accent + ' 65%, transparent)', bg: 'transparent', anim: 'none' }; }
+return { border: '#333B46', bg: 'transparent', anim: 'none' };
+});
+var open = infoName === n;
+return {
+name: n, level: level, training: training, boxes: boxes,
+color: (level === 0 && q === 0) ? '#7C8794' : '#E6E9ED',
+open: open, openAttr: open ? 'true' : 'false',
+infoColor: open ? accent : '#7C8794', infoBg: open ? '#1A1F26' : 'transparent',
+desc: descriptions[n] || 'Description not loaded in this mockup. The live site already holds it for every skill.',
+toggleInfo: function () { self.setState({ info: open ? '' : n }); }
+};
+});
+return {
+name: d[0], sp: d[1], count: names.length,
+queued: queuedLevels, hasQueue: queuedLevels > 0,
+share: Math.max(1, Math.round(toNumber(d[1]) / max * 100)) + '%',
+bg: selected ? '#1A1F26' : 'transparent',
+color: selected ? '#E6E9ED' : '#9AA3AE',
+barColor: selected ? accent : '#4A5360',
+pressed: selected ? 'true' : 'false',
+selected: selected,
+pick: function () { self.setState({ picked: d[0] }); },
+skills: skills
+};
+});
+var roster = [['TrilliumONE', 'TO', 'MAIN', '112.5M'], ['Sasha-9999', 'S9', 'MAIN', '25.5M'], ['Reacher-9', 'R9', 'ALT', '4.8M'], ['Lana C', 'LC', 'ALT', '10.4M'], ['Faster Than-Light', 'FL', 'ALT', '70.1M'], ['Faster Than-Ever', 'FE', 'ALT', '31.1M']];
+var charName = (this.state && this.state.char) || 'TrilliumONE';
+var charsOpen = !!(this.state && this.state.charsOpen);
+var charInitials = 'TO';
+var chars = roster.map(function (r) {
+var sel = r[0] === charName;
+if (sel) { charInitials = r[1]; }
+return {
+name: r[0], initials: r[1], tag: r[2], sp: r[3],
+selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent',
+pick: function () { self.setState({ char: r[0], charsOpen: false }); }
+};
+});
+var toggleChars = function () { self.setState({ charsOpen: !charsOpen }); };
+var tab = (this.state && this.state.tab) || 'overview';
+var tabs = [['overview', 'Overview'], ['skills', 'Skills'], ['training', 'Training']].map(function (t) {
+var sel = t[0] === tab;
+return {
+label: t[1], selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent', color: sel ? '#E6E9ED' : '#9AA3AE',
+pick: function () { self.setState({ tab: t[0], charsOpen: false }); }
+};
+});
+var qdata = [
+['TrilliumONE', 'TO', '1184d 5h 39m', 144, '84%', 'Medium Blaster Specialization|1d 19h 48m|4;Torpedoes|1d 15h 25m|3;Medium Autocannon Specialization|11d 14h 46m|4;Heavy Assault Cruisers|10h 59m|2;Caldari Battlecruiser|2d 11h 08m|3;Minmatar Battlecruiser|18d 8h 54m|4;Amarr Battlecruiser|19d 12h 19m|4;Gallente Battlecruiser|19d 12h 19m|4;Assault Frigates|2d 11h 08m|3;Minmatar Destroyer|1d 3h 36m|3'],
+['Sasha-9999', 'S9', '666d 17h 58m', 140, '84%', 'Frequency Modulation|7h 03m|3;Fuel Conservation|1d 6h 52m|3;Science|4d 10h 26m|4;Graviton Physics|38m|0;Advanced Weapon Upgrades|13d 21h 56m|4;Repair Systems|18h 49m|3;Weapon Destabilization|16h 38m|2;Electronic Warfare|8d 20h 52m|4;Recon Ships|20d 21h 46m|4;Propulsion Jamming|13d 7h 19m|4'],
+['Faster Than-Light', 'FL', '266d 17h 32m', 43, '52%', 'Command Center Upgrades|7d 5h 47m|4;Planetology|1d 15h 24m|4;Advanced Planetology|16d 6h 16m|4;Interplanetary Consolidation|15d 9h 44m|4;Supply Chain Management|7h 50m|2;Supply Chain Management|1d 20h 21m|3;Supply Chain Management|10d 10h 53m|4;Advanced Mass Production|4d 22h 16m|3;Advanced Mass Production|27d 21h 02m|4;Capacitor Emission Systems|5d 19h 31m|4'],
+['Faster Than-Ever', 'FE', '559d 5h 02m', 130, '41%', 'Command Center Upgrades|11d 13h 02m|4;Planetology|7d 22h 12m|4;Advanced Planetology|24d 9h 24m|4;Interplanetary Consolidation|19d 12h 19m|4;Electronics Upgrades|3d 9h 38m|4;Advanced Mass Production|1h 07m|0;Advanced Mass Production|5h 10m|1;Advanced Mass Production|1d 5h 16m|2;Advanced Mass Production|6d 21h 35m|3;Reprocessing Efficiency|25m|0'],
+['Reacher-9', 'R9', '597d 14h 47m', 126, '45%', 'Command Center Upgrades|9d 18h 29m|4;Planetology|8d 17h 15m|4;Advanced Planetology|22d 4h 11m|4;Interplanetary Consolidation|17d 17h 45m|4;Industry|18h 48m|3;Industry|4d 10h 26m|4;Science|4d 10h 26m|4;Mass Production|15m|0;Mass Production|1h 11m|1;Mass Production|6h 39m|2'],
+['Lana C', 'LC', '592d 19h 48m', 148, '45%', 'Command Center Upgrades|8d 20h 43m|4;Accounting|2d 3h 02m|3;Accounting|12d 42m|4;Advanced Planetology|3d 10h 47m|3;Planetology|11d 17h|4;Interplanetary Consolidation|16d 55m|4;Advanced Planetology|19d 12h 19m|4;Science|3d 21h 40m|4;Mining|3d 21h 40m|4;Archaeology|1h 33m|1']
+];
+var trainingTint = 'color-mix(in srgb, ' + accent + ' 40%, transparent)';
+var queuedLine = 'color-mix(in srgb, ' + accent + ' 65%, transparent)';
+var queues = qdata.map(function (q) {
+var rows = q[5].split(';').map(function (row, i) {
+var parts = row.split('|');
+var level = parseInt(parts[2], 10);
+return {
+n: i + 1, name: parts[0], time: parts[1], target: level + 1,
+boxes: [0, 1, 2, 3, 4].map(function (b) {
+if (b < level) { return { border: '#C9CED6', bg: '#C9CED6', anim: 'none' }; }
+if (b === level) { return i === 0 ? { border: accent, bg: trainingTint, anim: 'yo-throb 1.6s ease-in-out infinite' } : { border: queuedLine, bg: 'transparent', anim: 'none' }; }
+return { border: '#333B46', bg: 'transparent', anim: 'none' };
+})
+};
+});
+return { name: q[0], initials: q[1], done: q[2], count: q[3], pct: q[4], rows: rows, more: q[3] - rows.length };
+});
+var levelOf = {};
+built.forEach(function (g) { g.skills.forEach(function (k) { levelOf[k.name] = k.level; }); });
+var seen = {};
+var tInfo = (this.state && this.state.tinfo !== undefined) ? this.state.tinfo : 1;
+var trainingRows = 'Medium Blaster Specialization|1d 19h 48m;Torpedoes|1d 15h 25m;Medium Autocannon Specialization|11d 14h 46m;Heavy Assault Cruisers|10h 59m;Caldari Battlecruiser|2d 11h 08m;Minmatar Battlecruiser|18d 8h 54m;Amarr Battlecruiser|19d 12h 19m;Gallente Battlecruiser|19d 12h 19m;Assault Frigates|2d 11h 08m;Minmatar Destroyer|1d 3h 36m;Medium Artillery Specialization|16d 6h 16m;Medium Railgun Specialization|16d 6h 16m;Hybrid Weapon Rigging|13d 7h 19m;Weapon Destabilization|12d 15h 06m;Heavy Assault Cruisers|3d 16h 42m;Interdictors|3d 1h 55m;Graviton Physics|16h 38m;Graviton Physics|3d 22h 05m;Armored Command Specialist|17h 42m;Caldari Tactical Destroyer|9d 18h 10m;Armored Command Specialist|4d 4h 09m;Shield Command Specialist|4d 4h 09m;Medium Pulse Laser Specialization|2d 20h 59m;Medium Pulse Laser Specialization|16d 6h 16m;Small Blaster Specialization|9d 18h 05m;Small Artillery Specialization|9d 18h 10m;Small Pulse Laser Specialization|9d 18h 10m;Target Painting|13d 7h 19m;Burst Projector Operation|2d 12h 03m;Command Ships|20h 54m;Infomorph Synchronizing|9d 10h 36m;Advanced Infomorph Psychology|23d 14h 31m;Elite Infomorph Psychology|1h 37m;Elite Infomorph Psychology|7h 31m;Caldari Battlecruiser|19d 12h 19m;Energy Pulse Weapons|8d 20h 52m;Breacher Pod Clone Longevity|21h 57m;Breacher Pod Clone Efficacity|15h 41m;Breacher Pod Projection|15h 41m;Breacher Pod Rapid Firing|15h 41m;Long Distance Jamming|17d 17h 45m;Signal Suppression|22d 4h 11m;Signal Dispersion|22d 4h 11m;Frequency Modulation|13d 7h 19m;Marauders|4h 37m;Gallente Battleship|3h 16m;Large Hybrid Turret|12h 12m;Marauders|1d 2h 08m;Gallente Battleship|19h 31m;Large Hybrid Turret|2d 20h 59m;Marauders|6d 3h 50m;Gallente Battleship|4d 14h 23m;Gallente Battleship|26d 26m;Marauders|34d 20h 17m;Large Hybrid Turret|16d 6h 16m;Large Blaster Specialization|44m;Large Railgun Specialization|44m;Large Blaster Specialization|3h 27m;Large Railgun Specialization|3h 27m;Large Railgun Specialization|19h 31m;Large Blaster Specialization|19h 31m;Large Blaster Specialization|4d 14h 23m;Large Blaster Specialization|26d 26m;Large Railgun Specialization|4d 14h 23m;Large Railgun Specialization|26d 26m;Minmatar Battleship|19h 31m;Large Projectile Turret|12h 12m;Minmatar Battleship|4d 14h 23m;Large Projectile Turret|2d 20h 59m;Minmatar Destroyer|6d 12h 06m;Large Projectile Turret|16d 6h 16m;Large Autocannon Specialization|44m;Large Autocannon Specialization|3h 27m;Large Autocannon Specialization|19h 31m;Minmatar Battleship|26d 26m;Large Autocannon Specialization|4d 14h 23m;Large Autocannon Specialization|26d 26m;Large Artillery Specialization|44m;Large Artillery Specialization|3h 27m;Large Artillery Specialization|19h 31m;Large Artillery Specialization|4d 14h 23m;Large Artillery Specialization|26d 26m;Large Energy Turret|12h 12m;Large Energy Turret|2d 20h 59m;Sentry Drone Interfacing|3d 9h 42m;Interceptors|10h 27m;Torpedoes|13d 13m;Torpedo Specialization|44m;Torpedo Specialization|3h 27m;Torpedo Specialization|19h 31m;Torpedo Specialization|4d 14h 23m;Torpedo Specialization|26d 26m;Amarr Tactical Destroyer|9d 18h 10m;Tactical Weapon Reconfiguration|19h 31m;Information Command Specialist|4d 4h 09m;Advanced Target Management|13d 7h 19m;Tactical Weapon Reconfiguration|4d 14h 23m;Information Command Specialist|23d 14h 31m;Resistance Phasing|13d 7h 19m;Burst Projector Operation|35d 11h 30m;Micro Jump Drive Operation|3d 9h 42m;Armored Command Specialist|23d 14h 31m;Command Burst Specialist|28d 7h 49m;Shield Command Specialist|23d 14h 31m;Signature Masking|22d 4h 11m;Neurotoxin Control|8d 20h 52m;Neurotoxin Recovery|22d 4h 11m;Electronic Attack Ships|2d 11h 08m;Mutated Drone Specialization|17h 20m;Mutated Drone Specialization|4d 2h 02m;Elite Infomorph Psychology|1d 18h 29m;Elite Infomorph Psychology|10d 21m;Amarr Battleship|3h 27m;Amarr Battleship|19h 31m;Amarr Battleship|4d 14h 23m;Amarr Battleship|26d 26m;Interceptors|2d 11h 08m;Interceptors|13d 22h 31m;Caldari Strategic Cruiser|12h 12m;Caldari Propulsion Systems|13h 48m;Caldari Offensive Systems|13h 48m;Caldari Core Systems|18h 49m;Caldari Defensive Systems|18h 49m;Caldari Strategic Cruiser|2d 20h 59m;Caldari Offensive Systems|3d 6h 03m;Caldari Propulsion Systems|3d 6h 03m;Caldari Core Systems|4d 10h 26m;Caldari Defensive Systems|4d 10h 26m;Caldari Strategic Cruiser|16d 6h 16m;Astrogeology|13d 7h 19m;EDENCOM Frigate|4h 53m;EDENCOM Frigate|1d 3h 36m;Sentry Drone Interfacing|19d 6h 10m;Advanced Spaceship Command|2d 20h 59m;Advanced Spaceship Command|16d 6h 16m;Capital Ships|1h 18m;Jump Drive Operation|3d 9h 42m;Cynosural Field Theory|3d 6h 56m;Salvaging|2d 8h 27m;Interdictors|17d 10h 09m;Tactical Weapon Reconfiguration|26d 26m;Salvaging|13d 7h 19m;Command Ships|4d 22h 16m;Large Energy Turret|16d 6h 16m'.split(';').map(function (row, i) {
+var parts = row.split('|');
+var done = (levelOf[parts[0]] || 0) + (seen[parts[0]] || 0);
+seen[parts[0]] = (seen[parts[0]] || 0) + 1;
+return {
+n: i + 1, name: parts[0], time: parts[1], target: done + 1, active: i === 0,
+open: tInfo === i + 1, openAttr: tInfo === i + 1 ? 'true' : 'false',
+infoColor: tInfo === i + 1 ? accent : '#7C8794', infoBg: tInfo === i + 1 ? '#1A1F26' : 'transparent',
+desc: descriptions[parts[0]] || 'Description not loaded in this mockup. The live site already holds it for every skill.',
+toggleInfo: function () { self.setState({ tinfo: tInfo === i + 1 ? 0 : i + 1 }); },
+boxes: [0, 1, 2, 3, 4].map(function (b) {
+if (b < done) { return { border: '#C9CED6', bg: '#C9CED6', anim: 'none' }; }
+if (b === done) { return i === 0 ? { border: accent, bg: trainingTint, anim: 'yo-throb 1.6s ease-in-out infinite' } : { border: queuedLine, bg: 'transparent', anim: 'none' }; }
+return { border: '#333B46', bg: 'transparent', anim: 'none' };
+})
+};
+});
+var shown = all ? built : built.filter(function (g) { return g.selected; });
+return { accent: accent, groups: built, shown: shown, showRail: !all, tabs: tabs, queues: queues, trainingRows: trainingRows, isOverview: tab === 'overview', isSkills: tab === 'skills', isTraining: tab === 'training', perChar: tab !== 'overview', chars: chars, charName: charName, charInitials: charInitials, charsOpen: charsOpen, charsOpenAttr: charsOpen ? 'true' : 'false', toggleChars: toggleChars, trainingBg: 'color-mix(in srgb, ' + accent + ' 40%, transparent)', queuedBorder: 'color-mix(in srgb, ' + accent + ' 65%, transparent)' };
+}
+}
+</script>
+</body>
+</html>

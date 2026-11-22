@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Wallet (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050607}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="max-width: 390px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; overflow: hidden; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 0 16px; border-bottom: 1px solid #1C2128">
+<a href="MobileMain.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 56px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="order: 3; flex: 0 0 auto; width: calc(100% + 32px); box-sizing: border-box; margin: 0 -16px; padding: 0 8px; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; border-top: 1px solid #14181D; font-size: 13px; font-weight: 500; white-space: nowrap">
+<a href="MobileMain.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Overview</a>
+<a href="MobileSkills.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Skills</a>
+<a href="MobileClones.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Clones</a>
+<a href="MobileShips.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Ships</a>
+<a href="MobileAssets.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Assets</a>
+<a href="#" aria-current="page" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 16px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 24px 16px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; line-height: 1.15">Wallet</h1>
+<div style="position: relative; margin-top: 6px">
+<button type="button" onClick="{{toggleChars}}" aria-haspopup="listbox" aria-expanded="{{charsOpenAttr}}" aria-label="Character: {{charName}}" style="display: flex; align-items: center; gap: 10px; height: 44px; min-width: 240px; padding: 0 12px 0 6px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{charInitials}}</span>
+<span style="flex: 1; min-width: 0">{{charName}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{charsOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Characters" style="position: absolute; top: 50px; left: 0; z-index: 10; box-sizing: border-box; min-width: 320px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #111418; border: 1px solid #2A313B; border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55)">
+<sc-for list="{{chars}}" as="c" hint-placeholder-count="6">
+<button type="button" role="option" aria-selected="{{c.selAttr}}" onClick="{{c.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 5px; background: {{c.bg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{c.initials}}</span>
+<span style="flex: 1; min-width: 0">{{c.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.1em; color: #7C8794">{{c.tag}}</span>
+<span style="flex: none; width: 56px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: #9AA3AE">{{c.sp}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+<div style="flex: 1 1 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Balance</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 26px; font-weight: 500; line-height: 1">50,000,000.00 <span style="font-size: 13px; font-weight: 400; color: #9AA3AE">ISK</span></span>
+</div>
+</div>
+
+<div role="tablist" aria-label="Wallet views" style="align-self: flex-start; display: flex; gap: 2px; padding: 3px; background: #0E1114; border: 1px solid #1C2128; border-radius: 8px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{t.selAttr}}" onClick="{{t.pick}}" style="height: 44px; padding: 0 18px; border: 0; border-radius: 5px; background: {{t.bg}}; color: {{t.color}}; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">{{t.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{isJournal}}" hint-placeholder-val="{{true}}">
+<section aria-label="Journal" style="display: flex; flex-direction: column; gap: 14px">
+<div style="overflow-x: auto; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div>
+<sc-for list="{{days}}" as="d" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 12px; padding: 10px 16px; background: #0E1114; border-bottom: 1px solid #1C2128">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: 500; letter-spacing: 0.04em">{{d.date}}</h2>
+<span style="font-size: 12px; color: #9AA3AE">{{d.count}}</span>
+</div>
+<sc-for list="{{d.rows}}" as="r" hint-placeholder-count="12">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; padding: 10px 16px; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span style="order: 1; flex: none; width: 52px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{r.time}}</span>
+<span style="order: 2; flex: 1 1 130px; min-width: 0; font-size: 13.5px">{{r.type}}</span>
+<span style="order: 4; flex: 1 1 40%; min-width: 0; margin-left: 64px; font-size: 12.5px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.party}}</span>
+<span style="order: 3; flex: none; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: {{r.color}}">{{r.amount}}</span>
+<span style="order: 5; flex: none; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #7C8794">{{r.balance}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 13px; color: #9AA3AE">Showing the latest 40 journal entries</span>
+<button type="button" style="height: 44px; padding: 0 16px; border: 1px solid #2A313B; border-radius: 6px; background: transparent; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">Show more</button>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{isTrades}}" hint-placeholder-val="{{false}}">
+<section aria-label="Transactions" style="display: flex; flex-direction: column; gap: 14px">
+<div style="overflow-x: auto; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div>
+<sc-for list="{{tradeDays}}" as="d" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 12px; padding: 10px 16px; background: #0E1114; border-bottom: 1px solid #1C2128">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: 500; letter-spacing: 0.04em">{{d.date}}</h2>
+<span style="font-size: 12px; color: #9AA3AE">{{d.count}}</span>
+</div>
+<sc-for list="{{d.rows}}" as="r" hint-placeholder-count="6">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 16px; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span style="order: 1; flex: none; width: 52px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{r.time}}</span>
+<span style="order: 3; flex: none"><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; border: 1px solid {{r.sideBorder}}; color: {{r.color}}">{{r.side}}</span></span>
+<span style="order: 2; flex: 1 1 220px; min-width: 0; display: flex; align-items: center; gap: 10px"><span role="img" aria-label="Item icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="9" height="9" rx="1"></rect><path d="M6 8h4M8 6v4"></path></svg></span><span style="min-width: 0; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.item}}</span></span>
+<span style="order: 4; flex: 1 1 130px; min-width: 0; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{r.qtyUnit}}</span>
+<span style="order: 5; flex: none; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: {{r.color}}">{{r.total}}</span>
+<span title="{{r.location}}" style="order: 6; flex: 1 1 100%; min-width: 0; font-size: 12px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.location}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 13px; color: #9AA3AE">Showing the latest 20 market transactions</span>
+<button type="button" style="height: 44px; padding: 0 16px; border: 1px solid #2A313B; border-radius: 6px; background: transparent; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">Show more</button>
+</div>
+</section>
+</sc-if>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"$preview":{"width":390,"height":3400}}'>
+class Component extends DCLogic {
+renderVals() {
+var self = this;
+var accent = this.props.accent ?? '#F5A524';
+var roster = [['TrilliumONE', 'TO', 'MAIN', '112.5M'], ['Sasha-9999', 'S9', 'MAIN', '25.5M'], ['Reacher-9', 'R9', 'ALT', '4.8M'], ['Lana C', 'LC', 'ALT', '10.4M'], ['Faster Than-Light', 'FL', 'ALT', '70.1M'], ['Faster Than-Ever', 'FE', 'ALT', '31.1M']];
+var charName = (this.state && this.state.char) || 'TrilliumONE';
+var charsOpen = !!(this.state && this.state.charsOpen);
+var charInitials = 'TO';
+var chars = roster.map(function (r) {
+var sel = r[0] === charName;
+if (sel) { charInitials = r[1]; }
+return {
+name: r[0], initials: r[1], tag: r[2], sp: r[3],
+selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent',
+pick: function () { self.setState({ char: r[0], charsOpen: false }); }
+};
+});
+var toggleChars = function () { self.setState({ charsOpen: !charsOpen }); };
+var GOOD = '#4FD1C5';
+var BAD = '#FF8A7A';
+var ME = 'TrilliumONE';
+var tab = (this.state && this.state.tab) || 'journal';
+var tabs = [['journal', 'Journal'], ['trades', 'Transactions']].map(function (t) {
+var sel = t[0] === tab;
+return { label: t[1], selAttr: sel ? 'true' : 'false', bg: sel ? '#1A1F26' : 'transparent', color: sel ? '#E6E9ED' : '#9AA3AE', pick: function () { self.setState({ tab: t[0], charsOpen: false }); } };
+});
+function byDay(rows, noun) {
+var days = [];
+rows.forEach(function (r) {
+var d = days.length && days[days.length - 1].date === r.date ? days[days.length - 1] : null;
+if (!d) { d = { date: r.date, rows: [] }; days.push(d); }
+d.rows.push(r);
+});
+days.forEach(function (d) { d.count = d.rows.length + ' ' + noun + (d.rows.length === 1 ? '' : (noun === 'entry' ? '' : 's')); if (noun === 'entry' && d.rows.length !== 1) { d.count = d.rows.length + ' entries'; } });
+return days;
+}
+function money(text) { return text.replace(' ISK', ''); }
+var journal = ["2026-01-02 10:33 ~ Transaction tax ~ TrilliumONE ~ Secure Commerce Commission ~ -189,752.69 ISK ~ 50,000,000.00 ISK", "2026-01-02 09:58 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 50,189,752.69 ISK", "2026-01-02 09:49 ~ Market escrow ~ TrilliumONE ~ TrilliumONE ~ -2,970,094.15 ISK ~ 40,189,752.69 ISK", "2026-01-02 09:42 ~ Jump clone activation fee ~ TrilliumONE ~ Caldari Navy ~ -900,000.00 ISK ~ 43,159,846.84 ISK", "2026-01-02 09:34 ~ Market escrow ~ TrilliumONE ~ TrilliumONE ~ -4,886,024.51 ISK ~ 44,059,846.84 ISK", "2026-01-02 09:19 ~ Market escrow ~ TrilliumONE ~ TrilliumONE ~ -2,871,991.51 ISK ~ 48,945,871.35 ISK", "2026-01-02 08:42 ~ Market transaction ~ Example Pilot A ~ TrilliumONE ~ 1,229,476.22 ISK ~ 51,817,862.86 ISK", "2026-01-02 08:37 ~ Market transaction ~ Example Pilot A ~ TrilliumONE ~ 2,208,674.95 ISK ~ 50,588,386.64 ISK", "2026-01-02 08:34 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 48,379,711.69 ISK", "2026-01-02 08:22 ~ Daily goal payouts ~ AIR Laboratories ~ TrilliumONE ~ 500,000.00 ISK ~ 38,379,711.69 ISK", "2026-01-02 08:07 ~ Market transaction ~ Example Pilot B ~ TrilliumONE ~ 3,282,892.80 ISK ~ 37,879,711.69 ISK", "2026-01-02 07:45 ~ Market transaction ~ Example Pilot A ~ TrilliumONE ~ 501,917.28 ISK ~ 34,596,818.89 ISK", "2026-01-02 07:03 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 34,094,901.61 ISK", "2026-01-02 06:49 ~ Brokers fee ~ TrilliumONE ~ Caldari Navy ~ -34,770.98 ISK ~ 24,094,901.61 ISK", "2026-01-02 06:17 ~ Market transaction ~ Example Pilot B ~ TrilliumONE ~ 2,877,231.99 ISK ~ 24,129,672.59 ISK", "2026-01-02 05:48 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 21,252,440.60 ISK", "2026-01-02 05:46 ~ Market escrow ~ TrilliumONE ~ TrilliumONE ~ -3,171,246.05 ISK ~ 11,252,440.60 ISK", "2026-01-02 05:44 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 826,067.97 ISK ~ 14,423,686.65 ISK", "2026-01-02 05:37 ~ Jump clone activation fee ~ TrilliumONE ~ Caldari Navy ~ -900,000.00 ISK ~ 13,597,618.68 ISK", "2026-01-02 05:35 ~ Achievement milestone reward ~ AIR Laboratories ~ TrilliumONE ~ 71,560.19 ISK ~ 14,497,618.68 ISK", "2026-01-02 05:30 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 453,051.36 ISK ~ 14,426,058.49 ISK", "2026-01-02 05:29 ~ Brokers fee ~ TrilliumONE ~ Caldari Navy ~ -71,905.39 ISK ~ 13,973,007.13 ISK", "2026-01-02 05:24 ~ Brokers fee ~ TrilliumONE ~ Caldari Navy ~ -9,203.24 ISK ~ 14,044,912.52 ISK", "2026-01-02 05:19 ~ Daily goal payouts ~ AIR Laboratories ~ TrilliumONE ~ 500,000.00 ISK ~ 14,054,115.76 ISK", "2026-01-01 10:42 ~ Transaction tax ~ TrilliumONE ~ Secure Commerce Commission ~ -154,091.32 ISK ~ 13,554,115.76 ISK", "2026-01-01 10:11 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 13,708,207.08 ISK", "2026-01-01 09:28 ~ Achievement milestone reward ~ AIR Laboratories ~ TrilliumONE ~ 59,012.24 ISK ~ 3,708,207.08 ISK", "2026-01-01 09:22 ~ Achievement milestone reward ~ AIR Laboratories ~ TrilliumONE ~ 84,436.99 ISK ~ 3,649,194.84 ISK", "2026-01-01 09:13 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ 3,564,757.85 ISK", "2026-01-01 09:10 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 110,452.65 ISK ~ -6,435,242.15 ISK", "2026-01-01 08:49 ~ Transaction tax ~ TrilliumONE ~ Secure Commerce Commission ~ -189,212.81 ISK ~ -6,545,694.80 ISK", "2026-01-01 08:35 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 845,539.22 ISK ~ -6,356,481.99 ISK", "2026-01-01 08:34 ~ Transaction tax ~ TrilliumONE ~ Secure Commerce Commission ~ -16,830.54 ISK ~ -7,202,021.21 ISK", "2026-01-01 07:55 ~ Daily goal payouts ~ AIR Laboratories ~ TrilliumONE ~ 500,000.00 ISK ~ -7,185,190.67 ISK", "2026-01-01 07:27 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ -7,685,190.67 ISK", "2026-01-01 06:24 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 362,976.77 ISK ~ -17,685,190.67 ISK", "2026-01-01 06:17 ~ Jump clone activation fee ~ TrilliumONE ~ Caldari Navy ~ -900,000.00 ISK ~ -18,048,167.44 ISK", "2026-01-01 06:00 ~ Achievement milestone reward ~ AIR Laboratories ~ TrilliumONE ~ 27,256.29 ISK ~ -17,148,167.44 ISK", "2026-01-01 05:37 ~ Bounty prizes ~ CONCORD ~ TrilliumONE ~ 445,893.01 ISK ~ -17,175,423.73 ISK", "2026-01-01 05:20 ~ Player donation ~ Example Pilot C ~ TrilliumONE ~ 10,000,000.00 ISK ~ -17,621,316.74 ISK"].map(function (line) {
+var p = line.split(' ~ ');
+var amount = money(p[4]);
+var negative = amount.charAt(0) === '-';
+var other = p[2] === ME ? p[3] : p[2];
+return {
+date: p[0].slice(0, 10), time: p[0].slice(11), type: p[1],
+party: other === ME ? 'Own escrow' : other,
+amount: negative ? '\u2212' + amount.slice(1) : '+' + amount,
+color: negative ? BAD : GOOD,
+balance: money(p[5])
+};
+});
+var trades = ["2026-01-02 13:25 ~ Buy ~ Nanite Repair Paste ~ 100 ~ 25,000.00 ISK ~ 2,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-02 09:54 ~ Buy ~ Scourge Rage Heavy Assault Missile ~ 1,000 ~ 250.00 ISK ~ 250,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-02 08:43 ~ Buy ~ Damage Control II ~ 1 ~ 400,000.00 ISK ~ 400,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-02 07:12 ~ Buy ~ Merlin ~ 1 ~ 450,000.00 ISK ~ 450,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-02 06:59 ~ Buy ~ Medium Shield Extender II ~ 1 ~ 900,000.00 ISK ~ 900,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-02 06:00 ~ Buy ~ Warp Scrambler II ~ 1 ~ 1,500,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 17:03 ~ Buy ~ Warp Scrambler II ~ 1 ~ 1,500,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 16:39 ~ Buy ~ Warp Scrambler II ~ 1 ~ 1,500,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 14:23 ~ Sell ~ Nanite Repair Paste ~ 100 ~ 25,000.00 ISK ~ 2,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 12:05 ~ Buy ~ Nanite Repair Paste ~ 100 ~ 25,000.00 ISK ~ 2,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 11:29 ~ Sell ~ Merlin ~ 1 ~ 450,000.00 ISK ~ 450,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 11:07 ~ Buy ~ Warp Scrambler II ~ 1 ~ 1,500,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 09:45 ~ Buy ~ Stasis Webifier II ~ 2 ~ 1,200,000.00 ISK ~ 2,400,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2026-01-01 08:56 ~ Buy ~ Warp Scrambler II ~ 1 ~ 1,500,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 15:24 ~ Sell ~ Medium Shield Extender II ~ 1 ~ 900,000.00 ISK ~ 900,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 14:39 ~ Buy ~ Hobgoblin II ~ 5 ~ 300,000.00 ISK ~ 1,500,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 14:07 ~ Buy ~ Medium Shield Extender II ~ 1 ~ 900,000.00 ISK ~ 900,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 11:18 ~ Buy ~ Scourge Rage Heavy Assault Missile ~ 1,000 ~ 250.00 ISK ~ 250,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 10:26 ~ Buy ~ Scourge Rage Heavy Assault Missile ~ 1,000 ~ 250.00 ISK ~ 250,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2025-12-31 07:08 ~ Sell ~ Merlin ~ 1 ~ 450,000.00 ISK ~ 450,000.00 ISK ~ Jita IV - Moon 4 - Caldari Navy Assembly Plant"].map(function (line) {
+var p = line.split(' ~ ');
+var buy = p[1] === 'Buy';
+return {
+date: p[0].slice(0, 10), time: p[0].slice(11), side: p[1].toUpperCase(), item: p[2], qty: p[3],
+unit: money(p[4]), qtyUnit: p[3] + ' × ' + money(p[4]), total: (buy ? '\u2212' : '+') + money(p[5]), location: p[6],
+color: buy ? BAD : GOOD,
+sideBorder: buy ? 'color-mix(in srgb, #FF8A7A 45%, transparent)' : 'color-mix(in srgb, #4FD1C5 45%, transparent)'
+};
+});
+return { accent: accent, tabs: tabs, isJournal: tab === 'journal', isTrades: tab === 'trades',
+days: byDay(journal, 'entry'), tradeDays: byDay(trades, 'transaction'),
+chars: chars, charName: charName, charInitials: charInitials, charsOpen: charsOpen, charsOpenAttr: charsOpen ? 'true' : 'false', toggleChars: toggleChars };
+}
+}
+</script>
+</body>
+</html>

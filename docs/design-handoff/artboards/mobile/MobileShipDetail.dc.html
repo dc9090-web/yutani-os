@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Loki (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050607}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="max-width: 390px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; overflow: hidden; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 0 16px; border-bottom: 1px solid #1C2128">
+<a href="MobileMain.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 56px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="order: 3; flex: 0 0 auto; width: calc(100% + 32px); box-sizing: border-box; margin: 0 -16px; padding: 0 8px; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; border-top: 1px solid #14181D; font-size: 13px; font-weight: 500; white-space: nowrap">
+<a href="MobileMain.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Overview</a>
+<a href="MobileSkills.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Skills</a>
+<a href="MobileClones.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Clones</a>
+<a href="MobileShips.dc.html" aria-current="page" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Ships</a>
+<a href="MobileAssets.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Assets</a>
+<a href="MobileWallet.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 16px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 20px 16px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<a href="MobileShips.dc.html" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 13px; font-weight: 500">
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 3l-3 3 3 3"></path></svg>
+All ships
+</a>
+
+<section aria-label="Ship summary" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 16px; padding: 16px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<span role="img" aria-label="Ship image placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 8px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 18px; color: #9AA3AE">LO</span>
+<div style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Strategic Cruiser · Minmatar</span>
+<h1 style="margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; line-height: 1.15">Loki<span style="font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 16px; letter-spacing: 0; color: #C9CED6">Loki - TrilliumONE</span></h1>
+<span style="font-size: 13.5px; color: #9AA3AE"><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; color: #4FD1C5">0.9</span> <span style="font-weight: 500; color: #E6E9ED">Jita</span> · Jita IV - Moon 4 - Caldari Navy Assembly Plant</span>
+<span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 4px; font-size: 13px; color: #9AA3AE">Mastery
+<span role="img" aria-label="Mastery level 4 of 5" style="display: flex; gap: 3px"><span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span><span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span><span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span><span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #C9CED6; background: #C9CED6"></span><span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid #333B46"></span></span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #E6E9ED">IV of V</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; border: 1px solid {{accent}}; color: {{accent}}">EXAMPLE DATA</span>
+</span>
+</div>
+<div style="flex: 1 1 100%; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 14px; border-top: 1px solid #1C2128">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Estimated value</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 24px; font-weight: 500; line-height: 1">1.92B <span style="font-size: 12px; font-weight: 400; color: #9AA3AE">ISK</span></span>
+<div style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px 14px; font-size: 12.5px; color: #4FD1C5">
+<span style="display: flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>Fit is legal</span>
+<span style="display: flex; align-items: center; gap: 7px"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>All skills trained</span>
+</div>
+</div>
+</section>
+
+<section aria-label="Key figures" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1C2128; border: 1px solid #1C2128; border-radius: 8px; overflow: hidden">
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">DPS</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500">{{totalDps}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{dpsSub}}</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">EHP</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500">36,074</span>
+<span style="font-size: 12px; color: #9AA3AE">Shield recharge 27.0 hp/s</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Speed</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500">1,765 <span style="font-size: 13px; color: #9AA3AE">m/s</span></span>
+<span style="font-size: 12px; color: #9AA3AE">With MWD · 289.1 m/s without</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Capacitor</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500; color: #4FD1C5">Stable 42%</span>
+<span style="font-size: 12px; color: #9AA3AE">+2.2 GJ/s</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Lock range</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500">81.3 <span style="font-size: 13px; color: #9AA3AE">km</span></span>
+<span style="font-size: 12px; color: #9AA3AE">6 targets · 300 mm scan res</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 7px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Align time</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500">5.23 <span style="font-size: 13px; color: #9AA3AE">s</span></span>
+<span style="font-size: 12px; color: #9AA3AE">7.12 s with MWD on</span>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 20px">
+
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+
+<section aria-label="Modules" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Modules</h2>
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid #1C2128; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">
+<span style="flex: 1; min-width: 0">Module</span>
+<span style="flex: none; width: 70px; text-align: right">State</span>
+</div>
+<sc-for list="{{racks}}" as="k" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 10px; padding: 6px 0 4px">
+<h3 style="margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase">{{k.name}}</h3>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{k.used}}</span>
+</div>
+<sc-for list="{{k.rows}}" as="m" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span role="img" aria-label="Icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="9" height="9" rx="1"></rect><path d="M6 8h4M8 6v4"></path></svg></span>
+<span style="flex: none; width: 22px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{m.qty}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px">{{m.name}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{m.sub}}</span>
+</span>
+<span style="flex: none; width: 70px; display: flex; justify-content: flex-end"><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; border: 1px solid {{m.stateBorder}}; color: {{m.stateColor}}">{{m.state}}</span></span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</section>
+
+<section aria-label="Ammunition" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Ammunition</h2>
+<span style="font-size: 12.5px; color: #9AA3AE">5 weapons loaded with the best ammo in cargo</span>
+</div>
+<div style="display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{ammo}}" as="a" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; gap: 5px; padding: 10px 0; border-bottom: 1px solid #171B21">
+<span style="font-size: 13.5px">{{a.name}}</span>
+<span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 12.5px; color: #C9CED6"><span style="display: flex; align-items: center; gap: 7px"><span aria-hidden="true" style="flex: none; width: 8px; height: 8px; border-radius: 2px; background: {{a.color}}"></span>{{a.type}}</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{a.meta}}</span></span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Consumables" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Consumables</h2>
+<div style="display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 44px; padding: 6px 0; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span style="flex: 1 1 240px; min-width: 0; font-size: 13.5px">Nanite Repair Paste</span>
+<span style="flex: 0 1 220px; font-size: 13px; color: #C9CED6">Overheat repair</span>
+<span style="flex: none; width: 130px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">—</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 44px; padding: 6px 0; box-sizing: border-box; border-bottom: 1px solid #171B21">
+<span style="flex: 1 1 240px; min-width: 0; font-size: 13.5px">Agency 'Pyrolancea' DB5 Dose II</span>
+<span style="flex: 0 1 220px; font-size: 13px; color: #C9CED6">+5% weapon damage</span>
+<span style="flex: none; width: 130px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">Slot 11 · 30 min</span>
+</div>
+</div>
+</section>
+
+<section aria-label="Cargo and drones" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Cargo and drones</h2>
+<sc-for list="{{holds}}" as="h" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 10px; padding: 6px 0 6px; border-bottom: 1px solid #1C2128">
+<h3 style="margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase">{{h.name}}</h3>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{h.used}}</span>
+</div>
+<sc-for list="{{h.items}}" as="i" hint-placeholder-count="4">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 3px 12px; padding: 9px 0; border-bottom: 1px solid #171B21">
+<span style="flex: 1 1 100%; min-width: 0; font-size: 13.5px">{{i.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #9AA3AE">{{i.qty}}</span>
+<span style="flex: none; width: 150px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px">{{i.value}}</span>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</section>
+
+<section aria-label="Ship bonuses" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Ship bonuses</h2>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{bonuses}}" as="b" hint-placeholder-count="8">
+<li style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid #171B21">
+<span style="flex: 1 1 100%; font-size: 12.5px; font-weight: 500; color: #9AA3AE">{{b.skill}}</span>
+<span style="flex: 1 1 260px; min-width: 0; font-size: 13.5px">{{b.text}}</span>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-label="Skills" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Skills</h2>
+<sc-if value="{{gapExample}}" hint-placeholder-val="{{true}}">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; border: 1px solid {{accent}}; color: {{accent}}">EXAMPLE DATA</span>
+</sc-if>
+</div>
+<span style="font-size: 12.5px; color: #9AA3AE">{{gapNote}}</span>
+</div>
+<sc-if value="{{gapEmpty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 14px 0 2px; border-top: 1px solid #1C2128; font-size: 13.5px; color: #4FD1C5">Every skill that affects this ship, its bonuses, modules and drones is at level 5.</p>
+</sc-if>
+<sc-for list="{{gapGroups}}" as="g" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 10px; padding: 6px 0 6px; border-bottom: 1px solid #1C2128">
+<h3 style="margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase">{{g.name}}</h3>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{g.count}}</span>
+</div>
+<sc-for list="{{g.skills}}" as="k" hint-placeholder-count="2">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 24px; padding: 11px 0; border-bottom: 1px solid #171B21">
+<div style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 5px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span role="img" aria-label="Level {{k.level}} of 5" style="flex: none; display: flex; gap: 3px; width: 62px; height: 10px">
+<sc-for list="{{k.boxes}}" as="b" hint-placeholder-count="5">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}"></span>
+</sc-for>
+</span>
+<span aria-hidden="true" style="flex: none; width: 10px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{k.level}}</span>
+<span style="margin-left: 4px; font-size: 13.5px; font-weight: 500">{{k.name}}</span>
+</div>
+<span style="font-size: 12.5px; color: #C9CED6">{{k.effect}}</span>
+</div>
+<div style="flex: 0 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Affects</span>
+<span style="font-size: 13px">{{k.affects}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</section>
+
+</div>
+
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+
+<section aria-label="Fitting" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Fitting</h2>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">CPU</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #C9CED6">428.65 / 562.50 tf</span>
+</div>
+<div role="img" aria-label="CPU 76% used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: 76%; background: repeating-linear-gradient(90deg, #C9CED6 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Powergrid</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #C9CED6">828.60 / 892.50 MW</span>
+</div>
+<div role="img" aria-label="Powergrid 93% used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: 93%; background: repeating-linear-gradient(90deg, #C9CED6 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Calibration</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #C9CED6">225 / 400</span>
+</div>
+<div role="img" aria-label="Calibration 56% used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: 56%; background: repeating-linear-gradient(90deg, #C9CED6 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">High<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">8 / 8</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Mid<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">5 / 5</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Low<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">4 / 4</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Rigs<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">3 / 3</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Subsystems<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">4 / 4</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Turrets<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">0 / 2</span></span>
+<span style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: #0E1114; border: 1px solid #1C2128; border-radius: 5px; font-size: 12.5px; color: #9AA3AE">Launchers<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">5 / 5</span></span>
+</div>
+</section>
+
+<section aria-label="Defense" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Defense</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px">36,074 <span style="font-size: 11px; color: #9AA3AE">EHP</span></span>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)) minmax(0, 1.3fr); gap: 8px 8px; align-items: end">
+<span></span>
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; text-align: right">EM</span>
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; text-align: right">Therm</span>
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; text-align: right">Kin</span>
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; text-align: right">Exp</span>
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; text-align: right">EHP</span>
+<sc-for list="{{layers}}" as="l" hint-placeholder-count="3">
+<span style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px; font-weight: 500">{{l.name}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: #9AA3AE">{{l.hp}}</span>
+</span>
+<sc-for list="{{l.res}}" as="x" hint-placeholder-count="4">
+<span style="display: flex; flex-direction: column; gap: 5px">
+<span style="text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{x.pct}}</span>
+<span aria-hidden="true" style="display: block; height: 3px; background: #232932"><span style="display: block; height: 3px; width: {{x.pct}}; background: {{x.color}}"></span></span>
+</span>
+</sc-for>
+<span style="align-self: start; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{l.ehp}}</span>
+</sc-for>
+<span style="grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid #1C2128; font-size: 13px; color: #9AA3AE">Total<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; font-weight: 600; color: #E6E9ED">36,074 EHP</span></span>
+</div>
+</section>
+
+<section aria-label="Repairs" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Repairs</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); gap: 1px; background: #1C2128; border: 1px solid #1C2128; border-radius: 6px; overflow: hidden">
+<div style="background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Passive shield</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px">27.0 <span style="font-size: 11px; color: #9AA3AE">hp/s</span></span></div>
+<div style="background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Shield boost</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA3AE">0 <span style="font-size: 11px">hp/s</span></span></div>
+<div style="background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Armor repair</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA3AE">0 <span style="font-size: 11px">hp/s</span></span></div>
+<div style="background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Hull repair</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: #9AA3AE">0 <span style="font-size: 11px">hp/s</span></span></div>
+</div>
+</section>
+
+<sc-for list="{{groupsA}}" as="g" hint-placeholder-count="2">
+<section style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">{{g.title}}</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: {{g.color}}">{{g.headline}}</span>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #171B21">
+<dt style="font-size: 13px; color: #9AA3AE">{{r.k}}</dt>
+<dd style="margin: 0; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: {{r.weight}}">{{r.v}}</dd>
+</div>
+</sc-for>
+</dl>
+</section>
+</sc-for>
+
+<section aria-label="Drones" style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">Drones</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px">{{droneDps}} DPS</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span id="drone-select-label" style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Drones launched</span>
+<button type="button" onClick="{{toggleDrones}}" aria-expanded="{{dronesOpenAttr}}" aria-labelledby="drone-select-label" style="display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; box-sizing: border-box; padding: 8px 12px; background: #0E1114; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span style="flex: 1; min-width: 0">{{droneSummary}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transform: {{dronesChevron}}"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{dronesOpen}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; background: #0E1114; border: 1px solid #2A313B; border-radius: 6px">
+<sc-for list="{{droneRows}}" as="o" hint-placeholder-count="1">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #1C2128">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 13.5px">{{o.name}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: #9AA3AE">{{o.meta}}</span>
+</div>
+<button type="button" onClick="{{o.less}}" aria-label="One fewer {{o.name}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #2A313B; border-radius: 5px; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1; color: {{o.lessColor}}; cursor: {{o.lessCursor}}">−</button>
+<span aria-live="polite" style="flex: none; width: 44px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{o.count}} <span style="color: #7C8794">/ {{o.max}}</span></span>
+<button type="button" onClick="{{o.more}}" aria-label="One more {{o.name}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #2A313B; border-radius: 5px; background: transparent; font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1; color: {{o.moreColor}}; cursor: {{o.moreCursor}}">+</button>
+</div>
+</sc-for>
+<span style="padding: 9px 12px; font-size: 12px; color: #9AA3AE">Only drones in this ship's drone bay are listed. The limit per drone follows the ship's bandwidth and your drone control limit.</span>
+</div>
+</sc-if>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{droneStats}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #171B21">
+<dt style="font-size: 13px; color: #9AA3AE">{{r.k}}</dt>
+<dd style="margin: 0; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px">{{r.v}}</dd>
+</div>
+</sc-for>
+</dl>
+</section>
+
+<sc-for list="{{groupsB}}" as="g" hint-placeholder-count="3">
+<section style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 16px 18px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25">{{g.title}}</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; color: {{g.color}}">{{g.headline}}</span>
+</div>
+<dl style="margin: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #171B21">
+<dt style="font-size: 13px; color: #9AA3AE">{{r.k}}</dt>
+<dd style="margin: 0; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: {{r.weight}}">{{r.v}}</dd>
+</div>
+</sc-for>
+</dl>
+</section>
+</sc-for>
+
+</div>
+
+</div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"skillGaps":{"editor":"enum","default":"Example gaps","options":["Example gaps","This ship"]},"droneBay":{"editor":"enum","default":"Real bay","options":["Real bay","Example mixed bay"]},"$preview":{"width":390,"height":8200}}'>
+class Component extends DCLogic {
+renderVals() {
+var accent = this.props.accent ?? '#F5A524';
+var d = {"racks": [["High", "8 / 8", [[1, "Covert Ops Cloaking Device II", "", "", "", "ACTIVE"], [5, "Caldari Navy Heavy Assault Missile Launcher", "Inferno Rage Heavy Assault Missile", "21.1 km", "—", "ACTIVE"], [1, "Sisters Expanded Probe Launcher", "", "", "", "ACTIVE"], [1, "Dark Blood Medium Energy Neutralizer", "", "12.0 km", "6.0 km", "ACTIVE"]]], ["Mid", "5 / 5", [[1, "Shadow Serpentis 50MN Microwarpdrive", "", "", "", "ACTIVE"], [1, "Thukker Large Shield Extender", "", "", "", "ONLINE"], [1, "Thukker Medium Cap Battery", "", "", "", "ONLINE"], [2, "Federation Navy Stasis Webifier", "", "31.5 km", "—", "ACTIVE"]]], ["Low", "4 / 4", [[3, "Republic Fleet Ballistic Control System", "", "", "", "ONLINE"], [1, "Damage Control II", "", "", "", "ONLINE"]]], ["Rigs", "3 / 3", [[3, "Medium Core Defense Field Extender II", "", "", "", "ONLINE"]]], ["Subsystems", "4 / 4", [[1, "Loki Core - Immobility Drivers", "", "", "", "ONLINE"], [1, "Loki Defensive - Covert Reconfiguration", "", "", "", "ONLINE"], [1, "Loki Offensive - Launcher Efficiency Configuration", "", "", "", "ONLINE"], [1, "Loki Propulsion - Intercalated Nanofibers", "", "", "", "ONLINE"]]]], "ammo": [["Inferno Rage Heavy Assault Missile", "Thermal", "528.6", "21.1 km", "—", "SHORT"], ["Mjolnir Rage Heavy Assault Missile", "EM", "528.6", "21.1 km", "—", "SHORT"], ["Nova Rage Heavy Assault Missile", "Explosive", "528.6", "21.1 km", "—", "SHORT"], ["Caldari Navy Nova Heavy Assault Missile", "Explosive", "391.4", "25.3 km", "—", "SHORT"], ["Guristas Mjolnir Heavy Assault Missile", "EM", "374.4", "25.3 km", "—", "SHORT"]], "holds": [["Drone bay", "40 / 40 m³", [["Imperial Navy Infiltrator", "×4", "7,788,000.00 ISK"]]], ["Cargo", "70.5 / 450 m³", [["Caldari Navy Nova Heavy Assault Missile", "×360", "413,280.00 ISK"], ["Nova Rage Heavy Assault Missile", "×1000", "78,590.00 ISK"], ["Agency \u0027Pyrolancea\u0027 DB5 Dose II", "×2", "17,956,000.00 ISK"], ["Nanite Repair Paste", "×332", "8,681,800.00 ISK"], ["Inferno Rage Heavy Assault Missile", "×705", "54,256.80 ISK"], ["Guristas Mjolnir Heavy Assault Missile", "×625", "687,500.00 ISK"], ["Mjolnir Rage Heavy Assault Missile", "×590", "48,633.70 ISK"], ["Sisters Combat Scanner Probe", "×16", "7,596,800.00 ISK"]]]], "bonuses": [["Minmatar Defensive Systems V", "bonus to all Minmatar Defensive Systems effectiveness"], ["Minmatar Core Systems V", "bonus to all Minmatar Core Systems effectiveness"], ["Minmatar Offensive Systems V", "bonus to all Minmatar Offensive Systems effectiveness"], ["Minmatar Propulsion Systems V", "bonus to all Minmatar Propulsion Systems effectiveness"], ["Minmatar Strategic Cruiser V", "5% reduction in module damage from overheating"], ["Minmatar Strategic Cruiser V", "10% bonus to nanite repair paste repair speed"], ["Role bonus", "Rigs may be removed from this ship without being destroyed"], ["Role bonus", "99% reduction in Scan Probe Launcher CPU requirements"]], "layers": [["Shield", "11,340 hp · 1,050 s", [56, 48, 48, 56]], ["Armor", "3,125 hp", [83, 59, 36, 24]], ["Hull", "2,500 hp", [60, 60, 60, 60]]], "groups": [["Capacitor", "Stable 42%", "good", [["Capacity", "2,447 GJ / 4m 4s"], ["Recharge", "25.1 GJ/s peak"], ["Net change", "+2.2 GJ/s (8.9%)"]]], ["Offense", "609.2 DPS", "", [["Weapons", "528.6 dps"], ["Drones", "80.6 dps"], ["Volley", "1,177 HP"]]], ["Targeting", "81.3 km", "", [["Sensor strength", "20.4 points (Ladar)"], ["Scan resolution", "300 mm"], ["Signature radius", "203 m · 1,166 m MWD"], ["Max targets", "6×"]]], ["Navigation", "289.1 m/s", "", [["With MWD", "1,765.1 m/s"], ["Mass", "13,800.0 t"], ["Inertia", "0.2734×"], ["Warp speed", "4.00 AU/s"], ["Align time", "5.23 s"], ["Align, MWD on", "7.12 s"]]], ["Drones", "80.6 DPS", "", [["Bandwidth", "40 / 40 Mbit/s"], ["Control range", "60.0 km"], ["In bay", "4 drones"]]], ["Estimated value", "", "", [["Hull", "227,700,000.00 ISK"], ["Modules and rigs", "1,644,347,700.00 ISK"], ["Charges", "384.80 ISK"], ["Drones", "7,788,000.00 ISK"], ["Cargo", "35,516,860.50 ISK"], ["Total", "1,915,352,945.30 ISK"]]]]};
+var dmg = { EM: '#5CC8FF', Thermal: '#FF8A7A', Kinetic: '#9AA3AE', Explosive: '#F5A524' };
+var resColors = [dmg.EM, dmg.Thermal, dmg.Kinetic, dmg.Explosive];
+var racks = d.racks.map(function (k) {
+return { name: k[0], used: k[1], rows: k[2].map(function (m) {
+var active = m[5] === 'ACTIVE';
+return {
+qty: m[0] > 1 ? m[0] + '×' : '', name: m[1], charge: m[2],
+sub: [m[2], m[3] ? 'optimal ' + m[3] : '', (m[4] && m[4] !== '—') ? 'falloff ' + m[4] : ''].filter(function (t) { return t; }).join(' · '), optimal: m[3], falloff: m[4], state: m[5],
+stateColor: active ? accent : '#9AA3AE',
+stateBorder: active ? 'color-mix(in srgb, ' + accent + ' 55%, transparent)' : '#2A313B'
+};
+}) };
+});
+var ammo = d.ammo.map(function (a) { return { name: a[0], type: a[1], color: dmg[a[1]] || '#9AA3AE', dps: a[2], optimal: a[3], falloff: a[4], range: a[5], meta: a[2] + ' dps · ' + a[3] + ' · ' + a[5].toLowerCase() + ' range' }; });
+var holds = d.holds.map(function (h) { return { name: h[0], used: h[1], items: h[2].map(function (i) { return { name: i[0], qty: i[1], value: i[2] }; }) }; });
+var bonuses = d.bonuses.map(function (b) { return { skill: b[0], text: b[1] }; });
+var layerEhp = ['≈ 23.6k', '≈ 6.3k', '≈ 6.3k'];
+var layers = d.layers.map(function (l, li) { return { name: l[0], hp: l[1], ehp: layerEhp[li], res: l[2].map(function (p, n) { return { pct: p + '%', color: resColors[n] }; }) }; });
+var groups = d.groups.map(function (g) {
+return { title: g[0], headline: g[1], color: g[2] === 'good' ? '#4FD1C5' : '#E6E9ED', rows: g[3].map(function (r) { return { k: r[0], v: r[1], weight: r[0] === 'Total' ? '600' : '400' }; }) };
+});
+var gapMode = (this.props.skillGaps ?? 'Example gaps') !== 'This ship';
+var gapData = gapMode ? [["Ship and bonuses", [["Minmatar Strategic Cruiser", 4, "5% reduction in module damage from overheating and 10% bonus to nanite repair paste repair speed, per level", "Loki hull"], ["Minmatar Offensive Systems", 4, "Bonus to all Minmatar Offensive Systems effectiveness, per level", "Loki Offensive - Launcher Efficiency Configuration"]]], ["Modules", [["Rapid Launch", 4, "3% bonus to missile launcher rate of fire per level", "5× Caldari Navy Heavy Assault Missile Launcher"], ["Warhead Upgrades", 4, "2% bonus to missile damage per level", "5× Caldari Navy Heavy Assault Missile Launcher"], ["Propulsion Jamming", 3, "5% reduction in capacitor need of stasis webifiers per level", "2× Federation Navy Stasis Webifier"]]], ["Drones", [["Drone Interfacing", 4, "10% bonus to drone damage per level", "Imperial Navy Infiltrator"], ["Drone Sharpshooting", 3, "5% bonus to drone optimal range per level", "Imperial Navy Infiltrator"]]]] : [];
+var gapGroups = gapData.map(function (g) {
+return { name: g[0], count: g[1].length + (g[1].length === 1 ? ' skill' : ' skills'), skills: g[1].map(function (k) {
+return {
+name: k[0], level: k[1], effect: k[2], affects: k[3],
+boxes: [0, 1, 2, 3, 4].map(function (b) { return b < k[1] ? { border: '#C9CED6', bg: '#C9CED6' } : { border: '#333B46', bg: 'transparent' }; })
+};
+}) };
+});
+var gapTotal = 0;
+gapGroups.forEach(function (g) { gapTotal += g.skills.length; });
+var gapNote = gapTotal ? gapTotal + ' skills could still improve this ship' : '';
+var self = this;
+var example = (this.props.droneBay ?? 'Real bay') !== 'Real bay';
+var bay = [{ name: 'Imperial Navy Infiltrator', inBay: 4, bw: 10, dps: 20.15 }];
+if (example) { bay.push({ name: 'Example light drone (not real data)', inBay: 5, bw: 5, dps: 10 }); }
+var BANDWIDTH = 40;
+var MAX_ACTIVE = 5;
+var WEAPON_DPS = 528.6;
+var chosen = (this.state && this.state.drones) || { 'Imperial Navy Infiltrator': 4 };
+var counts = bay.map(function (b) { return Math.min(chosen[b.name] || 0, b.inBay); });
+var bwUsed = 0, active = 0, droneDpsNum = 0;
+bay.forEach(function (b, i) { bwUsed += counts[i] * b.bw; active += counts[i]; droneDpsNum += counts[i] * b.dps; });
+function setCount(name, n) { var next = {}; bay.forEach(function (b, i) { next[b.name] = counts[i]; }); next[name] = n; self.setState({ drones: next }); }
+var droneRows = bay.map(function (b, i) {
+var c = counts[i];
+var room = Math.min(b.inBay - c, MAX_ACTIVE - active, Math.floor((BANDWIDTH - bwUsed) / b.bw));
+var canMore = room > 0;
+var canLess = c > 0;
+return {
+name: b.name, count: c, max: c + Math.max(0, room),
+meta: b.inBay + ' in bay · ' + b.bw + ' Mbit/s · ' + b.dps.toFixed(1) + ' dps each',
+more: function () { if (canMore) { setCount(b.name, c + 1); } },
+less: function () { if (canLess) { setCount(b.name, c - 1); } },
+moreColor: canMore ? '#E6E9ED' : '#4A5360', moreCursor: canMore ? 'pointer' : 'default',
+lessColor: canLess ? '#E6E9ED' : '#4A5360', lessCursor: canLess ? 'pointer' : 'default'
+};
+});
+var picked = bay.map(function (b, i) { return counts[i] ? counts[i] + '× ' + b.name : ''; }).filter(function (t) { return t; });
+var droneSummary = picked.length ? picked.join(', ') : 'No drones launched';
+var dronesOpen = (this.state && this.state.dronesOpen !== undefined) ? this.state.dronesOpen : true;
+var droneDps = droneDpsNum.toFixed(1);
+var totalDps = (WEAPON_DPS + droneDpsNum).toFixed(1);
+var droneStats = [
+{ k: 'Launched', v: active + ' / ' + MAX_ACTIVE + ' drones' },
+{ k: 'Bandwidth', v: bwUsed + ' / ' + BANDWIDTH + ' Mbit/s' },
+{ k: 'Control range', v: '60.0 km' },
+{ k: 'Drone bay', v: '40 / 40 m³' }
+];
+groups.forEach(function (g) {
+if (g.title === 'Offense') { g.headline = totalDps + ' DPS'; g.rows.forEach(function (r) { if (r.k === 'Drones') { r.v = droneDps + ' dps'; } }); }
+});
+var groupsA = groups.filter(function (g) { return g.title === 'Capacitor' || g.title === 'Offense'; });
+var groupsB = groups.filter(function (g) { return g.title === 'Targeting' || g.title === 'Navigation' || g.title === 'Estimated value'; });
+return { accent: accent, racks: racks, ammo: ammo, holds: holds, bonuses: bonuses, layers: layers, groupsA: groupsA, groupsB: groupsB,
+gapGroups: gapGroups, gapNote: gapNote, gapExample: gapMode, gapEmpty: !gapMode,
+totalDps: totalDps, dpsSub: WEAPON_DPS.toFixed(1) + ' weapons · ' + droneDps + ' drones', droneDps: droneDps,
+droneRows: droneRows, droneSummary: droneSummary, droneStats: droneStats,
+dronesOpen: dronesOpen, dronesOpenAttr: dronesOpen ? 'true' : 'false', dronesChevron: dronesOpen ? 'rotate(180deg)' : 'none',
+toggleDrones: function () { self.setState({ dronesOpen: !dronesOpen }); } };
+}
+}
+</script>
+</body>
+</html>

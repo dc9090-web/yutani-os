@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Clones (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050607}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="max-width: 390px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; overflow: hidden; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 0 16px; border-bottom: 1px solid #1C2128">
+<a href="MobileMain.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 56px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="order: 3; flex: 0 0 auto; width: calc(100% + 32px); box-sizing: border-box; margin: 0 -16px; padding: 0 8px; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; border-top: 1px solid #14181D; font-size: 13px; font-weight: 500; white-space: nowrap">
+<a href="MobileMain.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Overview</a>
+<a href="MobileSkills.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Skills</a>
+<a href="#" aria-current="page" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Clones</a>
+<a href="MobileShips.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Ships</a>
+<a href="MobileAssets.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Assets</a>
+<a href="MobileWallet.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 16px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 24px 16px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; line-height: 1.15">Clones</h1>
+<div style="position: relative; margin-top: 6px">
+<button type="button" onClick="{{toggleChars}}" aria-haspopup="listbox" aria-expanded="{{charsOpenAttr}}" aria-label="Character: {{charName}}" style="display: flex; align-items: center; gap: 10px; height: 44px; min-width: 240px; padding: 0 12px 0 6px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{charInitials}}</span>
+<span style="flex: 1; min-width: 0">{{charName}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{charsOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Characters" style="position: absolute; top: 50px; left: 0; z-index: 10; box-sizing: border-box; min-width: 320px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #111418; border: 1px solid #2A313B; border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55)">
+<sc-for list="{{chars}}" as="c" hint-placeholder-count="6">
+<button type="button" role="option" aria-selected="{{c.selAttr}}" onClick="{{c.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 5px; background: {{c.bg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{c.initials}}</span>
+<span style="flex: 1; min-width: 0">{{c.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.1em; color: #7C8794">{{c.tag}}</span>
+<span style="flex: none; width: 56px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: #9AA3AE">{{c.sp}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+
+<section aria-label="Active clone" style="display: flex; flex-direction: column; gap: 18px; padding: 16px 16px 20px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px 32px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25">Active clone</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; color: #0A0C0F; background: {{accent}}">ACTIVE</span>
+</div>
+<span style="font-size: 13px; color: #9AA3AE">6 implants fitted</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Home station</span>
+<span style="font-size: 14px; font-weight: 500">Jita IV - Moon 4 - Caldari Navy Assembly Plant</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Implant slots</span>
+<div style="display: flex; align-items: center; gap: 10px">
+<span role="img" aria-label="{{active.used}} of 10 implant slots used" style="display: flex; gap: 3px">
+<sc-for list="{{active.slots}}" as="b" hint-placeholder-count="10">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}"></span>
+</sc-for>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{active.used}} / 10</span>
+</div>
+</div>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr)); gap: 0 40px; align-items: start; border-top: 1px solid #1C2128">
+<sc-for list="{{active.implants}}" as="i" hint-placeholder-count="6">
+<li style="min-width: 0; border-bottom: 1px solid #171B21">
+<div style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; box-sizing: border-box">
+<span title="Slot {{i.slot}}" style="flex: none; width: 18px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #7C8794">{{i.slot}}</span>
+<span role="img" aria-label="Implant icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="7" height="7" rx="1"></rect><path d="M6.5 2.5v2M9.5 2.5v2M6.5 11.5v2M9.5 11.5v2M2.5 6.5h2M2.5 9.5h2M11.5 6.5h2M11.5 9.5h2"></path></svg>
+</span>
+<span style="flex: 0 1 auto; min-width: 0; font-size: 13.5px">{{i.name}}</span>
+<button type="button" onClick="{{i.toggleInfo}}" aria-label="About {{i.name}}" aria-expanded="{{i.openAttr}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: -6px; padding: 0; border: 0; border-radius: 4px; background: {{i.infoBg}}; color: {{i.infoColor}}; cursor: pointer">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.6"></circle><path d="M7 6.4v3.4"></path><path d="M7 4.3v.1"></path></svg>
+</button>
+<span aria-hidden="true" style="flex: 1"></span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #4FD1C5">{{i.bonus}}</span>
+</div>
+<sc-if value="{{i.open}}" hint-placeholder-val="{{false}}">
+<p style="box-sizing: border-box; margin: 0 0 10px 0; padding: 10px 12px; background: #0E1114; border: 1px solid #1C2128; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #C9CED6">{{i.desc}}</p>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+</section>
+
+<section aria-label="Jump clones" style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 20px; line-height: 1.25">Jump clones</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #9AA3AE">8 clones · 2 stations</span>
+</div>
+<sc-for list="{{locations}}" as="loc" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding-bottom: 10px; border-bottom: 1px solid #1C2128">
+<h3 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 17px; line-height: 1.3">{{loc.system}}</h3>
+<span style="font-size: 13px; color: #9AA3AE">{{loc.station}}</span>
+<span style="margin-left: auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #9AA3AE">{{loc.countLabel}}</span>
+</div>
+<sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+<div style="background: #111418; border: 1px solid #1C2128; border-bottom: 0; border-radius: 8px; overflow: hidden">
+<sc-for list="{{loc.clones}}" as="c" hint-placeholder-count="4">
+<div style="border-bottom: 1px solid #1C2128">
+<button type="button" onClick="{{c.toggle}}" aria-expanded="{{c.openAttr}}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; width: 100%; min-height: 52px; box-sizing: border-box; padding: 10px 16px; border: 0; background: {{c.rowBg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; text-align: left; cursor: pointer">
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transform: {{c.chevron}}"><path d="M4.5 3l3 3-3 3"></path></svg>
+<span aria-hidden="true" style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; padding: 3px 6px; border: 1px solid #2A313B; border-radius: 3px; color: #9AA3AE">{{c.id}}</span>
+<span style="flex: 1 1 200px; min-width: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-size: 15px; font-weight: {{c.nameWeight}}; color: {{c.nameColor}}">{{c.name}}</span>
+<span role="img" aria-label="{{c.used}} of 10 implant slots used" style="flex: none; display: flex; gap: 3px">
+<sc-for list="{{c.slots}}" as="b" hint-placeholder-count="10">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}"></span>
+</sc-for>
+</span>
+<span style="flex: none; width: 92px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{c.used}} / 10 slots</span>
+</button>
+<sc-if value="{{c.isOpen}}" hint-placeholder-val="{{false}}">
+<div style="padding: 0 16px 16px 16px">
+<sc-if value="{{c.hasImplants}}" hint-placeholder-val="{{true}}">
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); gap: 0 40px; align-items: start; border-top: 1px solid #1C2128">
+<sc-for list="{{c.implants}}" as="i" hint-placeholder-count="5">
+<li style="min-width: 0; border-bottom: 1px solid #171B21">
+<div style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; box-sizing: border-box">
+<span title="Slot {{i.slot}}" style="flex: none; width: 18px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #7C8794">{{i.slot}}</span>
+<span role="img" aria-label="Implant icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="7" height="7" rx="1"></rect><path d="M6.5 2.5v2M9.5 2.5v2M6.5 11.5v2M9.5 11.5v2M2.5 6.5h2M2.5 9.5h2M11.5 6.5h2M11.5 9.5h2"></path></svg>
+</span>
+<span style="flex: 0 1 auto; min-width: 0; font-size: 13.5px">{{i.name}}</span>
+<button type="button" onClick="{{i.toggleInfo}}" aria-label="About {{i.name}}" aria-expanded="{{i.openAttr}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: -6px; padding: 0; border: 0; border-radius: 4px; background: {{i.infoBg}}; color: {{i.infoColor}}; cursor: pointer">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.6"></circle><path d="M7 6.4v3.4"></path><path d="M7 4.3v.1"></path></svg>
+</button>
+<span aria-hidden="true" style="flex: 1"></span>
+</div>
+<sc-if value="{{i.open}}" hint-placeholder-val="{{false}}">
+<p style="box-sizing: border-box; margin: 0 0 10px 0; padding: 10px 12px; background: #0E1114; border: 1px solid #1C2128; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #C9CED6">{{i.desc}}</p>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{c.empty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 12px 0 0; border-top: 1px solid #1C2128; font-size: 13.5px; color: #9AA3AE">No implants</p>
+</sc-if>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isCards}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); gap: 16px; align-items: start">
+<sc-for list="{{loc.clones}}" as="c" hint-placeholder-count="4">
+<article style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 20px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; align-items: center; gap: 14px">
+<span aria-hidden="true" style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; padding: 3px 6px; border: 1px solid #2A313B; border-radius: 3px; color: #9AA3AE">{{c.id}}</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<h4 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: {{c.nameWeight}}; font-size: 16px; line-height: 1.5; color: {{c.nameColor}}">{{c.name}}</h4>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<span role="img" aria-label="{{c.used}} of 10 implant slots used" style="display: flex; gap: 3px">
+<sc-for list="{{c.slots}}" as="b" hint-placeholder-count="10">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}"></span>
+</sc-for>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{c.used}} / 10 slots</span>
+</div>
+<sc-if value="{{c.hasImplants}}" hint-placeholder-val="{{true}}">
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid #1C2128">
+<sc-for list="{{c.implants}}" as="i" hint-placeholder-count="5">
+<li style="min-width: 0; border-bottom: 1px solid #171B21">
+<div style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; box-sizing: border-box">
+<span title="Slot {{i.slot}}" style="flex: none; width: 18px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #7C8794">{{i.slot}}</span>
+<span role="img" aria-label="Implant icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="7" height="7" rx="1"></rect><path d="M6.5 2.5v2M9.5 2.5v2M6.5 11.5v2M9.5 11.5v2M2.5 6.5h2M2.5 9.5h2M11.5 6.5h2M11.5 9.5h2"></path></svg>
+</span>
+<span style="flex: 0 1 auto; min-width: 0; font-size: 13.5px">{{i.name}}</span>
+<button type="button" onClick="{{i.toggleInfo}}" aria-label="About {{i.name}}" aria-expanded="{{i.openAttr}}" style="flex: none; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-left: -6px; padding: 0; border: 0; border-radius: 4px; background: {{i.infoBg}}; color: {{i.infoColor}}; cursor: pointer">
+<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="7" r="5.6"></circle><path d="M7 6.4v3.4"></path><path d="M7 4.3v.1"></path></svg>
+</button>
+<span aria-hidden="true" style="flex: 1"></span>
+</div>
+<sc-if value="{{i.open}}" hint-placeholder-val="{{false}}">
+<p style="box-sizing: border-box; margin: 0 0 10px 0; padding: 10px 12px; background: #0E1114; border: 1px solid #1C2128; border-radius: 6px; font-size: 13px; line-height: 1.5; color: #C9CED6">{{i.desc}}</p>
+</sc-if>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{c.empty}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 14px 0 2px; border-top: 1px solid #1C2128; font-size: 13.5px; color: #9AA3AE">No implants</p>
+</sc-if>
+</article>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</section>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"cloneLayout":{"editor":"enum","default":"List","options":["List","Cards"]},"$preview":{"width":390,"height":2700}}'>
+class Component extends DCLogic {
+renderVals() {
+var self = this;
+var accent = this.props.accent ?? '#F5A524';
+var roster = [['TrilliumONE', 'TO', 'MAIN', '112.5M'], ['Sasha-9999', 'S9', 'MAIN', '25.5M'], ['Reacher-9', 'R9', 'ALT', '4.8M'], ['Lana C', 'LC', 'ALT', '10.4M'], ['Faster Than-Light', 'FL', 'ALT', '70.1M'], ['Faster Than-Ever', 'FE', 'ALT', '31.1M']];
+var charName = (this.state && this.state.char) || 'TrilliumONE';
+var charsOpen = !!(this.state && this.state.charsOpen);
+var charInitials = 'TO';
+var chars = roster.map(function (r) {
+var sel = r[0] === charName;
+if (sel) { charInitials = r[1]; }
+return {
+name: r[0], initials: r[1], tag: r[2], sp: r[3],
+selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent',
+pick: function () { self.setState({ char: r[0], charsOpen: false }); }
+};
+});
+var toggleChars = function () { self.setState({ charsOpen: !charsOpen }); };
+var effects = {"Ocular Filter - Improved": "+5 Perception.", "Memory Augmentation - Improved": "+5 Memory.", "Neural Boost - Improved": "+5 Willpower.", "Cybernetic Subprocessor - Improved": "+5 Intelligence.", "Limited Social Adaptation Chip": "+1 Charisma.", "Inherent Implants 'Squire' Power Grid Management EG-602": "2% bonus to ship power grid output.", "Inherent Implants 'Squire' Power Grid Management EG-603": "3% bonus to ship power grid output.", "Inherent Implants 'Squire' Power Grid Management EG-605": "5% bonus to ship power grid output.", "Inherent Implants 'Squire' Capacitor Management EM-803": "3% bonus to capacitor capacity.", "Inherent Implants 'Squire' Capacitor Management EM-805": "5% bonus to capacitor capacity.", "Eifyr and Co. 'Gunslinger' Motion Prediction MR-703": "3% bonus to turret tracking speed.", "Eifyr and Co. 'Gunslinger' Motion Prediction MR-705": "5% bonus to turret tracking speed.", "Eifyr and Co. 'Gunslinger' Surgical Strike SS-903": "3% bonus to all turret damage.", "Zainou 'Deadeye' Sharpshooter ST-901": "1% bonus to turret optimal range.", "Zainou 'Deadeye' Sharpshooter ST-905": "5% bonus to turret optimal range.", "Zainou 'Gypsy' CPU Management EE-603": "3% bonus to ship CPU output.", "Zainou 'Gypsy' CPU Management EE-604": "4% bonus to ship CPU output.", "Zainou 'Deadeye' Medium Hybrid Turret MH-803": "3% bonus to medium hybrid turret damage.", "Eifyr and Co. 'Rogue' Evasive Maneuvering EM-701": "1% bonus to ship agility.", "Eifyr and Co. 'Rogue' Evasive Maneuvering EM-703": "3% bonus to ship agility.", "Inherent Implants 'Noble' Hull Upgrades HG-1001": "1% bonus to armor hit points.", "Inherent Implants 'Noble' Hull Upgrades HG-1003": "3% bonus to armor hit points.", "Zainou 'Gnome' Shield Management SM-703": "3% bonus to shield capacity.", "Eifyr and Co. 'Rogue' Navigation NN-603": "3% bonus to ship velocity.", "Zainou 'Deadeye' Rapid Launch RL-1003": "3% bonus to missile launcher rate of fire.", "Zainou 'Gnome' Shield Operation SP-903": "3% bonus to shield recharge rate.", "Zainou 'Deadeye' Guided Missile Precision GP-803": "3% reduction in the effect of target signature radius on missile explosions.", "Inherent Implants 'Lancer' Medium Energy Turret ME-801": "1% bonus to medium energy turret damage.", "Eifyr and Co. 'Rogue' Acceleration Control AC-601": "1% bonus to afterburner and microwarpdrive speed boost.", "Zainou 'Gnome' Weapon Upgrades WU-1005": "5% reduction in CPU need of turrets and launchers.", "Eifyr and Co. 'Rogue' High Speed Maneuvering HS-903": "3% reduction in microwarpdrive capacitor use.", "Zainou 'Deadeye' Missile Bombardment MB-703": "3% bonus to missile flight time.", "Low-grade Snake Alpha": "+2 Perception. Snake set: bonus to maximum velocity, stronger with each Snake implant fitted.", "Low-grade Snake Beta": "+2 Memory. Snake set: bonus to maximum velocity, stronger with each Snake implant fitted.", "Low-grade Snake Gamma": "+2 Willpower. Snake set: bonus to maximum velocity, stronger with each Snake implant fitted.", "Low-grade Snake Delta": "+2 Intelligence. Snake set: bonus to maximum velocity, stronger with each Snake implant fitted.", "Low-grade Snake Epsilon": "+2 Charisma. Snake set: bonus to maximum velocity, stronger with each Snake implant fitted."};
+var infoKey = (this.state && this.state.info !== undefined) ? this.state.info : 'ACTIVE-1';
+function build(list, key) {
+var implants = list.map(function (row) {
+var parts = row.split('|');
+var k = key + '-' + parts[0];
+var open = infoKey === k;
+return {
+slot: parseInt(parts[0], 10), name: parts[1], bonus: parts[2] || '',
+desc: effects[parts[1]] || 'Description not loaded in this mockup.',
+open: open, openAttr: open ? 'true' : 'false',
+infoColor: open ? accent : '#7C8794', infoBg: open ? '#1A1F26' : 'transparent',
+toggleInfo: function () { self.setState({ info: open ? '' : k }); }
+};
+}).sort(function (x, y) { return x.slot - y.slot; });
+var taken = {};
+implants.forEach(function (i) { taken[i.slot] = true; });
+var slots = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function (n) {
+return taken[n] ? { border: '#C9CED6', bg: '#C9CED6' } : { border: '#333B46', bg: 'transparent' };
+});
+return { implants: implants, slots: slots, used: implants.length, hasImplants: implants.length > 0, empty: implants.length === 0 };
+}
+var active = build([
+"1|Ocular Filter - Improved|+5 Perception",
+"2|Memory Augmentation - Improved|+5 Memory",
+"3|Neural Boost - Improved|+5 Willpower",
+"4|Cybernetic Subprocessor - Improved|+5 Intelligence",
+"5|Limited Social Adaptation Chip|+1 Charisma",
+"6|Inherent Implants 'Squire' Power Grid Management EG-602"
+], 'ACTIVE');
+var jita = ['Jita', 'Jita IV - Moon 4 - Caldari Navy Assembly Plant'];
+var kubinen = ['Kubinen', 'Kubinen VI - Moon 2 - Lai Dai Corporation Factory'];
+var raw = [
+[jita, ["7|Eifyr and Co. 'Gunslinger' Motion Prediction MR-705", "9|Zainou 'Deadeye' Sharpshooter ST-905", "8|Inherent Implants 'Squire' Capacitor Management EM-805", "6|Inherent Implants 'Squire' Power Grid Management EG-605", "1|Low-grade Snake Alpha", "2|Low-grade Snake Beta", "4|Low-grade Snake Delta", "5|Low-grade Snake Epsilon", "3|Low-grade Snake Gamma"], '[CLONE NAME]'],
+[kubinen, ["6|Zainou 'Gypsy' CPU Management EE-603", "8|Zainou 'Deadeye' Medium Hybrid Turret MH-803", "7|Eifyr and Co. 'Rogue' Evasive Maneuvering EM-703", "9|Eifyr and Co. 'Gunslinger' Surgical Strike SS-903", "10|Inherent Implants 'Noble' Hull Upgrades HG-1003"], '[CLONE NAME]'],
+[jita, ["7|Zainou 'Gnome' Shield Management SM-703", "6|Eifyr and Co. 'Rogue' Navigation NN-603", "10|Zainou 'Deadeye' Rapid Launch RL-1003", "9|Zainou 'Gnome' Shield Operation SP-903", "8|Zainou 'Deadeye' Guided Missile Precision GP-803"]],
+[jita, ["10|Inherent Implants 'Noble' Hull Upgrades HG-1001", "9|Zainou 'Deadeye' Sharpshooter ST-901", "8|Inherent Implants 'Lancer' Medium Energy Turret ME-801", "7|Eifyr and Co. 'Rogue' Evasive Maneuvering EM-701", "6|Eifyr and Co. 'Rogue' Acceleration Control AC-601"]],
+[jita, []],
+[jita, ["6|Zainou 'Gypsy' CPU Management EE-604", "10|Zainou 'Gnome' Weapon Upgrades WU-1005"]],
+[jita, ["7|Eifyr and Co. 'Gunslinger' Motion Prediction MR-703", "9|Eifyr and Co. 'Gunslinger' Surgical Strike SS-903", "6|Inherent Implants 'Squire' Power Grid Management EG-603"]],
+[jita, ["9|Eifyr and Co. 'Rogue' High Speed Maneuvering HS-903", "7|Zainou 'Deadeye' Missile Bombardment MB-703", "10|Zainou 'Deadeye' Rapid Launch RL-1003", "8|Inherent Implants 'Squire' Capacitor Management EM-803", "6|Inherent Implants 'Squire' Power Grid Management EG-603"]]
+];
+var openClones = (this.state && this.state.openClones) || { 'JC 01': true };
+var listLayout = (this.props.cloneLayout ?? 'List') === 'List';
+var clones = raw.map(function (r, n) {
+var id = 'JC ' + (n < 9 ? '0' : '') + (n + 1);
+var c = build(r[1], id);
+c.id = id;
+c.system = r[0][0];
+c.station = r[0][1];
+var isOpen = !!openClones[id];
+c.isOpen = isOpen;
+c.openAttr = isOpen ? 'true' : 'false';
+c.chevron = isOpen ? 'rotate(90deg)' : 'none';
+c.rowBg = isOpen ? '#141920' : 'transparent';
+c.toggle = function () { var next = {}; for (var k in openClones) { next[k] = openClones[k]; } next[id] = !isOpen; self.setState({ openClones: next }); };
+var given = r[2] || '';
+c.name = given || 'Unnamed clone';
+c.nameColor = given ? '#E6E9ED' : '#9AA3AE';
+c.nameWeight = given ? '600' : '500';
+return c;
+});
+var locations = [];
+clones.forEach(function (c) {
+var loc = locations.filter(function (l) { return l.station === c.station; })[0];
+if (!loc) { loc = { system: c.system, station: c.station, clones: [] }; locations.push(loc); }
+loc.clones.push(c);
+});
+locations.sort(function (x, y) { return y.clones.length - x.clones.length; });
+locations.forEach(function (l) { l.countLabel = l.clones.length + (l.clones.length === 1 ? ' clone' : ' clones'); });
+return { accent: accent, active: active, clones: clones, locations: locations, isList: listLayout, isCards: !listLayout, chars: chars, charName: charName, charInitials: charInitials, charsOpen: charsOpen, charsOpenAttr: charsOpen ? 'true' : 'false', toggleChars: toggleChars };
+}
+}
+</script>
+</body>
+</html>

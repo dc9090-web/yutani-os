@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Overview (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050607}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="max-width: 390px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; overflow: hidden; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 0 16px; border-bottom: 1px solid #1C2128">
+<a href="#" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 56px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="order: 3; flex: 0 0 auto; width: calc(100% + 32px); box-sizing: border-box; margin: 0 -16px; padding: 0 8px; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; border-top: 1px solid #14181D; font-size: 13px; font-weight: 500; white-space: nowrap">
+<a href="#" aria-current="page" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Overview</a>
+<a href="MobileSkills.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Skills</a>
+<a href="MobileClones.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Clones</a>
+<a href="MobileShips.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Ships</a>
+<a href="MobileAssets.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Assets</a>
+<a href="MobileWallet.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 16px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 24px 16px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; line-height: 1.15">Overview</h1>
+<p style="margin: 0; font-size: 14px; color: #9AA3AE">6 characters authorised</p>
+</div>
+
+<section aria-label="Account summary" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1C2128; border: 1px solid #1C2128; border-radius: 8px; overflow: hidden">
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Combined wallet</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 19px; font-weight: 500">160.00M <span style="font-size: 13px; color: #9AA3AE">ISK</span></span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Total skill points</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 19px; font-weight: 500">254.4M <span style="font-size: 13px; color: #9AA3AE">SP</span></span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Training queues</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 19px; font-weight: 500">6 <span style="font-size: 13px; color: #9AA3AE">of 6 active</span></span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 14px 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Next skill completes</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 19px; font-weight: 500">7h 22m <span style="font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 400; color: #9AA3AE">Sasha-9999</span></span>
+</div>
+</section>
+
+<section aria-label="Characters" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr)); gap: 16px">
+<sc-for list="{{characters}}" as="c" hint-placeholder-count="6">
+<article style="display: flex; flex-direction: column; gap: 16px; min-width: 0; padding: 16px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+
+<div style="display: flex; align-items: flex-start; gap: 14px">
+<div role="img" aria-label="Portrait placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 6px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: #9AA3AE">{{c.initials}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px">
+<h2 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25"><a href="#" style="color: #E6E9ED">{{c.name}}</a></h2>
+<sc-if value="{{c.isMain}}" hint-placeholder-val="{{true}}">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; padding: 2px 6px; border-radius: 3px; color: #0A0C0F; background: {{accent}}">MAIN</span>
+</sc-if>
+<sc-if value="{{c.isAlt}}" hint-placeholder-val="{{false}}">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; padding: 1px 5px; border-radius: 3px; color: #9AA3AE; border: 1px solid #2A313B">ALT</span>
+</sc-if>
+</div>
+<span style="font-size: 13px; color: #9AA3AE">{{c.corp}} · {{c.race}}</span>
+</div>
+<div style="flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Total SP</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 20px; font-weight: 500; line-height: 1">{{c.sp}}</span>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px">
+<sc-for list="{{c.roles}}" as="r" hint-placeholder-count="2">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 7px; border: 1px solid #262C35; border-radius: 3px; color: #9AA3AE">{{r.label}}</span>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); gap: 14px 16px; padding: 14px 0; border-top: 1px solid #1C2128; border-bottom: 1px solid #1C2128">
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 5px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Wallet</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px">{{c.wallet}}</span>
+<span style="font-size: 12px; color: #9AA3AE">ISK</span>
+</div>
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 5px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Ship</span>
+<span style="font-size: 14px; font-weight: 500">{{c.ship}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{c.shipClass}}</span>
+</div>
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 5px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Location</span>
+<span style="font-size: 14px; font-weight: 500"><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-weight: 400; color: #4FD1C5">{{c.sec}}</span> {{c.system}}</span>
+<span title="{{c.station}}" style="font-size: 12px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{c.station}}</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 9px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="min-width: 0; font-size: 13.5px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; margin-right: 8px">Training</span>{{c.skill}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #E6E9ED">{{c.eta}}</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div role="img" aria-label="Training progress {{c.pct}}" style="flex: 1; height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{c.pct}}; background: repeating-linear-gradient(90deg, {{accent}} 0 6px, transparent 6px 8px)"></div>
+</div>
+<span style="flex: none; width: 32px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">{{c.pct}}</span>
+</div>
+</div>
+
+</article>
+</sc-for>
+</section>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"$preview":{"width":390,"height":2700}}'>
+class Component extends DCLogic {
+renderVals() {
+var station = 'Jita IV - Moon 4 - Caldari Navy Assembly Plant';
+var rows = [
+{ name: 'TrilliumONE', initials: 'TO', main: true, corp: 'Prometheus9', race: 'Caldari', roles: ['PVE', 'PVP'], wallet: '50,000,000', ship: 'Orthrus', shipClass: 'Cruiser', skill: 'Medium Blaster Specialization V', eta: '1d 20h 07m', pct: '84%', sp: '112.5M' },
+{ name: 'Sasha-9999', initials: 'S9', main: true, corp: 'Prometheus9', race: 'Minmatar', roles: ['Hauler', 'Miner', 'Scanner', 'Tackler'], wallet: '20,000,000', ship: 'Curse', shipClass: 'Combat Recon Ship', skill: 'Frequency Modulation IV', eta: '7h 22m', pct: '83%', sp: '25.5M' },
+{ name: 'Reacher-9', initials: 'R9', main: false, corp: 'Prometheus9', race: 'Gallente', roles: ['Commerce', 'Industry'], wallet: '15,000,000', ship: 'Incursus', shipClass: 'Frigate', skill: 'Command Center Upgrades V', eta: '9d 18h 49m', pct: '45%', sp: '4.8M' },
+{ name: 'Lana C', initials: 'LC', main: false, corp: 'Prometheus9', race: 'Minmatar', roles: ['Hauler', 'Miner', 'Scanner'], wallet: '40,000,000', ship: 'Noctis', shipClass: 'Hauler', skill: 'Command Center Upgrades V', eta: '8d 21h 02m', pct: '45%', sp: '10.4M' },
+{ name: 'Faster Than-Light', initials: 'FL', main: false, corp: 'Science and Trade Institute', race: 'Caldari', roles: ['PVP', 'Scanner', 'Tackler'], wallet: '25,000,000', ship: 'Stiletto', shipClass: 'Interceptor', skill: 'Command Center Upgrades V', eta: '7d 6h 05m', pct: '52%', sp: '70.1M' },
+{ name: 'Faster Than-Ever', initials: 'FE', main: false, corp: 'Perkone', race: 'Caldari', roles: [], wallet: '10,000,000', ship: 'Sunesis', shipClass: 'Destroyer', skill: 'Command Center Upgrades V', eta: '11d 13h 20m', pct: '41%', sp: '31.1M' }
+];
+var characters = rows.map(function (r) {
+return {
+name: r.name, initials: r.initials, isMain: r.main, isAlt: !r.main,
+corp: r.corp, race: r.race,
+roles: r.roles.map(function (label) { return { label: label }; }),
+wallet: r.wallet, ship: r.ship, shipClass: r.shipClass,
+sec: '0.9', system: 'Jita', station: station,
+skill: r.skill, eta: r.eta, pct: r.pct, sp: r.sp
+};
+});
+return { accent: this.props.accent ?? '#F5A524', characters: characters };
+}
+}
+</script>
+</body>
+</html>

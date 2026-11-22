@@ -1,0 +1,92 @@
+/* Yutani OS redesign: design tokens.
+   Source of truth for colour, type, radius and spacing used across all artboards. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Surfaces */
+  --yo-bg: #0A0C0F;              /* page ground */
+  --yo-surface: #111418;         /* cards, panels, tables */
+  --yo-surface-sunken: #0E1114;  /* stat cells, day headers, inline panels, inputs */
+  --yo-surface-open: #141920;    /* expanded row / open accordion body */
+  --yo-surface-control: #1A1F26; /* selected tab, icon tiles, selected menu item */
+
+  /* Lines */
+  --yo-border: #1C2128;          /* card borders, section dividers */
+  --yo-border-row: #171B21;      /* hairline between rows */
+  --yo-border-faint: #14181D;    /* status strip, mobile nav divider */
+  --yo-border-control: #2A313B;  /* buttons, inputs, chips */
+  --yo-border-tile: #262C35;     /* image and icon tiles */
+
+  /* Text */
+  --yo-text: #E6E9ED;
+  --yo-text-2: #C9CED6;          /* secondary copy, descriptions */
+  --yo-text-muted: #9AA3AE;      /* meta, units, inactive nav */
+  --yo-text-label: #7C8794;      /* uppercase micro labels (min contrast 4.5:1 on surface) */
+  --yo-text-disabled: #4A5360;
+
+  /* Meaning */
+  --yo-accent: #F5A524;          /* amber: active nav, MAIN badge, training, queued, ACTIVE module */
+  --yo-good: #4FD1C5;            /* teal: stable cap, trained, money in, security status */
+  --yo-bad: #FF8A7A;             /* coral: cap runs out, missing skills, over-fit, money out */
+
+  /* Level blocks */
+  --yo-block-filled: #C9CED6;
+  --yo-block-empty: #333B46;
+  --yo-track: #232932;           /* bar tracks */
+
+  /* Damage types */
+  --yo-dmg-em: #5CC8FF;
+  --yo-dmg-thermal: #FF8A7A;
+  --yo-dmg-kinetic: #9AA3AE;
+  --yo-dmg-explosive: #F5A524;
+
+  /* Type */
+  --yo-font-ui: Inter, system-ui, sans-serif;
+  --yo-font-display: "Space Grotesk", Inter, sans-serif;            /* h1, h2, card titles, wordmark */
+  --yo-font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace; /* every number, tag and readout */
+
+  /* Radius */
+  --yo-radius-card: 8px;
+  --yo-radius-control: 6px;
+  --yo-radius-small: 5px;
+  --yo-radius-tile: 4px;
+  --yo-radius-chip: 3px;
+  --yo-radius-block: 1px;
+
+  /* Layout */
+  --yo-page-max: 1360px;
+  --yo-page-pad: 40px 32px 56px;       /* desktop main padding */
+  --yo-page-pad-mobile: 24px 16px 40px;
+  --yo-gap-section: 28px;              /* 20px on mobile */
+  --yo-gap-card: 16px;
+}
+
+/* Uppercase micro label used above every value */
+.yo-label {
+  font: 500 11px/1.4 var(--yo-font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--yo-text-label);
+}
+
+/* Level block strip: 5 squares for skills and mastery, 10 for implant slots */
+.yo-blocks { display: flex; gap: 3px; }
+.yo-block {
+  box-sizing: border-box;
+  width: 10px; height: 10px;
+  border-radius: var(--yo-radius-block);
+  border: 1px solid var(--yo-block-empty);
+}
+.yo-block.is-filled   { border-color: var(--yo-block-filled); background: var(--yo-block-filled); }
+.yo-block.is-queued   { border-color: color-mix(in srgb, var(--yo-accent) 65%, transparent); }
+.yo-block.is-training {
+  border-color: var(--yo-accent);
+  background: color-mix(in srgb, var(--yo-accent) 40%, transparent);
+  animation: yo-throb 1.6s ease-in-out infinite;
+}
+@keyframes yo-throb { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .yo-block.is-training { animation: none; } }
+
+/* Segmented progress bar (training progress, CPU, powergrid, calibration) */
+.yo-bar { height: 4px; background: repeating-linear-gradient(90deg, var(--yo-track) 0 6px, transparent 6px 8px); }
+.yo-bar > i { display: block; height: 4px; background: repeating-linear-gradient(90deg, var(--yo-bar-color, var(--yo-block-filled)) 0 6px, transparent 6px 8px); }

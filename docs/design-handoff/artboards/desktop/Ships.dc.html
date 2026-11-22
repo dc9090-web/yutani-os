@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Ships</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 36px; padding: 0 32px; border-bottom: 1px solid #1C2128">
+<a href="Main.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 60px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="display: flex; flex-wrap: wrap; gap: 2px; font-size: 13px; font-weight: 500">
+<a href="Main.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Overview</a>
+<a href="Skills.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Skills</a>
+<a href="Clones.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Clones</a>
+<a href="#" aria-current="page" style="display: flex; align-items: center; height: 60px; padding: 0 14px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Ships</a>
+<a href="Assets.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Assets</a>
+<a href="Wallet.dc.html" style="display: flex; align-items: center; height: 60px; padding: 0 14px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 28px; padding: 9px 32px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 40px 32px 56px; display: flex; flex-direction: column; gap: 28px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.01em; line-height: 1.15">Ships</h1>
+<div style="position: relative; margin-top: 6px">
+<button type="button" onClick="{{toggleChars}}" aria-haspopup="listbox" aria-expanded="{{charsOpenAttr}}" aria-label="Character: {{charName}}" style="display: flex; align-items: center; gap: 10px; height: 44px; min-width: 240px; padding: 0 12px 0 6px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{charInitials}}</span>
+<span style="flex: 1; min-width: 0">{{charName}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{charsOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Characters" style="position: absolute; top: 50px; left: 0; z-index: 10; box-sizing: border-box; min-width: 320px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #111418; border: 1px solid #2A313B; border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55)">
+<sc-for list="{{chars}}" as="c" hint-placeholder-count="6">
+<button type="button" role="option" aria-selected="{{c.selAttr}}" onClick="{{c.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 5px; background: {{c.bg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{c.initials}}</span>
+<span style="flex: 1; min-width: 0">{{c.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.1em; color: #7C8794">{{c.tag}}</span>
+<span style="flex: none; width: 56px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: #9AA3AE">{{c.sp}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+<div role="tablist" aria-label="Ship lists" style="display: flex; gap: 2px; padding: 3px; background: #0E1114; border: 1px solid #1C2128; border-radius: 8px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{t.selAttr}}" onClick="{{t.pick}}" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 5px; background: {{t.bg}}; color: {{t.color}}; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">{{t.label}}<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #7C8794">{{t.count}}</span></button>
+</sc-for>
+</div>
+</div>
+
+<section aria-label="Ships" style="display: flex; flex-direction: column; gap: 14px">
+<sc-if value="{{isPanels}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{sorted}}" as="r" hint-placeholder-count="9">
+<article style="display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 16px 20px; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 28px">
+<div style="flex: 1.3 1 300px; min-width: 0; display: flex; align-items: center; gap: 14px">
+<span role="img" aria-label="Ship image placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 6px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: #9AA3AE">{{r.initials}}</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">{{r.kind}}</span>
+<h2 style="margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.25"><a href="ShipDetail.dc.html" style="color: #E6E9ED; text-decoration: underline; text-decoration-color: #3A424D; text-underline-offset: 4px">{{r.hull}}</a><span style="font-family: Inter, system-ui, sans-serif; font-weight: 400; font-size: 13.5px; color: #C9CED6">{{r.name}}</span></h2>
+<span title="{{r.station}}" style="font-size: 12.5px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.station}}</span>
+</div>
+</div>
+<div style="flex: 1.3 1 340px; min-width: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #1C2128; border: 1px solid #1C2128; border-radius: 6px; overflow: hidden">
+<div style="min-width: 0; background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">DPS</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; white-space: nowrap">{{r.dps}}</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">EHP</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; white-space: nowrap">{{r.ehp}}</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.speedLabel}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; white-space: nowrap">{{r.speed}}</span>
+</div>
+<div style="min-width: 0; background: #0E1114; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.capLabel}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 14px; white-space: nowrap; color: {{r.capColor}}">{{r.capShort}}</span>
+</div>
+</div>
+<div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">CPU</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: {{r.cpuText}}">{{r.cpuUsed}} / {{r.cpuMax}} tf</span>
+</div>
+<div role="img" aria-label="CPU {{r.cpuPct}} used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{r.cpuWidth}}; background: repeating-linear-gradient(90deg, {{r.cpuColor}} 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Powergrid</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: {{r.pgText}}">{{r.pgUsed}} / {{r.pgMax}} MW</span>
+</div>
+<div role="img" aria-label="Powergrid {{r.pgPct}} used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{r.pgWidth}}; background: repeating-linear-gradient(90deg, {{r.pgColor}} 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+</div>
+<div style="flex: 0 1 170px; min-width: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 17px; font-weight: 500; line-height: 1">{{r.value}} <span style="font-size: 11px; font-weight: 400; color: #9AA3AE">ISK</span></span>
+<span style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: {{r.skillColor}}"><span aria-hidden="true" style="flex: none; width: 6px; height: 6px; border-radius: 50%; background: {{r.skillColor}}"></span>{{r.skillLong}}</span>
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #9AA3AE">Mastery
+<span role="img" aria-label="Mastery level {{r.mastery}} of 5" style="display: flex; gap: 3px">
+<sc-for list="{{r.masteryBoxes}}" as="b" hint-placeholder-count="5">
+<span style="display: block; box-sizing: border-box; width: 10px; height: 10px; border-radius: 1px; border: 1px solid {{b.border}}; background: {{b.bg}}"></span>
+</sc-for>
+</span>
+<span style="width: 16px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #E6E9ED">{{r.masteryRoman}}</span>
+</span>
+<button type="button" onClick="{{r.toggle}}" aria-expanded="{{r.openAttr}}" style="display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 10px; border: 1px solid #2A313B; border-radius: 5px; background: {{r.rowBg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 12.5px; font-weight: 500; cursor: pointer">{{r.modLabel}}
+<svg aria-hidden="true" width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="transform: {{r.chevron}}"><path d="M4.5 3l3 3-3 3"></path></svg>
+</button>
+</div>
+</div>
+<sc-if value="{{r.isOpen}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid #1C2128">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Weapons and modules<span style="text-transform: none; letter-spacing: 0; color: #9AA3AE">{{r.unpriced}}</span></span>
+<sc-if value="{{r.hasModules}}" hint-placeholder-val="{{true}}">
+<ul style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 12px 32px">
+<sc-for list="{{r.modules}}" as="m" hint-placeholder-count="3">
+<li style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px">{{m.name}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{m.detail}}</span>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{r.noModules}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 13px; color: #9AA3AE">No weapons or modules listed</span>
+</sc-if>
+</div>
+</sc-if>
+</article>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isTable}}" hint-placeholder-val="{{false}}">
+<div style="overflow-x: auto; background: #111418; border: 1px solid #1C2128; border-radius: 8px">
+<div style="min-width: 1180px">
+<div style="display: grid; grid-template-columns: 24px 40px minmax(170px, 1.5fr) minmax(130px, 1.2fr) minmax(90px, 0.8fr) 76px 92px 112px 116px 124px 84px 86px; gap: 10px; align-items: center; padding: 12px 16px; border-bottom: 1px solid #1C2128; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">
+<span></span>
+<span></span>
+<span>Ship</span>
+<span>Name</span>
+<span>Location</span>
+<span style="text-align: right">DPS</span>
+<span style="text-align: right">EHP</span>
+<span style="text-align: right">Speed</span>
+<span>Capacitor</span>
+<span>Fitting</span>
+<span>Skills</span>
+<span style="text-align: right; color: #E6E9ED">Value ↓</span>
+</div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="20">
+<div style="border-bottom: 1px solid #171B21">
+<button type="button" onClick="{{r.toggle}}" aria-expanded="{{r.openAttr}}" style="display: grid; grid-template-columns: 24px 40px minmax(170px, 1.5fr) minmax(130px, 1.2fr) minmax(90px, 0.8fr) 76px 92px 112px 116px 124px 84px 86px; gap: 10px; align-items: center; width: 100%; min-height: 56px; box-sizing: border-box; padding: 6px 16px; border: 0; background: {{r.rowBg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; text-align: left; cursor: pointer">
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="transform: {{r.chevron}}"><path d="M4.5 3l3 3-3 3"></path></svg>
+<span role="img" aria-label="Ship image placeholder" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 5px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">{{r.initials}}</span>
+<span style="min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.hull}}</span>
+<span style="font-size: 12px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.kind}}</span>
+</span>
+<span style="min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+<span style="min-width: 0; font-size: 13px; color: #9AA3AE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.system}}</span>
+<span style="text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{r.dps}}</span>
+<span style="text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{r.ehp}}</span>
+<span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{r.speed}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: 0.08em; color: #7C8794">{{r.prop}}</span>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: {{r.capColor}}">{{r.cap}}</span>
+<span style="display: flex; flex-direction: column; gap: 5px">
+<span style="display: flex; align-items: center; gap: 6px">
+<span style="flex: none; width: 24px; font-size: 10px; letter-spacing: 0.08em; color: #7C8794">CPU</span>
+<span aria-hidden="true" style="flex: none; display: block; width: 48px; height: 4px; background: #232932">
+<span style="display: block; height: 4px; width: {{r.cpuWidth}}; background: {{r.cpuColor}}"></span>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{r.cpuText}}">{{r.cpuPct}}</span>
+</span>
+<span style="display: flex; align-items: center; gap: 6px">
+<span style="flex: none; width: 24px; font-size: 10px; letter-spacing: 0.08em; color: #7C8794">PG</span>
+<span aria-hidden="true" style="flex: none; display: block; width: 48px; height: 4px; background: #232932">
+<span style="display: block; height: 4px; width: {{r.pgWidth}}; background: {{r.pgColor}}"></span>
+</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: {{r.pgText}}">{{r.pgPct}}</span>
+</span>
+</span>
+<span style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: {{r.skillColor}}"><span aria-hidden="true" style="flex: none; width: 6px; height: 6px; border-radius: 50%; background: {{r.skillColor}}"></span>{{r.skillShort}}</span>
+<span style="text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{r.value}}</span>
+</button>
+<sc-if value="{{r.isOpen}}" hint-placeholder-val="{{false}}">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 20px 40px; padding: 8px 16px 22px 90px; background: #141920">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Weapons and modules</span>
+<sc-if value="{{r.hasModules}}" hint-placeholder-val="{{true}}">
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{r.modules}}" as="m" hint-placeholder-count="3">
+<li style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px">{{m.name}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{m.detail}}</span>
+</li>
+</sc-for>
+</ul>
+</sc-if>
+<sc-if value="{{r.noModules}}" hint-placeholder-val="{{false}}">
+<span style="font-size: 13px; color: #9AA3AE">None listed</span>
+</sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">CPU</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: {{r.cpuText}}">{{r.cpuUsed}} / {{r.cpuMax}} tf</span>
+</div>
+<div role="img" aria-label="CPU {{r.cpuPct}} used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{r.cpuWidth}}; background: repeating-linear-gradient(90deg, {{r.cpuColor}} 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Powergrid</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: {{r.pgText}}">{{r.pgUsed}} / {{r.pgMax}} MW</span>
+</div>
+<div role="img" aria-label="Powergrid {{r.pgPct}} used" style="height: 4px; background: repeating-linear-gradient(90deg, #232932 0 6px, transparent 6px 8px)">
+<div style="height: 4px; width: {{r.pgWidth}}; background: repeating-linear-gradient(90deg, {{r.pgColor}} 0 6px, transparent 6px 8px)"></div>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Location</span>
+<span style="font-size: 13.5px">{{r.station}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Skills</span>
+<span style="font-size: 13.5px; color: {{r.skillColor}}">{{r.skillLong}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Value</span>
+<span style="font-size: 13.5px"><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px">{{r.value}}</span> ISK<span style="color: #9AA3AE">{{r.unpriced}}</span></span>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<span style="font-size: 13px; color: #9AA3AE">{{footNote}}</span>
+<button type="button" style="height: 44px; padding: 0 16px; border: 1px solid #2A313B; border-radius: 6px; background: transparent; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">{{showAll}}</button>
+</div>
+</section>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"shipLayout":{"editor":"enum","default":"Panels","options":["Panels","Table"]},"$preview":{"width":1440,"height":3300}}'>
+class Component extends DCLogic {
+renderVals() {
+var self = this;
+var accent = this.props.accent ?? '#F5A524';
+var roster = [['TrilliumONE', 'TO', 'MAIN', '112.5M'], ['Sasha-9999', 'S9', 'MAIN', '25.5M'], ['Reacher-9', 'R9', 'ALT', '4.8M'], ['Lana C', 'LC', 'ALT', '10.4M'], ['Faster Than-Light', 'FL', 'ALT', '70.1M'], ['Faster Than-Ever', 'FE', 'ALT', '31.1M']];
+var charName = (this.state && this.state.char) || 'TrilliumONE';
+var charsOpen = !!(this.state && this.state.charsOpen);
+var charInitials = 'TO';
+var chars = roster.map(function (r) {
+var sel = r[0] === charName;
+if (sel) { charInitials = r[1]; }
+return {
+name: r[0], initials: r[1], tag: r[2], sp: r[3],
+selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent',
+pick: function () { self.setState({ char: r[0], charsOpen: false }); }
+};
+});
+var toggleChars = function () { self.setState({ charsOpen: !charsOpen }); };
+var fitted = [["Loki", "Minmatar", "Strategic Cruiser", "Loki - TrilliumONE", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "609.2", "36,074", "1,765 m/s", "MWD", "Stable 42%", "428.65/562.50", "828.60/892.50", 0, "1.92B", 0, "5× Caldari Navy Heavy Assault Missile Launcher~Inferno Rage Heavy Assault Missile · range 21.1 km;Dark Blood Medium Energy Neutralizer~optimal 12.0 km · falloff 6.0 km;2× Federation Navy Stasis Webifier~range 31.5 km"], ["Gila", "Caldari", "Cruiser", "Gee", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "2,174.9", "56,099", "705 m/s", "AB", "Stable 85%", "426.84/451.25", "702.75/854.25", 0, "1.68B", 0, "4× Dread Guristas Rapid Light Missile Launcher~Mjolnir Fury Light Missile · range 38.0 km"], ["Proteus", "Gallente", "Strategic Cruiser", "Prometheus 6", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "1,172.7", "24,798", "715 m/s", "AB", "Lasts 1m 13s", "325.90/362.50", "1142.90/1425.20", 0, "992.6M", 1, "5× Heavy Neutron Blaster II~Void M · optimal 3.4 km · falloff 3.1 km;Caldari Navy Warp Scrambler~range 10.0 km"], ["Tengu", "Caldari", "Strategic Cruiser", "Tengu - TrilliumONE", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "381.9", "22,230", "613 m/s", "AB", "Stable 37%", "584.42/587.50", "945.68/1026.63", 0, "731.7M", 0, "6× Heavy Assault Missile Launcher II~Scourge Rage Heavy Assault Missile · range 21.9 km;Warp Scrambler II~range 9.0 km;Stasis Webifier II~range 10.0 km"], ["Pacifier", "", "Covert Ops", "Prometheus 2", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "—", "2,104", "3,039 m/s", "MWD", "Stable 76%", "325.00/342.00", "23.00/76.50", 0, "691.2M", 0, ""], ["Legion", "Amarr", "Strategic Cruiser", "Bee", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "392.1", "14,047", "2,004 m/s", "MWD", "Lasts 1m 49s", "329.28/387.50", "1163.40/1377.00", 0, "608.1M", 0, "6× Heavy Beam Laser II~Aurora M · optimal 106.5 km · falloff 14.1 km"], ["Brutix Navy Issue", "Gallente", "Combat Battlecruiser", "RRRR", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "996.5", "114,013", "1,369 m/s", "MWD", "Lasts 13m 51s", "555.00/568.75", "1259.60/1574.62", 0, "604.6M", 0, "6× Heavy Ion Blaster II~Void M · optimal 3.5 km · falloff 3.1 km;Skirmish Command Burst II~range 37.7 km;Federation Navy Stasis Webifier~range 14.0 km;Caldari Navy Warp Disruptor~range 26.0 km"], ["Hurricane Fleet Issue", "Minmatar", "Combat Battlecruiser", "Wraith", "Kubinen", "Kubinen VI - Moon 2 - Lai Dai Corporation Factory", "840.4", "71,506", "231 m/s", "", "Stable 86%", "407.00/525.00", "1386.10/1759.50", 0, "601.3M", 0, "6× 220mm Vulcan AutoCannon II~Hail M · optimal 1.7 km · falloff 11.6 km;2× Heavy Assault Missile Launcher II~Scourge Rage Heavy Assault Missile · range 16.9 km;Republic Fleet Warp Scrambler~range 11.3 km"], ["Orthrus", "Caldari", "Cruiser", ":)", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "359.6", "18,055", "554 m/s", "MWD", "Lasts 17m 1s", "533.25/575.00", "527.50/1020.00", 0, "569.7M", 2, "5× Rapid Light Missile Launcher II~Mjolnir Fury Light Missile · range 47.5 km;3× Remote Sensor Dampener II~Targeting Range Dampening Script · optimal 42.0 km · falloff 84.0 km;Dark Blood Warp Disruptor~range 45.0 km"], ["Retribution", "Amarr", "Assault Frigate", "BEEM ;)", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "306.5", "31,003", "2,492 m/s", "MWD", "Stable 47%", "173.50/175.00", "73.80/79.05", 0, "536.1M", 0, "4× Small Focused Beam Laser II~Gleam S · optimal 5.4 km · falloff 3.1 km"], ["Gila", "Caldari", "Cruiser", "GAC", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "842.9", "25,366", "635 m/s", "AB", "Stable 33%", "471.00/475.00", "831.20/854.25", 0, "497.0M", 1, "4× Rapid Light Missile Launcher II~Mjolnir Fury Light Missile · range 31.6 km;Medium Ghoul Compact Energy Nosferatu~optimal 8.0 km · falloff 4.0 km"], ["Cenotaph", "Pirate", "Combat Battlecruiser", "Ryu", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "—", "34,267", "213 m/s", "", "Stable 100%", "0.00/625.00", "0.00/1402.50", 0, "435.0M", 0, ""], ["Confessor", "Amarr", "Tactical Destroyer", "C", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "345.7", "6,292", "656 m/s", "AB", "Lasts 1m 12s", "220.50/225.00", "88.16/90.91", 0, "382.9M", 1, "4× Small Focused Beam Laser II~Gleam S · optimal 5.0 km · falloff 3.1 km;Centii B-Type Small Remote Armor Repairer~optimal 9.8 km · falloff 3.5 km;Centii C-Type Small Remote Armor Repairer~optimal 9.4 km · falloff 3.4 km"], ["Brutix Navy Issue", "Gallente", "Combat Battlecruiser", "RM4", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "634.1", "52,923", "1,369 m/s", "MWD", "Lasts 2m 15s", "541.75/568.75", "1509.20/1574.62", 0, "347.0M", 0, "6× 250mm Prototype Gauss Gun~Caldari Navy Antimatter Charge M · optimal 23.3 km · falloff 21.9 km;Skirmish Command Burst II~range 37.7 km"], ["Gila", "Caldari", "Cruiser", "G4", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "—", "15,616", "244 m/s", "", "Stable 100%", "0.00/475.00", "0.00/854.25", 0, "331.7M", 0, ""], ["Jackdaw", "Caldari", "Tactical Destroyer", "J", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "155.7", "6,297", "1,089 m/s", "AB", "Lasts 1m 44s", "288.25/337.50", "75.00/89.25", 0, "299.2M", 1, "5× Rocket Launcher II~Scourge Rage Rocket · range 8.4 km;Warp Scrambler II~range 9.0 km;Stasis Webifier II~range 10.0 km"], ["Sleipnir", "Minmatar", "Command Ship", "CH3", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "—", "28,435", "206 m/s", "", "Stable 100%", "0.00/593.75", "0.00/1657.50", 1, "277.4M", 0, ""], ["Ishtar", "Gallente", "Heavy Assault Cruiser", "NS", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "562.2", "57,302", "219 m/s", "", "Stable 52%", "492.50/484.50", "828.00/943.50", 0, "275.9M", 0, ""], ["Stratios", "Gallente", "Cruiser", "Stratios", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "—", "13,489", "228 m/s", "", "Stable 100%", "0.00/500.00", "0.00/1173.00", 0, "267.3M", 0, ""], ["Hyperion", "Gallente", "Battleship", "011011", "Jita", "Jita IV - Moon 4 - Caldari Navy Assembly Plant", "605.4", "77,988", "144 m/s", "", "Lasts 1m 11s", "739.00/750.00", "19272.16/20400.00", 3, "256.5M", 0, "6× Neutron Blaster Cannon II~Void L · optimal 6.8 km · falloff 6.3 km;Heavy Stasis Grappler II~optimal 1.0 km · falloff 10.0 km;Stasis Webifier II~range 10.0 km;Burst Jammer II~range 16.8 km"]];
+var saved = [["Armageddon Navy Issue", "Amarr", "Battleship", "De BuG's Armageddon Navy Issue", "Saved fit", "Saved fit", "494.4", "126,184", "956 m/s", "MWD", "Lasts 49s", "747.00/749.70", "20066.00/20400.00", 2, "322.99B", 0, "2× Vepas' Modified Rapid Heavy Missile Launcher~Mjolnir Fury Heavy Missile · range 47.2 km;3× Estamel's Modified Rapid Heavy Missile Launcher~Mjolnir Fury Heavy Missile · range 47.2 km;2× Heavy Energy Neutralizer II~optimal 22.0 km · falloff 10.5 km;Tobias' Modified Heavy Warp Scrambler~range 15.0 km;Tobias' Modified Stasis Webifier~range 20.0 km"], ["Phoenix Navy Issue", "Caldari", "Dreadnought", "Phoenix WH Fleet PVP, 5000dps, 4mil ehp,", "Saved fit", "Saved fit", "2,487.6", "3,526,019", "0 m/s", "", "Lasts 2m 33s", "1198.00/1262.50", "620135.75/733125.00", 6, "22.66B", 0, "3× Dread Guristas Rapid Torpedo Launcher~Scourge Rage Torpedo · range 67.8 km;Republic Fleet Target Painter~optimal 50.4 km · falloff 126.0 km"], ["Loki", "Minmatar", "Strategic Cruiser", "Instalock Overpiced", "Saved fit", "Saved fit", "517.9", "56,879", "289 m/s", "", "Stable 80%", "345.00/412.50", "1351.80/1483.84", 0, "13.34B", 0, "2× Arbalest Compact Light Missile Launcher~Dread Guristas Inferno Light Missile · range 42.2 km;5× 720mm Howitzer Artillery II~Arch Angel EMP M · optimal 18.8 km · falloff 27.3 km"], ["Marshal", "", "Black Ops", "L4 Marshal Autocannon PvE", "Saved fit", "Saved fit", "672.1", "56,983", "1,985 m/s", "MWD", "Lasts 55s", "823.50/1000.00", "17384.00/22950.00", 5, "11.62B", 0, "6× 800mm Repeating Cannon II~Hail L · optimal 3.5 km · falloff 31.8 km;Heavy Energy Nosferatu II~optimal 20.0 km · falloff 10.0 km"], ["Phoenix Navy Issue", "Caldari", "Dreadnought", "Bombeldo HAW Solo", "Saved fit", "Saved fit", "2,573.0", "1,739,550", "0 m/s", "", "Lasts 2m 24s", "1216.09/1262.50", "743259.00/806437.50", 6, "10.97B", 0, "3× Rapid Torpedo Launcher II~Scourge Rage Torpedo · range 60.8 km;2× Republic Fleet Target Painter~optimal 50.4 km · falloff 126.0 km;Domination Heavy Warp Scrambler~range 12.3 km"], ["Cenotaph", "Pirate", "Combat Battlecruiser", "PvP, Cenobyte Mk.I", "Saved fit", "Saved fit", "551.0", "119,539", "3,438 m/s", "MWD", "Lasts 1m 14s", "446.50/625.00", "1821.50/1862.87", 0, "5.85B", 3, "3× Caldari Navy Heavy Assault Missile Launcher~Inferno Rage Heavy Assault Missile · range 21.1 km;3× Republic Fleet Dual 180mm Autocannon~Hail M · optimal 1.5 km · falloff 10.6 km"], ["Gila", "Caldari", "Cruiser", "T6 Exot", "Saved fit", "Saved fit", "865.1", "30,630", "729 m/s", "AB", "Stable 57%", "442.00/475.00", "822.00/854.25", 0, "4.44B", 0, "4× Caldari Navy Rapid Light Missile Launcher~Scourge Fury Light Missile · range 31.6 km"], ["Cenotaph", "Pirate", "Combat Battlecruiser", "Cenotaph - Solo Wormhole PVP / Hunter", "Saved fit", "Saved fit", "655.2", "76,947", "1,256 m/s", "AB", "Stable 46%", "449.50/625.00", "1431.50/1619.89", 0, "4.41B", 3, "3× Caldari Navy Heavy Assault Missile Launcher~Inferno Rage Heavy Assault Missile · range 21.1 km;3× Republic Fleet Dual 180mm Autocannon~Hail M · optimal 1.5 km · falloff 10.6 km;Dark Blood Warp Scrambler~range 11.3 km;Dark Blood Stasis Webifier~range 15.0 km"], ["Ishtar", "Gallente", "Heavy Assault Cruiser", "*T6 Gamma Baseline", "Saved fit", "Saved fit", "443.9", "62,636", "600 m/s", "AB", "Stable 48%", "421.50/425.00", "876.60/943.50", 0, "3.40B", 0, "4× 280mm Howitzer Artillery II~Republic Fleet Fusion S · optimal 7.5 km · falloff 10.9 km"], ["Mekubal", "Pirate", "Destroyer", "Projekt 1065", "Saved fit", "Saved fit", "422.4", "11,648", "2,104 m/s", "AB", "Lasts 48s", "223.00/225.00", "81.40/84.15", 0, "3.36B", 0, "4× 200mm AutoCannon II~Hail S · optimal 750 m · falloff 9.4 km;Small Gremlin Compact Energy Neutralizer~optimal 4.0 km · falloff 2.0 km;Federation Navy Stasis Webifier~range 14.0 km;J5 Enduring Warp Disruptor~range 20.0 km"]];
+var tab = (this.state && this.state.tab) || 'fitted';
+var tabs = [['fitted', 'Fitted ships', 67], ['saved', 'Saved fits', 122]].map(function (t) {
+var sel = t[0] === tab;
+return {
+label: t[1], count: t[2], selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent', color: sel ? '#E6E9ED' : '#9AA3AE',
+pick: function () { self.setState({ tab: t[0], charsOpen: false }); }
+};
+});
+var openRows = (this.state && this.state.openRows) || { 'fitted-0': true };
+var GOOD = '#4FD1C5';
+var BAD = '#FF8A7A';
+function usage(pair) {
+var parts = pair.split('/');
+var used = parseFloat(parts[0]);
+var max = parseFloat(parts[1]);
+var pct = max > 0 ? Math.round(used / max * 100) : 0;
+var over = used > max;
+return {
+used: parts[0], max: parts[1], pct: pct + '%', width: Math.min(100, pct) + '%',
+color: over ? BAD : '#C9CED6', text: over ? BAD : '#9AA3AE'
+};
+}
+var source = tab === 'fitted' ? fitted : saved;
+var rows = source.map(function (d, i) {
+var key = tab + '-' + i;
+var isOpen = !!openRows[key];
+var cpu = usage(d[11]);
+var pg = usage(d[12]);
+var missing = d[13];
+var stable = d[10].indexOf('Stable') === 0;
+var modules = d[16] ? d[16].split(';').map(function (m) { var p = m.split('~'); return { name: p[0], detail: p[1] }; }) : [];
+return {
+hull: d[0], kind: d[2] + (d[1] ? ' · ' + d[1] : ''), name: d[3], system: d[4], station: d[5],
+initials: d[0].replace(/[^A-Za-z]/g, '').slice(0, 2).toUpperCase(),
+dps: d[6], ehp: d[7], speed: d[8], prop: d[9],
+cap: d[10], capColor: stable ? GOOD : BAD,
+cpuUsed: cpu.used, cpuMax: cpu.max, cpuPct: cpu.pct, cpuWidth: cpu.width, cpuColor: cpu.color, cpuText: cpu.text,
+pgUsed: pg.used, pgMax: pg.max, pgPct: pg.pct, pgWidth: pg.width, pgColor: pg.color, pgText: pg.text,
+skillColor: missing ? BAD : GOOD,
+skillShort: missing ? missing + ' missing' : 'Trained',
+skillLong: missing ? missing + (missing === 1 ? ' missing skill' : ' missing skills') : 'All skills trained',
+value: d[14],
+unpriced: d[15] ? ' · ' + d[15] + (d[15] === 1 ? ' item unpriced' : ' items unpriced') : '',
+modules: modules, hasModules: modules.length > 0, noModules: modules.length === 0,
+cls: d[2], order: i,
+mastery: missing ? 3 : 4,
+masteryRoman: ['', 'I', 'II', 'III', 'IV', 'V'][missing ? 3 : 4],
+masteryBoxes: [0, 1, 2, 3, 4].map(function (b) { return b < (missing ? 3 : 4) ? { border: '#C9CED6', bg: '#C9CED6' } : { border: '#333B46', bg: 'transparent' }; }),
+speedLabel: 'Speed' + (d[9] ? ' · ' + d[9] : ''),
+capShort: d[10].replace('Stable ', '').replace('Lasts ', ''),
+capLabel: stable ? 'Cap · Stable' : 'Cap · Lasts',
+modLabel: 'Modules ' + modules.length,
+isOpen: isOpen, openAttr: isOpen ? 'true' : 'false',
+chevron: isOpen ? 'rotate(90deg)' : 'none',
+rowBg: isOpen ? '#141920' : 'transparent',
+toggle: function () { var next = {}; for (var k in openRows) { next[k] = openRows[k]; } next[key] = !isOpen; self.setState({ openRows: next }); }
+};
+});
+var classOrder = ['Titan', 'Supercarrier', 'Dreadnought', 'Carrier', 'Force Auxiliary', 'Marauder', 'Black Ops', 'Battleship', 'Command Ship', 'Attack Battlecruiser', 'Combat Battlecruiser', 'Strategic Cruiser', 'Heavy Assault Cruiser', 'Heavy Interdiction Cruiser', 'Combat Recon Ship', 'Force Recon Ship', 'Logistics', 'Cruiser', 'Tactical Destroyer', 'Command Destroyer', 'Interdictor', 'Destroyer', 'Assault Frigate', 'Covert Ops', 'Interceptor', 'Expedition Frigate', 'Frigate', 'Corvette', 'Shuttle'];
+function rank(c) { var n = classOrder.indexOf(c); return n < 0 ? classOrder.length : n; }
+var sorted = rows.slice().sort(function (x, y) { return (rank(x.cls) - rank(y.cls)) || (x.order - y.order); });
+var panelLayout = (this.props.shipLayout ?? 'Panels') === 'Panels';
+var footNote = tab === 'fitted' ? (panelLayout ? 'Showing 20 of 67 fitted ships, ordered by hull type. Mastery levels are example values.' : 'Showing 20 of 67 fitted ships, highest value first') : (panelLayout ? 'Showing 10 of 122 saved fits, ordered by hull type. Mastery levels are example values.' : 'Showing 10 of 122 saved fits, highest value first');
+var showAll = tab === 'fitted' ? 'Show all 67' : 'Show all 122';
+return { accent: accent, tabs: tabs, rows: rows, sorted: sorted, isPanels: panelLayout, isTable: !panelLayout, footNote: footNote, showAll: showAll, chars: chars, charName: charName, charInitials: charInitials, charsOpen: charsOpen, charsOpenAttr: charsOpen ? 'true' : 'false', toggleChars: toggleChars };
+}
+}
+</script>
+</body>
+</html>

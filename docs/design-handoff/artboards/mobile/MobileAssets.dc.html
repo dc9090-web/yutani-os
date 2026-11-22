@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Yutani OS — Assets (mobile)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#050607}
+a{color:#9AA3AE;text-decoration:none}a:hover{color:#E6E9ED}
+</style>
+</helmet>
+<div style="max-width: 390px; margin: 0 auto; min-height: 100vh; box-sizing: border-box; overflow: hidden; background: #0A0C0F; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.4">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 0 16px; padding: 0 16px; border-bottom: 1px solid #1C2128">
+<a href="MobileMain.dc.html" aria-label="Yutani OS home" style="display: flex; align-items: center; gap: 10px; height: 56px; color: #E6E9ED">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.3em">YUTANI</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.12em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: {{accent}}">OS</span>
+</a>
+<nav aria-label="Primary" style="order: 3; flex: 0 0 auto; width: calc(100% + 32px); box-sizing: border-box; margin: 0 -16px; padding: 0 8px; display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 2px; border-top: 1px solid #14181D; font-size: 13px; font-weight: 500; white-space: nowrap">
+<a href="MobileMain.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Overview</a>
+<a href="MobileSkills.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Skills</a>
+<a href="MobileClones.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Clones</a>
+<a href="MobileShips.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Ships</a>
+<a href="#" aria-current="page" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px; color: #E6E9ED; box-shadow: inset 0 -2px 0 {{accent}}">Assets</a>
+<a href="MobileWallet.dc.html" style="flex: none; display: flex; align-items: center; height: 44px; padding: 0 12px">Wallet</a>
+</nav>
+<button type="button" aria-label="Account menu, DC" style="margin-left: auto; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 10px 0 6px; background: #111418; border: 1px solid #1C2128; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">
+<span aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">DC</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; padding: 8px 16px; border-bottom: 1px solid #14181D; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 0.08em; color: #7C8794">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA3AE"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 50%; background: #4FD1C5"></span>SYS ONLINE</span>
+<span>ESI OK</span>
+<span>SDE 3720952</span>
+<span>6 CHARACTERS</span>
+<span style="margin-left: auto">2026-11-22 04:11 UTC</span>
+</div>
+
+<main style="max-width: 1360px; margin: 0 auto; box-sizing: border-box; padding: 24px 16px 40px; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px">
+<h1 style="margin: 0; font-family: 'Space Grotesk', Inter, sans-serif; font-weight: 600; font-size: 26px; letter-spacing: -0.01em; line-height: 1.15">Assets</h1>
+<div style="position: relative; margin-top: 6px">
+<button type="button" onClick="{{toggleChars}}" aria-haspopup="listbox" aria-expanded="{{charsOpenAttr}}" aria-label="Character: {{charName}}" style="display: flex; align-items: center; gap: 10px; height: 44px; min-width: 240px; padding: 0 12px 0 6px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{charInitials}}</span>
+<span style="flex: 1; min-width: 0">{{charName}}</span>
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5l3 3 3-3"></path></svg>
+</button>
+<sc-if value="{{charsOpen}}" hint-placeholder-val="{{false}}">
+<div role="listbox" aria-label="Characters" style="position: absolute; top: 50px; left: 0; z-index: 10; box-sizing: border-box; min-width: 320px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #111418; border: 1px solid #2A313B; border-radius: 8px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55)">
+<sc-for list="{{chars}}" as="c" hint-placeholder-count="6">
+<button type="button" role="option" aria-selected="{{c.selAttr}}" onClick="{{c.pick}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px 0 6px; border: 0; border-radius: 5px; background: {{c.bg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 400; color: #9AA3AE">{{c.initials}}</span>
+<span style="flex: 1; min-width: 0">{{c.name}}</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 400; letter-spacing: 0.1em; color: #7C8794">{{c.tag}}</span>
+<span style="flex: none; width: 56px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 400; color: #9AA3AE">{{c.sp}}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 100%; min-width: 0">
+<label for="asset-filter" style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Filter by name</label>
+<input id="asset-filter" type="search" value="{{query}}" onChange="{{onQuery}}" placeholder="Gyrostabilizer, Tritanium…" style="height: 44px; box-sizing: border-box; padding: 0 12px; background: #111418; border: 1px solid #2A313B; border-radius: 6px; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 14px">
+</div>
+</div>
+
+<section aria-label="Asset totals" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: #1C2128; border: 1px solid #1C2128; border-radius: 8px; overflow: hidden">
+<div style="background: #0E1114; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Items</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 22px; font-weight: 500">1,668</span></div>
+<div style="background: #0E1114; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Locations</span><span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 22px; font-weight: 500">69</span></div>
+<div style="grid-column: 1 / -1; background: #0E1114; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px"><span style="font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #7C8794">Largest location</span><span style="font-size: 14px; font-weight: 500; line-height: 1.9">Jita IV - Moon 4 <span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; font-weight: 400; color: #9AA3AE">1,323 items</span></span></div>
+</section>
+
+<section aria-label="Locations" style="display: flex; flex-direction: column; gap: 12px">
+<div style="background: #111418; border: 1px solid #1C2128; border-bottom: 0; border-radius: 8px; overflow: hidden">
+<sc-for list="{{locations}}" as="l" hint-placeholder-count="12">
+<div style="border-bottom: 1px solid #1C2128">
+<button type="button" onClick="{{l.toggle}}" aria-expanded="{{l.openAttr}}" style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; width: 100%; min-height: 52px; box-sizing: border-box; padding: 10px 16px; border: 0; background: {{l.rowBg}}; color: #E6E9ED; font-family: Inter, system-ui, sans-serif; font-size: 13.5px; text-align: left; cursor: pointer">
+<svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#9AA3AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none; transform: {{l.chevron}}"><path d="M4.5 3l3 3-3 3"></path></svg>
+<span style="flex: 1 1 250px; min-width: 0; font-weight: {{l.weight}}">{{l.name}}</span>
+<span style="flex: none; margin-left: 24px; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px">{{l.itemsLabel}}</span>
+<span style="flex: 1 1 auto; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12.5px; color: #9AA3AE">{{l.volume}}</span>
+</button>
+<sc-if value="{{l.showTree}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 6px 16px 20px 16px; background: #141920">
+<sc-for list="{{l.holders}}" as="h" hint-placeholder-count="1">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px">
+<span role="img" aria-label="Ship image placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 5px; background: #1A1F26; border: 1px solid #262C35; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; color: #9AA3AE">{{h.initials}}</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'Space Grotesk', Inter, sans-serif; font-size: 16px; font-weight: 600">{{h.name}} <span style="font-family: Inter, system-ui, sans-serif; font-size: 13.5px; font-weight: 400; color: #C9CED6">{{h.label}}</span></span>
+<span style="font-size: 12.5px; color: #9AA3AE">{{h.summary}}</span>
+</div>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.1em; padding: 2px 6px; border: 1px solid #2A313B; border-radius: 3px; color: #9AA3AE">{{h.flag}}</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 18px 36px; align-items: start">
+<sc-for list="{{h.groups}}" as="g" hint-placeholder-count="3">
+<div style="min-width: 0; display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid #2A313B">
+<h3 style="margin: 0; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase">{{g.name}}</h3>
+<span style="font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{g.count}}</span>
+</div>
+<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+<sc-for list="{{g.items}}" as="i" hint-placeholder-count="4">
+<li style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; box-sizing: border-box; border-bottom: 1px solid #1C2128">
+<span role="img" aria-label="Item icon placeholder" style="flex: none; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; background: #1A1F26; border: 1px solid #262C35; color: #7C8794"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="9" height="9" rx="1"></rect><path d="M6 8h4M8 6v4"></path></svg></span>
+<span style="flex: none; width: 34px; text-align: right; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: #9AA3AE">{{i.qty}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13.5px">{{i.name}}</span>
+<span style="font-size: 12px; color: #9AA3AE">{{i.note}}</span>
+</span>
+<span style="flex: none; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11.5px; color: #9AA3AE">{{i.where}}</span>
+</li>
+</sc-for>
+</ul>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{l.showStub}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; padding: 4px 16px 16px 16px; background: #141920; font-size: 13px; color: #9AA3AE">Contents not loaded in this mockup. Kubinen VI is the one location with its items filled in.</p>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{noMatches}}" hint-placeholder-val="{{false}}">
+<p style="margin: 0; font-size: 13.5px; color: #9AA3AE">No locations or loaded items match that filter.</p>
+</sc-if>
+<span style="font-size: 13px; color: #9AA3AE">{{footNote}}</span>
+</section>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F5A524","options":["#F5A524","#5CC8FF","#4FD1C5","#E6E9ED"]},"$preview":{"width":390,"height":7400}}'>
+class Component extends DCLogic {
+renderVals() {
+var self = this;
+var accent = this.props.accent ?? '#F5A524';
+var roster = [['TrilliumONE', 'TO', 'MAIN', '112.5M'], ['Sasha-9999', 'S9', 'MAIN', '25.5M'], ['Reacher-9', 'R9', 'ALT', '4.8M'], ['Lana C', 'LC', 'ALT', '10.4M'], ['Faster Than-Light', 'FL', 'ALT', '70.1M'], ['Faster Than-Ever', 'FE', 'ALT', '31.1M']];
+var charName = (this.state && this.state.char) || 'TrilliumONE';
+var charsOpen = !!(this.state && this.state.charsOpen);
+var charInitials = 'TO';
+var chars = roster.map(function (r) {
+var sel = r[0] === charName;
+if (sel) { charInitials = r[1]; }
+return {
+name: r[0], initials: r[1], tag: r[2], sp: r[3],
+selAttr: sel ? 'true' : 'false',
+bg: sel ? '#1A1F26' : 'transparent',
+pick: function () { self.setState({ char: r[0], charsOpen: false }); }
+};
+});
+var toggleChars = function () { self.setState({ charsOpen: !charsOpen }); };
+var LOADED = 'Kubinen VI - Moon 2 - Lai Dai Corporation Factory';
+var raw = ["Jita IV - Moon 4 - Caldari Navy Assembly Plant|1323|3,896,609", "Uitra VI - Moon 4 - State War Academy|71|652,711", "Kubinen VI - Moon 2 - Lai Dai Corporation Factory|41|216,432", "Anin IX - Moon 16 - Caldari Steel Factory|21|52,189", "Torrinos V - Moon 5 - Lai Dai Corporation Factory|16|15,054", "Torrinos V - Moon 16 - Home Guard Logistic Support|14|168", "Vaankalen I - Moon 3 - Expert Housing Production Plant|13|38,685", "Hirtamon VI - Moon 6 - Ytiri Storage|8|43,654", "Nonni I - Kaalakiota Corporation Factory|8|293", "Korama V - Moon 20 - Ishukone Corporation Factory|7|38", "Liekuri VI - Moon 4 - Sukuuvestaa Corporation Production Plant|7|15,060", "Saisio VII - Moon 1 - Peace and Order Unit Testing Facilities|7|57", "Hirtamon IV - Moon 1 - Echelon Entertainment Development Studio|6|19,417", "Uemisaisen VII - Moon 16 - Home Guard Assembly Plant|6|15,020", "Akora IX - Moon 19 - CreoDron Factory|6|75", "Choga VII - Expert Distribution Retail Center|5|14", "Piekura VII - Spacelane Patrol Assembly Plant|5|15,010", "Uemon VIII - Moon 3 - Perkone Factory|4|15,010", "Ylandoki II - Zainou Biotech Production|4|8.1", "Sobaseki X - Moon 12 - Propel Dynamics Factory|4|15,010", "Kaunokka VI - Moon 2 - The Convocation of Triglav Semiosis Theater|4|15,010", "Malkalen III - Ishukone Watch Assembly Plant|4|15,010", "Haajinen XII - Moon 8 - Ishukone Watch Logistic Support|4|15,010", "Torrinos V - Moon 6 - Home Guard Assembly Plant|4|15", "Torrinos VI - Moon 16 - Home Guard Logistic Support|4|15,010", "Unpas VI - Moon 3 - Spacelane Patrol Assembly Plant|4|2.7", "Kaimon III - Moon 1 - Corporate Police Force Assembly Plant|4|15,010", "Amod V - Amarr Trade Registry Archives|4|15,015", "Rancer IV - Moon 18 - Roden Shipyards Factory|4|15,010", "Jan VI - Moon 21 - CONCORD Academy|4|1.4", "Stetille V - X-Sense Chemical Refinery|4|15,000", "Crielere I - Ishukone Corporation Research Center|4|15,010", "Caslemon VI - Moon 4 - Wiyrkomi Corporation Warehouse|3|10", "Noghere VIII - Moon 1 - Core Complexion Inc. Factory|3|15,010", "Torrinos V - Moon 15 - Spacelane Patrol Logistic Support|2|10", "Ibura IX - Moon 11 - Spacelane Patrol Testing Facilities|2|0.1", "Eystur IV - Quafe Company Factory|2|11", "Torrinos V - Moon 10 - Caldari Provisions Food Packaging|1|5", "Kor-Azor Prime IV (Eclipticum) - Moon Griklaeum - Ishukone Corporation Factory|1|5,000", "Nuken VIII - Moon 7 - Lai Dai Corporation Research Center|1|10", "Osmon VI - Moon 6 - Lai Dai Corporation Factory|1|5", "Olettiers VII - Moon 2 - Expert Distribution Retail Center|1|14", "Poinen IV - Moon 8 - Sukuuvestaa Corporation Factory|1|0", "Nourvukaiken II - Moon 1 - Modern Finances Depository|1|5", "New Caldari Prime - Moon 1 - Chief Executive Panel Bureau|1|5", "Jita IV - Caldari Business Tribunal Information Center|1|1.7", "Jita IV - Moon 5 - Caldari Navy Assembly Plant|1|0.1", "Kakakela VI - Moon 15 - Caldari Navy Assembly Plant|1|10", "Sobaseki X - Moon 1 - Caldari Navy Assembly Plant|1|5,000", "Isikemi VI - Moon 5 - Caldari Navy Logistic Support|1|5", "Poinen V - Moon 26 - Internal Security Assembly Plant|1|5", "Erenta II - Moon 2 - Home Guard Assembly Plant|1|5", "Isinokka V - Moon 2 - Spacelane Patrol Logistic Support|1|10", "Oipo III - Moon 8 - Spacelane Patrol Logistic Support|1|10", "Piekura VIII - Moon 8 - Spacelane Patrol Assembly Plant|1|1.5", "Kakakela VII - Moon 9 - Corporate Police Force Assembly Plant|1|0.6", "Jita IV - Moon 6 - Caldari Provisions School|1|0", "Paara VI - Moon 2 - School of Applied Knowledge|1|0", "Isaziwa X - Science and Trade Institute School|1|0", "Osmon IV - Moon 5 - Science and Trade Institute School|1|5", "Korama II - Moon 5 - Republic Security Services Logistic Support|1|17,400", "Hek VIII - Moon 12 - Boundless Creation Factory|1|10", "Misaba V - Moon 3 - Zoar and Sons Factory|1|25", "Alkabsi IV - Moon 1 - HZO Refinery Mineral Reserve|1|5,000", "Pakkonen I - Moon 1 - Nurtura Plantation|1|5", "Amarr VIII (Oris) - Emperor Family Academy|1|10,000", "Semiki V - Aliastra Warehouse|1|1", "Mastakomon V - CONCORD Bureau|1|5", "Kamela V - 24th Imperial Crusade Logistic Support|1|5"];
+var kubinen = [{"name": "Hurricane Fleet Issue", "label": "Wraith", "flag": "HANGAR", "summary": "40 items inside: 24 fitted, 10 drones, 11 cargo stacks", "groups": [["Fitted", "24 items", [["6×", "220mm Vulcan AutoCannon II", "", "High 1–6"], ["2×", "Heavy Assault Missile Launcher II", "", "High 7–8"], ["3×", "Sensor Booster II", "Scan Resolution Script loaded in each", "Mid 1–3"], ["", "Republic Fleet Warp Scrambler", "", "Mid 4"], ["", "Damage Control II", "", "Low 1"], ["", "1600mm Steel Plates II", "", "Low 2"], ["3×", "Republic Fleet Gyrostabilizer", "", "Low 3–5"], ["", "Kinetic Energized Membrane II", "", "Low 6"], ["2×", "Medium Trimark Armor Pump II", "", "Rig 1–2"], ["", "Medium Projectile Collision Accelerator I", "", "Rig 3"]]], ["Drone bay", "10 drones", [["10×", "Hobgoblin II", "Held as 5 stacks", ""]]], ["Cargo hold", "11 stacks", [["660", "Scourge Rage Heavy Assault Missile", "", ""], ["487", "Nanite Repair Paste", "", ""], ["772", "Domination Depleted Uranium M", "", ""], ["4", "Republic Fleet Nuclear M", "", ""], ["2", "Agency \u0027Pyrolancea\u0027 DB5 Dose II", "", ""], ["3,848", "Hail M", "", ""], ["244", "Barrage M", "", ""], ["4,136", "Republic Fleet EMP M", "", ""], ["4,928", "Republic Fleet Titanium Sabot M", "", ""], ["473", "Mjolnir Rage Heavy Assault Missile", "", ""], ["6", "Scan Resolution Script", "", ""]]]]}];
+var query = (this.state && this.state.query) || '';
+var q = query.trim().toLowerCase();
+var openLocs = (this.state && this.state.openLocs) || {};
+if (!(this.state && this.state.openLocs)) { openLocs[LOADED] = true; }
+function holdersFor(filter) {
+return kubinen.map(function (h) {
+var groups = h.groups.map(function (g) {
+var items = g[2].filter(function (i) { return !filter || i[1].toLowerCase().indexOf(filter) > -1; })
+.map(function (i) { return { qty: i[0], name: i[1], note: i[2], where: i[3] }; });
+return { name: g[0], count: g[1], items: items };
+}).filter(function (g) { return g.items.length > 0; });
+return { name: h.name, label: h.label, flag: h.flag, summary: h.summary, initials: h.name.slice(0, 2).toUpperCase(), groups: groups };
+}).filter(function (h) { return h.groups.length > 0; });
+}
+var locations = raw.map(function (row) {
+var p = row.split('|');
+var name = p[0];
+var nameHit = !q || name.toLowerCase().indexOf(q) > -1;
+var holders = name === LOADED ? holdersFor(nameHit ? '' : q) : [];
+var itemHit = !!q && holders.length > 0 && !nameHit;
+var isOpen = !!openLocs[name] || itemHit;
+return {
+name: name, items: Number(p[1]).toLocaleString('en-US'), volume: p[2] + ' m³',
+itemsLabel: Number(p[1]).toLocaleString('en-US') + (p[1] === '1' ? ' item' : ' items'),
+visible: nameHit || itemHit,
+holders: holders,
+isOpen: isOpen, openAttr: isOpen ? 'true' : 'false',
+showTree: isOpen && name === LOADED, showStub: isOpen && name !== LOADED,
+chevron: isOpen ? 'rotate(90deg)' : 'none',
+rowBg: isOpen ? '#141920' : 'transparent',
+weight: isOpen ? '600' : '400',
+toggle: function () { var next = {}; for (var k in openLocs) { next[k] = openLocs[k]; } next[name] = !isOpen; self.setState({ openLocs: next }); }
+};
+}).filter(function (l) { return l.visible; });
+var footNote = q ? locations.length + ' of 69 locations match' : 'All 69 locations, most items first';
+return { accent: accent, locations: locations, query: query, footNote: footNote, noMatches: locations.length === 0,
+onQuery: function (e) { self.setState({ query: e && e.target ? e.target.value : '' }); },
+chars: chars, charName: charName, charInitials: charInitials, charsOpen: charsOpen, charsOpenAttr: charsOpen ? 'true' : 'false', toggleChars: toggleChars };
+}
+}
+</script>
+</body>
+</html>
