@@ -11,6 +11,9 @@ export interface SheetSkillProps {
   activeLevel: number;
   queued: number;
   training: boolean;
+  /** The stored sheet's levels, before the live queue was laid over them. */
+  trainedLevel?: number;
+  trainedActiveLevel?: number;
 }
 export interface SheetGroupProps {
   groupId: number;

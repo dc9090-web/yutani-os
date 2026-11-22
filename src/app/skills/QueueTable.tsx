@@ -15,6 +15,12 @@ export interface QueueEntryView {
   remaining: string;
   /** 0–1 through the level, on the entry in training only; every other row is `null`. */
   progress: number | null;
+  /** What `remaining` and `progress` were worked out from (ISO-8601 UTC, SP bounds), for a reader that works them out again later. */
+  startAt?: string | null;
+  finishAt?: string | null;
+  levelStartSp?: number | null;
+  levelEndSp?: number | null;
+  trainingStartSp?: number | null;
 }
 
 /**

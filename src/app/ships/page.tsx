@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
-import { getPrices } from "../../lib/db/market-prices.js";
-import { placeViews } from "../../lib/names/place.js";
-import { loadFitData } from "../../lib/ships/load.js";
-import { masteryLevel } from "../../lib/ships/mastery.js";
-import { getMasteryRequirements, getRaces, getTypes } from "../../lib/sde/repo.js";
+import { loadShips } from "../../lib/pages/ships.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { assembledShips, assetShipCards, rootLocationId, savedFitCards, sortShipPanels, type ShipCardView } from "../../lib/view/ships.js";
+import type { ShipCardView } from "../../lib/view/ships.js";
 import { CharacterPicker } from "../components/CharacterPicker.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { Tabs } from "../components/Tabs.js";
@@ -33,38 +29,7 @@ export default async function ShipsPage() {
   const character = pickActive(characters, session?.activeCharacterId ?? null);
   if (character === null) return <NoCharacter title="Ships" />;
 
-  const { assets, fittings, ctx, skillsSynced } = await loadFitData(character.id);
-  const groups = assembledShips(assets, ctx.data);
-  const byItemId = new Map(assets.map((a) => [a.itemId, a]));
-
-  // Batched lookups for the whole page: one price query over every type the character owns or has
-  // in a fitting, one locationLabels pass over the places the ships are parked in (ships sitting
-  // inside another item are labelled from the asset rows), and one mastery query over the hulls.
-  const priceIds = [
-    ...assets.map((a) => a.typeId),
-    ...fittings.flatMap((f) => [f.shipTypeId, ...f.items.map((i) => i.typeId)]),
-  ];
-  // The hull's race is not in `DogmaData` — one `getTypes` batch over the hull ids, joined against
-  // the (tiny, unfiltered) race table.
-  const hullTypeIds = [...new Set([...groups.map((g) => g.ship.typeId), ...fittings.map((f) => f.shipTypeId)])];
-  const [prices, places, hullTypes, races, mastery] = await Promise.all([
-    getPrices(priceIds),
-    // Every ship's real place — a ship in a container is where the container is — with its system's security.
-    placeViews(groups.map((g) => rootLocationId(g.ship, byItemId))),
-    getTypes(hullTypeIds),
-    getRaces(),
-    getMasteryRequirements(hullTypeIds),
-  ]);
-  const raceNames = new Map<number, string>();
-  for (const [typeId, type] of hullTypes) {
-    const raceName = type.raceId === null ? undefined : races.get(type.raceId);
-    if (raceName !== undefined) raceNames.set(typeId, raceName);
-  }
-  // Mastery is a claim about the pilot's skills: until they have synced there is nothing to say.
-  const masteryOf = (typeId: number): number | null => (skillsSynced ? masteryLevel(mastery.get(typeId), ctx.skills) : null);
-
-  const ships = sortShipPanels(assetShipCards(groups, ctx, places, byItemId, prices, raceNames, masteryOf));
-  const fits = sortShipPanels(savedFitCards(fittings, ctx, prices, raceNames, masteryOf));
+  const { ships, fits, skillsSynced } = await loadShips(character.id);
 
   const picker = <CharacterPicker characters={characters} activeId={character.id} />;
   const banner = skillsSynced ? null : (

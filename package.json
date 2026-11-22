@@ -16,6 +16,9 @@
     "dogma:fixture": "tsx scripts/dogma-fixture.ts",
     "skills:fixture": "tsx scripts/skills-fixture.ts",
     "esi:types": "tsx scripts/esi-types.ts",
+    "app:token": "tsx scripts/app-token.ts",
+    "api:fixtures": "tsx scripts/api-fixtures.ts",
+    "api:sde-extra": "tsx scripts/api-sde-extra.ts",
     "worker": "tsx src/worker/index.ts"
   },
   "dependencies": {

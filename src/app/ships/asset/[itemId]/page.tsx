@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { readSession } from "../../../../lib/auth/session.js";
 import { listCharacters } from "../../../../lib/db/characters.js";
 import { parseId } from "../../../../lib/api/json.js";
-import { assetSheet } from "../../../../lib/ships/sheet.js";
+import { loadAssetSheet } from "../../../../lib/pages/ships.js";
 import { pickActive } from "../../../../lib/view/characters.js";
 import { NoCharacter } from "../../../components/NoCharacter.js";
 import { CouldNotCompute } from "../../CouldNotCompute.js";
@@ -15,7 +15,7 @@ export default async function AssetFitPage({ params }: { params: Promise<{ itemI
 
   const itemId = parseId((await params).itemId);
   if (itemId === null) notFound();
-  const result = await assetSheet(character.id, itemId);
+  const result = await loadAssetSheet(character.id, itemId);
   if (result.kind === "notFound") notFound();
   if (result.kind === "error") return <CouldNotCompute title={result.title} />;
   return <FitSheet view={result.view} />;

@@ -209,6 +209,27 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 - 🛰️ **EVE SSO adds characters.** Once signed in, Settings › Add character runs EVE SSO with PKCE, the token's JWT verified against CCP's JWKS.
 - 🔐 **Refresh tokens are encrypted at rest** with the session secret. Access tokens are refreshed by the worker as needed.
 - 🚪 **One guard for every path.** The proxy lets through the login page, the health check, the Google sign-in routes and the brand images. Everything else needs the session cookie.
+- 📱 **Phones sign in with the same Google account.** The Android app posts a Google ID token to `/api/v1/auth/google` and gets a bearer token; only its SHA-256 is stored. Settings › Signed-in phones lists each device and revokes it. A token whose account leaves the allow-list stops working.
+
+---
+
+## 📱 The app API
+
+`/api/v1` serves the same view objects the pages draw, as JSON, for the Android app. It reads only; nothing here talks to ESI.
+
+| Route | What it returns |
+| --- | --- |
+| `POST /api/v1/auth/google`, `DELETE /api/v1/auth/session` | Sign a phone in with `{ idToken, deviceName }`; sign it out. |
+| `GET /api/v1/sync` | Every resource a phone should hold, with its current ETag. |
+| `GET /api/v1/me`, `/characters`, `/overview`, `/training-overview` | The account, the character switcher, the Overview, Skills › Overview. |
+| `GET /api/v1/characters/{id}/skills`, `/training`, `/clones`, `/assets`, `/ships` | One character's screens. |
+| `GET /api/v1/characters/{id}/wallet` | The balance; with `?kind=journal\|transactions&offset=&limit=` (at most 500) a slice of that list. |
+| `GET /api/v1/characters/{id}/ships/asset/{itemId}`, `/ships/fit/{fittingId}` | A fit sheet, with the per-drone numbers the drone selector sums. |
+
+- 🔑 **Bearer token or the site's cookie.** Without either: `401 { "error": "unauthorised" }`, never a redirect.
+- 📦 **`{ data, generatedAt }`**, errors as `{ error }` with 400, 401 or 404. The character is always in the path.
+- 🏷️ **ETags that ignore the clock.** Every GET answers `If-None-Match` with `304`. A tag moves when the stored data does, not because a countdown ticked, so anything worked out against the clock also carries its raw timestamps and SP bounds for the app to recompute.
+- 🧾 **A contract in the repo.** [`api-fixtures/v1/`](api-fixtures/v1/) holds every response for an invented account and a [README](api-fixtures/v1/README.md) of the shapes. A test fails when a loader drifts from them.
 
 ---
 
@@ -275,7 +296,9 @@ The first worker tick downloads and imports the SDE, which takes a few minutes. 
 | `npm run migrate` | Apply the schema, idempotently. |
 | `npm run sde:import` | Download and import the current SDE by hand, without waiting for the schedule. |
 | `npm run esi:types` | Regenerate the typed ESI client from CCP's OpenAPI document for the pinned compatibility date. |
-| `npm run sde:fixture` / `dogma:fixture` / `skills:fixture` | Rebuild the test fixtures from a real SDE. |
+| `npm run sde:fixture` / `dogma:fixture` / `skills:fixture` / `api:sde-extra` | Rebuild the test fixtures from a real SDE. |
+| `npm run api:fixtures` | Rewrite `api-fixtures/v1/` from the loaders, against the test database (which it truncates). |
+| `npm run app:token -- <email> [device name]` | Create an app session in the database and print its bearer token once, for development. |
 | `npm test` | The vitest suite. `npm run test:watch` to keep it running. |
 | `npm run typecheck` | `tsc --noEmit`. |
 
@@ -316,7 +339,7 @@ Yutani OS is the sister project of [Yutani](https://github.com/dc9090-web/yutani
 npm test
 ```
 
-1,166 vitest tests across 132 files cover the SSO flow, the ESI client's rate limiting and breaker, the SDE importer, the dogma engine against real fits, EFT parsing, the skill timeline and remap optimiser, the killmail pipeline and the React components. The `tests/db` suite needs a Postgres on port 5432; `compose.dev.yml` provides one.
+1,699 vitest tests across 183 files cover the SSO flow, the app API and its contract fixtures, the ESI client's rate limiting and breaker, the SDE importer, the dogma engine against real fits, EFT parsing, the skill timeline and remap optimiser, the killmail pipeline and the React components. The `tests/db` suite needs a Postgres on port 5432; `compose.dev.yml` provides one.
 
 ---
 

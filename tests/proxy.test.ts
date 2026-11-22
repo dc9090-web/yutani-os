@@ -5,10 +5,10 @@ import { SESSION_COOKIE, signPayload } from "../src/lib/auth/session.js";
 
 describe("isPublicPath", () => {
   it("allows login, auth, health, static", () => {
-    for (const p of ["/login", "/auth/google/start", "/auth/google/callback?code=1", "/api/health", "/_next/static/x.js", "/favicon.ico", "/icon.svg", "/eve-mark.svg", "/yutani/wordmark-white.png", "/yutani/kana-white.png"]) expect(isPublicPath(p)).toBe(true);
+    for (const p of ["/login", "/auth/google/start", "/auth/google/callback?code=1", "/api/health", "/api/v1/auth/google", "/_next/static/x.js", "/favicon.ico", "/icon.svg", "/eve-mark.svg", "/yutani/wordmark-white.png", "/yutani/kana-white.png"]) expect(isPublicPath(p)).toBe(true);
   });
   it("guards everything else", () => {
-    for (const p of ["/", "/settings", "/yutani", "/yutanix/x.png", "/api/accounts", "/ships/1", "/login-history", "/api/healthz", "/auth/start", "/auth/callback?code=1", "/auth/googlex", "/auth/switch"]) expect(isPublicPath(p)).toBe(false);
+    for (const p of ["/", "/settings", "/yutani", "/yutanix/x.png", "/api/accounts", "/ships/1", "/login-history", "/api/healthz", "/auth/start", "/auth/callback?code=1", "/auth/googlex", "/auth/switch", "/api/v1/me", "/api/v1/auth/session", "/api/v1/auth/googlex", "/api/v1/characters/1/skills"]) expect(isPublicPath(p)).toBe(false);
   });
 
   it("guards the wallet JSON route like every other API route", () => {
@@ -63,5 +63,51 @@ describe("proxy", () => {
     const req = new NextRequest("https://eve.example.com/settings");
     req.cookies.set(SESSION_COOKIE, signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET));
     expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
+  });
+
+  describe("/api/v1", () => {
+    const signed = () => signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET!);
+    beforeEach(() => { process.env.SESSION_SECRET = "s".repeat(32); });
+
+    it("answers an unauthenticated request with 401 JSON, never a redirect", async () => {
+      const res = proxy(new NextRequest("https://eve.example.com/api/v1/overview"));
+      expect(res.status).toBe(401);
+      expect(res.headers.get("location")).toBeNull();
+      await expect(res.json()).resolves.toEqual({ error: "unauthorised" });
+    });
+
+    it("lets a bearer header through for the route to verify", () => {
+      const req = new NextRequest("https://eve.example.com/api/v1/overview", { headers: { authorization: "Bearer some-token" } });
+      expect(proxy(req).status).toBe(200);
+    });
+
+    it("does not let an empty or non-bearer Authorization header through", () => {
+      for (const authorization of ["Bearer", "Bearer ", "Basic abc"]) {
+        const req = new NextRequest("https://eve.example.com/api/v1/overview", { headers: { authorization } });
+        expect(proxy(req).status).toBe(401);
+      }
+    });
+
+    it("lets the site's own cookie through", () => {
+      const req = new NextRequest("https://eve.example.com/api/v1/overview");
+      req.cookies.set(SESSION_COOKIE, signed());
+      expect(proxy(req).status).toBe(200);
+    });
+
+    it("401s a cookie whose account is off the allow-list", () => {
+      process.env.ALLOWED_GOOGLE_EMAILS = "someone-else@example.com";
+      const req = new NextRequest("https://eve.example.com/api/v1/overview");
+      req.cookies.set(SESSION_COOKIE, signed());
+      expect(proxy(req).status).toBe(401);
+    });
+
+    it("lets the sign-in route through with nothing at all", () => {
+      expect(proxy(new NextRequest("https://eve.example.com/api/v1/auth/google", { method: "POST" })).status).toBe(200);
+    });
+
+    it("a bearer header opens nothing outside /api/v1", () => {
+      const req = new NextRequest("https://eve.example.com/api/accounts", { headers: { authorization: "Bearer some-token" } });
+      expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
+    });
   });
 });

@@ -78,8 +78,8 @@ async function sheetFor(input: {
 }
 
 /** `/ships/asset/[itemId]` — an assembled ship in the character's assets. */
-export async function assetSheet(characterId: number, itemId: number): Promise<SheetResult> {
-  const data = await loadFitData(characterId);
+export async function assetSheet(characterId: number, itemId: number, loaded?: FitData): Promise<SheetResult> {
+  const data = loaded ?? await loadFitData(characterId);
   const group = assembledShips(data.assets, data.ctx.data).find((g) => g.ship.itemId === itemId);
   if (group === undefined) return { kind: "notFound" };
 
@@ -122,8 +122,8 @@ async function shipLocation(ship: AssetRow, byItemId: ReadonlyMap<number, AssetR
 }
 
 /** `/ships/fit/[fittingId]` — a saved ESI fitting. */
-export async function fittingSheet(characterId: number, fittingId: number): Promise<SheetResult> {
-  const data = await loadFitData(characterId);
+export async function fittingSheet(characterId: number, fittingId: number, loaded?: FitData): Promise<SheetResult> {
+  const data = loaded ?? await loadFitData(characterId);
   const fitting = data.fittings.find((f) => f.fittingId === fittingId);
   if (fitting === undefined) return { kind: "notFound" };
   const typeName = data.ctx.data.types.get(fitting.shipTypeId)?.name ?? `Unknown type (${fitting.shipTypeId})`;

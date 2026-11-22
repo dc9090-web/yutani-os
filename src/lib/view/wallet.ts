@@ -129,8 +129,8 @@ export function toTransactionViews(
 }
 
 /** One page of journal rows plus one batched name lookup. Postgres only — never ESI. */
-export async function loadJournalViews(characterId: number, offset = 0): Promise<JournalView[]> {
-  const rows = await listJournal(characterId, { limit: WALLET_PAGE_SIZE, offset });
+export async function loadJournalViews(characterId: number, offset = 0, limit = WALLET_PAGE_SIZE): Promise<JournalView[]> {
+  const rows = await listJournal(characterId, { limit, offset });
   const ids = new Set<number>();
   for (const row of rows) {
     if (row.firstPartyId !== null) ids.add(row.firstPartyId);
@@ -140,8 +140,8 @@ export async function loadJournalViews(characterId: number, offset = 0): Promise
 }
 
 /** One page of transactions plus one getTypes and one locationLabels pass. */
-export async function loadTransactionViews(characterId: number, offset = 0): Promise<TransactionView[]> {
-  const rows = await listTransactions(characterId, { limit: WALLET_PAGE_SIZE, offset });
+export async function loadTransactionViews(characterId: number, offset = 0, limit = WALLET_PAGE_SIZE): Promise<TransactionView[]> {
+  const rows = await listTransactions(characterId, { limit, offset });
   const [types, places] = await Promise.all([
     getTypes([...new Set(rows.map((r) => r.typeId))]),
     placeViews(rows.map((r) => r.locationId).filter((id): id is number => id !== null)),

@@ -406,3 +406,18 @@ CREATE TABLE IF NOT EXISTS multiview_characters (
   character_id  bigint PRIMARY KEY REFERENCES characters(id) ON DELETE CASCADE,
   position      int NOT NULL
 );
+
+-- ── Android app: bearer sessions ────────────────────────────────────────────
+-- One row per signed-in phone. Only the SHA-256 of the token is kept, so a copy of this table
+-- signs nobody in. Tokens do not expire; a row ends when revoked_at is set (Settings, or the app
+-- signing out). email is checked against ALLOWED_GOOGLE_EMAILS on every request.
+CREATE TABLE IF NOT EXISTS app_sessions (
+  id            bigserial PRIMARY KEY,
+  token_hash    text NOT NULL UNIQUE,
+  google_sub    text NOT NULL,
+  email         text NOT NULL,
+  device_name   text NOT NULL,
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  last_used_at  timestamptz,
+  revoked_at    timestamptz
+);

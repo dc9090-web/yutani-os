@@ -13,7 +13,7 @@ describe("schema", () => {
     await applySchema(pool);
     const { rows } = await pool.query("SELECT table_name FROM information_schema.tables WHERE table_schema='public'");
     expect(rows.map((r) => r.table_name).sort()).toEqual([
-      "accounts",
+      "accounts", "app_sessions",
       "character_assets", "character_attributes", "character_clones", "character_fitting_items",
       "character_fittings", "character_implants", "character_jump_clones", "character_killmails",
       "character_location",

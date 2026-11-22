@@ -1,5 +1,6 @@
 import { portraitUrl } from "../../lib/view/characters.js";
 import type { OverviewTraining } from "../../lib/view/format.js";
+import type { RawQueueEntry } from "../../lib/pages/raw.js";
 import { SegBar } from "./SegBar.js";
 
 export interface OverviewShip { typeId: number; typeName: string; groupName: string | null }
@@ -19,6 +20,8 @@ export interface OverviewCard {
   /** null when the token lacks esi-location.read_online.v1 — spec §9 says show nothing, not "offline". */
   online: boolean | null;
   training: OverviewTraining;
+  /** What `training` was worked out from, for a reader that has to work it out again later (the phone). */
+  trainingRaw?: { synced: boolean; queue: RawQueueEntry[] };
   /** "112.5M", no " SP" suffix — the label above it already says "Total SP". */
   totalSp: string | null;
   /** The account's name in capitals; "MAIN" gets the filled amber badge, anything else the outlined one. */
