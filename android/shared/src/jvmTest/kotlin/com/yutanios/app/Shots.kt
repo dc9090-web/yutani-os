@@ -35,7 +35,7 @@ object Shots {
                 // Cut into phone-height tiles and drop the ones with nothing on them, so each is readable.
                 val whole = javax.imageio.ImageIO.read(png.inputStream())
                 val tile = 800 * 2
-                File(out).listFiles { f -> f.name.startsWith("$name-") }?.forEach { it.delete() }
+                File(out).listFiles { f -> Regex("${Regex.escape(name)}-\\d+\\.png").matches(f.name) }?.forEach { it.delete() }
                 for (i in 0 until whole.height / tile) {
                     val part = whole.getSubimage(0, i * tile, whole.width, tile)
                     val ground = part.getRGB(4, tile - 4)

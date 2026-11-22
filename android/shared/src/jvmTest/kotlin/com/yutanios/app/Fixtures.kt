@@ -11,7 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import okio.Path.Companion.toPath
-import okio.fakefilesystem.FakeFileSystem
+import okio.FileSystem
+import java.nio.file.Files
 import java.io.File
 import kotlin.time.Instant
 
@@ -33,11 +34,14 @@ object Fixtures {
     /** The moment the fixtures were generated at: the app's clock while rendering them. */
     val now: Long by lazy { Instant.parse(AppJson.decodeFromString(Envelope.serializer(SyncList.serializer()), text("/api/v1/sync")).generatedAt).toEpochMilliseconds() }
 
-    /** A signed-in app holding the fixtures as its copy, with no network. */
+    /**
+     * A signed-in app holding the fixtures as its copy, with no network. On real files in a temp
+     * folder: okio's fake file system is not safe for the concurrent reads several screens make.
+     */
     fun app(scope: CoroutineScope): AppContainer {
         val tokens = object : TokenStore { override fun get() = "fixture"; override fun set(token: String?) {} }
         val offline = MockEngine { respondError(HttpStatusCode.ServiceUnavailable) }
-        val app = AppContainer("https://site.test", tokens, FakeFileSystem(), "/copy".toPath(), offline, null, "test", scope, now = { now })
+        val app = AppContainer("https://site.test", tokens, FileSystem.SYSTEM, Files.createTempDirectory("yutani-fixtures").toString().toPath(), offline, null, "test", scope, now = { now })
         runBlocking { fill(app.store); app.store.markSync(true, now - 5 * 60_000) }
         return app
     }
