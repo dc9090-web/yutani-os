@@ -6,6 +6,7 @@ import { shipRenderUrl } from "../../lib/view/fit-sheet.js";
 import { roman } from "../../lib/view/format.js";
 import { Chevron } from "../components/Disclosure.js";
 import { LevelBlocks, filledBlocks } from "../components/LevelBlocks.js";
+import { Place } from "../components/Place.js";
 import { SegBar } from "../components/SegBar.js";
 
 function Fitting({ view }: { view: GaugeView }) {
@@ -57,7 +58,7 @@ export function ShipPanel({ card }: { card: ShipCardView }) {
               <Link href={card.href} className="sp-hull">{card.typeName}</Link>
               {card.name === null || card.name === card.typeName ? null : <span className="sp-name">{card.name}</span>}
             </h2>
-            <span className="sp-station" title={card.location}>{card.location}</span>
+            <Place className="sp-station" name={card.location} system={card.system} />
           </div>
         </div>
         {!computed ? <p className="sp-error yo-bad">{card.error ?? "Could not compute"}</p> : (<>
@@ -101,8 +102,12 @@ export function ShipPanel({ card }: { card: ShipCardView }) {
                 const detail = [w.charge, w.range].filter((x) => x !== null).join(" · ");
                 return (
                   <li key={w.key}>
-                    <span className="sp-module-name">{w.count > 1 ? `${w.count}× ` : ""}{w.name}</span>
-                    {detail === "" ? null : <span className="sp-module-detail">{detail}</span>}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="yo-tile sp-module-icon" src={`https://images.evetech.net/types/${w.typeId}/icon?size=64`} alt="" loading="lazy" />
+                    <span className="sp-module-text">
+                      <span className="sp-module-name">{w.count > 1 ? `${w.count}× ` : ""}{w.name}</span>
+                      {detail === "" ? null : <span className="sp-module-detail">{detail}</span>}
+                    </span>
                   </li>
                 );
               })}

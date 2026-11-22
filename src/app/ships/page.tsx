@@ -2,12 +2,12 @@ import Link from "next/link";
 import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { getPrices } from "../../lib/db/market-prices.js";
-import { locationLabels } from "../../lib/names/index.js";
+import { placeViews } from "../../lib/names/place.js";
 import { loadFitData } from "../../lib/ships/load.js";
 import { masteryLevel } from "../../lib/ships/mastery.js";
 import { getMasteryRequirements, getRaces, getTypes } from "../../lib/sde/repo.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { assembledShips, assetShipCards, savedFitCards, sortShipPanels, type ShipCardView } from "../../lib/view/ships.js";
+import { assembledShips, assetShipCards, rootLocationId, savedFitCards, sortShipPanels, type ShipCardView } from "../../lib/view/ships.js";
 import { CharacterPicker } from "../components/CharacterPicker.js";
 import { NoCharacter } from "../components/NoCharacter.js";
 import { Tabs } from "../components/Tabs.js";
@@ -49,7 +49,8 @@ export default async function ShipsPage() {
   const hullTypeIds = [...new Set([...groups.map((g) => g.ship.typeId), ...fittings.map((f) => f.shipTypeId)])];
   const [prices, places, hullTypes, races, mastery] = await Promise.all([
     getPrices(priceIds),
-    locationLabels(groups.filter((g) => g.ship.locationType !== "item").map((g) => g.ship.locationId)),
+    // Every ship's real place — a ship in a container is where the container is — with its system's security.
+    placeViews(groups.map((g) => rootLocationId(g.ship, byItemId))),
     getTypes(hullTypeIds),
     getRaces(),
     getMasteryRequirements(hullTypeIds),

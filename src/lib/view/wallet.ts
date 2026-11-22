@@ -1,8 +1,9 @@
 import { listJournal, listTransactions, type JournalRow, type TransactionRow } from "../db/character-wallet.js";
-import { displayNames, locationLabels } from "../names/label.js";
+import { displayNames } from "../names/label.js";
+import { placeViews } from "../names/place.js";
 import { getTypes } from "../sde/repo.js";
 import { refTypeLabel } from "./enums.js";
-import { grouped, isk, stamp } from "./format.js";
+import { grouped, isk, stamp, type SecView } from "./format.js";
 
 export { stamp } from "./format.js";
 
@@ -48,6 +49,8 @@ export interface TransactionView {
   /** Unit price and total without the unit; the total is signed — money out for a buy, in for a sale. */
   unitText: string;
   signedTotal: string;
+  /** The location's solar system and security status; null when there is no location or it resolves to none. */
+  system: SecView | null;
 }
 
 function party(id: number | null, names: ReadonlyMap<number, string>): string | null {
@@ -105,12 +108,13 @@ export function toJournalViews(rows: JournalRow[], names: ReadonlyMap<number, st
 export function toTransactionViews(
   rows: TransactionRow[],
   types: ReadonlyMap<number, { name: string | null }>,
-  places: ReadonlyMap<number, { name: string }>,
+  places: ReadonlyMap<number, { name: string; system?: SecView | null }>,
 ): TransactionView[] {
   return rows.map((row) => ({
     day: dayOf(row.date),
     time: timeOf(row.date),
     typeId: row.typeId,
+    system: row.locationId === null ? null : places.get(row.locationId)?.system ?? null,
     unitText: money(row.unitPrice),
     signedTotal: signed(row.unitPrice * row.quantity * (row.isBuy ? -1 : 1)),
     transactionId: row.transactionId,
@@ -140,7 +144,7 @@ export async function loadTransactionViews(characterId: number, offset = 0): Pro
   const rows = await listTransactions(characterId, { limit: WALLET_PAGE_SIZE, offset });
   const [types, places] = await Promise.all([
     getTypes([...new Set(rows.map((r) => r.typeId))]),
-    locationLabels(rows.map((r) => r.locationId).filter((id): id is number => id !== null)),
+    placeViews(rows.map((r) => r.locationId).filter((id): id is number => id !== null)),
   ]);
   return toTransactionViews(rows, types, places);
 }

@@ -80,6 +80,7 @@ export default async function Overview() {
       },
       dockedAt: docked === null ? null : places.get(docked)?.name ?? null,
       ship: shipType?.name == null ? null : {
+        typeId: shipType.id,
         typeName: shipType.name,
         groupName: shipType.groupId == null ? null : groups.get(shipType.groupId)?.name ?? null,
       },

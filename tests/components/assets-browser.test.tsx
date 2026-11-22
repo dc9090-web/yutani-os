@@ -11,7 +11,7 @@ const node = (itemId: number, typeId: number, typeName: string, rawFlag: string,
 
 const locations: AssetViewLocation[] = [
   {
-    locationId: 60003760, label: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", itemCount: 1323, volume: 27294,
+    locationId: 60003760, label: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", itemCount: 1323, volume: 27294, system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
     nodes: [
       node(1035000000001, 587, "Rifter", "Hangar", {
         name: "Scarlet Dart",
@@ -37,7 +37,8 @@ describe("AssetsBrowser", () => {
   it("lists locations with their item count and volume, collapsed", () => {
     ui();
     expect(jita()).toHaveAttribute("aria-expanded", "false");
-    expect(jita()).toHaveTextContent("1,323 items27,294 m³");
+    expect(jita()).toHaveTextContent("0.9 Jita IV - Moon 4 - Caldari Navy Assembly Plant1,323 items27,294 m³");
+    expect(within(jita()).getByText("0.9")).toHaveClass("yo-sec", "sec-high");
     expect(screen.getByRole("button", { name: /Emperor Family Academy/ })).toHaveTextContent("1 item1.2 m³");
     expect(screen.queryByText("Rifter")).toBeNull();
     expect(screen.getByText("All 2 locations, most items first")).toBeInTheDocument();

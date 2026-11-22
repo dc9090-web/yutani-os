@@ -2,12 +2,13 @@ import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { listAssets } from "../../lib/db/character-assets.js";
 import { getGroups, getTypes } from "../../lib/sde/repo.js";
-import { locationLabels } from "../../lib/names/index.js";
+import { placeViews } from "../../lib/names/place.js";
 import { pickActive } from "../../lib/view/characters.js";
 import { grouped, typeDescription } from "../../lib/view/format.js";
 import { buildAssetTree, isBlueprintCategory, isChargeCategory, locationDisplayLabel, sumVolume, toViewNodes, type AssetViewLocation, type TypeInfo } from "../../lib/view/assets.js";
 import { CharacterPicker } from "../components/CharacterPicker.js";
 import { NoCharacter } from "../components/NoCharacter.js";
+import { Place } from "../components/Place.js";
 import { StatStrip } from "../components/StatStrip.js";
 import { AssetsBrowser } from "./AssetsBrowser.js";
 
@@ -24,7 +25,7 @@ export default async function AssetsPage() {
     getTypes([...new Set(rows.map((r) => r.typeId))]),
     // Every root, including "item"-typed ones: those are orphans (a structure-docked hangar), so
     // they are places too — see locationDisplayLabel and AssetLocation's doc comment.
-    locationLabels(tree.map((l) => l.locationId)),
+    placeViews(tree.map((l) => l.locationId)),
   ]);
 
   // Blueprints have no "icon" image, only bp/bpc, and a loaded charge shares its module's slot —
@@ -48,6 +49,7 @@ export default async function AssetsPage() {
     return {
       locationId: location.locationId,
       label: locationDisplayLabel(location.locationId, places.get(location.locationId)),
+      system: places.get(location.locationId)?.system ?? null,
       itemCount: location.itemCount,
       volume: sumVolume(nodes),
       nodes,
@@ -67,7 +69,7 @@ export default async function AssetsPage() {
         { label: "Locations", value: grouped(locations.length) },
         largest === null
           ? { label: "Largest location", value: "—" }
-          : { label: "Largest location", value: largest.label, unit: `${grouped(largest.itemCount)} item${largest.itemCount === 1 ? "" : "s"}`, valueIsText: true },
+          : { label: "Largest location", value: <Place name={largest.label} system={largest.system} />, unit: `${grouped(largest.itemCount)} item${largest.itemCount === 1 ? "" : "s"}`, valueIsText: true },
       ]} />
       <AssetsBrowser locations={locations} descriptions={descriptions} />
     </div>

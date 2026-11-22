@@ -11,7 +11,7 @@ const full: OverviewCard = {
   balance: "1,234,568",
   system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
   dockedAt: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
-  ship: { typeName: "Rifter", groupName: "Frigate" },
+  ship: { typeId: 587, typeName: "Rifter", groupName: "Frigate" },
   online: null,
   training: { active: true, skill: "Caldari Frigate V", time: "3h 12m", percent: 64 },
   totalSp: "47.4M",
@@ -37,6 +37,11 @@ describe("CharacterCard", () => {
     expect(screen.getByText("3h 12m")).toHaveClass("ov-eta");
     expect(screen.getByRole("img", { name: "Training progress 64%" })).toBeInTheDocument();
     expect(screen.getByText("64%")).toBeInTheDocument();
+  });
+
+  it("shows the ship's icon beside its name", () => {
+    const { container } = render(<CharacterCard card={full} />);
+    expect(container.querySelector("img.ov-ship-icon")?.getAttribute("src")).toBe("https://images.evetech.net/types/587/icon?size=64");
   });
 
   it("gives MAIN the filled badge and any other account the outlined one", () => {

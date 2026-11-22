@@ -114,6 +114,8 @@ export function relativeTime(date: Date | null, now: Date = new Date()): string 
 }
 
 export type SecClass = "sec-high" | "sec-low" | "sec-null";
+/** A solar system with its security status formatted and classed for colour. */
+export interface SecView { name: string; sec: string; secClass: string }
 
 /**
  * The client rounds security to one decimal before colouring it, and so do we: 0.45 is high-sec.

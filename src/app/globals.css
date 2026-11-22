@@ -161,6 +161,12 @@ a:not([class]):hover { color: var(--yo-text); }
 .yo-good { color: var(--yo-good); }
 .yo-bad { color: var(--yo-bad); }
 .yo-muted { color: var(--yo-text-muted); }
+/* Security status: teal high-sec, amber low-sec, coral null-sec. The figure itself says which. */
+.sec-high { color: var(--yo-good); }
+.sec-low { color: var(--yo-accent); }
+.sec-null { color: var(--yo-bad); }
+.yo-sec { font-family: var(--yo-font-mono); font-weight: 400; }
+.yo-sec-system { font-weight: 500; color: var(--yo-text); }
 
 /* Uppercase micro label used above every value */
 .yo-label { font: 500 11px/1.4 var(--yo-font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--yo-text-label); }
@@ -839,9 +845,7 @@ a:not([class]):hover { color: var(--yo-text); }
 /* Shared by every phase-3 page. */
 /* Only ever shown for a character who is online; offline and unknown show nothing. */
 
-.sec-high { color: var(--pos); }
-.sec-low { color: var(--warn); }
-.sec-null { color: var(--neg); }
+
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .dur { font-variant-numeric: tabular-nums; }
 .card-stack { display: grid; gap: 20px; }
@@ -1241,3 +1245,14 @@ li.slot-row:last-child { border-bottom: 0; }
 .settings-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--yo-gap-card); }
 .km-slot, .km-victim { overflow-x: auto; }
 @media (max-width: 760px) { .settings-grid { grid-template-columns: minmax(0, 1fr); } }
+/* Icons on every item row, and the security status in front of every location. */
+.sp-module-list li { flex-direction: row; align-items: center; gap: 10px; }
+.sp-module-icon { width: 30px; height: 30px; }
+.sp-module-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sd-icon.is-small { width: 28px; height: 28px; }
+.sd-icon-space { flex: none; width: 28px; }
+.ov-ship { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ov-ship-icon { width: 30px; height: 30px; }
+.ov-ship-text { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cl-fact .cl-fact-value { font-size: 14px; font-weight: 500; }
+@media (max-width: 760px) { .sd-ammo .sd-icon, .sd-icon-space { display: none; } }

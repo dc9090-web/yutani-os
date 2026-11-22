@@ -6,13 +6,14 @@ import type { ShipCardView } from "../../src/lib/view/ships.js";
 const card: ShipCardView = {
   key: "asset:1", href: "/ships/asset/1", name: "Wraith", typeId: 33157, typeName: "Hurricane Fleet Issue",
   groupName: "Combat Battlecruiser", raceName: "Minmatar", location: "Kubinen VI - Moon 2 - Lai Dai Corporation Factory",
+  system: { name: "Kubinen", sec: "0.4", secClass: "sec-low" },
   stats: { dps: "812.4", ehp: "98,112", velocity: "1,402 m/s", cap: "Lasts 2m 41s", capOk: false, propKind: "MWD" },
   cpu: { label: "CPU", unit: "tf", used: 520.5, output: 593.75, text: "520.50 / 593.75 tf", percent: 87.7, over: false },
   power: { label: "Powergrid", unit: "MW", used: 1500, output: 1437.5, text: "1500.00 / 1437.50 MW", percent: 100, over: true },
   missingSkills: 0,
   weapons: [
-    { key: "a", name: "220mm Vulcan AutoCannon II", count: 6, charge: "Hail M", range: "optimal 1.5 km · falloff 14.2 km" },
-    { key: "b", name: "Republic Fleet Warp Scrambler", count: 1, charge: null, range: "range 11.3 km" },
+    { key: "a", typeId: 2913, name: "220mm Vulcan AutoCannon II", count: 6, charge: "Hail M", range: "optimal 1.5 km · falloff 14.2 km" },
+    { key: "b", typeId: 15433, name: "Republic Fleet Warp Scrambler", count: 1, charge: null, range: "range 11.3 km" },
   ],
   value: "412.6M ISK", valueRaw: 412_600_000, unpriced: "2 items unpriced", error: null, mastery: 4,
 };
@@ -24,7 +25,8 @@ describe("ShipPanel", () => {
     expect(screen.getByText("Combat Battlecruiser · Minmatar")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Hurricane Fleet Issue" })).toHaveAttribute("href", "/ships/asset/1");
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Hurricane Fleet IssueWraith");
-    expect(screen.getByTitle(card.location)).toBeInTheDocument();
+    expect(screen.getByTitle(card.location)).toHaveTextContent("0.4 Kubinen VI - Moon 2 - Lai Dai Corporation Factory");
+    expect(screen.getByText("0.4")).toHaveClass("yo-sec", "sec-low");
   });
 
   it("shows the four headline stats, with the capacitor's verdict in the label and its colour", () => {
@@ -73,6 +75,7 @@ describe("ShipPanel", () => {
     fireEvent.click(button);
     expect(button).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("6× 220mm Vulcan AutoCannon II").nextElementSibling).toHaveTextContent("Hail M · optimal 1.5 km · falloff 14.2 km");
+    expect(screen.getByText("6× 220mm Vulcan AutoCannon II").closest("li")!.querySelector("img")?.getAttribute("src")).toBe("https://images.evetech.net/types/2913/icon?size=64");
     expect(screen.getByText("Republic Fleet Warp Scrambler").nextElementSibling).toHaveTextContent("range 11.3 km");
     expect(screen.getByText(/2 items unpriced/)).toBeInTheDocument();
     fireEvent.click(button);
@@ -89,6 +92,11 @@ describe("ShipPanel", () => {
     render(<ShipPanel card={{ ...card, name: "Hurricane Fleet Issue", groupName: null, raceName: null }} />);
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(/^Hurricane Fleet Issue$/);
     expect(screen.queryByText(/Minmatar/)).toBeNull();
+  });
+
+  it("shows a saved fit's location plainly, with no security figure", () => {
+    render(<ShipPanel card={{ ...card, location: "Saved fit", system: null }} />);
+    expect(screen.getByTitle("Saved fit")).toHaveTextContent(/^Saved fit$/);
   });
 
   it("says a fit could not be computed instead of showing numbers", () => {

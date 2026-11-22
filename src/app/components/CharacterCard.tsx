@@ -2,7 +2,7 @@ import { portraitUrl } from "../../lib/view/characters.js";
 import type { OverviewTraining } from "../../lib/view/format.js";
 import { SegBar } from "./SegBar.js";
 
-export interface OverviewShip { typeName: string; groupName: string | null }
+export interface OverviewShip { typeId: number; typeName: string; groupName: string | null }
 
 export interface OverviewCard {
   id: number;
@@ -67,10 +67,16 @@ export function CharacterCard({ card }: { card: OverviewCard }) {
         </div>
         <div className="ov-cell">
           <span className="yo-label">Ship</span>
-          {card.ship === null ? NOT_SYNCED : (<>
-            <span className="ov-cell-value">{card.ship.typeName}</span>
-            <span className="ov-cell-sub">{card.ship.groupName ?? "—"}</span>
-          </>)}
+          {card.ship === null ? NOT_SYNCED : (
+            <div className="ov-ship">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="yo-tile ov-ship-icon" src={`https://images.evetech.net/types/${card.ship.typeId}/icon?size=64`} alt="" loading="lazy" />
+              <span className="ov-ship-text">
+                <span className="ov-cell-value">{card.ship.typeName}</span>
+                <span className="ov-cell-sub">{card.ship.groupName ?? "—"}</span>
+              </span>
+            </div>
+          )}
         </div>
         <div className="ov-cell">
           <span className="yo-label">Location</span>

@@ -49,7 +49,7 @@ export function hintText(hint: ChargeRangeHint | null): string | null {
 }
 
 /** One line of a ship card's weapons list: identical weapon + charge pairs are counted together. */
-export interface ShipWeaponView { key: string; name: string; count: number; charge: string | null; range: string | null }
+export interface ShipWeaponView { key: string; typeId: number; name: string; count: number; charge: string | null; range: string | null }
 
 /**
  * The fit's turrets and launchers in slot order, grouped by weapon type and loaded charge, then every
@@ -70,7 +70,7 @@ function shipModuleLines(fit: Fit, weapons: boolean): ShipWeaponView[] {
     const seen = out.get(key);
     if (seen !== undefined) { seen.count += 1; continue; }
     out.set(key, {
-      key,
+      key, typeId: item.typeId,
       name: fit.data.types.get(item.typeId)?.name ?? `Unknown type (${item.typeId})`,
       count: 1,
       charge: chargeId === null ? null : fit.data.types.get(chargeId)?.name ?? `Unknown type (${chargeId})`,
@@ -163,6 +163,21 @@ export function shipLocationLabel(
   return parent.name ?? data.types.get(parent.typeId)?.name ?? `Container ${ship.locationId}`;
 }
 
+/**
+ * The place a ship is really in: its own location, or — for a ship inside a container or another
+ * ship's bay — the place the outermost holder sits in. An asset whose holder is missing from the
+ * response answers with the id it has, which no place will match.
+ */
+export function rootLocationId(ship: AssetRow, byItemId: ReadonlyMap<number, AssetRow>): number {
+  let holder = ship;
+  for (let hops = 0; holder.locationType === "item" && hops < 16; hops++) {
+    const parent = byItemId.get(holder.locationId);
+    if (parent === undefined) break;
+    holder = parent;
+  }
+  return holder.locationId;
+}
+
 /** One labelled bucket of `fitValueGroups`'s walk — `/ships`'s flat total and the fit sheet's five
  *  per-group value lines are two views onto the same five buckets. */
 export interface FitValueGroup { label: string; entries: ValuedEntry[] }
@@ -221,6 +236,8 @@ export function shipCardStats(perf: FitPerformance): ShipCardStats {
 export interface ShipCardView {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
+  /** The solar system the ship is in, with its security status; null for a saved fit or an unresolved place. */
+  system?: import("./format.js").SecView | null;
   stats: ShipCardStats | null;
   cpu: GaugeView | null; power: GaugeView | null; missingSkills: number;
   /** Turrets and launchers with their charge and reach; empty when the fit has none. */
@@ -233,6 +250,7 @@ export interface ShipCardView {
 export function toShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
+  system?: import("./format.js").SecView | null;
   stats: FitStats; problems: Problem[]; entries: ValuedEntry[]; prices: ReadonlyMap<number, Price>;
   /** `fitPerformance(built.fit)`; absent → no stat strip on the card. */
   perf?: FitPerformance;
@@ -243,6 +261,7 @@ export function toShipCard(input: {
   return {
     key: input.key, href: input.href, name: input.name, typeId: input.typeId,
     typeName: input.typeName, groupName: input.groupName, raceName: input.raceName, location: input.location,
+    system: input.system ?? null,
     stats: input.perf === undefined ? null : shipCardStats(input.perf),
     cpu: gauge("CPU", "tf", input.stats.cpu),
     power: gauge("Powergrid", "MW", input.stats.power),
@@ -260,6 +279,7 @@ export function toShipCard(input: {
 export function errorShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
+  system?: import("./format.js").SecView | null;
   mastery?: number | null;
 }): ShipCardView {
   return {
@@ -337,7 +357,7 @@ export function computeFit(build: () => BuiltFit, what: string): ComputedFit | n
 export function assetShipCards(
   groups: ShipGroup[],
   ctx: FitContext,
-  places: ReadonlyMap<number, { name: string }>,
+  places: ReadonlyMap<number, { name: string; system?: import("./format.js").SecView | null }>,
   byItemId: ReadonlyMap<number, AssetRow>,
   prices: ReadonlyMap<number, Price>,
   raceNames: ReadonlyMap<number, string>,
@@ -353,6 +373,7 @@ export function assetShipCards(
       groupName: groupNameFor(group.ship.typeId, ctx.data),
       raceName: raceNames.get(group.ship.typeId) ?? null,
       location: shipLocationLabel(group.ship, places, byItemId, ctx.data),
+      system: places.get(rootLocationId(group.ship, byItemId))?.system ?? null,
       mastery: masteryOf(group.ship.typeId),
     };
     const computed = computeFit(() => fitFromAssets(group.ship, group.children, ctx), base.key);

@@ -115,8 +115,8 @@ describe("shipWeapons", () => {
     ], ctx);
     // Hail S: 1,200 m x 0.5; 5,160 m x the hull's +10 % x 0.75. Unloaded: the bare gun.
     expect(shipWeapons(built.fit)).toEqual([
-      { key: "2889:12608", name: "200mm AutoCannon II", count: 2, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
-      { key: "2889:", name: "200mm AutoCannon II", count: 1, charge: null, range: "optimal 1.2 km · falloff 5.7 km" },
+      { key: "2889:12608", typeId: 2889, name: "200mm AutoCannon II", count: 2, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
+      { key: "2889:", typeId: 2889, name: "200mm AutoCannon II", count: 1, charge: null, range: "optimal 1.2 km · falloff 5.7 km" },
     ]);
   });
 
@@ -126,8 +126,8 @@ describe("shipWeapons", () => {
       asset({ itemId: 1021, typeId: 5443, locationFlag: "MedSlot0", isSingleton: true }),   // Faint Epsilon Scoped Warp Scrambler
     ], ctx);
     expect(shipWeapons(built.fit)).toEqual([
-      { key: "2889:12608", name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
-      { key: "5443:", name: "Faint Epsilon Scoped Warp Scrambler", count: 1, charge: null, range: "range 8.3 km" },
+      { key: "2889:12608", typeId: 2889, name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" },
+      { key: "5443:", typeId: 5443, name: "Faint Epsilon Scoped Warp Scrambler", count: 1, charge: null, range: "range 8.3 km" },
     ]);
   });
 
@@ -160,7 +160,7 @@ describe("assetShipCards / savedFitCards", () => {
   it("builds one card per assembled ship, sorted by value", () => {
     const groups = [{ ship: SHIP, children: CHILDREN }];
     const cards = assetShipCards(groups, ctx, places, new Map([[1000, SHIP]]), PRICES, races);
-    expect(cards[0].weapons).toEqual([{ key: "2889:12608", name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" }]);
+    expect(cards[0].weapons).toEqual([{ key: "2889:12608", typeId: 2889, name: "200mm AutoCannon II", count: 1, charge: "Hail S", range: "optimal 600 m · falloff 4.3 km" }]);
     expect(cards).toHaveLength(1);
     expect(cards[0]).toMatchObject({
       key: "asset:1000", href: "/ships/asset/1000", name: "Scarlet Dart", typeName: "Rifter",

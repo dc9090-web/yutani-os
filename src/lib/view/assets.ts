@@ -96,6 +96,8 @@ export interface AssetViewNode {
 
 export interface AssetViewLocation {
   locationId: number; label: string; itemCount: number; volume: number; nodes: AssetViewNode[];
+  /** The location's solar system and its security status; absent or null when it resolves to none. */
+  system?: { name: string; sec: string; secClass: string } | null;
 }
 
 /** Serialisable view nodes: names resolved, flags humanised, volume already multiplied out. */

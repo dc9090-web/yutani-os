@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { Chevron } from "../components/Disclosure.js";
+import { Place } from "../components/Place.js";
 import {
   contentsEmpty, filterContents, locationContents,
   type AssetContents, type AssetGroupView, type AssetItemRow, type AssetViewLocation,
@@ -122,7 +123,7 @@ export function AssetsBrowser({ locations, descriptions = {} }: { locations: Ass
                 <div key={location.locationId} className="as-loc" data-open={open || undefined}>
                   <button type="button" className="as-loc-row" aria-expanded={open} onClick={() => toggleLocation(location.locationId)}>
                     <Chevron open={open} />
-                    <span className="as-loc-name">{location.label}</span>
+                    <Place className="as-loc-name" name={location.label} system={location.system} />
                     <span className="as-loc-items">{grouped(location.itemCount)}<span className="as-loc-unit"> item{location.itemCount === 1 ? "" : "s"}</span></span>
                     <span className="as-loc-volume">{volume(location.volume)}</span>
                   </button>

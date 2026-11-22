@@ -176,6 +176,7 @@ describe("FitSheet", () => {
     expect(row).toHaveTextContent("4.3 km");
     expect(row).toHaveTextContent("SHORT");
     expect(row.querySelectorAll(".sd-swatch").length).toBeGreaterThan(0);
+    expect(row.querySelector("img")?.getAttribute("src")).toBe("https://images.evetech.net/types/12608/icon?size=64");
     expect(within(row).getByText("21.7")).toHaveAttribute("data-desc", "21.7 dps from 1 × 200mm AutoCannon II loaded with it");
   });
 
@@ -202,6 +203,11 @@ describe("FitSheet", () => {
     expect(within(hold).getByRole("heading", { name: "Cargo hold" }).nextElementSibling).toHaveTextContent("166.5 / 450 m³");
     expect(within(hold).getByText("Hail S").closest("li")).toHaveTextContent("Hail S×1,000100,000.00 ISK");
     expect(within(hold).getByText("Hobgoblin II").closest("li")).toHaveTextContent("Hobgoblin II×5—");
+    // Every item carries its icon; a type the SDE does not know has none to show.
+    expect(within(hold).getByText("Hobgoblin II").closest("li")!.querySelector("img")?.getAttribute("src")).toBe("https://images.evetech.net/types/2456/icon?size=64");
+    expect(within(hold).getByText("Unknown type (99999)").closest("li")!.querySelector("img")).toBeNull();
+    expect(within(panel("Consumables")).getByText("Nanite Repair Paste").closest("li")!.querySelector("img")).not.toBeNull();
+    expect(within(panel("Drones")).getByText("Hammerhead II").closest(".sd-drone-row")!.querySelector("img")?.getAttribute("src")).toContain("/types/2185/icon");
     expect(within(hold).getByRole("heading", { name: "Unknown types" })).toBeInTheDocument();
     expect(within(hold).getByText(/excluded from the calculation/)).toBeInTheDocument();
     expect(within(hold).queryByRole("heading", { name: "Not fitted" })).toBeNull();

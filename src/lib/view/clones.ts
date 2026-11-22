@@ -1,3 +1,4 @@
+import type { SecView } from "./format.js";
 import { implantBonusLabel } from "./skills.js";
 
 /** `implantness` in sde_type_attributes: which of the ten implant slots a type plugs into. */
@@ -69,11 +70,13 @@ export interface CloneLocationView {
   title: string;
   /** The full station or structure name; null when `title` already says everything there is. */
   station: string | null;
+  /** The system's security status, for the coloured figure in front of the title. */
+  system: SecView | null;
   clones: JumpCloneView[];
 }
 
 export interface JumpCloneSource { jumpCloneId: number; locationId: number | null; name: string | null; implants: readonly number[] }
-export interface ClonePlace { name: string; systemName: string | null }
+export interface ClonePlace { name: string; systemName: string | null; system?: SecView | null }
 
 /**
  * Jump clones grouped by where they are, the place with the most clones first (ties keep the order
@@ -91,8 +94,8 @@ export function cloneLocations(
     let location = byKey.get(key);
     if (location === undefined) {
       location = place === undefined
-        ? { key, title: "Unknown location", station: null, clones: [] }
-        : { key, title: place.systemName ?? place.name, station: place.systemName === null ? null : place.name, clones: [] };
+        ? { key, title: "Unknown location", station: null, system: null, clones: [] }
+        : { key, title: place.systemName ?? place.name, station: place.systemName === null ? null : place.name, system: place.system ?? null, clones: [] };
       byKey.set(key, location);
     }
     location.clones.push({

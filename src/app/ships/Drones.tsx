@@ -103,6 +103,8 @@ export function DronesPanel() {
                 const room = roomFor(control, launched, type);
                 return (
                   <div key={type.typeId} className="sd-drone-row">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="yo-tile sd-icon is-small" src={`https://images.evetech.net/types/${type.typeId}/icon?size=64`} alt="" loading="lazy" />
                     <div className="sd-drone-id">
                       <span className="sd-drone-name">{type.name}</span>
                       <span className="sd-drone-meta">{type.inBay} in bay · {grouped(type.bandwidth)} Mbit/s · {type.dpsEach.toFixed(1)} dps each</span>

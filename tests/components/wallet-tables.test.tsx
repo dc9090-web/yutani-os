@@ -16,7 +16,7 @@ function transactionRow(id: number, extra: Partial<TransactionView> = {}): Trans
   return {
     transactionId: id, date: "2026-08-31 18:30", day: "2026-08-31", time: "18:30", side: "Buy", typeId: 34, typeName: "Tritanium",
     quantity: "1,000", unitPrice: "4.18 ISK", unitText: "4.18", total: "4,180.00 ISK", signedTotal: "−4,180.00",
-    location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", ...extra,
+    location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", system: { name: "Jita", sec: "0.9", secClass: "sec-high" }, ...extra,
   };
 }
 
@@ -94,8 +94,9 @@ describe("TransactionsTable", () => {
     render(<TransactionsTable characterId={CID} initial={[transactionRow(1)]} />);
     const [row] = dataRows();
     expect(within(row).getAllByRole("cell").map((c) => c.textContent)).toEqual([
-      "18:30", "BUY", "Tritanium", "1,000", "× 4.18", "−4,180.00", "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+      "18:30", "BUY", "Tritanium", "1,000", "× 4.18", "−4,180.00", "0.9 Jita IV - Moon 4 - Caldari Navy Assembly Plant",
     ]);
+    expect(within(row).getByText("0.9")).toHaveClass("yo-sec", "sec-high");
     expect(row.querySelector("img.wt-icon")?.getAttribute("src")).toBe("https://images.evetech.net/types/34/icon?size=32");
   });
 

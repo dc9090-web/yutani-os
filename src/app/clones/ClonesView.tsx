@@ -3,6 +3,8 @@ import { typeIconUrl } from "../../lib/view/assets.js";
 import { Disclosure } from "../components/Disclosure.js";
 import { InfoButton, InfoGroup, InfoPanel } from "../components/Info.js";
 import { LevelBlocks } from "../components/LevelBlocks.js";
+import { Place } from "../components/Place.js";
+import type { SecView } from "../../lib/view/format.js";
 
 function SlotStrip({ clone }: { clone: CloneView }) {
   return <LevelBlocks states={clone.slots.map((taken) => (taken ? "filled" : "empty"))} label={`${clone.used} of 10 implant slots used`} />;
@@ -40,7 +42,8 @@ function ImplantList({ implants, scope, wide = false }: { implants: ImplantView[
 export function ClonesView({ synced, home, active, locations }: {
   /** False until the clones job has written anything for this character. */
   synced: boolean;
-  home: string | null;
+  /** The home station with its system's security status. */
+  home: { name: string; system: SecView | null } | null;
   active: CloneView;
   locations: CloneLocationView[];
 }) {
@@ -65,7 +68,7 @@ export function ClonesView({ synced, home, active, locations }: {
           </div>
           <div className="cl-fact">
             <span className="yo-label">Home station</span>
-            <span className="cl-fact-value">{home ?? "—"}</span>
+            {home === null ? <span className="cl-fact-value">—</span> : <Place className="cl-fact-value" name={home.name} system={home.system} />}
           </div>
           <div className="cl-fact is-slots">
             <span className="yo-label">Implant slots</span>
@@ -87,7 +90,10 @@ export function ClonesView({ synced, home, active, locations }: {
         {cloneCount === 0 ? <p className="yo-empty">No jump clones.</p> : locations.map((location, locationIndex) => (
           <div key={location.key} className="cl-location">
             <div className="cl-location-head">
-              <h3 className="cl-location-title">{location.title}</h3>
+              <h3 className="cl-location-title">
+                {location.system === null ? null : <><span className={`yo-sec ${location.system.secClass}`}>{location.system.sec}</span>{" "}</>}
+                {location.title}
+              </h3>
               {location.station === null ? null : <span className="cl-location-station">{location.station}</span>}
               <span className="cl-location-count">{location.clones.length} clone{location.clones.length === 1 ? "" : "s"}</span>
             </div>
@@ -98,7 +104,7 @@ export function ClonesView({ synced, home, active, locations }: {
                   summary={<>
                     {/* Read out, unlike the artboard's: unnamed clones have nothing else to tell them apart. */}
                     <span className="cl-code">{clone.code}</span>
-                    <span className={`cl-name${clone.name === null ? " is-unnamed" : ""}`}>{clone.name ?? "Unnamed clone"}</span>
+                    <span className={`cl-name${clone.name === null ? " is-unnamed" : ""}`}>{clone.name ?? "Jump clone"}</span>
                     <SlotStrip clone={clone} />
                     <span className="cl-used">{clone.used} / 10 slots</span>
                   </>}

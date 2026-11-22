@@ -78,6 +78,8 @@ function AmmoRow({ row }: { row: AmmoRowView }) {
   const main = row.damage?.types[0] ?? null;
   return (
     <li className="sd-ammo">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="yo-tile sd-icon is-small" src={iconUrl(row.typeId)} alt="" loading="lazy" />
       <span className="sd-ammo-name" data-desc={[row.damage?.desc, row.desc].filter(Boolean).join("\n\n") || undefined}>{row.name}</span>
       <span className="sd-ammo-damage">
         {row.damage === null || main === null ? "—" : (<>
@@ -101,6 +103,8 @@ function AmmoRow({ row }: { row: AmmoRowView }) {
 function ConsumableRow({ row }: { row: ConsumableRowView }) {
   return (
     <li className="sd-consumable">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="yo-tile sd-icon is-small" src={iconUrl(row.typeId)} alt="" loading="lazy" />
       <span className="sd-consumable-name" data-desc={row.desc ?? undefined}>{row.name}</span>
       <span className="sd-consumable-effect">{row.effect}</span>
       {/* A dash when no fitted module takes it and it has no slot or duration to show. */}
@@ -109,7 +113,8 @@ function ConsumableRow({ row }: { row: ConsumableRowView }) {
   );
 }
 
-function Hold({ name, used, entries, note }: { name: string; used?: string; entries: EntryView[]; note?: string }) {
+/** `icons` is off for the unknown-types list: the image server has nothing for a type the SDE lacks. */
+function Hold({ name, used, entries, note, icons = true }: { name: string; used?: string; entries: EntryView[]; note?: string; icons?: boolean }) {
   return (
     <div className="sd-hold">
       <div className="sd-hold-head">
@@ -120,6 +125,8 @@ function Hold({ name, used, entries, note }: { name: string; used?: string; entr
       <ul className="sd-list">
         {entries.map((entry) => (
           <li key={entry.key} className="sd-entry">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {icons ? <img className="yo-tile sd-icon is-small" src={iconUrl(entry.typeId)} alt="" loading="lazy" /> : null}
             <span className="sd-entry-name">
               <span data-desc={entry.desc ?? undefined}>{entry.name}</span>
               {entry.nickname === null ? null : <span className="sd-entry-nick"> {entry.nickname}</span>}
@@ -304,7 +311,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                   {assumedNote === null ? null : <span className="sd-card-note">{assumedNote}</span>}
                 </div>
                 <div className="sd-ammo-head yo-label" aria-hidden="true">
-                  <span className="sd-ammo-name">Round</span><span className="sd-ammo-damage">Damage</span><span className="sd-ammo-dps">DPS</span>
+                  <span className="sd-icon-space" /><span className="sd-ammo-name">Round</span><span className="sd-ammo-damage">Damage</span><span className="sd-ammo-dps">DPS</span>
                   <span className="sd-optimal">Optimal</span><span className="sd-falloff">Falloff</span><span className="sd-ammo-band">Range</span>
                 </div>
                 <ul className="sd-list is-tight">{view.ammo.map((row) => <AmmoRow key={row.key} row={row} />)}</ul>
@@ -325,7 +332,7 @@ export function FitSheet({ view }: { view: FitSheetView }) {
                 {view.cargo.length === 0 ? null : <Hold name="Cargo hold" used={bay("Cargo hold")} entries={view.cargo} />}
               </>)}
               {view.unknown.length === 0 ? null : (
-                <Hold name="Unknown types" entries={view.unknown} note="The static data does not know these types, so they are excluded from the calculation." />
+                <Hold name="Unknown types" icons={false} entries={view.unknown} note="The static data does not know these types, so they are excluded from the calculation." />
               )}
               {view.unfittable.length === 0 ? null : (
                 <Hold name="Not fitted" entries={view.unfittable} note="Saved with no slot, so the fitting window would not place them either." />

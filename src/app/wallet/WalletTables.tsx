@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import type { JournalView, TransactionView } from "../../lib/view/wallet.js";
+import { Place } from "../components/Place.js";
 // Mirrors WALLET_PAGE_SIZE in src/lib/view/wallet.ts. A value import from that module would pull the
 // Postgres client into the browser bundle (it imports the wallet repo), so the constant is repeated here.
 const WALLET_PAGE_SIZE = 100;
@@ -156,7 +157,7 @@ export function TransactionsTable({ characterId, initial }: { characterId: numbe
                   <span className="wt-qty" role="cell">{row.quantity}</span>
                   <span className="wt-unit" role="cell"><span className="wt-times" aria-hidden="true">× </span>{row.unitText}</span>
                   <span className={`wt-total is-${tone}`} role="cell">{row.signedTotal}</span>
-                  <span className="wt-loc" role="cell" title={row.location}>{row.location}</span>
+                  <span className="wt-loc" role="cell"><Place name={row.location} system={row.system} /></span>
                 </div>
               );
             })}

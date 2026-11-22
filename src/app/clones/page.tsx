@@ -1,8 +1,8 @@
 import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { getClones, listImplants } from "../../lib/db/character-clones.js";
-import { getSolarSystems, getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
-import { locationLabels } from "../../lib/names/index.js";
+import { getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
+import { placeViews } from "../../lib/names/place.js";
 import { pickActive } from "../../lib/view/characters.js";
 import { cloneLocations, cloneView, type ClonePlace, type ImplantSource } from "../../lib/view/clones.js";
 import { typeDescription } from "../../lib/view/format.js";
@@ -29,12 +29,11 @@ export default async function ClonesPage() {
   const [types, attributes, places] = await Promise.all([
     getTypes(typeIds),
     Promise.all(typeIds.map((id) => getTypeAttributes(id))),
-    locationLabels([
+    placeViews([
       ...(clones?.homeLocationId == null ? [] : [clones.homeLocationId]),
       ...jumpClones.map((c) => c.locationId).filter((id): id is number => id !== null),
     ]),
   ]);
-  const systems = await getSolarSystems([...new Set([...places.values()].flatMap((p) => (p.solarSystemId === null ? [] : [p.solarSystemId])))]);
 
   const implantTypes = new Map<number, ImplantSource>(typeIds.map((id, index) => [id, {
     name: types.get(id)?.name ?? null,
@@ -44,7 +43,8 @@ export default async function ClonesPage() {
   const clonePlaces = new Map<number, ClonePlace>([...places].map(([id, place]) => [id, {
     name: place.name,
     // A clone parked in a system-level place has nothing more specific than the system itself.
-    systemName: place.kind === "system" || place.solarSystemId === null ? null : systems.get(place.solarSystemId)?.name ?? null,
+    systemName: place.kind === "system" ? null : place.system?.name ?? null,
+    system: place.system,
   }]));
 
   return (<>
@@ -53,7 +53,7 @@ export default async function ClonesPage() {
     </PageHead>
     <ClonesView
       synced={clones !== null || implantIds.length > 0}
-      home={clones?.homeLocationId == null ? null : places.get(clones.homeLocationId)?.name ?? null}
+      home={clones?.homeLocationId == null ? null : places.get(clones.homeLocationId) ?? null}
       active={cloneView(implantIds, implantTypes)}
       locations={cloneLocations(jumpClones, clonePlaces, implantTypes)}
     />

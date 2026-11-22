@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { masteryLevel } from "../../src/lib/ships/mastery.js";
-import { HULL_CLASS_ORDER, sortShipPanels, type ShipCardView } from "../../src/lib/view/ships.js";
+import { HULL_CLASS_ORDER, rootLocationId, sortShipPanels, type ShipCardView } from "../../src/lib/view/ships.js";
+import type { AssetRow } from "../../src/lib/db/character-assets.js";
 
 // Five levels; each asks a little more of two skills.
 const requirements = [
@@ -55,5 +56,22 @@ describe("sortShipPanels", () => {
     expect(HULL_CLASS_ORDER[0]).toBe("Titan");
     expect(HULL_CLASS_ORDER[HULL_CLASS_ORDER.length - 1]).toBe("Shuttle");
     expect(HULL_CLASS_ORDER.indexOf("Battleship")).toBeLessThan(HULL_CLASS_ORDER.indexOf("Combat Battlecruiser"));
+  });
+});
+
+describe("rootLocationId", () => {
+  const asset = (itemId: number, locationId: number, locationType: string): AssetRow =>
+    ({ itemId, typeId: 1, quantity: 1, locationId, locationType, locationFlag: "Hangar", isSingleton: true, isBlueprintCopy: false, name: null }) as AssetRow;
+  it("is the ship's own location when it sits in a station", () => {
+    expect(rootLocationId(asset(1, 60003760, "station"), new Map())).toBe(60003760);
+  });
+  it("climbs out of containers and other ships to the place they are in", () => {
+    const carrier = asset(9, 60003760, "station");
+    const container = asset(8, 9, "item");
+    const ship = asset(1, 8, "item");
+    expect(rootLocationId(ship, new Map([[9, carrier], [8, container]]))).toBe(60003760);
+  });
+  it("stops at a holder the asset list does not contain", () => {
+    expect(rootLocationId(asset(1, 777, "item"), new Map())).toBe(777);
   });
 });

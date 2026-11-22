@@ -15,15 +15,15 @@ const active = clone([
 ]);
 const locations: CloneLocationView[] = [
   {
-    key: "60003760", title: "Jita", station: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+    key: "60003760", title: "Jita", station: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
     clones: [
       { ...clone([implant(1, "Low-grade Snake Alpha", 1, "+2 Perception", "Part of the Snake set.")]), jumpCloneId: 1001, code: "JC 01", name: null },
       { ...clone([]), jumpCloneId: 1002, code: "JC 02", name: "Empty spare" },
     ],
   },
-  { key: "60001234", title: "Kubinen", station: "Kubinen VI - Moon 2 - Lai Dai Corporation Factory", clones: [{ ...clone([implant(2, "Gypsy CPU EE-603", 6)]), jumpCloneId: 1003, code: "JC 03", name: null }] },
+  { key: "60001234", title: "Kubinen", station: "Kubinen VI - Moon 2 - Lai Dai Corporation Factory", system: { name: "Kubinen", sec: "0.4", secClass: "sec-low" }, clones: [{ ...clone([implant(2, "Gypsy CPU EE-603", 6)]), jumpCloneId: 1003, code: "JC 03", name: null }] },
 ];
-const ui = () => render(<ClonesView synced home="Jita IV - Moon 4 - Caldari Navy Assembly Plant" active={active} locations={locations} />);
+const ui = () => render(<ClonesView synced home={{ name: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", system: { name: "Jita", sec: "0.9", secClass: "sec-high" } }} active={active} locations={locations} />);
 
 describe("ClonesView", () => {
   it("shows the active clone: badge, implant count, home station, slot strip and implants", () => {
@@ -31,7 +31,8 @@ describe("ClonesView", () => {
     const panel = screen.getByRole("region", { name: "Active clone" });
     expect(within(panel).getByText("ACTIVE")).toBeInTheDocument();
     expect(within(panel).getByText("2 implants fitted")).toBeInTheDocument();
-    expect(within(panel).getByText("Home station").nextElementSibling).toHaveTextContent("Jita IV - Moon 4 - Caldari Navy Assembly Plant");
+    expect(within(panel).getByText("Home station").nextElementSibling).toHaveTextContent("0.9 Jita IV - Moon 4 - Caldari Navy Assembly Plant");
+    expect(within(panel).getByText("0.9")).toHaveClass("yo-sec", "sec-high");
     const strip = within(panel).getByRole("img", { name: "2 of 10 implant slots used" });
     expect(strip.children).toHaveLength(10);
     expect([...strip.children].map((c) => c.classList.contains("is-filled"))).toEqual([true, false, false, false, false, true, false, false, false, false]);
@@ -44,7 +45,8 @@ describe("ClonesView", () => {
     ui();
     const jump = screen.getByRole("region", { name: "Jump clones" });
     expect(within(jump).getByText("3 clones · 2 stations")).toBeInTheDocument();
-    expect(within(jump).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Jita", "Kubinen"]);
+    expect(within(jump).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["0.9 Jita", "0.4 Kubinen"]);
+    expect(within(jump).getByText("0.4")).toHaveClass("sec-low");
     expect(within(jump).getByText("2 clones")).toBeInTheDocument();
     expect(within(jump).getByText("1 clone")).toBeInTheDocument();
   });
@@ -60,7 +62,7 @@ describe("ClonesView", () => {
 
   it("names a clone, or says it is unnamed, and says so when it has no implants", () => {
     ui();
-    expect(screen.getAllByText("Unnamed clone")[0]).toHaveClass("is-unnamed");
+    expect(screen.getAllByText("Jump clone")[0]).toHaveClass("is-unnamed");
     expect(screen.getByText("Empty spare")).not.toHaveClass("is-unnamed");
     fireEvent.click(screen.getByText("Empty spare").closest("button")!);
     expect(screen.getByText("No implants")).toBeInTheDocument();
