@@ -1,6 +1,8 @@
 # Yutani OS for Android — design
 
-Date: 2026-11-22. Status: approved by the owner on 2026-11-22. Nothing here is built yet.
+Date: 2026-11-22. Status: approved by the owner on 2026-11-22. Phase 1 is live. Amended the same day
+with "Offline first" (section 6) at the owner's request; where section 6 disagrees with an earlier
+section, section 6 wins.
 
 ## Intent
 
@@ -26,7 +28,8 @@ Items marked **(my call)** were chosen by Claude, not by the owner. Any of them 
 - The app never recomputes anything the site already computes. Fit stats, training times, mastery
   and security colours come from the site as finished values.
 - The site and the app cannot drift: both read from the same loading code.
-- The app shows its last-known data when the phone is off Tailscale, clearly marked as old.
+- The app keeps a full copy of every character's data on the phone, opens from that copy at once,
+  works with no connection, and asks the site only for what changed (owner, 2026-11-22).
 
 ## Non-goals
 
@@ -270,6 +273,43 @@ fixture and extend it with `scripts/dogma-fixture.ts` if not.
   services (needed to test sign-in), Xvfb.
 - Junie, Air and the JetBrains IDE MCP server are not used: they need a JetBrains IDE or account,
   and the work is done from the terminal.
+
+### 6. Offline first (amendment, 2026-11-22)
+
+The owner's words: "grab data on my characters and store it so it only checks for updates … super
+fast and work if there is little or no reception." The owner then said to go ahead without further
+questions, so everything below is **my call** unless it repeats that sentence.
+
+- **The phone holds everything.** After sign-in the app downloads every resource for every
+  character, screens never opened included: overview, skills, training, clones, assets, wallet,
+  ships and every ship's detail. Screens read only from the copy on the phone; the network only
+  ever updates that copy.
+- **Only what changed.** Every `GET /api/v1/*` response carries an `ETag` and answers
+  `If-None-Match` with `304`. `GET /api/v1/sync` lists every resource the phone should hold with
+  its current tag: `{ data: { resources: [{ path, etag }] }, generatedAt }`. A sync is one small
+  request, then one request per resource whose tag differs; resources no longer listed are deleted
+  from the phone. The site must be able to answer the list cheaply (it must not run the dogma
+  engine for every ship on every call), so it remembers each resource's tag until the stored data
+  behind it changes.
+- **Clock strings never come from the copy.** As in section 3: anything worked out against "now"
+  carries raw values and the app recomputes it, so a day-old copy still counts down correctly.
+- **Drones on Ship detail.** Replaces the section 3 call. The ship-detail response carries the
+  per-drone numbers the site's own selector uses (`DroneLimits` in `src/lib/view/drones.ts`) and
+  the app ports that 43-line sum, with tests mirroring the site's. No request per selection.
+- **Wallet.** Replaces the section 3 call. The route takes `kind`, `offset` and `limit` (at most
+  500). The phone keeps the newest 500 rows of the journal and of the transactions per character;
+  older rows are fetched on demand and need a connection.
+- **When it syncs.** On opening the app, on pull-to-refresh, and in the background about once an
+  hour while the phone has a network (Android WorkManager; it simply fails quietly when the site
+  cannot be reached, which includes Tailscale being off). Every screen shows "as of 14:05" from
+  the copy's own time, and "offline" when the last attempt failed.
+- **Storage.** One JSON file per resource plus a small index of tags, in the app's private
+  storage. No database on the phone: the site already returns finished view objects, so there is
+  nothing to query.
+- **Icons.** Coil's disk cache keeps item and ship icons after first sight; an icon never seen
+  shows its placeholder offline.
+- **Display:** the machine has no `sudo`, so no Xvfb. The desktop target stays for fast tests and
+  off-screen rendering; screenshots come from a headless Android emulator.
 
 ## Phases
 
