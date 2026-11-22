@@ -56,7 +56,7 @@ the app from starting. The Google side is a one-off in the Google Cloud console:
    logged as `[auth] google account not allowed: <address>` in `docker logs eve-app`, which shows the
    address to add.
 
-Phase 2 (the Android app) adds an Android OAuth client to this same project; nothing here changes.
+The Android app adds an Android OAuth client to this same project (package name and the signing key's SHA-1); nothing here changes. The steps are in [android/README.md](../android/README.md).
 
 ## 2. Install
 

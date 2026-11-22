@@ -80,13 +80,23 @@ export JAVA_HOME=<jdk 21> ANDROID_HOME=<Android SDK>
 
 Copy the APK to the phone and open it (Android asks once to allow installs from that source), or
 with the phone on USB: `adb install -r androidApp-release.apk`. An update is the same step with a
-newer APK; raise `versionCode` in `androidApp/build.gradle.kts` for each one.
+newer APK; raise `versionCode` in `androidApp/build.gradle.kts` for each one. An update keeps the
+sign-in and the copy of the data.
 
 ## Signing out and lost phones
 
 "Sign out" in the app (the button with your initials) removes the phone's token and its copy of
 the data. Every signed-in phone is also listed on the site under Settings › Signed-in phones, with
 a Revoke button; a revoked phone is signed out the next time it reaches the site.
+
+## Using it
+
+- Swipe left or right to move between Overview, Skills, Clones, Ships, Assets and Wallet, or tap a
+  section in the strip under the logo.
+- The dropdown under a page title picks the character. The choice is remembered.
+- Long-press an item, module, implant or skill for its description.
+- Pull down on any screen to sync now. "Sync now" and "Sign out" are under the button with your initials.
+- On a ship, the drone selector changes the DPS figures on the phone, with no connection needed.
 
 ## What syncs when
 

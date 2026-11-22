@@ -1,8 +1,27 @@
 # Yutani OS for Android — design
 
-Date: 2026-11-22. Status: approved by the owner on 2026-11-22. Phase 1 is live. Amended the same day
-with "Offline first" (section 6) at the owner's request; where section 6 disagrees with an earlier
-section, section 6 wins.
+Date: 2026-11-22. Status: approved by the owner on 2026-11-22 and amended the same day with
+"Offline first" (section 6); where section 6 disagrees with an earlier section, section 6 wins.
+
+**Built and live (2026-11-22):** phases 1 to 4. Google sign-in on the site, the read API with phone
+sessions, and the app with every read-only screen, running on the owner's phone. Phases 5 and 6 are
+not started.
+
+**Where the build departed from this document:**
+
+- The Android build plugin now requires a multiplatform library module beside a plain application
+  module, so the project is `shared` + `androidApp` + `desktopApp`, not one `composeApp`.
+- No view models: with every screen reading a stored copy, a screen collects its resource directly
+  (`resource(path, serializer)`), and the store and sync engine carry the tests.
+- No DataStore: the small settings live in the store's own index file.
+- The machine had no `sudo` and no access to KVM, so there is no emulator and no virtual display.
+  Screens are drawn off screen from the contract fixtures, and the first run on Android was on the
+  owner's phone. The Kotlin agent skills, the Android CLI and the Hot Reload server in section 5 were
+  not installed.
+- The six sections sit in a pager, so a swipe flips between them (asked for by the owner after the
+  first build).
+- `/api/v1/characters/{id}/wallet` with no `kind` returns the balance alone; ship detail returns
+  `{ kind: "ok", view }` or `{ kind: "error", title }`.
 
 ## Intent
 
