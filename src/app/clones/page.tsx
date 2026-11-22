@@ -1,12 +1,15 @@
 import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { getClones, listImplants } from "../../lib/db/character-clones.js";
-import { getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
+import { getSolarSystems, getTypeAttributes, getTypes } from "../../lib/sde/repo.js";
 import { locationLabels } from "../../lib/names/index.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { implantBonusLabel } from "../../lib/view/skills.js";
+import { cloneLocations, cloneView, type ClonePlace, type ImplantSource } from "../../lib/view/clones.js";
+import { typeDescription } from "../../lib/view/format.js";
+import { CharacterPicker } from "../components/CharacterPicker.js";
 import { NoCharacter } from "../components/NoCharacter.js";
-import { ClonesCard, type ImplantView, type JumpCloneView } from "../skills/ClonesCard.js";
+import { PageHead } from "../components/PageHead.js";
+import { ClonesView } from "./ClonesView.js";
 
 export default async function ClonesPage() {
   const [session, characters] = await Promise.all([readSession(), listCharacters()]);
@@ -17,41 +20,42 @@ export default async function ClonesPage() {
     listImplants(character.id),
     getClones(character.id),
   ]);
+  const jumpClones = clones?.jumpClones ?? [];
 
-  // One types query for the active implants and every jump clone's implants, one dogma query per
-  // active implant (at most ten) and one locationLabels pass for the home station plus every jump clone.
-  const jumpImplantIds = (clones?.jumpClones ?? []).flatMap((c) => c.implants);
-  const [types, implantAttributes, places] = await Promise.all([
-    getTypes([...new Set([...implantIds, ...jumpImplantIds])]),
-    Promise.all(implantIds.map((id) => getTypeAttributes(id))),
+  // One types query for every implant on the page, one dogma query per distinct implant type (the
+  // slot and the attribute bonus both live there), and one locationLabels pass for the home station
+  // plus every jump clone.
+  const typeIds = [...new Set([...implantIds, ...jumpClones.flatMap((c) => c.implants)])];
+  const [types, attributes, places] = await Promise.all([
+    getTypes(typeIds),
+    Promise.all(typeIds.map((id) => getTypeAttributes(id))),
     locationLabels([
       ...(clones?.homeLocationId == null ? [] : [clones.homeLocationId]),
-      ...(clones?.jumpClones ?? []).map((c) => c.locationId).filter((id): id is number => id !== null),
+      ...jumpClones.map((c) => c.locationId).filter((id): id is number => id !== null),
     ]),
   ]);
+  const systems = await getSolarSystems([...new Set([...places.values()].flatMap((p) => (p.solarSystemId === null ? [] : [p.solarSystemId])))]);
 
-  const implants: ImplantView[] = implantIds.map((typeId, index) => ({
-    typeId,
-    name: types.get(typeId)?.name ?? `Type ${typeId}`,
-    bonus: implantBonusLabel(implantAttributes[index]),
-  }));
-
-  const jumpClones: JumpCloneView[] = (clones?.jumpClones ?? []).map((clone) => ({
-    jumpCloneId: clone.jumpCloneId,
-    label: clone.locationId === null ? "Unknown location" : places.get(clone.locationId)?.name ?? "Unknown location",
-    name: clone.name,
-    implants: clone.implants.map((typeId) => types.get(typeId)?.name ?? `Type ${typeId}`),
-  }));
+  const implantTypes = new Map<number, ImplantSource>(typeIds.map((id, index) => [id, {
+    name: types.get(id)?.name ?? null,
+    attributes: attributes[index],
+    desc: typeDescription(types.get(id)?.description),
+  }]));
+  const clonePlaces = new Map<number, ClonePlace>([...places].map(([id, place]) => [id, {
+    name: place.name,
+    // A clone parked in a system-level place has nothing more specific than the system itself.
+    systemName: place.kind === "system" || place.solarSystemId === null ? null : systems.get(place.solarSystemId)?.name ?? null,
+  }]));
 
   return (<>
-    <h1 className="page-title">Clones</h1>
-    <p className="page-sub">{character.name}</p>
-    <div className="card-stack">
-      <ClonesCard
-        home={clones?.homeLocationId == null ? null : places.get(clones.homeLocationId)?.name ?? null}
-        implants={implants}
-        jumpClones={jumpClones}
-      />
-    </div>
+    <PageHead title="Clones">
+      <CharacterPicker characters={characters} activeId={character.id} />
+    </PageHead>
+    <ClonesView
+      synced={clones !== null || implantIds.length > 0}
+      home={clones?.homeLocationId == null ? null : places.get(clones.homeLocationId)?.name ?? null}
+      active={cloneView(implantIds, implantTypes)}
+      locations={cloneLocations(jumpClones, clonePlaces, implantTypes)}
+    />
   </>);
 }

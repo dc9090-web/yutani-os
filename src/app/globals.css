@@ -372,6 +372,46 @@ a:not([class]):hover { color: var(--yo-text); }
   .tr-bar { width: 96px; }
 }
 
+/* ---------- Clones (Clones.dc.html, List layout) ---------- */
+.cl-active { gap: 18px; }
+.cl-active-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px 32px; }
+.cl-active-id, .cl-fact { display: flex; flex-direction: column; gap: 6px; }
+.cl-fact.is-slots { gap: 8px; }
+.cl-active-title { display: flex; align-items: center; gap: 10px; }
+.cl-fact-value { font-size: 14px; font-weight: 500; }
+.cl-slots { display: flex; align-items: center; gap: 10px; }
+.cl-slots-count, .cl-used { font-family: var(--yo-font-mono); font-size: 12px; color: var(--yo-text-muted); }
+.cl-implants { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); gap: 0 40px; align-items: start; border-top: 1px solid var(--yo-border); }
+.cl-implants.is-wide { grid-template-columns: repeat(auto-fit, minmax(min(480px, 100%), 1fr)); }
+.cl-implant { min-width: 0; border-bottom: 1px solid var(--yo-border-row); }
+.cl-implant-row { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 0; box-sizing: border-box; }
+.cl-slot { flex: none; width: 18px; text-align: right; font-family: var(--yo-font-mono); font-size: 11px; color: var(--yo-text-label); }
+.cl-icon { width: 30px; height: 30px; }
+.cl-implant-name { flex: 0 1 auto; min-width: 0; font-size: 13.5px; }
+.cl-fill { flex: 1; }
+.cl-bonus { flex: none; font-family: var(--yo-font-mono); font-size: 12px; color: var(--yo-good); }
+.cl-info { margin: 0 0 10px 28px; }
+.cl-jump { display: flex; flex-direction: column; gap: var(--yo-gap-section); }
+.cl-location { display: flex; flex-direction: column; gap: 14px; }
+.cl-location-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding-bottom: 10px; border-bottom: 1px solid var(--yo-border); }
+.cl-location-title { margin: 0; font-family: var(--yo-font-display); font-weight: 600; font-size: 17px; line-height: 1.3; }
+.cl-location-station { font-size: 13px; color: var(--yo-text-muted); }
+.cl-location-count { margin-left: auto; font-family: var(--yo-font-mono); font-size: 12.5px; color: var(--yo-text-muted); }
+.cl-list { background: var(--yo-surface); border: 1px solid var(--yo-border); border-bottom: 0; border-radius: var(--yo-radius-card); overflow: hidden; }
+.cl-clone { border-bottom: 1px solid var(--yo-border); }
+.cl-clone > .yo-disclosure-row { min-height: 52px; padding: 8px 20px; }
+.cl-clone > .yo-disclosure-body { padding: 0 20px 16px 46px; }
+.cl-code { flex: none; font-family: var(--yo-font-mono); font-size: 11px; letter-spacing: 0.08em; padding: 3px 6px; border: 1px solid var(--yo-border-control); border-radius: var(--yo-radius-chip); color: var(--yo-text-muted); }
+.cl-name { flex: 1; min-width: 0; font-family: var(--yo-font-display); font-size: 15px; font-weight: 600; color: var(--yo-text); }
+.cl-name.is-unnamed { font-weight: 500; color: var(--yo-text-muted); }
+.cl-used { flex: none; width: 92px; text-align: right; }
+@media (max-width: 760px) {
+  .cl-info { margin-left: 0; }
+  .cl-clone > .yo-disclosure-row { padding: 10px 16px; }
+  .cl-clone > .yo-disclosure-body { padding: 0 16px 16px; }
+  .cl-name { flex: 1 1 200px; }
+}
+
 /* =====================================================================================
    Screens the redesign did not cover, and pages not yet rebuilt. Layout rules as they were;
    the re-skin block at the end of the file restyles them.
@@ -447,8 +487,6 @@ a:not([class]):hover { color: var(--yo-text); }
 .level-box.active { background: var(--accent); border-color: var(--accent); }
 .level-box.training { border-color: var(--accent); animation: levelBlink 1.1s ease-in-out infinite; }
 @keyframes levelBlink { 0%, 100% { background: rgba(245, 166, 35, 0.10); } 50% { background: var(--accent); } }
-.clone-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
-.clone-list li { background: var(--raised); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 13px; }
 
 /* ---------- Assets (phase 3) ---------- */
 .filter-input { display: block; width: 100%; max-width: 320px; margin: 6px 0 16px; padding: 8px 10px; background: var(--raised); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font: inherit; }
@@ -845,7 +883,7 @@ li.slot-row:last-child { border-bottom: 0; }
 /* Tiles */
 .char-avatar, .user-avatar, .ship-render, .fit-render, .fit-hull-render, .tq-portrait { border-radius: var(--yo-radius-control); border: 1px solid var(--yo-border-tile); background: var(--yo-surface-control); }
 .item-icon, .module-icon, .sheet-mod .charge-icon { border-radius: var(--yo-radius-tile); background: var(--yo-surface-control); box-shadow: none; }
-.attr, .ship-stat, .counter, .clone-list li { background: var(--yo-surface-sunken); border-color: var(--yo-border); border-radius: var(--yo-radius-control); }
+.attr, .ship-stat, .counter { background: var(--yo-surface-sunken); border-color: var(--yo-border); border-radius: var(--yo-radius-control); }
 /* Bars: 4px, 6px segments with 2px gaps */
 .progress, .gauge { height: 4px; border-radius: 0; background: repeating-linear-gradient(90deg, var(--yo-track) 0 6px, transparent 6px 8px); }
 .progress-fill { background: repeating-linear-gradient(90deg, var(--yo-accent) 0 6px, transparent 6px 8px); }
