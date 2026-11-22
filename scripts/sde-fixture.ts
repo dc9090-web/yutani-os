@@ -78,6 +78,14 @@ async function main(): Promise<void> {
   members.push(await member(source, "mapConstellations", (r) => CONSTELLATION_IDS.has(r._key as number)));
   members.push(await member(source, "mapSolarSystems", (r) => systemIds.has(r._key as number)));
   members.push(await member(source, "npcStations", (r) => STATION_SYSTEM_IDS.has(r.solarSystemID as number)));
+  // Ship mastery: the allow-listed hulls' mastery rows, and the certificates those name.
+  const certificateIds = new Set<number>();
+  for await (const record of readJsonlMember(source, "masteries.jsonl")) {
+    if (!TYPE_IDS.has(record._key as number)) continue;
+    for (const level of asArray(record._value)) for (const id of (level._value as number[] | undefined) ?? []) certificateIds.add(id);
+  }
+  members.push(await member(source, "masteries", (r) => TYPE_IDS.has(r._key as number)));
+  members.push(await member(source, "certificates", (r) => certificateIds.has(r._key as number)));
 
   await writeZip(dest, members);
   const { size } = await stat(dest);

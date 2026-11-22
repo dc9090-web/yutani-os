@@ -34,6 +34,8 @@ export const SDE_TABLES = [
   "sde_stations",
   "sde_alpha_skills",
   "sde_skill_plans",
+  "sde_masteries",
+  "sde_certificate_skills",
 ] as const;
 
 export type SdeTableName = (typeof SDE_TABLES)[number];
@@ -197,6 +199,24 @@ const TABLE_BODIES: Record<SdeTableName, string> = {
     description text,
     skills      jsonb,
     milestones  jsonb`,
+  // Ship mastery (redesign 2026-11): a hull's five mastery levels each list certificates
+  // (masteries.jsonl); level is the SDE's 0–4, shown as I–V.
+  sde_masteries: `
+    type_id        int NOT NULL,
+    level          int NOT NULL,
+    certificate_id int NOT NULL,
+    PRIMARY KEY (type_id, level, certificate_id)`,
+  // A certificate asks for each of its skills at a level per tier (certificates.jsonl). Mastery
+  // level N needs every one of its certificates at tier N: basic, standard, improved, advanced, elite.
+  sde_certificate_skills: `
+    certificate_id int NOT NULL,
+    skill_id       int NOT NULL,
+    basic          int,
+    standard       int,
+    improved       int,
+    advanced       int,
+    elite          int,
+    PRIMARY KEY (certificate_id, skill_id)`,
 };
 
 const INDEXES: { name: string; table: SdeTableName; expr: string }[] = [

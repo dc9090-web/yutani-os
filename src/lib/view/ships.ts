@@ -226,6 +226,8 @@ export interface ShipCardView {
   /** Turrets and launchers with their charge and reach; empty when the fit has none. */
   weapons: ShipWeaponView[];
   value: string | null; valueRaw: number; unpriced: string | null; error: string | null;
+  /** The pilot's mastery of the hull, 0–5; null when the SDE has no mastery data for it. */
+  mastery: number | null;
 }
 
 export function toShipCard(input: {
@@ -235,6 +237,7 @@ export function toShipCard(input: {
   /** `fitPerformance(built.fit)`; absent → no stat strip on the card. */
   perf?: FitPerformance;
   weapons?: ShipWeaponView[];
+  mastery?: number | null;
 }): ShipCardView {
   const roll = rollUpValue(input.entries, input.prices);
   return {
@@ -246,6 +249,7 @@ export function toShipCard(input: {
     missingSkills: input.problems.filter((p) => p.kind === "skill").length,
     weapons: input.weapons ?? [],
     value: iskShort(roll.total), valueRaw: roll.total, unpriced: unpricedNote(roll.unpriced), error: null,
+    mastery: input.mastery ?? null,
   };
 }
 
@@ -256,10 +260,12 @@ export function toShipCard(input: {
 export function errorShipCard(input: {
   key: string; href: string; name: string | null; typeId: number; typeName: string;
   groupName: string | null; raceName: string | null; location: string;
+  mastery?: number | null;
 }): ShipCardView {
   return {
     ...input, stats: null, cpu: null, power: null, missingSkills: 0, weapons: [],
     value: null, valueRaw: -1, unpriced: null, error: "Could not compute",
+    mastery: input.mastery ?? null,
   };
 }
 
@@ -273,6 +279,35 @@ function groupNameFor(typeId: number, data: DogmaData): string | null {
 export function sortShipCards(cards: ShipCardView[]): ShipCardView[] {
   return [...cards].sort((a, b) =>
     b.valueRaw - a.valueRaw || a.typeName.localeCompare(b.typeName) || a.key.localeCompare(b.key));
+}
+
+/**
+ * Hull types largest first — the order the Ships page lists its panels in (redesign hand-off,
+ * PAGES.md §4; `classOrder` in `Ships.dc.html`). These are SDE group names. A group not named here
+ * sorts after all of them.
+ */
+export const HULL_CLASS_ORDER: readonly string[] = [
+  "Titan", "Supercarrier", "Dreadnought", "Carrier", "Force Auxiliary", "Marauder", "Black Ops", "Battleship",
+  "Command Ship", "Attack Battlecruiser", "Combat Battlecruiser", "Strategic Cruiser", "Heavy Assault Cruiser",
+  "Heavy Interdiction Cruiser", "Combat Recon Ship", "Force Recon Ship", "Logistics", "Cruiser", "Tactical Destroyer",
+  "Command Destroyer", "Interdictor", "Destroyer", "Assault Frigate", "Covert Ops", "Interceptor", "Expedition Frigate",
+  "Frigate", "Corvette", "Shuttle",
+];
+
+function hullRank(groupName: string | null): number {
+  const index = groupName === null ? -1 : HULL_CLASS_ORDER.indexOf(groupName);
+  return index === -1 ? HULL_CLASS_ORDER.length : index;
+}
+
+/**
+ * The Ships page's order: by hull type, largest first, then by value. Hull types the list does not
+ * name come last, grouped by name so the same kind of ship still sits together.
+ */
+export function sortShipPanels(cards: ShipCardView[]): ShipCardView[] {
+  return [...cards].sort((a, b) =>
+    hullRank(a.groupName) - hullRank(b.groupName)
+    || (hullRank(a.groupName) === HULL_CLASS_ORDER.length ? (a.groupName ?? "").localeCompare(b.groupName ?? "") : 0)
+    || b.valueRaw - a.valueRaw || a.typeName.localeCompare(b.typeName) || a.key.localeCompare(b.key));
 }
 
 /** A saved fit is not anywhere, so its card's location line says what it is instead. */
@@ -306,6 +341,7 @@ export function assetShipCards(
   byItemId: ReadonlyMap<number, AssetRow>,
   prices: ReadonlyMap<number, Price>,
   raceNames: ReadonlyMap<number, string>,
+  masteryOf: (typeId: number) => number | null = () => null,
 ): ShipCardView[] {
   return sortShipCards(groups.map((group) => {
     const base = {
@@ -317,6 +353,7 @@ export function assetShipCards(
       groupName: groupNameFor(group.ship.typeId, ctx.data),
       raceName: raceNames.get(group.ship.typeId) ?? null,
       location: shipLocationLabel(group.ship, places, byItemId, ctx.data),
+      mastery: masteryOf(group.ship.typeId),
     };
     const computed = computeFit(() => fitFromAssets(group.ship, group.children, ctx), base.key);
     if (computed === null) return errorShipCard(base);
@@ -332,6 +369,7 @@ export function assetShipCards(
 export function savedFitCards(
   fittings: FittingRow[], ctx: FitContext, prices: ReadonlyMap<number, Price>,
   raceNames: ReadonlyMap<number, string>,
+  masteryOf: (typeId: number) => number | null = () => null,
 ): ShipCardView[] {
   return sortShipCards(fittings.map((fitting) => {
     const base = {
@@ -343,6 +381,7 @@ export function savedFitCards(
       groupName: groupNameFor(fitting.shipTypeId, ctx.data),
       raceName: raceNames.get(fitting.shipTypeId) ?? null,
       location: SAVED_FIT_LOCATION,
+      mastery: masteryOf(fitting.shipTypeId),
     };
     const computed = computeFit(() => fitFromFitting(fitting, fitting.items, ctx), base.key);
     if (computed === null) return errorShipCard(base);

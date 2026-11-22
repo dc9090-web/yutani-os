@@ -34,9 +34,9 @@ describe("field helpers", () => {
 });
 
 describe("every table def", () => {
-  it("covers 20 tables and declares a type for every column", () => {
-    expect(SDE_TABLE_DEFS.length).toBe(20);
-    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(20);
+  it("covers 22 tables and declares a type for every column", () => {
+    expect(SDE_TABLE_DEFS.length).toBe(22);
+    expect(new Set(SDE_TABLE_DEFS.map((d) => d.table)).size).toBe(22);
     for (const def of SDE_TABLE_DEFS) {
       expect(def.columns.length).toBeGreaterThan(0);
       for (const c of def.columns) expect(["int", "text", "bool", "float8", "jsonb"]).toContain(c.type);
@@ -205,6 +205,20 @@ describe("phase 6 static data", () => {
       { skillId: 3329, level: 3 }, { skillId: 3356, level: 2 }, { skillId: 3302, level: 3 },
       { skillId: 3315, level: 3 }, { skillId: 3310, level: 3 },
     ]);
+  }, 30_000);
+
+  it("fans a hull's mastery levels out to one row per certificate", async () => {
+    const mastery = await rows("sde_masteries", "masteries.jsonl", 587);
+    expect(mastery).toHaveLength(36);                      // 7 certificates at levels 0–3, 8 at level 4
+    expect(mastery[0]).toEqual([587, 0, 96]);
+    expect(mastery.filter((r) => r[1] === 4).map((r) => r[2])).toEqual([96, 99, 71, 141, 117, 150, 89, 94]);
+  }, 30_000);
+
+  it("maps a certificate's skills with their level per tier", async () => {
+    const core = await rows("sde_certificate_skills", "certificates.jsonl", 96);   // Core Spaceship Operation
+    expect(core).toHaveLength(7);
+    expect(core[1]).toEqual([96, 3413, 1, 3, 4, 5, 5]);    // Power Grid Management: basic I … elite V
+    expect(core[3]).toEqual([96, 3418, 0, 1, 3, 4, 5]);    // a skill the basic tier does not ask for
   }, 30_000);
 
   it("json stringifies without touching a string", () => {

@@ -13,7 +13,7 @@ describe("sde-mini.zip", () => {
       "dogmaAttributeCategories.jsonl", "dogmaAttributes.jsonl", "marketGroups.jsonl", "mapRegions.jsonl",
       "types.jsonl", "typeDogma.jsonl", "typeBonus.jsonl", "dogmaEffects.jsonl",
       "mapConstellations.jsonl", "mapSolarSystems.jsonl", "npcStations.jsonl",
-      "cloneGrades.jsonl", "skillPlans.jsonl", "races.jsonl",
+      "cloneGrades.jsonl", "skillPlans.jsonl", "races.jsonl", "masteries.jsonl", "certificates.jsonl",
     ];
     const counts: Record<string, number> = {};
     for (const m of members) counts[m] = await fixtureCount(m);
@@ -37,6 +37,8 @@ describe("sde-mini.zip", () => {
       "cloneGrades.jsonl": 4,
       "skillPlans.jsonl": 40,
       "races.jsonl": 11,
+      "masteries.jsonl": 1,          // the Rifter
+      "certificates.jsonl": 8,       // the ones its five mastery levels name
     });
   }, 30_000);
 

@@ -336,3 +336,65 @@ export async function listPlanSkills(): Promise<SdePlanSkill[]> {
     };
   });
 }
+
+/** The certificate tier each mastery level (the SDE's 0–4) asks for. */
+const MASTERY_TIERS = ["basic", "standard", "improved", "advanced", "elite"] as const;
+
+/** For one hull: per mastery level 1–5 (index 0–4), the level each skill has to reach. */
+export type MasteryRequirements = Map<number, number>[];
+
+/**
+ * What each mastery level of each hull asks for, flattened from certificates to skills: level N
+ * needs every certificate it lists at tier N, so a skill's requirement is the highest any of those
+ * certificates sets. A hull the SDE has no mastery for is simply absent from the map.
+ *
+ * Returns an empty map while the mastery tables have not been imported yet (a deploy that added
+ * them, before the worker's next SDE import) — callers show mastery as unknown, not as zero.
+ */
+export async function getMasteryRequirements(typeIds: readonly number[]): Promise<Map<number, MasteryRequirements>> {
+  const out = new Map<number, MasteryRequirements>();
+  if (typeIds.length === 0) return out;
+  const tier = `CASE m.level ${MASTERY_TIERS.map((name, level) => `WHEN ${level} THEN cs.${name}`).join(" ")} END`;
+  let rows: { typeId: number; level: number; skillId: number; need: number | null }[];
+  try {
+    ({ rows } = await getPool().query(
+      `SELECT m.type_id AS "typeId", m.level, cs.skill_id AS "skillId", max(${tier}) AS need
+       FROM sde_masteries m JOIN sde_certificate_skills cs ON cs.certificate_id = m.certificate_id
+       WHERE m.type_id = ANY($1::int[]) AND m.level BETWEEN 0 AND 4
+       GROUP BY m.type_id, m.level, cs.skill_id`, [[...new Set(typeIds)]]));
+  } catch (e) {
+    // 42P01 undefined_table: the tables arrive with the next SDE import.
+    if ((e as { code?: string }).code === "42P01") return out;
+    throw e;
+  }
+  for (const row of rows) {
+    if (row.need === null || row.need <= 0) continue;
+    let levels = out.get(row.typeId);
+    if (levels === undefined) {
+      levels = MASTERY_TIERS.map(() => new Map<number, number>());
+      out.set(row.typeId, levels);
+    }
+    levels[row.level].set(row.skillId, row.need);
+  }
+  return out;
+}
+
+/**
+ * SDE tables that hold no rows. A table added to the importer after the current build was loaded
+ * stays empty until the next import, so the update job treats any empty table as a reason to
+ * import again rather than waiting for CCP's next build.
+ */
+export async function emptySdeTables(tables: readonly string[]): Promise<string[]> {
+  const empty: string[] = [];
+  for (const table of tables) {
+    if (!/^sde_[a-z_]+$/.test(table)) throw new Error(`not an sde table: ${table}`);
+    try {
+      const { rows } = await getPool().query(`SELECT 1 FROM ${table} LIMIT 1`);
+      if (rows.length === 0) empty.push(table);
+    } catch (e) {
+      if ((e as { code?: string }).code !== "42P01") throw e;
+      empty.push(table);
+    }
+  }
+  return empty;
+}

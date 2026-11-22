@@ -13,6 +13,7 @@ function deps(over: Partial<SdeUpdateDeps> = {}): { d: SdeUpdateDeps; removed: s
   const d: SdeUpdateDeps = {
     fetchLatestBuild: vi.fn(async () => LATEST),
     getSdeMeta: vi.fn(async () => null),
+    emptyTables: vi.fn(async () => []),
     downloadSde: vi.fn(async () => {}),
     importSde: vi.fn(async () => result(3484357, 52863)),
     tmpFile: (buildNumber) => `/tmp/eve-sde-${buildNumber}.zip`,
@@ -53,6 +54,16 @@ describe("sde-update job", () => {
     expect(d.downloadSde).not.toHaveBeenCalled();
     expect(d.importSde).not.toHaveBeenCalled();
     expect(removed).toEqual([]);
+  });
+
+  it("imports the same build again when a table the importer fills is still empty", async () => {
+    const { d } = deps({
+      getSdeMeta: vi.fn(async () => ({ buildNumber: 3484357 })),
+      emptyTables: vi.fn(async () => ["sde_masteries", "sde_certificate_skills"]),
+    });
+    expect(await createSdeUpdateJob(d).run({ esi: {} as never })).toBe(52863);
+    expect(d.downloadSde).toHaveBeenCalledTimes(1);
+    expect(d.importSde).toHaveBeenCalledWith("/tmp/eve-sde-3484357.zip");
   });
 
   it("propagates a version-poll failure without downloading", async () => {

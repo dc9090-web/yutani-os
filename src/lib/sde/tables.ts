@@ -261,6 +261,22 @@ export const SDE_TABLE_DEFS: readonly SdeTable[] = [
       json(list(r.milestones).map((s) => ({ skillId: int(s.typeID), level: int(s.level) }))),
     ],
   },
+  {
+    table: "sde_masteries",
+    member: "masteries",
+    columns: cols({ type_id: "int", level: "int", certificate_id: "int" }),
+    // The one file whose top level is `_key`/`_value`: typeID → [{ _key: level, _value: [certificateID…] }].
+    map: (r) => list(r._value).flatMap((level) =>
+      (Array.isArray(level._value) ? (level._value as unknown[]) : []).map((cert) => [int(r._key), int(level._key), int(cert)])),
+  },
+  {
+    table: "sde_certificate_skills",
+    member: "certificates",
+    columns: cols({ certificate_id: "int", skill_id: "int", basic: "int", standard: "int", improved: "int", advanced: "int", elite: "int" }),
+    map: (r) => list(r.skillTypes).map((s) => [
+      int(r._key), int(s._key), int(s.basic), int(s.standard), int(s.improved), int(s.advanced), int(s.elite),
+    ]),
+  },
 ];
 
 const BY_NAME = new Map<SdeTableName, SdeTable>(SDE_TABLE_DEFS.map((d) => [d.table, d]));

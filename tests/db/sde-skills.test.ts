@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
 import type { Pool } from "pg";
 import { resetDb, resetSde } from "./helpers.js";
 import { closePool } from "../../src/lib/db/client.js";
-import { getAlphaSkills, getCareerPlan, getRaces, listCareerPlans, listPlanSkills } from "../../src/lib/sde/repo.js";
+import { emptySdeTables, getAlphaSkills, getCareerPlan, getMasteryRequirements, getRaces, listCareerPlans, listPlanSkills } from "../../src/lib/sde/repo.js";
 
 let pool: Pool;
 beforeAll(async () => { pool = await resetDb(); });
@@ -91,5 +91,50 @@ describe("listPlanSkills", () => {
     expect(awu).toMatchObject({ groupId: 255, groupName: "Gunnery", rank: 6, primaryAttr: 167, secondaryAttr: 168 });
     expect(awu.prereqs).toEqual([{ skillId: 3318, level: 4 }]);
     expect(skills.find((s) => s.id === 3300)!.prereqs).toEqual([]);
+  });
+});
+
+describe("getMasteryRequirements", () => {
+  beforeEach(async () => {
+    // Hull 587: levels 0–3 name certificate 96; level 4 names 96 and 117. Hull 588: level 0 only.
+    await pool.query(`INSERT INTO sde_masteries (type_id, level, certificate_id) VALUES
+      (587, 0, 96), (587, 1, 96), (587, 2, 96), (587, 3, 96), (587, 4, 96), (587, 4, 117), (588, 0, 117)`);
+    await pool.query(`INSERT INTO sde_certificate_skills (certificate_id, skill_id, basic, standard, improved, advanced, elite) VALUES
+      (96, 3413, 1, 3, 4, 5, 5), (96, 3418, 0, 1, 3, 4, 5), (117, 3413, 2, 2, 2, 2, 4), (117, 3300, 1, 1, 1, 1, 3)`);
+  });
+
+  it("reads each level at its own tier and leaves out skills the tier does not ask for", async () => {
+    const levels = (await getMasteryRequirements([587])).get(587)!;
+    expect(levels).toHaveLength(5);
+    expect([...levels[0]]).toEqual([[3413, 1]]);                        // basic: 3418 is 0, so not asked
+    expect(Object.fromEntries(levels[1])).toEqual({ 3413: 3, 3418: 1 });
+    expect(Object.fromEntries(levels[3])).toEqual({ 3413: 5, 3418: 4 });
+  });
+  it("takes the highest level any certificate asks of a shared skill", async () => {
+    const levels = (await getMasteryRequirements([587])).get(587)!;
+    expect(Object.fromEntries(levels[4])).toEqual({ 3413: 5, 3418: 5, 3300: 3 });
+  });
+  it("answers for several hulls at once and omits one with no mastery data", async () => {
+    const out = await getMasteryRequirements([587, 588, 999, 587]);
+    expect([...out.keys()].sort()).toEqual([587, 588]);
+    expect([...out.get(588)![0]]).toEqual(expect.arrayContaining([[3413, 2], [3300, 1]]));
+    expect(out.get(588)![1].size).toBe(0);
+    expect((await getMasteryRequirements([])).size).toBe(0);
+  });
+  it("is empty, not an error, before the mastery tables exist", async () => {
+    await pool.query("DROP TABLE sde_masteries");
+    expect((await getMasteryRequirements([587])).size).toBe(0);
+  });
+});
+
+describe("emptySdeTables", () => {
+  it("names tables with no rows, and ones that are missing", async () => {
+    await pool.query("INSERT INTO sde_races (id, name) VALUES (1, 'Caldari')");
+    expect(await emptySdeTables(["sde_races", "sde_alpha_skills"])).toEqual(["sde_alpha_skills"]);
+    await pool.query("DROP TABLE IF EXISTS sde_masteries");
+    expect(await emptySdeTables(["sde_races", "sde_masteries"])).toEqual(["sde_masteries"]);
+  });
+  it("refuses anything that is not an sde table name", async () => {
+    await expect(emptySdeTables(["characters"])).rejects.toThrow(/not an sde table/);
   });
 });
