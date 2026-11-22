@@ -40,20 +40,35 @@ export function parseDeviceName(raw: unknown): string | null {
   return name.length >= 1 && name.length <= 80 ? name : null;
 }
 
+/** Google's signing keys could not be reached; the caller should answer 503, not "invalid token". */
+export class KeysUnavailableError extends Error {
+  constructor(message: string) { super(message); this.name = "KeysUnavailableError"; }
+}
+
+// jose reports a slow key fetch as ERR_JWKS_TIMEOUT; a failed one surfaces as fetch's own TypeError.
+function keysUnavailable(e: unknown): boolean {
+  return e instanceof TypeError || (e as { code?: unknown } | null)?.code === "ERR_JWKS_TIMEOUT";
+}
+
 export interface AppLoginDeps { verify: typeof verifyGoogleIdToken; jwks: () => JWTVerifyGetKey }
 const realDeps: AppLoginDeps = { verify: verifyGoogleIdToken, jwks: googleJwks };
 
 /**
  * The phone's sign-in: Android's Credential Manager hands the app a Google ID token minted for the
  * web client ID, and this trades it for an app session. Same checks as the web callback except the
- * nonce — there is no redirect here to bind one to. Throws AuthError "jwt" or "not-allowed".
+ * nonce — there is no redirect here to bind one to. Throws AuthError "jwt" or "not-allowed", or
+ * KeysUnavailableError when Google's keys cannot be fetched.
  */
 export async function appGoogleLogin(
   a: { idToken: string; deviceName: string }, config: AppConfig = getConfig(), deps: AppLoginDeps = realDeps,
 ): Promise<{ token: string; email: string }> {
   let identity;
   try { identity = await deps.verify(a.idToken, { jwks: deps.jwks(), clientId: config.googleClientId }); }
-  catch (e) { throw new AuthError("jwt", (e as Error).message); }
+  catch (e) {
+    // Google's keys could not be fetched: the token was never judged, so this is not the phone's fault.
+    if (keysUnavailable(e)) throw new KeysUnavailableError((e as Error).message);
+    throw new AuthError("jwt", (e as Error).message);
+  }
   const email = identity.email.trim().toLowerCase();
   if (!config.allowedGoogleEmails.has(email)) {
     console.error("[auth] google account not allowed:", email);

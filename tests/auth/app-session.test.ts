@@ -107,6 +107,13 @@ describe("appGoogleLogin", () => {
     expect(createAppSession).not.toHaveBeenCalled();
   });
 
+  it("reports unreachable Google keys as such, not as a bad token", async () => {
+    for (const failure of [new TypeError("fetch failed"), Object.assign(new Error("timed out"), { code: "ERR_JWKS_TIMEOUT" })]) {
+      const verify = vi.fn().mockRejectedValue(failure);
+      await expect(appGoogleLogin({ idToken: "ok", deviceName: "Pixel 9" }, config, deps(verify))).rejects.toMatchObject({ name: "KeysUnavailableError" });
+    }
+  });
+
   it("with the real verifier: a token without a nonce passes here, a wrong audience or unverified email does not", async () => {
     const { publicKey, privateKey } = await generateKeyPair("RS256");
     const localJwks = createLocalJWKSet({ keys: [{ ...(await exportJWK(publicKey)), kid: "k1", alg: "RS256" }] });

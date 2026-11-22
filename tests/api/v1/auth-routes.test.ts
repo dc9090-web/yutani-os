@@ -36,6 +36,20 @@ describe("POST /api/v1/auth/google", () => {
     await expect(res.json()).resolves.toEqual({ error: "invalid-token" });
   });
 
+  it("503s when Google's keys cannot be fetched, so the phone does not read it as a bad token", async () => {
+    const { KeysUnavailableError } = await import("../../../src/lib/auth/app-session.js");
+    appGoogleLogin.mockRejectedValue(new KeysUnavailableError("fetch failed"));
+    const res = await post({ idToken: "id.tok", deviceName: "Pixel 9" });
+    expect(res.status).toBe(503);
+    await expect(res.json()).resolves.toEqual({ error: "unavailable" });
+  });
+
+  it("400s a body far larger than any ID token without reading it as JSON", async () => {
+    const res = await post({ idToken: "x".repeat(9000), deviceName: "Pixel 9" });
+    expect(res.status).toBe(400);
+    expect(appGoogleLogin).not.toHaveBeenCalled();
+  });
+
   it("403s not-allowed for an account off the list", async () => {
     appGoogleLogin.mockRejectedValue(new AuthError("not-allowed", "nope"));
     const res = await post({ idToken: "id.tok", deviceName: "Pixel 9" });

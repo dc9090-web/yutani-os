@@ -17,6 +17,8 @@ describe("api parsing", () => {
     expect(parseId("12")).toBe(12);
     expect(parseId("abc")).toBeNull();
     expect(parseId("0")).toBeNull();
+    for (const odd of ["1e30", "0x10", " 5 ", "5.0", "-5", "99999999999999999999"]) expect(parseId(odd)).toBeNull();
+    expect(parseId("1040000000001")).toBe(1040000000001);
     expect(parseId("-3")).toBeNull();
     expect(parseId("1.5")).toBeNull();
   });

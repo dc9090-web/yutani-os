@@ -39,9 +39,11 @@ export function parseAccountId(body: unknown): number | null | undefined {
   if (v === null) return null;
   return typeof v === "number" && Number.isInteger(v) && v > 0 ? v : undefined;
 }
+/** Plain decimal digits only, within what a bigint column and a JS number both hold: "1e30" or "0x10" would otherwise reach Postgres and fail there as a 500. */
 export function parseId(raw: string): number | null {
+  if (!/^\d{1,16}$/.test(raw)) return null;
   const id = Number(raw);
-  return Number.isInteger(id) && id > 0 ? id : null;
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
 /**
