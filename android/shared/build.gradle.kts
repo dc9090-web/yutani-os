@@ -62,5 +62,8 @@ compose.resources {
 tasks.withType<Test>().configureEach {
     systemProperty("fixtures", rootProject.file("../api-fixtures/v1").absolutePath)
     systemProperty("shots", providers.gradleProperty("shots").getOrElse(""))
+    // -PliveUrl=… -PliveToken=… runs LiveSyncTest against a real site (a local one, with a dev token).
+    systemProperty("liveUrl", providers.gradleProperty("liveUrl").getOrElse(""))
+    systemProperty("liveToken", providers.gradleProperty("liveToken").getOrElse(""))
     inputs.dir(rootProject.file("../api-fixtures/v1")).optional()
 }
