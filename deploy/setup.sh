@@ -137,6 +137,7 @@ while :; do
   [[ -z "$OVERVIEW_CHARACTER_IDS" ]] || valid_ids "$OVERVIEW_CHARACTER_IDS" && break
   printf '  %sDigits and commas only.%s\n' "$red" "$reset"
 done
+ask OWNER_INITIALS "Your initials for the account button in the header (empty = a person icon)" "$(yaml_get "$site" owner_initials)"
 
 # ---------------------------------------------------------------- credentials
 heading "EVE SSO application"
@@ -190,6 +191,7 @@ domain: "$DOMAIN"
 acme_email: "$ACME_EMAIL"
 allowed_character_ids: "$ALLOWED_CHARACTER_IDS"
 overview_character_ids: "$OVERVIEW_CHARACTER_IDS"
+owner_initials: "$OWNER_INITIALS"
 # Allowed through Traefik on top of the host's own LAN (detected at install time), Tailscale and loopback.
 extra_allowed_cidrs: $extra_yaml
 YAML

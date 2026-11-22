@@ -3,6 +3,8 @@ export interface AppConfig {
   allowedCharacterIds: Set<number>;
   /** Characters the Overview page and the Skills training overview show; empty = every authorised character. */
   overviewCharacterIds: Set<number>;
+  /** Up to three letters for the header's account button (OWNER_INITIALS); null shows a person icon. */
+  ownerInitials: string | null;
   esiBaseUrl: string; esiCompatibilityDate: string; esiUserAgent: string;
   sessionSecret: string; databaseUrl: string;
   /** Public origin (from EVE_CALLBACK_URL). Route handlers behind Traefik see the container origin, so redirects use this. */
@@ -21,6 +23,12 @@ export function parseAllowedCharacterIds(raw: string | undefined): Set<number> {
   return out;
 }
 
+/** Letters and digits only, upper-cased, at most three — anything else in OWNER_INITIALS is dropped. */
+export function parseOwnerInitials(raw: string | undefined): string | null {
+  const clean = (raw ?? "").replace(/[^\p{L}\p{N}]/gu, "").slice(0, 3).toUpperCase();
+  return clean === "" ? null : clean;
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const missing = REQUIRED.filter((k) => !env[k]);
   if (missing.length) throw new Error(`Missing env: ${missing.join(", ")}`);
@@ -28,6 +36,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     eveClientId: env.EVE_CLIENT_ID!, eveClientSecret: env.EVE_CLIENT_SECRET!, eveCallbackUrl: env.EVE_CALLBACK_URL!,
     allowedCharacterIds: parseAllowedCharacterIds(env.ALLOWED_CHARACTER_IDS),
     overviewCharacterIds: parseAllowedCharacterIds(env.OVERVIEW_CHARACTER_IDS),
+    ownerInitials: parseOwnerInitials(env.OWNER_INITIALS),
     esiBaseUrl: env.ESI_BASE_URL ?? "https://esi.evetech.net",
     esiCompatibilityDate: env.ESI_COMPATIBILITY_DATE!, esiUserAgent: env.ESI_USER_AGENT!,
     sessionSecret: env.SESSION_SECRET!, databaseUrl: env.DATABASE_URL!,

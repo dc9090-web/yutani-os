@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 
-/** "2026-10-01 · 13:25 UTC" */
+/** "2026-10-01 13:25 UTC" */
 export function utcStamp(date: Date): string {
   const iso = date.toISOString();
-  return `${iso.slice(0, 10)} · ${iso.slice(11, 16)} UTC`;
+  return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
 }
 
 /**
@@ -18,5 +18,5 @@ export function SysClock({ initial }: { initial: string }) {
     const id = setInterval(tick, 60_000);
     return () => clearInterval(id);
   }, []);
-  return <span className="dur">{text}</span>;
+  return <span>{text}</span>;
 }

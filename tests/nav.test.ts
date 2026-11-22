@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { NAV_ITEMS, isNavActive } from "../src/config/nav.js";
 
 describe("nav", () => {
-  it("has the eight fixed destinations in order", () => {
-    expect(NAV_ITEMS.map((i) => i.key)).toEqual(["overview", "skills", "clones", "ships", "fitting", "assets", "wallet", "combat"]);
+  it("has the six destinations in order, without Fitting and Combat", () => {
+    expect(NAV_ITEMS.map((i) => i.key)).toEqual(["overview", "skills", "clones", "ships", "assets", "wallet"]);
   });
   it("overview is active only on /", () => {
     const overview = NAV_ITEMS[0];

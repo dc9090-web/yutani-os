@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { loadConfig, parseAllowedCharacterIds } from "../src/lib/config.js";
+import { loadConfig, parseAllowedCharacterIds, parseOwnerInitials } from "../src/lib/config.js";
 
 const full: NodeJS.ProcessEnv = {
   NODE_ENV: "test",
@@ -19,6 +19,12 @@ describe("config", () => {
     expect(c.overviewCharacterIds.size).toBe(0);   // optional: unset means every character
     expect([...loadConfig({ ...full, OVERVIEW_CHARACTER_IDS: "3,1" }).overviewCharacterIds]).toEqual([3, 1]);
     expect(c.esiBaseUrl).toBe("https://esi.evetech.net");
+  });
+  it("reads the owner's initials for the account button, or null when unset", () => {
+    expect(loadConfig(full).ownerInitials).toBeNull();
+    expect(loadConfig({ ...full, OWNER_INITIALS: " dc " }).ownerInitials).toBe("DC");
+    expect(parseOwnerInitials("d.c. long")).toBe("DCL");
+    expect(parseOwnerInitials("  ")).toBeNull();
   });
   it("derives siteOrigin from the callback URL (route handlers behind Traefik see localhost)", () => {
     expect(loadConfig(full).siteOrigin).toBe("https://x");

@@ -1,18 +1,8 @@
-import { Chakra_Petch, JetBrains_Mono, Michroma } from "next/font/google";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 
-// Yutani OS type system (design hand-back 2026-10-01): Michroma for panel labels, nav and buttons;
-// Chakra Petch for titles, names and values; JetBrains Mono for body copy and every table/readout.
-// globals.css aliases the older --font-inter / --font-poppins / --font-grotesk names onto these.
-export const michroma = Michroma({ subsets: ["latin"], weight: "400", variable: "--font-label", display: "swap" });
-export const chakraPetch = Chakra_Petch({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-display",
-  display: "swap",
-});
-export const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
-  display: "swap",
-});
+// Yutani OS type system (redesign hand-off 2026-11-22, docs/design-handoff/DESIGN_SYSTEM.md):
+// Inter for names and prose, Space Grotesk for headings, JetBrains Mono for every figure, tag and
+// readout. globals.css builds --yo-font-ui / --yo-font-display / --yo-font-mono on these variables.
+export const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-inter-face", display: "swap" });
+export const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-grotesk-face", display: "swap" });
+export const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono-face", display: "swap" });

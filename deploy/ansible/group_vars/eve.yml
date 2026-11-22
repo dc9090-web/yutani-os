@@ -12,6 +12,7 @@ esi_compatibility_date: "2026-08-18"
 # CCP asks every ESI caller to identify itself with a contact; zKillboard also wants the project URL.
 esi_user_agent: "YutaniOS/0.1 ({{ acme_email }}; +https://{{ domain }})"
 overview_character_ids: ""
+owner_initials: ""
 # Traefik's lan-only allow-list is built at install time from the host's own LAN, Tailscale's range
 # and loopback, plus extra_allowed_cidrs. Set lan_allowed_cidrs in site.yml to replace it outright.
 extra_allowed_cidrs: []
