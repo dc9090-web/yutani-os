@@ -26,7 +26,7 @@ const names = new Map([[669539978, "TrilliumONE"], [2112625428, "Caldari Navy"]]
 describe("toJournalViews", () => {
   it("formats the date, humanises the ref type and signs the amount", () => {
     const [first] = toJournalViews(journal, names);
-    expect(first).toEqual({
+    expect(first).toMatchObject({
       id: 24_000_000_001, date: "2026-08-31 18:30", refType: "Market transaction",
       description: "Market transaction", amount: "-4,180.50 ISK", sign: "neg", balance: "1,234,567.89 ISK",
       firstParty: "TrilliumONE", secondParty: "Caldari Navy",
@@ -71,7 +71,7 @@ describe("toTransactionViews", () => {
       new Map([[34, { name: "Tritanium" }]]),
       new Map([[60003760, { name: "Jita IV - Moon 4 - Caldari Navy Assembly Plant" }]]),
     );
-    expect(first).toEqual({
+    expect(first).toMatchObject({
       transactionId: 7_000_000_001, date: "2026-08-31 18:30", side: "Buy", typeName: "Tritanium",
       quantity: "1,000", unitPrice: "4.18 ISK", total: "4,180.00 ISK",
       location: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
@@ -83,5 +83,35 @@ describe("toTransactionViews", () => {
     expect(second.typeName).toBe("Type 999999");
     expect(second.location).toBe("—");
     expect(second.side).toBe("Sell");
+  });
+});
+
+describe("wallet views for the redesigned tables", () => {
+  const SELF = 669539978;
+  it("splits the date into a day and a time, and signs amounts without a unit", () => {
+    const [out, , inn] = toJournalViews(journal, names, SELF);
+    expect(out).toMatchObject({ day: "2026-08-31", time: "18:30", signedAmount: "\u22124,180.50", balanceText: "1,234,567.89" });
+    expect(inn).toMatchObject({ time: "16:00", signedAmount: "+1,000,000.00" });
+  });
+  it("names the other party whichever side the character is on", () => {
+    const [out, unknown, inn] = toJournalViews(journal, names, SELF);
+    expect(out.withParty).toBe("Caldari Navy");       // character is first party
+    expect(inn.withParty).toBe("Caldari Navy");       // character is second party
+    expect(unknown.withParty).toBe("ID 888");         // no first party at all
+    expect(unknown.signedAmount).toBeNull();
+    expect(unknown.balanceText).toBeNull();
+  });
+  it("calls market escrow against yourself 'Own escrow', and any other self entry by name", () => {
+    const self = { ...journal[0], firstPartyId: SELF, secondPartyId: SELF };
+    expect(toJournalViews([{ ...self, refType: "market_escrow" }], names, SELF)[0].withParty).toBe("Own escrow");
+    expect(toJournalViews([{ ...self, refType: "player_donation" }], names, SELF)[0].withParty).toBe("TrilliumONE");
+  });
+  it("shows a zero amount without a sign", () => {
+    expect(toJournalViews([{ ...journal[0], amount: 0 }], names, SELF)[0].signedAmount).toBe("0.00");
+  });
+  it("signs a transaction's total: out for a buy, in for a sale", () => {
+    const [buy, sell] = toTransactionViews(transactions, new Map(), new Map());
+    expect(buy).toMatchObject({ day: "2026-08-31", time: "18:30", typeId: 34, unitText: "4.18", signedTotal: "\u22124,180.00" });
+    expect(sell).toMatchObject({ time: "12:00", unitText: "250,000.00", signedTotal: "+250,000.00" });
   });
 });

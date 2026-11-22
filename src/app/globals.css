@@ -480,6 +480,79 @@ a:not([class]):hover { color: var(--yo-text); }
   .as-body { padding: 6px 16px 20px; }
 }
 
+/* ---------- Wallet (Wallet.dc.html) ---------- */
+.wt-balance-box { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.wt-balance-figure { font-family: var(--yo-font-mono); font-size: 30px; font-weight: 500; line-height: 1; }
+.wt-balance-figure.is-none { font-family: var(--yo-font-ui); font-size: 14px; font-weight: 400; color: var(--yo-text-muted); }
+.wt-balance-unit { font-size: 13px; font-weight: 400; color: var(--yo-text-muted); }
+.wt-section { display: flex; flex-direction: column; gap: 14px; }
+.wt-scroll { overflow-x: auto; background: var(--yo-surface); border: 1px solid var(--yo-border); border-radius: var(--yo-radius-card); }
+.wt-table { min-width: 780px; }
+.wt-table.is-wide { min-width: 1080px; }
+.wt-head { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--yo-border); }
+.wt-table.is-wide .wt-head { gap: 14px; }
+.wt-group { display: flex; flex-direction: column; }
+.wt-day { display: flex; align-items: baseline; gap: 12px; padding: 10px 20px; background: var(--yo-surface-sunken); border-bottom: 1px solid var(--yo-border); }
+.wt-day-date { margin: 0; font-family: var(--yo-font-mono); font-size: 12.5px; font-weight: 500; letter-spacing: 0.04em; }
+.wt-day-count { font-size: 12px; color: var(--yo-text-muted); }
+.wt-row { display: flex; align-items: center; box-sizing: border-box; border-bottom: 1px solid var(--yo-border-row); }
+.wt-row.is-journal { gap: 16px; min-height: 40px; padding: 4px 20px; }
+.wt-row.is-trade { gap: 14px; min-height: 44px; padding: 4px 20px; }
+.wt-time { flex: none; width: 52px; }
+.wt-row .wt-time { font-family: var(--yo-font-mono); font-size: 12px; color: var(--yo-text-muted); }
+.wt-type { flex: 1.2; min-width: 0; }
+.wt-row .wt-type { font-size: 13.5px; }
+.wt-with { flex: 1; min-width: 0; }
+.wt-row .wt-with { font-size: 13px; color: var(--yo-text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wt-amount, .wt-balance { flex: none; width: 170px; text-align: right; }
+.wt-row .wt-amount { font-family: var(--yo-font-mono); font-size: 13px; }
+.wt-row .wt-balance { font-family: var(--yo-font-mono); font-size: 12.5px; color: var(--yo-text-muted); }
+.wt-row .is-pos { color: var(--yo-good); }
+.wt-row .is-neg { color: var(--yo-bad); }
+.wt-side { flex: none; width: 50px; }
+.wt-side-tag { font-family: var(--yo-font-mono); font-size: 10px; letter-spacing: 0.1em; padding: 2px 6px; border-radius: var(--yo-radius-chip); border: 1px solid; }
+.wt-side-tag.is-neg { border-color: color-mix(in srgb, var(--yo-bad) 45%, transparent); }
+.wt-side-tag.is-pos { border-color: color-mix(in srgb, var(--yo-good) 45%, transparent); }
+.wt-item { flex: 1.5; min-width: 0; }
+.wt-row .wt-item { display: flex; align-items: center; gap: 10px; }
+.wt-icon { width: 30px; height: 30px; }
+.wt-item-name { min-width: 0; font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wt-qty { flex: none; width: 60px; text-align: right; }
+.wt-row .wt-qty { font-family: var(--yo-font-mono); font-size: 12.5px; }
+.wt-unit { flex: none; width: 140px; text-align: right; }
+.wt-row .wt-unit { font-family: var(--yo-font-mono); font-size: 12.5px; color: var(--yo-text-muted); }
+.wt-times { display: none; }
+.wt-total { flex: none; width: 150px; text-align: right; }
+.wt-row .wt-total { font-family: var(--yo-font-mono); font-size: 13px; }
+.wt-loc { flex: 1; min-width: 0; }
+.wt-row .wt-loc { font-size: 12.5px; color: var(--yo-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wt-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.wt-foot-note { font-size: 13px; color: var(--yo-text-muted); }
+@media (max-width: 760px) {
+  .yo-page-head-row > .wt-balance-box { flex: 1 1 100%; align-items: flex-start; }
+  .wt-balance-figure { font-size: 26px; }
+  .wt-table, .wt-table.is-wide { min-width: 0; }
+  .wt-head { display: none; }
+  .wt-day { padding: 10px 16px; }
+  /* Journal: time, type, amount; then who and the balance. */
+  .wt-row.is-journal { flex-wrap: wrap; align-items: baseline; gap: 3px 12px; min-height: 0; padding: 10px 16px; }
+  .is-journal .wt-time { order: 1; }
+  .is-journal .wt-type { order: 2; flex: 1 1 130px; }
+  .is-journal .wt-amount { order: 3; width: auto; }
+  .is-journal .wt-with { order: 4; flex: 1 1 40%; margin-left: 64px; font-size: 12.5px; color: var(--yo-text-muted); }
+  .is-journal .wt-balance { order: 5; width: auto; font-size: 12px; color: var(--yo-text-label); }
+  /* Transactions: time and item; side, quantity × unit price, total; location. */
+  .wt-row.is-trade { flex-wrap: wrap; gap: 6px 12px; min-height: 0; padding: 10px 16px; }
+  .is-trade .wt-time { order: 1; }
+  .is-trade .wt-item { order: 2; flex: 1 1 220px; }
+  .is-trade .wt-side { order: 3; width: auto; }
+  .is-trade .wt-qty { order: 4; width: auto; font-size: 12px; color: var(--yo-text-muted); }
+  .is-trade .wt-unit { order: 5; flex: 1 1 100px; width: auto; margin-left: -6px; text-align: left; font-size: 12px; }
+  .wt-times { display: inline; }
+  .is-trade .wt-total { order: 6; width: auto; font-size: 12.5px; }
+  .is-trade .wt-loc { order: 7; flex: 1 1 100%; font-size: 12px; }
+}
+
 /* =====================================================================================
    Screens the redesign did not cover, and pages not yet rebuilt. Layout rules as they were;
    the re-skin block at the end of the file restyles them.

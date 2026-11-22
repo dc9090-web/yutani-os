@@ -2,9 +2,12 @@ import { readSession } from "../../lib/auth/session.js";
 import { listCharacters } from "../../lib/db/characters.js";
 import { getWallet } from "../../lib/db/character-wallet.js";
 import { pickActive } from "../../lib/view/characters.js";
-import { isk } from "../../lib/view/format.js";
+import { grouped } from "../../lib/view/format.js";
 import { loadJournalViews, loadTransactionViews } from "../../lib/view/wallet.js";
+import { CharacterPicker } from "../components/CharacterPicker.js";
 import { NoCharacter } from "../components/NoCharacter.js";
+import { PageHead } from "../components/PageHead.js";
+import { Tabs } from "../components/Tabs.js";
 import { JournalTable, TransactionsTable } from "./WalletTables.js";
 
 export default async function WalletPage() {
@@ -19,21 +22,20 @@ export default async function WalletPage() {
   ]);
 
   return (<>
-    <h1 className="page-title">Wallet</h1>
-    <p className="page-sub">{character.name}</p>
-    <div className="card-stack">
-      <div className="card">
-        <h2 className="card-title">Balance</h2>
-        <span className="stat-value">{wallet === null ? "Not synced yet" : isk(wallet.balance)}</span>
+    <PageHead title="Wallet" aside={
+      <div className="wt-balance-box">
+        <span className="yo-label">Balance</span>
+        {wallet === null
+          ? <span className="wt-balance-figure is-none">Not synced yet</span>
+          : <span className="wt-balance-figure">{grouped(wallet.balance.toFixed(2))} <span className="wt-balance-unit">ISK</span></span>}
       </div>
-      <div className="card">
-        <h2 className="card-title">Journal</h2>
-        <JournalTable characterId={character.id} initial={journal} />
-      </div>
-      <div className="card">
-        <h2 className="card-title">Transactions</h2>
-        <TransactionsTable characterId={character.id} initial={transactions} />
-      </div>
-    </div>
+    }>
+      <CharacterPicker characters={characters} activeId={character.id} />
+    </PageHead>
+    {/* The tables are keyed by character: switching characters must not carry "show more" rows across. */}
+    <Tabs label="Wallet views" tabs={[
+      { id: "journal", label: "Journal", content: <JournalTable key={character.id} characterId={character.id} initial={journal} /> },
+      { id: "transactions", label: "Transactions", content: <TransactionsTable key={character.id} characterId={character.id} initial={transactions} /> },
+    ]} />
   </>);
 }

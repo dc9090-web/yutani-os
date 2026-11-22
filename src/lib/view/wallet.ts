@@ -20,6 +20,16 @@ export interface JournalView {
   balance: string | null;
   firstParty: string | null;
   secondParty: string | null;
+  /** "2026-08-31" (UTC) — the day header the row sits under. */
+  day: string;
+  /** "18:30" (UTC). */
+  time: string;
+  /** The other side of the entry — From and To merged into one column (redesign hand-off, PAGES.md §7). */
+  withParty: string | null;
+  /** "+10,000,000.00" / "−189,752.69", no unit: the column header carries it. */
+  signedAmount: string | null;
+  /** "50,000,000.00", no unit. */
+  balanceText: string | null;
 }
 
 export interface TransactionView {
@@ -31,6 +41,13 @@ export interface TransactionView {
   unitPrice: string;
   total: string;
   location: string;
+  day: string;
+  time: string;
+  /** For the item's icon. */
+  typeId: number;
+  /** Unit price and total without the unit; the total is signed — money out for a buy, in for a sale. */
+  unitText: string;
+  signedTotal: string;
 }
 
 function party(id: number | null, names: ReadonlyMap<number, string>): string | null {
@@ -38,8 +55,41 @@ function party(id: number | null, names: ReadonlyMap<number, string>): string | 
   return names.get(id) ?? `ID ${id}`;
 }
 
-export function toJournalViews(rows: JournalRow[], names: ReadonlyMap<number, string>): JournalView[] {
+const MINUS = "\u2212";
+/** "1,234.50" — two decimals, grouped, no unit and no sign. */
+function money(value: number): string {
+  return grouped(Math.abs(value).toFixed(2));
+}
+/** "+1,234.50" / "−1,234.50"; a zero carries no sign. */
+function signed(value: number): string {
+  const text = money(value);
+  if (text === "0.00") return text;
+  return `${value > 0 ? "+" : MINUS}${text}`;
+}
+const dayOf = (date: Date): string => date.toISOString().slice(0, 10);
+const timeOf = (date: Date): string => date.toISOString().slice(11, 16);
+
+/**
+ * Who the entry was with, seen from `selfId`: the party that is not this character. When both
+ * sides are the character — market escrow moving between their own wallet and their own order —
+ * there is no other party, and the column says "Own escrow" for an escrow entry and the character's
+ * own name otherwise. Without `selfId` the first party is the best guess.
+ */
+function otherParty(row: JournalRow, names: ReadonlyMap<number, string>, selfId: number | null): string | null {
+  const { firstPartyId: first, secondPartyId: second } = row;
+  if (selfId === null) return party(first ?? second, names);
+  if (first === selfId && second === selfId) return row.refType === "market_escrow" ? "Own escrow" : party(selfId, names);
+  if (first === selfId) return party(second, names);
+  return party(first ?? second, names);
+}
+
+export function toJournalViews(rows: JournalRow[], names: ReadonlyMap<number, string>, selfId: number | null = null): JournalView[] {
   return rows.map((row) => ({
+    day: dayOf(row.date),
+    time: timeOf(row.date),
+    withParty: otherParty(row, names, selfId),
+    signedAmount: row.amount === null ? null : signed(row.amount),
+    balanceText: row.balance === null ? null : money(row.balance),
     id: row.id,
     date: stamp(row.date),
     refType: refTypeLabel(row.refType),
@@ -58,6 +108,11 @@ export function toTransactionViews(
   places: ReadonlyMap<number, { name: string }>,
 ): TransactionView[] {
   return rows.map((row) => ({
+    day: dayOf(row.date),
+    time: timeOf(row.date),
+    typeId: row.typeId,
+    unitText: money(row.unitPrice),
+    signedTotal: signed(row.unitPrice * row.quantity * (row.isBuy ? -1 : 1)),
     transactionId: row.transactionId,
     date: stamp(row.date),
     side: row.isBuy ? "Buy" : "Sell",
@@ -77,7 +132,7 @@ export async function loadJournalViews(characterId: number, offset = 0): Promise
     if (row.firstPartyId !== null) ids.add(row.firstPartyId);
     if (row.secondPartyId !== null) ids.add(row.secondPartyId);
   }
-  return toJournalViews(rows, await displayNames([...ids]));
+  return toJournalViews(rows, await displayNames([...ids]), characterId);
 }
 
 /** One page of transactions plus one getTypes and one locationLabels pass. */
