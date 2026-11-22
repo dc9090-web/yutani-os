@@ -1,52 +1,61 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
-import { QueueTable } from "../../src/app/skills/QueueTable.js";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { QueueTable, type QueueEntryView } from "../../src/app/skills/QueueTable.js";
 
-const entries = [
-  { position: 1, skill: "Caldari Frigate", desc: "Skill at operating Caldari frigates.", trainedLevel: 4, targetLevel: 5, remaining: "1d 6h 30m", progress: 0.42 },
-  { position: 2, skill: "Gunnery", desc: null, trainedLevel: 2, targetLevel: 3, remaining: "—", progress: null },
+const entries: QueueEntryView[] = [
+  { position: 1, skillId: 3300, skill: "Gunnery", desc: "Basic turret operation skill.", targetLevel: 5, remaining: "6d 2h 40m", progress: 0.37 },
+  { position: 2, skillId: 3327, skill: "Spaceship Command", desc: null, targetLevel: 4, remaining: "1d 2h", progress: null },
+  { position: 3, skillId: 3327, skill: "Spaceship Command", desc: null, targetLevel: 5, remaining: "5d 9h 12m", progress: null },
 ];
 
 describe("QueueTable", () => {
-  it("lists the queue with time-remaining and level-box columns, drawing a progress bar on the head entry only", () => {
+  it("lists the queue in order with the target level and time remaining", () => {
     render(<QueueTable entries={entries} />);
-    expect(screen.getByRole("columnheader", { name: "Time remaining" })).toBeInTheDocument();
-    expect(screen.getByText("Caldari Frigate")).toBeInTheDocument();
-    expect(screen.getByText("1d 6h 30m")).toBeInTheDocument();
-    expect(screen.getByText("—")).toBeInTheDocument();   // the queued entry's missing time remaining
-    const bar = screen.getByRole("progressbar");
-    expect(bar.querySelector(".progress-fill")?.getAttribute("style")).toContain("42%");
-    expect(screen.getByText("42%")).toBeInTheDocument();   // .progress-pct
-    expect(screen.queryAllByRole("progressbar")).toHaveLength(1);
+    const rows = screen.getAllByRole("listitem");
+    expect(rows).toHaveLength(3);
+    expect(rows[0]).toHaveTextContent("15Gunnery");
+    expect(rows[0]).toHaveTextContent("6d 2h 40m");
+    // A skill queued twice steps up one level per entry.
+    expect(rows[1]).toHaveTextContent("24Spaceship Command1d 2h");
+    expect(rows[2]).toHaveTextContent("35Spaceship Command5d 9h 12m");
   });
 
-  it("shows the training entry's level boxes as active up to trainedLevel, blinking at targetLevel", () => {
+  it("gives the entry in training a TRAINING tag, a progress bar and a pulsing target block", () => {
     render(<QueueTable entries={entries} />);
-    const trainingRow = screen.getByText("Caldari Frigate").closest("tr")!;
-    const boxes = within(trainingRow).getByLabelText("Trained level 4, training level 5");
-    const cells = boxes.querySelectorAll(".level-box");
-    expect(cells).toHaveLength(5);
-    expect(within(trainingRow).getByLabelText(/training level 5/)).toBeInTheDocument();
-    expect(boxes.querySelectorAll(".level-box.active")).toHaveLength(4);
-    expect(boxes.querySelectorAll(".level-box.training")).toHaveLength(1);
+    expect(screen.getAllByText("TRAINING")).toHaveLength(1);
+    const bar = screen.getByRole("img", { name: "Progress 37%" });
+    expect((bar.firstElementChild as HTMLElement).style.width).toBe("37%");
+    expect(screen.getByText("37%")).toBeInTheDocument();
+    const blocks = screen.getByRole("img", { name: "Training to level 5" });
+    expect([...blocks.children].map((c) => c.className)).toEqual([
+      "yo-block is-filled", "yo-block is-filled", "yo-block is-filled", "yo-block is-filled", "yo-block is-training",
+    ]);
   });
 
-  it("shows a merely-queued entry's level boxes with no training box and the 'queued' label", () => {
+  it("outlines a queued entry's target level and leaves higher levels empty", () => {
     render(<QueueTable entries={entries} />);
-    const queuedRow = screen.getByText("Gunnery").closest("tr")!;
-    const boxes = within(queuedRow).getByLabelText("Trained level 2, level 3 queued");
-    expect(boxes.querySelectorAll(".level-box.active")).toHaveLength(2);
-    expect(boxes.querySelectorAll(".level-box.training")).toHaveLength(0);
+    const blocks = screen.getByRole("img", { name: "Queued to level 4" });
+    expect([...blocks.children].map((c) => c.className)).toEqual([
+      "yo-block is-filled", "yo-block is-filled", "yo-block is-filled", "yo-block is-queued", "yo-block",
+    ]);
   });
 
-  it("hangs the SDE description off the skill name as hover text, and no hover at all when there is none", () => {
+  it("opens the skill's description inline from its info button, and has no button without one", () => {
     render(<QueueTable entries={entries} />);
-    expect(screen.getByText("Caldari Frigate").getAttribute("data-desc")).toBe("Skill at operating Caldari frigates.");
-    expect(screen.getByText("Gunnery").hasAttribute("data-desc")).toBe(false);
+    expect(screen.queryByText("Basic turret operation skill.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "About Gunnery" }));
+    expect(screen.getByText("Basic turret operation skill.")).toHaveClass("yo-info-panel");
+    expect(screen.queryByRole("button", { name: "About Spaceship Command" })).toBeNull();
+  });
+
+  it("shows no bar for a paused queue", () => {
+    render(<QueueTable entries={[{ ...entries[0], remaining: "—", progress: null }]} />);
+    expect(screen.queryByText("TRAINING")).toBeNull();
+    expect(screen.getByText("—")).toBeInTheDocument();
   });
 
   it("shows the empty state when the queue is empty", () => {
     render(<QueueTable entries={[]} />);
-    expect(screen.getByText(/nothing in the training queue/i)).toBeInTheDocument();
+    expect(screen.getByText("Nothing in the training queue.")).toBeInTheDocument();
   });
 });

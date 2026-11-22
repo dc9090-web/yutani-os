@@ -19,28 +19,43 @@ const empty: TrainingQueueView = { id: 3, name: "Sasha-9999", online: false, sta
 const unsynced: TrainingQueueView = { id: 4, name: "Lana C", online: null, status: { kind: "notSynced" }, progress: null, count: 0, truncated: false, rows: [] };
 
 describe("TrainingOverview", () => {
-  it("renders one card per character with the head progress bar, rows and the truncation note", () => {
+  it("renders one card per character with the queue length, the current skill's bar, rows and the remainder", () => {
     render(<TrainingOverview characters={[active, paused, empty, unsynced]} />);
-    expect(screen.getByText("Training overview")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Training overview" })).toBeInTheDocument();
     expect(document.querySelectorAll(".tq-card")).toHaveLength(4);
 
-    const card = screen.getByText("TrilliumONE").closest(".tq-card") as HTMLElement;
+    const card = screen.getByRole("heading", { name: /TrilliumONE/ }).closest(".tq-card") as HTMLElement;
     expect(within(card).getByText("29d 16h 11m")).toBeInTheDocument();
-    expect(within(card).getByText("22")).toBeInTheDocument();              // .tq-count is the full queue length
-    expect(within(card).getByRole("progressbar").querySelector(".progress-fill")?.getAttribute("style")).toContain("37%");
+    expect(within(card).getByText("In queue").nextElementSibling).toHaveTextContent("22");   // the full queue length
+    const bar = within(card).getByRole("img", { name: "Current skill progress 37%" });
+    expect((bar.firstElementChild as HTMLElement).style.width).toBe("37%");
     expect(within(card).getByText("Large Projectile Turret")).toBeInTheDocument();
-    expect(within(card).getByLabelText("Trained level 4, training level 5")).toBeInTheDocument();
-    expect(within(card).getByText("Showing first 2 of 22")).toBeInTheDocument();
-    expect(card.querySelector(".online-dot.on")).not.toBeNull();
+    // Levels below the target are solid; the target is amber — pulsing on the entry in training.
+    const training = within(card).getByRole("img", { name: "Training to level 5" });
+    expect([...training.children].map((c) => c.className)).toEqual([
+      "yo-block is-filled", "yo-block is-filled", "yo-block is-filled", "yo-block is-filled", "yo-block is-training",
+    ]);
+    const queued = within(card).getByRole("img", { name: "Queued to level 5" });
+    expect(queued.lastElementChild?.className).toBe("yo-block is-queued");
+    expect(within(card).getByText("+20 more in queue")).toBeInTheDocument();
+    expect(within(card).getByText("Online")).toHaveClass("yo-tag", "is-good");
   });
 
   it("shows paused, empty and not-synced states without a progress bar", () => {
     render(<TrainingOverview characters={[paused, empty, unsynced]} />);
-    expect(screen.queryAllByRole("progressbar")).toHaveLength(0);
+    expect(screen.queryAllByRole("img", { name: /Current skill progress/ })).toHaveLength(0);
     expect(screen.getByText("Paused")).toBeInTheDocument();
     expect(screen.getByText("No skills in queue")).toBeInTheDocument();
     expect(screen.getByText("Not synced")).toBeInTheDocument();
-    expect(screen.queryByText(/Showing first/)).toBeNull();
-    expect(document.querySelectorAll(".online-dot")).toHaveLength(0);
+    expect(screen.getByText("Skills not synced yet")).toBeInTheDocument();
+    expect(screen.queryByText(/more in queue/)).toBeNull();
+    expect(screen.queryByText("Online")).toBeNull();
+  });
+
+  it("shows the block legend", () => {
+    render(<TrainingOverview characters={[active]} />);
+    expect(screen.getByText("Trained")).toBeInTheDocument();
+    expect(screen.getByText("Training now")).toBeInTheDocument();
+    expect(screen.getByText("Queued")).toBeInTheDocument();
   });
 });

@@ -1,62 +1,67 @@
+import { InfoButton, InfoGroup, InfoPanel } from "../components/Info.js";
+import { LevelBlocks, queueBlocks } from "../components/LevelBlocks.js";
+import { SegBar } from "../components/SegBar.js";
+
 export interface QueueEntryView {
+  /** 1-based place in the live queue. */
   position: number;
+  skillId: number;
   skill: string;
-  /** The skill's SDE description as hover text (`typeDescription()`); null when the SDE has none. */
+  /** The skill's SDE description for the info panel (`typeDescription()`); null when the SDE has none. */
   desc: string | null;
-  /** The level already trained going into this entry — `targetLevel - 1` (see the page's derivation). */
-  trainedLevel: number;
-  /** The level this queue entry finishes at. */
+  /** The level this queue entry finishes at (`finished_level`). A skill queued several times steps up one level per entry. */
   targetLevel: number;
-  /** Time left to train, pre-formatted with `duration()`; "—" when the entry has no start/finish dates (a paused queue). */
+  /** Time left to train, pre-formatted with `duration()`; "—" when the entry has no dates (a paused queue). */
   remaining: string;
-  /** Only the head entry gets a bar; every other row is `null`. */
+  /** 0–1 through the level, on the entry in training only; every other row is `null`. */
   progress: number | null;
 }
 
 /**
- * Five boxes: solid for every level already trained, and — only on the entry actually in progress
- * (`training`) — a blinking box (`.level-box.training`, `@keyframes levelBlink`) at the level being
- * trained towards. Queued-but-not-yet-training entries just show the gap as empty boxes.
+ * The Training tab's rows (redesign hand-off, `Skills.dc.html`): position, level blocks, the target
+ * level digit, the skill with its info button, and the time remaining. The row in training adds a
+ * TRAINING tag and its progress bar.
  */
-export function LevelBoxes({ trainedLevel, targetLevel, training }: { trainedLevel: number; targetLevel: number; training: boolean }) {
-  const label = training
-    ? `Trained level ${trainedLevel}, training level ${targetLevel}`
-    : `Trained level ${trainedLevel}, level ${targetLevel} queued`;
-  return (
-    <span className="level-boxes" aria-label={label}>
-      {[1, 2, 3, 4, 5].map((level) => {
-        const cls = level <= trainedLevel ? " active" : training && level === targetLevel ? " training" : "";
-        return <span key={level} className={`level-box${cls}`} />;
-      })}
-    </span>
-  );
-}
-
 export function QueueTable({ entries }: { entries: QueueEntryView[] }) {
-  if (entries.length === 0) return <p className="faint">Nothing in the training queue.</p>;
+  if (entries.length === 0) return <p className="yo-empty">Nothing in the training queue.</p>;
   return (
-    <table className="table">
-      <thead><tr><th>#</th><th>Skill</th><th>Level</th><th>Time remaining</th><th>Progress</th></tr></thead>
-      <tbody>
-        {entries.map((e) => (
-          <tr key={e.position}>
-            <td className="muted">{e.position}</td>
-            <td><span data-desc={e.desc ?? undefined}>{e.skill}</span></td>
-            <td><LevelBoxes trainedLevel={e.trainedLevel} targetLevel={e.targetLevel} training={e.progress !== null} /></td>
-            <td className="dur">{e.remaining}</td>
-            <td>
-              {e.progress === null ? null : (
-                <div className="progress-wrap">
-                  <div className="progress" role="progressbar" aria-valuenow={Math.round(e.progress * 100)} aria-valuemin={0} aria-valuemax={100}>
-                    <div className="progress-fill" style={{ width: `${Math.round(e.progress * 100)}%` }} />
-                  </div>
-                  <span className="progress-pct">{Math.round(e.progress * 100)}%</span>
-                </div>
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <InfoGroup>
+      <div className="tr-head yo-label">
+        <span className="tr-n">#</span>
+        <span className="tr-level">Level</span>
+        <span className="tr-skill">Skill</span>
+        <span>Time remaining</span>
+      </div>
+      <ol className="tr-list">
+        {entries.map((e) => {
+          const id = `queue-${e.position}`;
+          const training = e.progress !== null;
+          const pct = e.progress === null ? 0 : Math.round(e.progress * 100);
+          return (
+            <li key={e.position} className="tr-item">
+              <div className="tr-row">
+                <span className="tr-n yo-mono">{e.position}</span>
+                <LevelBlocks states={queueBlocks(e.targetLevel, training)} label={`${training ? "Training" : "Queued"} to level ${e.targetLevel}`} />
+                <span className="sk-level is-target" aria-hidden="true">{e.targetLevel}</span>
+                <span className="tr-name">{e.skill}</span>
+                {e.desc === null ? null : <InfoButton id={id} name={e.skill} />}
+                {/* One group, so on a phone the tag, bar and time drop to a second line together. */}
+                <span className="tr-end">
+                  {training ? (
+                    <span className="tr-active">
+                      <span className="yo-flag">TRAINING</span>
+                      <SegBar value={e.progress ?? 0} tone="accent" label={`Progress ${pct}%`} className="tr-bar" />
+                      <span className="tr-pct">{pct}%</span>
+                    </span>
+                  ) : null}
+                  <span className="tr-time">{e.remaining}</span>
+                </span>
+              </div>
+              {e.desc === null ? null : <InfoPanel id={id} className="tr-info">{e.desc}</InfoPanel>}
+            </li>
+          );
+        })}
+      </ol>
+    </InfoGroup>
   );
 }

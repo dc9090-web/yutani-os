@@ -42,6 +42,7 @@ describe("trainingQueueView", () => {
   });
 
   it("caps the rows at the overview limit but keeps the full count", () => {
+    expect(TRAINING_OVERVIEW_LIMIT).toBe(10);   // the redesign shows ten entries per character
     const queue = Array.from({ length: 25 }, (_, i) => entry(i, 3300, 1, i, i + 1));
     const view = trainingQueueView({ ...base, queue }, names, now);
     expect(view.rows).toHaveLength(TRAINING_OVERVIEW_LIMIT);

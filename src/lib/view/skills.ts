@@ -109,3 +109,63 @@ export function implantBonusLabel(attributes: ReadonlyMap<number, number>): stri
   }
   return null;
 }
+
+export interface SheetSkillView {
+  skillId: number;
+  name: string;
+  /** Levels trained, as the blocks show them. */
+  level: number;
+  /** Lower than `level` only when a trained level is not active (an alpha clone, a lapsed Expert System). */
+  activeLevel: number;
+  /** Further levels of this skill sitting in the training queue. */
+  queued: number;
+  /** True when the first of those queued levels is the one training right now. */
+  training: boolean;
+}
+export interface SheetGroupView {
+  groupId: number; name: string; groupSp: number;
+  /** Queued levels across the group's skills. */
+  queued: number;
+  skills: SheetSkillView[];
+}
+
+/**
+ * The Skills tab (redesign hand-off, PAGES.md §2): the grouped skill sheet with the live training
+ * queue laid over it, so each skill shows the levels queued behind what is trained and which level
+ * is in training now.
+ *
+ * `queue` is the live queue (after `liveQueue`). Only entries above the trained level count. The
+ * sheet can lag the queue — ESI advances it on login — so when the lowest live entry for a skill
+ * starts more than one level above the sheet, the levels in between have finished and are shown as
+ * trained.
+ */
+export function sheetGroups(
+  groups: readonly SkillGroupView[],
+  queue: readonly { skillId: number; finishedLevel: number; finishDate: Date | null }[],
+): SheetGroupView[] {
+  const head = queue[0] ?? null;
+  const levels = new Map<number, number[]>();
+  for (const entry of queue) {
+    const list = levels.get(entry.skillId) ?? [];
+    list.push(entry.finishedLevel);
+    levels.set(entry.skillId, list);
+  }
+  return groups.map((group) => {
+    const skills = group.skills.map((skill): SheetSkillView => {
+      const ahead = (levels.get(skill.skillId) ?? []).filter((level) => level > skill.trainedLevel);
+      const level = ahead.length === 0 ? skill.trainedLevel : Math.max(skill.trainedLevel, Math.min(...ahead) - 1);
+      const queued = new Set(ahead).size;
+      return {
+        skillId: skill.skillId, name: skill.name, level,
+        activeLevel: Math.min(skill.activeLevel, level),
+        queued,
+        training: queued > 0 && head !== null && head.finishDate !== null && head.skillId === skill.skillId,
+      };
+    });
+    return {
+      groupId: group.groupId, name: group.name, groupSp: group.groupSp,
+      queued: skills.reduce((sum, skill) => sum + skill.queued, 0),
+      skills,
+    };
+  });
+}

@@ -1,8 +1,8 @@
 import type { SkillQueueRow } from "../db/character-skills.js";
 import { duration, queueProgress } from "./format.js";
 
-/** Rows shown per character on the Skills page's Training overview (design hand-back 2026-10-01). */
-export const TRAINING_OVERVIEW_LIMIT = 20;
+/** Rows shown per character on the Skills page's Overview tab (redesign hand-off, PAGES.md §2). */
+export const TRAINING_OVERVIEW_LIMIT = 10;
 
 export interface TrainingQueueRow {
   position: number;

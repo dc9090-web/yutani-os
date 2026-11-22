@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { attributeViews, queueProgress, remapAvailability, ATTRIBUTE_BONUS_ATTR, SKILL_CATEGORY_ID } from "../../src/lib/view/skills.js";
+import { attributeViews, queueProgress, remapAvailability, sheetGroups, ATTRIBUTE_BONUS_ATTR, SKILL_CATEGORY_ID } from "../../src/lib/view/skills.js";
 
 const NOW = new Date("2026-09-01T12:00:00Z");
 
@@ -155,5 +155,38 @@ describe("liveQueue", () => {
   it("takes the first entry by order, not the one numbered zero — ESI trims finished entries without renumbering", () => {
     const queue = [entry(6, "2026-09-01T18:00:00Z"), entry(7, "2026-09-02T18:00:00Z")];
     expect(liveQueue(queue, NOW)[0]?.queuePosition).toBe(6);
+  });
+});
+
+describe("sheetGroups", () => {
+  const skill = (skillId: number, trainedLevel: number, activeLevel = trainedLevel) => ({ skillId, name: `Skill ${skillId}`, trainedLevel, activeLevel, skillpoints: 0 });
+  const group = (skills: ReturnType<typeof skill>[]) => [{ groupId: 1, name: "Gunnery", groupSp: 1000, skills }];
+  const soon = new Date("2026-11-23T00:00:00Z");
+  const q = (skillId: number, finishedLevel: number, finishDate: Date | null = soon) => ({ skillId, finishedLevel, finishDate });
+
+  it("lays the queue over the sheet: queued levels per skill, the head in training, a group total", () => {
+    const [view] = sheetGroups(group([skill(10, 3), skill(11, 2), skill(12, 5), skill(13, 0)]), [q(10, 4), q(11, 3), q(10, 5), q(13, 1)]);
+    expect(view.skills.map((s) => [s.skillId, s.level, s.queued, s.training])).toEqual([
+      [10, 3, 2, true], [11, 2, 1, false], [12, 5, 0, false], [13, 0, 1, false],
+    ]);
+    expect(view.queued).toBe(4);
+    expect(view.groupSp).toBe(1000);
+  });
+  it("does not call a paused head 'training'", () => {
+    const [view] = sheetGroups(group([skill(10, 3)]), [q(10, 4, null)]);
+    expect(view.skills[0]).toMatchObject({ queued: 1, training: false });
+  });
+  it("ignores queue entries at or below the trained level", () => {
+    const [view] = sheetGroups(group([skill(10, 4)]), [q(10, 4), q(10, 5)]);
+    expect(view.skills[0]).toMatchObject({ level: 4, queued: 1 });
+  });
+  it("treats levels the live queue has moved past as trained when the sheet lags", () => {
+    // The sheet says III, but the lowest entry still in the live queue is V: IV has finished.
+    const [view] = sheetGroups(group([skill(10, 3)]), [q(10, 5)]);
+    expect(view.skills[0]).toMatchObject({ level: 4, queued: 1, training: true });
+  });
+  it("keeps the active level, never above the shown level", () => {
+    const [view] = sheetGroups(group([skill(10, 5, 4)]), []);
+    expect(view.skills[0]).toMatchObject({ level: 5, activeLevel: 4, queued: 0, training: false });
   });
 });
