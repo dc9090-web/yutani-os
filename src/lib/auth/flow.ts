@@ -7,7 +7,7 @@ import { OAUTH_MAX_AGE, signPayload, verifyPayload, type OauthPayload } from "./
 import { buildAuthorizeUrl, exchangeCode, generatePkce, getSsoMetadata, remoteJwks, verifyEveJwt, type SsoMetadata } from "./sso.js";
 
 export class AuthError extends Error {
-  constructor(public code: "state" | "not-allowed" | "token" | "jwt", message: string) { super(message); this.name = "AuthError"; }
+  constructor(public code: "state" | "not-allowed" | "token" | "jwt" | "cancelled", message: string) { super(message); this.name = "AuthError"; }
 }
 
 export interface FlowDeps {
