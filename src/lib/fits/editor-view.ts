@@ -250,7 +250,7 @@ export function editorView(input: {
   ];
 
   const roll = rollUpValue(docValueEntries(built), prices);
-  const perf = fitPerformance(built.fit);
+  const perf = fitPerformance(built.fit, built.drones);
 
   return {
     gauges: [

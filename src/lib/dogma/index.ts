@@ -21,9 +21,10 @@ export {
 } from "./calc.js";
 export { fitStats, type FitStats, type ModuleStat, type ResourcePool, type SlotUsage } from "./stats.js";
 export {
-  CHARACTER_ATTR, PERF_ATTR, chargeRangeHint, fitPerformance, moduleRange, weaponDpsWith, weaponRange, weaponRangeWith,
-  type CapStability, type ChargeRangeHint, type FitPerformance, type LayerPerformance, type ModuleRange, type Propulsion, type WeaponRange,
+  CHARACTER_ATTR, PERF_ATTR, REPAIR_EFFECT, chargeRangeHint, droneRoom, fitPerformance, launchedDrones, moduleRange, weaponDpsWith, weaponRange, weaponRangeWith,
+  type CapStability, type ChargeRangeHint, type DroneControl, type DroneType, type FitPerformance, type LayerPerformance, type ModuleRange, type Propulsion, type WeaponRange,
 } from "./perf.js";
+export { skillGaps, type SkillGap, type SkillGapGroup } from "./skill-gaps.js";
 export { CHARGE_GROUP_ATTRS, CHARGE_SIZE_ATTR, assumeCargoAmmo, chargeFits, type AssumedAmmo } from "./ammo.js";
 export {
   itemLabel, missingSkills, validateFit, type MissingSkill, type Problem, type ProblemKind,

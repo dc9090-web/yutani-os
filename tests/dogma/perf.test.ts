@@ -518,6 +518,8 @@ describe("a hull that carries nothing", () => {
       capacitorCapacity: null, capRechargeTime: null, capStable: null, capUsage: null, capPeakRecharge: null, capDelta: null,
       maxTargets: null, maxTargetRange: null, scanResolution: null, signatureRadius: null, sensorStrength: null,
       mass: null, inertia: null, warpSpeed: null, droneBandwidth: null, droneBay: null, droneControlRange: null,
+      // Rates are sums, so "no repairers" is an honest 0; drone control is only worked out given a bay.
+      shieldBoostRate: 0, armorRepairRate: 0, hullRepairRate: 0, drones: null,
     });
   });
 });

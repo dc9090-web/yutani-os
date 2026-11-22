@@ -80,6 +80,22 @@ export const PERF_ATTR = {
  */
 export const CHARACTER_ATTR = {
   droneControlDistance: 458,  // metres
+  maxActiveDrones: 352,       // how many drones the pilot can control at once (the Drones skill)
+} as const;
+
+/**
+ * Local repair modules, by the effect that does the repairing — remote repairers carry the same
+ * amount attributes but other effects, so the effect is what tells them apart. Verified by name
+ * against the full SDE (shieldBoosting, fueledShieldBoosting, armorRepair, fueledArmorRepair,
+ * structureRepair).
+ */
+export const REPAIR_EFFECT = {
+  shieldBoost: [4, 4936], armorRepair: [27, 5275], hullRepair: [26],
+} as const;
+const FUELED_ARMOR_REPAIR = 5275;
+const REPAIR_ATTR = {
+  shieldBonus: 68, armorDamageAmount: 84, structureDamageAmount: 83,
+  chargedArmorDamageMultiplier: 1886,   // an ancillary armor repairer's multiplier while it holds paste
 } as const;
 
 /**
@@ -217,6 +233,127 @@ export interface FitPerformance {
   droneBandwidth: number | null;
   droneBay: number | null;
   droneControlRange: number | null;
+  /**
+   * hp/s restored by the fit's own active repair modules, one figure per layer; 0 when the fit has
+   * none. Cycle time only, like `dps`: an ancillary module's reload is not modelled. An ancillary
+   * armor repairer counts its paste multiplier when it holds a charge.
+   */
+  shieldBoostRate: number;
+  armorRepairRate: number;
+  hullRepairRate: number;
+  /**
+   * What the pilot can do with the drones in the bay — only when `fitPerformance` was given the bay.
+   * With it, `droneDps` (and so `dps` and `volley`) is the damage of `drones.launched`, not of
+   * one drone per bay row.
+   */
+  drones: DroneControl | null;
+}
+
+/** One drone type in the bay. */
+export interface DroneType {
+  typeId: number;
+  name: string;
+  inBay: number;
+  /** Mbit/s one drone takes. */
+  bandwidth: number;
+  /** Damage per second and per volley of one drone, with the pilot's skills; 0 for a drone that deals none. */
+  dpsEach: number;
+  volleyEach: number;
+}
+
+export interface DroneControl {
+  types: DroneType[];
+  /** Mbit/s the hull can control. */
+  bandwidth: number;
+  /** How many drones the pilot can control at once; null when the data set does not define the attribute. */
+  maxActive: number | null;
+  /** typeId → how many are launched by default: the hardest-hitting drones first, as many as the limits allow. */
+  launched: Record<number, number>;
+}
+
+/**
+ * How many more of `type` can be launched on top of `launched`: the lowest of what is left in the
+ * bay, what is left of the pilot's control limit, and what the remaining bandwidth carries.
+ */
+export function droneRoom(control: DroneControl, launched: Readonly<Record<number, number>>, type: DroneType): number {
+  let active = 0;
+  let used = 0;
+  for (const t of control.types) {
+    const n = launched[t.typeId] ?? 0;
+    active += n;
+    used += n * t.bandwidth;
+  }
+  const byBay = type.inBay - (launched[type.typeId] ?? 0);
+  const byControl = control.maxActive === null ? Infinity : control.maxActive - active;
+  const byBandwidth = type.bandwidth > 0 ? Math.floor((control.bandwidth - used + 1e-9) / type.bandwidth) : Infinity;
+  return Math.max(0, Math.min(byBay, byControl, byBandwidth));
+}
+
+/** Damage per second, volley, drones out and bandwidth in use for a launched selection. */
+export function launchedDrones(control: DroneControl, launched: Readonly<Record<number, number>>): { dps: number; volley: number; active: number; bandwidthUsed: number } {
+  let dps = 0, volley = 0, active = 0, bandwidthUsed = 0;
+  for (const type of control.types) {
+    const n = Math.min(launched[type.typeId] ?? 0, type.inBay);
+    dps += n * type.dpsEach;
+    volley += n * type.volleyEach;
+    active += n;
+    bandwidthUsed += n * type.bandwidth;
+  }
+  return { dps, volley, active, bandwidthUsed };
+}
+
+/**
+ * The drone bay as the pilot can use it. `bay` is the hold's rows (a stack per row; ESI splits a
+ * stack once a drone has been launched, so one type may arrive as several rows — they are summed).
+ * Each type's per-drone damage is read off the drone item the fit already models for it.
+ */
+function droneControl(fit: Fit, bay: readonly { typeId: number; quantity: number }[]): DroneControl {
+  const inBay = new Map<number, number>();
+  for (const entry of bay) inBay.set(entry.typeId, (inBay.get(entry.typeId) ?? 0) + entry.quantity);
+  const types: DroneType[] = [];
+  for (const [typeId, count] of inBay) {
+    const item = fit.drones.find((d) => d.typeId === typeId);
+    if (item === undefined) continue;   // a type this SDE build does not know: it is listed as unknown elsewhere
+    const shot = shotDamage(fit, item, item);
+    types.push({
+      typeId, name: item.name ?? `Unknown type (${typeId})`, inBay: count,
+      bandwidth: attrOr(fit, item, PERF_ATTR.droneBandwidthUsed, 0),
+      dpsEach: shot === null ? 0 : shot.perShot / shot.cycle,
+      volleyEach: shot === null ? 0 : shot.perShot,
+    });
+  }
+  types.sort((a, b) => b.dpsEach - a.dpsEach || a.bandwidth - b.bandwidth || a.typeId - b.typeId);
+  const control: DroneControl = {
+    types,
+    bandwidth: shipAttr(fit, PERF_ATTR.droneBandwidth) ?? 0,
+    maxActive: fit.data.attributes.has(CHARACTER_ATTR.maxActiveDrones)
+      ? Math.floor(getAttr(fit, fit.character, CHARACTER_ATTR.maxActiveDrones)) : null,
+    launched: {},
+  };
+  for (const type of types) {
+    const n = droneRoom(control, control.launched, type);
+    if (n > 0) control.launched[type.typeId] = n;
+  }
+  return control;
+}
+
+/** hp/s from every active module carrying one of `effects`, reading `amountAttr` per cycle. */
+function repairRate(fit: Fit, effects: readonly number[], amountAttr: AttrId): number {
+  let rate = 0;
+  for (const { item } of fit.modules) {
+    if (item.state < State.Active) continue;
+    const effect = effects.find((id) => item.effects.has(id));
+    if (effect === undefined) continue;
+    const cycle = cycleSeconds(fit, item);
+    let amount = attrOr(fit, item, amountAttr, 0);
+    if (cycle === null || amount <= 0) continue;
+    if (effect === FUELED_ARMOR_REPAIR && item.charge !== undefined) {
+      const charged = attrOr(fit, item, REPAIR_ATTR.chargedArmorDamageMultiplier, 1);
+      if (charged > 0) amount *= charged;
+    }
+    rate += amount / cycle;
+  }
+  return rate;
 }
 
 /** How far a weapon reaches with the charge it holds. Metres. */
@@ -364,7 +501,7 @@ export function weaponDpsWith(fit: Fit, weapon: Item, chargeTypeId: number): num
  * attribute is missing from this `DogmaData`, the hull's type does not carry it, or a divisor is
  * zero. Callers render `null` as "—".
  */
-export function fitPerformance(fit: Fit): FitPerformance {
+export function fitPerformance(fit: Fit, bay?: readonly { typeId: number; quantity: number }[]): FitPerformance {
   const damage = weaponDamage(fit);
   const capacity = shipAttr(fit, PERF_ATTR.capacitorCapacity);
   const rechargeMs = shipAttr(fit, PERF_ATTR.rechargeRate);
@@ -383,11 +520,20 @@ export function fitPerformance(fit: Fit): FitPerformance {
   const droneRange = fit.data.attributes.has(CHARACTER_ATTR.droneControlDistance)
     ? getAttr(fit, fit.character, CHARACTER_ATTR.droneControlDistance) : null;
 
+  // Given the bay, drone damage is what the pilot can actually launch from it; without it (a fit
+  // with no hold on record) every modelled drone counts once, as before.
+  const drones = bay === undefined ? null : droneControl(fit, bay);
+  const out = drones === null ? null : launchedDrones(drones, drones.launched);
+  const weaponDps = damage?.weaponDps ?? 0;
+  const droneDps = out === null ? damage?.droneDps ?? 0 : out.dps;
+  const totalDps = out === null ? damage?.dps ?? 0 : weaponDps + out.dps;
+  const totalVolley = out === null ? damage?.volley ?? 0 : (damage?.weaponVolley ?? 0) + out.volley;
+
   return {
-    dps: damage?.dps ?? null,
-    volley: damage?.volley ?? null,
-    weaponDps: damage === null || damage.weaponDps <= 0 ? null : damage.weaponDps,
-    droneDps: damage === null || damage.droneDps <= 0 ? null : damage.droneDps,
+    dps: totalDps > 0 ? totalDps : null,
+    volley: totalVolley > 0 ? totalVolley : null,
+    weaponDps: weaponDps > 0 ? weaponDps : null,
+    droneDps: droneDps > 0 ? droneDps : null,
     ehp: ehpLayers.length === 0 ? null : ehpLayers.reduce((sum, l) => sum + l.ehp, 0),
     shield: layers[0], armor: layers[1], hull: layers[2],
     shieldRechargeTime: shieldTime,
@@ -412,6 +558,10 @@ export function fitPerformance(fit: Fit): FitPerformance {
     droneBandwidth: shipAttr(fit, PERF_ATTR.droneBandwidth),
     droneBay: shipAttr(fit, PERF_ATTR.droneCapacity),
     droneControlRange: droneRange !== null && droneRange > 0 ? droneRange : null,
+    shieldBoostRate: repairRate(fit, REPAIR_EFFECT.shieldBoost, REPAIR_ATTR.shieldBonus),
+    armorRepairRate: repairRate(fit, REPAIR_EFFECT.armorRepair, REPAIR_ATTR.armorDamageAmount),
+    hullRepairRate: repairRate(fit, REPAIR_EFFECT.hullRepair, REPAIR_ATTR.structureDamageAmount),
+    drones,
   };
 }
 
@@ -495,10 +645,11 @@ function layerPerformance(fit: Fit, layer: Layer): LayerPerformance | null {
  * damage for every fit the app can currently build. Recorded deviation: a drone sitting in the bay
  * still contributes here.
  */
-function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: number; droneDps: number } | null {
+function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: number; weaponVolley: number; droneDps: number } | null {
   let dps = 0;
   let volley = 0;
   let weaponDps = 0;
+  let weaponVolley = 0;
   let droneDps = 0;
   let armed = false;
 
@@ -513,6 +664,7 @@ function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: numbe
     volley += shot.perShot;
     dps += shot.perShot / shot.cycle;
     weaponDps += shot.perShot / shot.cycle;
+    weaponVolley += shot.perShot;
   }
 
   for (const drone of fit.drones) {
@@ -524,7 +676,7 @@ function weaponDamage(fit: Fit): { dps: number; volley: number; weaponDps: numbe
     droneDps += shot.perShot / shot.cycle;
   }
 
-  return armed ? { dps, volley, weaponDps, droneDps } : null;
+  return armed ? { dps, volley, weaponDps, weaponVolley, droneDps } : null;
 }
 
 /**

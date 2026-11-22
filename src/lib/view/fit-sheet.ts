@@ -1,9 +1,9 @@
 import {
-  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, moduleRange, weaponDpsWith, weaponRange, weaponRangeWith, chargeRangeHint, type ChargeRangeHint, type ModuleRange, type WeaponRange,
+  ATTR, HARDPOINTS, Operator, SLOT_KINDS, State, explain, getAttr, itemLabel, round2, type AppliedModifier, type BuiltFit, type DogmaData, type Fit, type FitEntry, type FitStats, type FitPerformance, type Hardpoint, type Item, type LayerPerformance, type ModuleStat, type Problem, type ProblemKind, type SlotKind, CATEGORY, chargeFits, hardpointOf, moduleRange, weaponDpsWith, weaponRange, weaponRangeWith, chargeRangeHint, launchedDrones, type ChargeRangeHint, type ModuleRange, type WeaponRange, type SkillGap, type SkillGapGroup,
 } from "../dogma/index.js";
 import { clock, grouped, isk, typeDescription } from "./format.js";
 export { typeDescription };
-import { priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
+import { iskShort, priceOf, rollUpValue, unpricedNote, type Price } from "./price.js";
 import { bonusLabel, fitValueGroups, gauge, type GaugeView, rangeText, hintText, dist, pct } from "./ships.js";
 import { consumableRows, type ConsumableRowView } from "./consumables.js";
 export { hintText, rangeText };
@@ -78,6 +78,8 @@ export function problemText(p: Problem): string {
 export interface RangeCells { optimal: string | null; falloff: string | null }
 
 export interface ModuleRowView {
+  /** How many identical modules — same type, charge, state and reach — this row stands for. */
+  quantity: number;
   key: string; name: string; typeId: number; charge: string | null;
   /** The loaded charge's type, for its icon; null when the module holds none. */
   chargeTypeId: number | null;
@@ -204,7 +206,11 @@ export interface ValueLineView { label: string; value: string }
 export interface StatRowView { label: string; value: string }
 /** A tank layer row of the Defense section: pool, an optional note (shield recharge time) and the
  *  four resistances as whole percents in EVE's order — em, thermal, kinetic, explosive. */
-export interface ResistRowView { layer: string; hp: string; note: string | null; resists: [number, number, number, number] }
+export interface ResistRowView {
+  layer: string; hp: string; note: string | null; resists: [number, number, number, number];
+  /** The layer's own effective hit points against an even damage profile, "23,612". */
+  ehp: string;
+}
 export interface StatSectionView { title: string; headline: string; rows: StatRowView[]; note?: string | null }
 
 /** The fitting window's stats panel: six sections plus the two bays, every value pre-formatted. */
@@ -240,8 +246,40 @@ export interface FitSheetView {
   consumables: ConsumableRowView[];
   /** The whole hold, ammunition included: the Ammunition panel says what a round does, this says how many and what they are worth. */
   cargo: EntryView[]; drones: EntryView[]; unfittable: EntryView[]; unknown: EntryView[];
-  value: { total: string; lines: ValueLineView[]; unpriced: string | null };
+  value: { total: string; totalShort: string; lines: ValueLineView[]; unpriced: string | null };
+  /** The pilot's mastery of the hull, 0–5; null when the SDE has none for it or skills have not synced. */
+  mastery: number | null;
+  /** The key figures strip, DPS aside — that one follows the drone selector and is drawn from `droneControl`. */
+  key: KeyFiguresView;
+  /** hp/s per repair source; `idle` marks a source the fit does not have. */
+  repairs: RepairView[];
+  /** What the drone selector needs; null for a hull with no drone bay and no drones aboard. */
+  droneControl: DroneSheetView | null;
+  /** Turrets and launchers alone, as numbers: the drone selector adds the launched drones to them. */
+  weapons: { dps: number; volley: number };
+  /** Skills below level 5 that change a number on this fit, grouped by where they land. */
+  skillGaps: SkillGapGroupView[];
 }
+
+export interface KeyFigureView { value: string; unit: string | null; note: string | null; tone: "good" | "bad" | null }
+export interface KeyFiguresView { ehp: KeyFigureView; speed: KeyFigureView; capacitor: KeyFigureView; lock: KeyFigureView; align: KeyFigureView }
+export interface RepairView { label: string; value: string; idle: boolean }
+export interface DroneTypeView { typeId: number; name: string; inBay: number; bandwidth: number; dpsEach: number; volleyEach: number }
+/** Plain numbers, not strings: the selector recalculates DPS, bandwidth and the limits in the browser. */
+export interface DroneSheetView {
+  types: DroneTypeView[];
+  /** Mbit/s the hull can control. */
+  bandwidth: number;
+  /** How many drones the pilot can control at once; null when the data does not say. */
+  maxActive: number | null;
+  /** typeId → launched count the page opens with. */
+  launched: Record<number, number>;
+  controlRange: string;
+  /** "40 / 40 m³". */
+  bay: string;
+}
+export interface SkillGapView { skillTypeId: number; name: string; level: number; effect: string | null; affects: string }
+export interface SkillGapGroupView { name: string; skills: SkillGapView[] }
 
 export interface FitSheetInput {
   title: string; typeId: number; typeName: string;
@@ -253,9 +291,13 @@ export interface FitSheetInput {
   prices: ReadonlyMap<number, Price>;
   /** Cleaned SDE descriptions keyed by type id — the hover text on every item name. */
   descriptions: ReadonlyMap<number, string>;
-  /** `fitPerformance(built.fit)` — the fitting-window numbers. */
+  /** `fitPerformance(built.fit, built.drones)` — the fitting-window numbers. */
   perf: FitPerformance;
   skillsSynced: boolean;
+  /** `masteryLevel()` for the hull; absent → unknown. */
+  mastery?: number | null;
+  /** `skillGaps(built.fit)`; absent → no Skills panel rows. */
+  skillGaps?: readonly SkillGap[];
 }
 
 const DASH = "—";
@@ -269,7 +311,115 @@ function layerRow(layer: string, perf: LayerPerformance | null, note: string | n
   return {
     layer, hp: whole(perf.hp, " hp"), note,
     resists: perf.resists.map((r) => Math.round(r * 100)) as [number, number, number, number],
+    ehp: whole(perf.ehp),
   };
+}
+
+/** The key figures strip, DPS aside (redesign hand-off, PAGES.md §5). A dash wherever the engine cannot say. */
+export function keyFigures(perf: FitPerformance): KeyFiguresView {
+  const prop = perf.propulsion;
+  const propName = prop === null ? null : prop.kind === "Microwarpdrive" ? "MWD" : "afterburner";
+  const cap = perf.capStable;
+  const lockNotes = [
+    perf.maxTargets === null ? null : `${perf.maxTargets} target${perf.maxTargets === 1 ? "" : "s"}`,
+    perf.scanResolution === null ? null : `${whole(perf.scanResolution)} mm scan res`,
+  ].filter((part): part is string => part !== null);
+  return {
+    ehp: {
+      value: whole(perf.ehp), unit: null, tone: null,
+      note: perf.shieldRechargeRate === null ? null : `Shield recharge ${fmtNum(perf.shieldRechargeRate, 1)} hp/s`,
+    },
+    speed: prop !== null
+      ? { value: whole(prop.velocity), unit: "m/s", tone: null, note: `With ${propName}${perf.maxVelocity === null ? "" : ` · ${fmtNum(perf.maxVelocity, 1)} m/s without`}` }
+      : { value: whole(perf.maxVelocity), unit: perf.maxVelocity === null ? null : "m/s", tone: null, note: null },
+    capacitor: {
+      value: cap === null ? DASH : cap.stable ? `Stable ${Math.round(cap.level * 100)}%` : `Lasts ${clock(cap.lastsSeconds)}`,
+      unit: null, tone: cap === null ? null : cap.stable ? "good" : "bad",
+      note: perf.capDelta === null ? null : `${perf.capDelta >= 0 ? "+" : "\u2212"}${Math.abs(perf.capDelta).toFixed(1)} GJ/s`,
+    },
+    lock: {
+      value: perf.maxTargetRange === null ? DASH : grouped((perf.maxTargetRange / 1000).toFixed(1)),
+      unit: perf.maxTargetRange === null ? null : "km", tone: null,
+      note: lockNotes.length === 0 ? null : lockNotes.join(" · "),
+    },
+    align: {
+      value: fmtNum(perf.alignTime, 2), unit: perf.alignTime === null ? null : "s", tone: null,
+      note: prop === null || prop.alignTime === null ? null : `${fmtNum(prop.alignTime, 2)} s with ${prop.kind === "Microwarpdrive" ? "MWD" : "AB"} on`,
+    },
+  };
+}
+
+/** The Repairs panel: the passive shield peak, then the three active repair rates. */
+export function repairViews(perf: FitPerformance): RepairView[] {
+  const row = (label: string, rate: number | null): RepairView => ({
+    label, value: rate === null ? DASH : rate > 0 ? fmtNum(rate, 1) : "0", idle: rate === null || rate <= 0,
+  });
+  return [
+    row("Passive shield", perf.shieldRechargeRate),
+    row("Shield boost", perf.shieldBoostRate),
+    row("Armor repair", perf.armorRepairRate),
+    row("Hull repair", perf.hullRepairRate),
+  ];
+}
+
+const GAP_GROUP_NAMES: Record<SkillGapGroup, string> = { ship: "Ship and bonuses", modules: "Modules", drones: "Drones" };
+const GAP_GROUP_ORDER: readonly SkillGapGroup[] = ["ship", "modules", "drones"];
+/** How many affected items a row names before it says "+N more". */
+const GAP_AFFECTS_LIMIT = 4;
+
+/**
+ * The sentence of a skill's SDE description that states its bonus ("3% bonus to missile launcher
+ * rate of fire per skill level."). The SDE has no separate field for it; when no sentence reads
+ * like a bonus the first one stands in.
+ */
+export function skillEffectText(description: string | null | undefined): string | null {
+  if (description == null || description.trim() === "") return null;
+  const sentences = description.replace(/\s+/g, " ").trim().split(/(?<=[.!?])\s+/);
+  const bonus = sentences.filter((s) => /%|per (skill )?level|bonus|reduc|increase/i.test(s));
+  return (bonus.length > 0 ? bonus : sentences.slice(0, 1)).join(" ");
+}
+
+/**
+ * `hullBonuses` is the hull's own per-level bonus lines keyed by skill: for a ship skill those say
+ * what a level buys on this hull, which the skill's generic description ("Skill for operation of
+ * Heavy Assault Cruisers.") does not.
+ */
+export function skillGapGroups(
+  gaps: readonly SkillGap[], descriptions: ReadonlyMap<number, string>,
+  hullBonuses: ReadonlyMap<number, readonly string[]> = new Map(),
+): SkillGapGroupView[] {
+  return GAP_GROUP_ORDER.flatMap((group) => {
+    const skills = gaps.filter((gap) => gap.group === group).map((gap): SkillGapView => {
+      const names = gap.affects.map((a) => {
+        const name = a.name ?? `Unknown type (${a.typeId})`;
+        return a.isShip ? `${name} hull` : a.count > 1 ? `${a.count}× ${name}` : name;
+      });
+      const extra = names.length - GAP_AFFECTS_LIMIT;
+      return {
+        skillTypeId: gap.skillTypeId, name: gap.name ?? `Skill ${gap.skillTypeId}`, level: gap.level,
+        effect: hullBonuses.has(gap.skillTypeId)
+          ? `${hullBonuses.get(gap.skillTypeId)!.join("; ")}, per level`
+          : skillEffectText(descriptions.get(gap.skillTypeId)),
+        affects: extra > 0 ? `${names.slice(0, GAP_AFFECTS_LIMIT).join(", ")}, +${extra} more` : names.join(", "),
+      };
+    });
+    return skills.length === 0 ? [] : [{ name: GAP_GROUP_NAMES[group], skills }];
+  });
+}
+
+/**
+ * Identical modules in one rack — same type, same charge, same state, same reach — as one row with
+ * a quantity ("5×"), in the order the first of each sits in the rack.
+ */
+export function mergeModuleRows(rows: ModuleRowView[]): ModuleRowView[] {
+  const merged = new Map<string, ModuleRowView>();
+  for (const row of rows) {
+    const key = [row.typeId, row.chargeTypeId ?? 0, row.state, row.range?.optimal ?? "", row.range?.falloff ?? "", row.chargeAssumed ? 1 : 0].join(":");
+    const seen = merged.get(key);
+    if (seen === undefined) merged.set(key, { ...row });
+    else seen.quantity += 1;
+  }
+  return [...merged.values()];
 }
 
 /** What the bay and drone maths need of an entry — `FitEntry` (the sheet) and the editor's `FitItem` both fit. */
@@ -388,6 +538,7 @@ const PERF_ATTR_DRONE_CAPACITY = 283;
 
 function moduleRow(fit: Fit, stat: ModuleStat, descriptions: ReadonlyMap<number, string>): ModuleRowView {
   return {
+    quantity: 1,
     key: `${stat.slot}:${stat.index}`,
     name: itemLabel(stat.item),
     typeId: stat.item.typeId,
@@ -543,7 +694,7 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     title: SLOT_TITLES[slot],
     used: stats.slots[slot].used,
     total: stats.slots[slot].total,
-    rows: [...(bySlot.get(slot) ?? [])].sort((a, b) => a.index - b.index).map((stat) => moduleRow(fit, stat, descriptions)),
+    rows: mergeModuleRows([...(bySlot.get(slot) ?? [])].sort((a, b) => a.index - b.index).map((stat) => moduleRow(fit, stat, descriptions))),
   }));
 
   const counters: CounterView[] = [
@@ -607,6 +758,40 @@ export function buildFitSheet(input: FitSheetInput): FitSheetView {
     drones: entryViews(built.drones, fit.data, prices, descriptions),
     unfittable: entryViews(built.unfittable, fit.data, prices, descriptions),
     unknown: entryViews(built.unknown, fit.data, prices, descriptions),
-    value: { total: isk(total), lines, unpriced: unpricedNote(unpriced) },
+    value: { total: isk(total), totalShort: iskShort(total), lines, unpriced: unpricedNote(unpriced) },
+    mastery: input.mastery ?? null,
+    key: keyFigures(input.perf),
+    repairs: repairViews(input.perf),
+    droneControl: droneSheetView(input.perf, built),
+    weapons: {
+      dps: input.perf.weaponDps ?? 0,
+      volley: Math.max(0, (input.perf.volley ?? 0) - (input.perf.drones === null ? 0 : launchedDrones(input.perf.drones, input.perf.drones.launched).volley)),
+    },
+    skillGaps: skillGapGroups(input.skillGaps ?? [], descriptions, hullBonusLines(input.bonuses)),
+  };
+}
+
+function hullBonusLines(bonuses: FitSheetInput["bonuses"]): Map<number, string[]> {
+  const out = new Map<number, string[]>();
+  for (const bonus of bonuses) {
+    if (bonus.skillTypeId === null) continue;
+    const lines = out.get(bonus.skillTypeId) ?? [];
+    lines.push(bonusLabel(bonus));
+    out.set(bonus.skillTypeId, lines);
+  }
+  return out;
+}
+
+/** The drone selector's data: nothing for a hull with no bay and nothing in it. */
+function droneSheetView(perf: FitPerformance, built: BuiltFit): DroneSheetView | null {
+  const control = perf.drones;
+  if (control === null || (control.types.length === 0 && (perf.droneBay ?? 0) <= 0)) return null;
+  return {
+    types: control.types.map((t) => ({ typeId: t.typeId, name: t.name, inBay: t.inBay, bandwidth: t.bandwidth, dpsEach: t.dpsEach, volleyEach: t.volleyEach })),
+    bandwidth: control.bandwidth,
+    maxActive: control.maxActive,
+    launched: control.launched,
+    controlRange: km(perf.droneControlRange),
+    bay: bayRow("Drone bay", built.drones, built.fit, PERF_ATTR_DRONE_CAPACITY).value,
   };
 }

@@ -359,7 +359,7 @@ export function assetShipCards(
     if (computed === null) return errorShipCard(base);
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
-      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
+      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit, computed.built.drones),
       weapons: shipWeapons(computed.built.fit),
     });
   }));
@@ -387,7 +387,7 @@ export function savedFitCards(
     if (computed === null) return errorShipCard(base);
     return toShipCard({
       ...base, stats: computed.stats, problems: computed.problems,
-      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit),
+      entries: fitValueEntries(computed.built), prices, perf: fitPerformance(computed.built.fit, computed.built.drones),
       weapons: shipWeapons(computed.built.fit),
     });
   }));

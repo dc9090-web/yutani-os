@@ -1,7 +1,8 @@
 import { getPrices } from "../db/market-prices.js";
-import { getRaces, getSolarSystems, getTypeBonuses, getTypes } from "../sde/repo.js";
+import { getMasteryRequirements, getRaces, getSolarSystems, getTypeBonuses, getTypes } from "../sde/repo.js";
 import { locationLabels } from "../names/index.js";
-import { CATEGORY, fitFromAssets, fitFromFitting, fitPerformance, type BuiltFit } from "../dogma/index.js";
+import { CATEGORY, fitFromAssets, fitFromFitting, fitPerformance, skillGaps, type BuiltFit } from "../dogma/index.js";
+import { masteryLevel } from "./mastery.js";
 import { buildFitSheet, typeDescription, type FitSheetView, type SheetLocationView } from "../view/fit-sheet.js";
 import { SAVED_FIT_LOCATION, assembledShips, computeFit, fitValueEntries } from "../view/ships.js";
 import { secClass, secText } from "../view/format.js";
@@ -33,8 +34,12 @@ async function sheetFor(input: {
   ];
   // The same id set prices everything and describes everything: one `getTypes` over it is the
   // hover text for every module, charge, drone and cargo line on the sheet.
-  const [prices, bonuses, itemTypes] = await Promise.all([
-    getPrices(priceIds), getTypeBonuses(input.typeId), getTypes([...new Set(priceIds)]),
+  // The Skills panel: skills below level 5 that change a number on this fit. Their SDE descriptions
+  // ride in the same `getTypes` — the per-level bonus text is in there.
+  const gaps = skillGaps(built.fit);
+  const [prices, bonuses, itemTypes, mastery] = await Promise.all([
+    getPrices(priceIds), getTypeBonuses(input.typeId), getTypes([...new Set([...priceIds, ...gaps.map((g) => g.skillTypeId)])]),
+    getMasteryRequirements([input.typeId]),
   ]);
   const descriptions = new Map<number, string>();
   for (const [id, type] of itemTypes) {
@@ -63,8 +68,11 @@ async function sheetFor(input: {
     view: buildFitSheet({
       title: input.title, typeId: input.typeId, typeName: input.typeName, ship, location: input.location,
       built, stats, problems, bonuses,
-      skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, perf: fitPerformance(built.fit),
+      skillLevels: input.data.ctx.skills, skillNames, prices, descriptions, perf: fitPerformance(built.fit, built.drones),
       skillsSynced: input.data.skillsSynced,
+      // Mastery and skill gaps are claims about the pilot's skills: nothing to say until they sync.
+      mastery: input.data.skillsSynced ? masteryLevel(mastery.get(input.typeId), input.data.ctx.skills) : null,
+      skillGaps: input.data.skillsSynced ? gaps : [],
     }),
   };
 }
