@@ -13,3 +13,6 @@ android
 api-fixtures
 .claude
 .preview
+# Development-only scripts that read tests/ (not in the image).
+scripts/api-fixtures.ts
+scripts/api-sde-extra.ts
