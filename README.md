@@ -92,12 +92,6 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 - ⏱️ **The queue, live.** Time remaining per entry, a ticking countdown above the table, and it advances past entries ESI still lists after they finished.
 - 🗂️ **Trained skills in framed groups**, with level boxes (trained, active, training) and the SDE description on hover.
 
-<div align="center">
-<img src="docs/screenshots/skill-plan.png" alt="The skill plan editor: toolbar stats, the plan table with done, in-queue and planned rows, and the attributes panel with an optimal remap" width="900">
-
-*(Screenshot from before the current design.)* *A plan. Entries, SP, time and finish date up top. Done, in-queue and planned rows with prerequisite and Alpha badges. The optimal remap on the right.*
-</div>
-
 - 📝 **EVEMon-style plans.** Up to 500 entries, prerequisites expanded automatically, Alpha-trainable levels badged, and a warning when another character on the account is already training.
 - 🧠 **Optimal remap.** Brute-forces all 2,885 legal attribute distributions and tells you the fastest one and how much it saves.
 - 📥 **Import and export.** Paste a plan from EVEMon, or start from one of CCP's forty certified career plans. Export as EVEMon text or in the in-game skill-plan format.
@@ -130,12 +124,6 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 
 ## 🛠️ The fitting designer
 
-<div align="center">
-<img src="docs/screenshots/fitting-editor.png" alt="The fitting designer: the slot rows with states and charges, the Fitting panel with CPU, powergrid, calibration and slot counts, Ship stats, the item browser and the drone bay" width="900">
-
-*(Screenshot from before the current design.)* *The designer. Modules with states and charges on the left, live fitting totals and Ship stats on the right, the item browser filtered to what fits this hull.*
-</div>
-
 - ⚡ **The dogma engine runs in the browser.** One cached request fetches the attribute and effect tables once a day, types are fetched on demand, and every change recomputes instantly.
 - 🧰 **Real module states.** Active, overloaded, online, offline and passive, with charges loaded and ammo assumed from cargo for the DPS number.
 - 🔎 **An item browser that knows your hull.** Tick "fits this hull" and the market tree only shows what will fit, with Tech II, Faction and Officer badges.
@@ -147,22 +135,10 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 
 ## ⚔️ Combat
 
-<div align="center">
-<img src="docs/screenshots/combat.png" alt="The Combat page: time filters, six stat tiles, the monthly activity strip, ships flown, ships lost and systems lists, and the killmail table" width="900">
-
-*(Screenshot from before the current design.)* *The killboard. Kills above the line, losses below. Statistics cover the most recent 20,000 killmails per character.*
-</div>
-
 - 📅 **30 days, 90 days, a year or everything**, for one character or all of them.
 - 🧮 **Kills, losses, efficiency, ISK destroyed, ISK lost, solo kills**, a twelve-month strip, and the ships and systems you fight in most.
 - 🕰️ **Your whole history.** ESI only keeps 90 days of killmails, so a backfill job walks zKillboard, politely, one request every two seconds, up to 20,000 kills and 20,000 losses per character.
 - 💸 **Every killmail is valued** from the same market table the Ships pages use, with zKillboard's total shown when it has one.
-
-<div align="center">
-<img src="docs/screenshots/killmail.png" alt="A killmail: the victim, the fit with destroyed and dropped columns and values per slot, and an Open in fitting designer button" width="900">
-
-*(Screenshot from before the current design.)* *One killmail. Victim, fit with destroyed and dropped columns, attackers, and a button that opens the victim's fit in the designer.*
-</div>
 
 ---
 
