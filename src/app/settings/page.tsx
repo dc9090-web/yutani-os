@@ -9,6 +9,7 @@ import { CharactersPanel } from "./CharactersPanel.js";
 import { StaticDataPanel } from "./StaticDataPanel.js";
 import { SyncStatus } from "./SyncStatus.js";
 import { TagsPanel } from "./TagsPanel.js";
+import { PageHead } from "../components/PageHead.js";
 
 export default async function SettingsPage() {
   const [accounts, characters, runs, sdeMeta, tags, tagsByChar] = await Promise.all([
@@ -24,13 +25,12 @@ export default async function SettingsPage() {
     if (ids.length > 0) characterTagIds[c.id] = ids;
   }
   return (<>
-    <h1 className="page-title">Settings</h1>
-    <p className="page-sub">Accounts, characters, static data and sync status.</p>
-    <div className="card-grid" style={{ gridTemplateColumns: "1fr 2fr", marginBottom: 20 }}>
+    <PageHead title="Settings" sub="Accounts, characters, static data and sync status." />
+    <div className="card-grid settings-grid">
       <AccountsPanel accounts={accounts} />
       <CharactersPanel characters={characters.map(toCharacterView)} accounts={accounts} tags={tags} characterTags={characterTagIds} />
     </div>
-    <div className="card-grid" style={{ gridTemplateColumns: "1fr 2fr", marginBottom: 20 }}>
+    <div className="card-grid settings-grid">
       <TagsPanel tags={tags} />
       <StaticDataPanel meta={sdeMeta} />
     </div>

@@ -27,7 +27,7 @@ export function CharactersPanel({ characters, accounts, tags, characterTags }: {
       {characters.length === 0 ? <p className="faint">No characters yet.</p> : null}
       {characters.map((c) => (
         <div key={c.id} className="char-row" style={{ marginBottom: 12 }}>
-          <Group justify="space-between" wrap="nowrap">
+          <Group justify="space-between" wrap="wrap">
             <Group gap="sm" wrap="nowrap">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={portraitUrl(c.id)} alt="" className={`char-avatar${c.tokenStatus === "needs_reauth" ? " warn" : ""}`} />
