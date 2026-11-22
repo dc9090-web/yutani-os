@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Yutani OS — install configurator.
 #
-# Asks for the few things only you know (the subdomain, your EVE SSO application, a Cloudflare DNS
-# token, which characters may sign in) and detects or generates everything else. It writes three
+# Asks for the few things only you know (the subdomain, your Google sign-in client and the Google
+# account(s) that may sign in, your EVE SSO application, a Cloudflare DNS token) and detects or
+# generates everything else. It writes three
 # git-ignored files that the Ansible playbook reads:
 #
 #   deploy/ansible/inventory.ini      where to install: this machine, or a host over SSH
-#   deploy/ansible/vars/site.yml      domain, contact email, characters, extra allowed networks
+#   deploy/ansible/vars/site.yml      domain, contact email, Google accounts, characters, networks
 #   deploy/ansible/vars/secrets.yml   tokens and generated secrets (mode 0600)
 #
 # Re-running is safe: existing answers come back as defaults and a secret that already exists is
@@ -74,6 +75,11 @@ rand_hex() {  # rand_hex BYTES
 }
 valid_domain() { [[ $1 =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]]; }
 valid_ids()    { [[ $1 =~ ^[0-9]+(,[0-9]+)*$ ]]; }
+valid_emails() {  # valid_emails "a@x,b@y" → 0 when every comma-separated entry contains an @
+  local e; local -a list; IFS=, read -r -a list <<<"$1"
+  [[ ${#list[@]} -gt 0 ]] || return 1
+  for e in "${list[@]}"; do [[ $e == ?*@?* ]] || return 1; done
+}
 valid_cidrs()  { [[ -z $1 || $1 =~ ^([0-9]{1,3}(\.[0-9]{1,3}){3}/[0-9]{1,2})(,[0-9]{1,3}(\.[0-9]{1,3}){3}/[0-9]{1,2})*$ ]]; }
 local_ip() { ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i=1;i<=NF;i++) if ($i=="src") {print $(i+1); exit}}'; }
 
@@ -121,16 +127,24 @@ while :; do
   printf '  %sUse CIDRs like 192.168.1.0/24, separated by commas.%s\n' "$red" "$reset"
 done
 
+# ---------------------------------------------------------------- google
+heading "Google sign-in"
+note "Only these Google accounts can sign in to the site. Several are separated by commas."
+note "The Google Cloud steps for the client are in deploy/README.md, \"Google sign-in set-up\"."
+note "  Authorised redirect URI: https://$DOMAIN/auth/google/callback"
+while :; do
+  ask ALLOWED_GOOGLE_EMAILS "Allowed Google account email(s)" "$(yaml_get "$site" allowed_google_emails)" required
+  ALLOWED_GOOGLE_EMAILS=${ALLOWED_GOOGLE_EMAILS// /}
+  valid_emails "$ALLOWED_GOOGLE_EMAILS" && break
+  printf '  %sEvery entry needs an @ (for example you@example.com), separated by commas.%s\n' "$red" "$reset"
+done
+ask GOOGLE_CLIENT_ID "Google client ID" "$(yaml_get "$secrets" google_client_id | sed 's/^CHANGEME$//')" required
+ask_secret GOOGLE_CLIENT_SECRET "Google client secret" "$(yaml_get "$secrets" google_client_secret | sed 's/^CHANGEME$//')"
+
 # ---------------------------------------------------------------- characters
 heading "Characters"
-note "Only allow-listed characters can sign in. Character IDs are the number in a zKillboard or"
-note "ESI character URL. Several are separated by commas."
-while :; do
-  ask ALLOWED_CHARACTER_IDS "Allowed character IDs" "$(yaml_get "$site" allowed_character_ids)" required
-  ALLOWED_CHARACTER_IDS=${ALLOWED_CHARACTER_IDS// /}
-  valid_ids "$ALLOWED_CHARACTER_IDS" && break
-  printf '  %sDigits and commas only.%s\n' "$red" "$reset"
-done
+note "Characters are added after sign-in, from Settings. Character IDs are the number in a"
+note "zKillboard or ESI character URL. Several are separated by commas."
 while :; do
   ask OVERVIEW_CHARACTER_IDS "Characters on the Overview and the Training overview (empty = all of them)" "$(yaml_get "$site" overview_character_ids)"
   OVERVIEW_CHARACTER_IDS=${OVERVIEW_CHARACTER_IDS// /}
@@ -189,7 +203,7 @@ cat > "$site" <<YAML
 # secrets in vars/secrets.yml. Edit and re-run: ansible-playbook site.yml --tags eve
 domain: "$DOMAIN"
 acme_email: "$ACME_EMAIL"
-allowed_character_ids: "$ALLOWED_CHARACTER_IDS"
+allowed_google_emails: "$ALLOWED_GOOGLE_EMAILS"
 overview_character_ids: "$OVERVIEW_CHARACTER_IDS"
 owner_initials: "$OWNER_INITIALS"
 # Allowed through Traefik on top of the host's own LAN (detected at install time), Tailscale and loopback.
@@ -202,6 +216,8 @@ cat > "$secrets" <<YAML
 cloudflare_dns_api_token: "$CLOUDFLARE_DNS_API_TOKEN"
 eve_client_id: "$EVE_CLIENT_ID"
 eve_client_secret: "$EVE_CLIENT_SECRET"
+google_client_id: "$GOOGLE_CLIENT_ID"
+google_client_secret: "$GOOGLE_CLIENT_SECRET"
 session_secret: "$SESSION_SECRET"
 postgres_password: "$POSTGRES_PASSWORD"
 YAML
@@ -219,6 +235,6 @@ cat <<TXT
      ansible-galaxy collection install -r requirements.yml
      ansible-playbook -K site.yml
    Later, to redeploy the app only:  ansible-playbook -K site.yml --tags eve
-3. Open https://$DOMAIN and sign each allow-listed character in with EVE Online.
+3. Open https://$DOMAIN, sign in with Google, then add each character from Settings.
    The first worker tick imports CCP's static data, which takes a few minutes.
 TXT

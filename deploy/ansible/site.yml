@@ -12,7 +12,7 @@
         that:
           - domain is defined and domain | length > 0 and domain != "eve.example.com"
           - acme_email is defined and "@" in acme_email
-          - allowed_character_ids is defined and allowed_character_ids | string | length > 0
+          - allowed_google_emails is defined and "@" in (allowed_google_emails | string)
     - name: Fail early on placeholder secrets
       ansible.builtin.assert:
         quiet: true
@@ -21,6 +21,8 @@
           - cloudflare_dns_api_token != "CHANGEME"
           - eve_client_id != "CHANGEME"
           - eve_client_secret != "CHANGEME"
+          - google_client_id != "CHANGEME"
+          - google_client_secret != "CHANGEME"
           - session_secret != "CHANGEME"
           - postgres_password != "CHANGEME"
     - name: Check the host is Debian or Ubuntu

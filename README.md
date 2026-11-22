@@ -4,7 +4,7 @@
 
 <br>
 
-**A self-hosted command centre for your EVE Online characters: skills, clones, ships, fitting, assets, wallet and combat, behind EVE SSO, in an amber-phosphor console.**
+**A self-hosted command centre for your EVE Online characters: skills, clones, ships, fitting, assets, wallet and combat, behind Google sign-in, in an amber-phosphor console.**
 
 One Next.js app, one sync worker, one Postgres. The pages never call ESI. The worker keeps the database fresh and the pages read from it, so every screen is instant and nothing you click can hit a rate limit.
 
@@ -28,7 +28,7 @@ One Next.js app, one sync worker, one Postgres. The pages never call ESI. The wo
 
 ## ✨ What it does
 
-Yutani OS signs your characters in with EVE SSO, syncs them in the background and gives you nine screens:
+Yutani OS adds your characters with EVE SSO, syncs them in the background and gives you nine screens:
 
 | | | |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ Yutani OS signs your characters in with EVE SSO, syncs them in the background an
 | ⚔️ | **Combat** | A private killboard: stats tiles, a twelve-month activity strip, top ships and systems, and every killmail back to the start of your history via zKillboard. |
 | ⚙️ | **Settings** | Accounts, characters, tags, the static-data build, and a sync-status table that tells you exactly what ran, when, and why it failed. |
 
-Everything sits behind one session cookie. Only allow-listed characters can sign in.
+Everything sits behind one session cookie. You sign in with Google, and only the Google accounts on the allow-list get in; EVE SSO is then used from Settings to add each character.
 
 ---
 
@@ -53,7 +53,7 @@ Everything sits behind one session cookie. Only allow-listed characters can sign
 | ⚛️ | **Next.js 16, React 19** | App router, server components for every page, API routes for the editors. One image serves the web app and the worker. |
 | 🟦 | **TypeScript, strict, end to end** | The ESI client is typed from CCP's OpenAPI document, pinned to a compatibility date, and regenerated with one command. |
 | 🐘 | **PostgreSQL 17** | One schema file, idempotent migrations. The SDE lives in our own `sde_*` tables, so every page is a local query. |
-| 🔐 | **EVE SSO with PKCE** | OAuth2 authorization code + PKCE, JWTs verified against CCP's JWKS, refresh tokens encrypted at rest, a character allow-list, and twelve read-only ESI scopes. |
+| 🔐 | **EVE SSO with PKCE** | OAuth2 authorization code + PKCE, JWTs verified against CCP's JWKS, refresh tokens encrypted at rest, and twelve read-only ESI scopes. |
 | 📡 | **A careful ESI client** | ETag caching in Postgres, per-route rate-limit buckets, an error-limit floor, and a circuit breaker that stops calling during a Tranquility outage instead of getting the app 420'd. |
 | 🧮 | **A pure dogma engine** | Modelled on Pyfa: fit tree, SDE effects with modifier info, stacking penalties, cap stability, DPS, volley, EHP, mobility and targeting. The same code runs on the server and in the browser. |
 | 🗂️ | **CCP's Static Data Export** | The worker streams the ~95 MB JSON Lines archive to disk, imports it, and re-checks the published build every six hours. |
@@ -204,10 +204,11 @@ Everything sits behind one session cookie. Only allow-listed characters can sign
 <img src="docs/screenshots/login.png" alt="The login page: the Yutani OS lockup, a sign-in card, the Log in with EVE Online button and the not-allowed error line" width="700">
 </div>
 
-- 🪪 **EVE SSO only.** Authorization code with PKCE, the token's JWT verified against CCP's JWKS, issuer and audience checked.
-- 📜 **A character allow-list.** A character that is not on it is turned away and nothing is stored.
+- 🪪 **Google sign-in.** Authorization code with PKCE, state and a nonce; the ID token verified against Google's JWKS, issuer, audience and nonce checked, and the email must be verified.
+- 📜 **An account allow-list.** Only the Google accounts in `ALLOWED_GOOGLE_EMAILS` get a session; an empty list stops the app from starting.
+- 🛰️ **EVE SSO adds characters.** Once signed in, Settings › Add character runs EVE SSO with PKCE, the token's JWT verified against CCP's JWKS.
 - 🔐 **Refresh tokens are encrypted at rest** with the session secret. Access tokens are refreshed by the worker as needed.
-- 🚪 **One guard for every path.** The proxy lets through the login page, the health check, the SSO callback and the brand images. Everything else needs the session cookie.
+- 🚪 **One guard for every path.** The proxy lets through the login page, the health check, the Google sign-in routes and the brand images. Everything else needs the session cookie.
 
 ---
 
@@ -230,7 +231,7 @@ Everything sits behind one session cookie. Only allow-listed characters can sign
 - **Node 24** and npm.
 - **PostgreSQL 17**, or Docker for the bundled dev database.
 - An **EVE developer application** from [developers.eveonline.com](https://developers.eveonline.com) with the callback `http://localhost:3000/auth/callback` and the twelve scopes listed in `src/lib/auth/sso.ts`.
-- The **character IDs** you want to allow in.
+- A **Google OAuth client** of type *Web application* with the redirect URI `http://localhost:3000/auth/google/callback`, and the Google account address you sign in with. The Google Cloud steps are in [deploy/README.md](deploy/README.md#google-sign-in-set-up).
 
 ### Run it locally
 
@@ -239,7 +240,7 @@ git clone https://github.com/dc9090-web/yutani-os.git
 cd yutani-os
 npm ci
 
-cp .env.example .env          # fill in the SSO app, the allow-list, a session secret and the database URL
+cp .env.example .env          # fill in the SSO app, the Google client, the allow-list, a session secret and the database URL
 docker compose -f compose.dev.yml up -d     # Postgres 17 on 127.0.0.1:5432, user/password/db all "eve"
 npm run migrate               # applies db/schema.sql and the SDE tables
 
@@ -247,15 +248,17 @@ npm run dev                   # the app on http://localhost:3000
 npm run worker                # in a second terminal: syncs characters, imports the SDE, pulls prices
 ```
 
-The first worker tick downloads and imports the SDE, which takes a few minutes. Settings shows "Not imported yet" until it is done. Then sign in with each character you allow-listed and the per-character jobs begin.
+The first worker tick downloads and imports the SDE, which takes a few minutes. Settings shows "Not imported yet" until it is done. Then sign in with Google, add each character from Settings, and the per-character jobs begin.
 
 ### Configuration
 
 | Variable | What it is |
 | --- | --- |
 | `EVE_CLIENT_ID`, `EVE_CLIENT_SECRET`, `EVE_CALLBACK_URL` | Your EVE SSO application. |
-| `ALLOWED_CHARACTER_IDS` | Comma-separated character IDs that may sign in. |
-| `OVERVIEW_CHARACTER_IDS` | Which of them the Overview and the Training overview show. Empty means all. |
+| `GOOGLE_CLIENT_ID` | Your Google OAuth client (type *Web application*). The redirect URI is derived from `EVE_CALLBACK_URL`'s origin plus `/auth/google/callback`. |
+| `GOOGLE_CLIENT_SECRET` | That client's secret. |
+| `ALLOWED_GOOGLE_EMAILS` | Comma-separated Google account emails that may sign in, compared case-insensitively. Empty stops the app from starting. |
+| `OVERVIEW_CHARACTER_IDS` | Which characters the Overview and the Training overview show. Empty means all. |
 | `ESI_COMPATIBILITY_DATE` | A date from ESI's published list. Pinned in five places; bump them together and re-run `npm run esi:types`. |
 | `ESI_USER_AGENT` | A descriptive user agent with a contact, as CCP asks. The zKillboard client appends the site URL to it. |
 | `SESSION_SECRET` | Signs the session cookie and encrypts refresh tokens. `openssl rand -hex 32`. |

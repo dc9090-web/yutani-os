@@ -11,8 +11,8 @@ SSH; the host's own LAN, Tailscale and loopback are the only networks allowed in
 ./deploy/setup.sh
 ```
 
-It asks for the subdomain, a contact email, which characters may sign in, your EVE SSO application and a
-Cloudflare DNS token, generates the session secret and the Postgres password, and writes three git-ignored
+It asks for the subdomain, a contact email, the Google account(s) that may sign in, your Google sign-in
+client, your EVE SSO application and a Cloudflare DNS token, generates the session secret and the Postgres password, and writes three git-ignored
 files: `ansible/inventory.ini` (where), `ansible/vars/site.yml` (what) and `ansible/vars/secrets.yml`
 (0600). Re-running keeps your answers as defaults and never regenerates a secret. Every prompt can be
 pre-seeded from an environment variable of the same name (`DOMAIN=eve.example.com ./deploy/setup.sh`).
@@ -24,7 +24,39 @@ You need, before you start:
 - A Cloudflare API token with *Zone → DNS → Edit* on that zone.
 - An EVE developer application (<https://developers.eveonline.com>) with the callback
   `https://<your domain>/auth/callback` and the twelve scopes listed in `src/lib/auth/sso.ts`.
-- The character IDs you want to allow in.
+- A Google sign-in client and the Google account address you sign in with (see
+  [Google sign-in set-up](#google-sign-in-set-up) below).
+
+## Google sign-in set-up
+
+The site is signed in to with Google; EVE SSO is only used afterwards, from Settings, to add and
+re-authorise characters. Only the addresses in `allowed_google_emails` get in, and an empty list stops
+the app from starting. The Google side is a one-off in the Google Cloud console:
+
+1. **Create a project** at <https://console.cloud.google.com/projectcreate> (any name, for example
+   "Yutani OS"), and make sure it is the selected project.
+2. **Configure the Google Auth Platform**: open <https://console.cloud.google.com/auth/overview> and
+   click **Get started**. Under *App Information* give the **App name** and a **User support email**
+   (your own address is fine); under *Audience* choose **External**; give a contact email; agree to the
+   user data policy and click **Create**.
+3. **Leave it in Testing** (*Audience* → *Publishing status* stays **Testing**; nothing needs
+   verifying) and, on the same *Audience* page, add your Google account under **Test users**. With only
+   the `openid email` scopes Google does not strictly require the test-user entry, but adding it costs
+   nothing and keeps the project's intent obvious.
+4. **Create an OAuth client**: *Clients* (<https://console.cloud.google.com/auth/clients>) →
+   **Create client** → application type **Web application**. Under **Authorised redirect URIs** add
+   `https://<your domain>/auth/google/callback` (and `http://localhost:3000/auth/google/callback` if you
+   also run it locally), then **Create**. A changed redirect URI can take a few minutes to apply; a
+   mismatch shows Google's `redirect_uri_mismatch` page.
+5. **Copy the client ID and the client secret** into `vars/secrets.yml` as `google_client_id` and
+   `google_client_secret` (`setup.sh` asks for both). Copy the secret straight away: the console shows
+   it in full only when the client is created.
+6. **Put your account's address in `allowed_google_emails`** in `vars/site.yml` (`setup.sh` asks for it;
+   several are separated by commas). Case and surrounding spaces do not matter. A refused sign-in is
+   logged as `[auth] google account not allowed: <address>` in `docker logs eve-app`, which shows the
+   address to add.
+
+Phase 2 (the Android app) adds an Android OAuth client to this same project; nothing here changes.
 
 ## 2. Install
 
@@ -66,9 +98,8 @@ change is needed. Two of them were added in phase 3:
 - `esi-location.read_online.v1` — whether the character is currently online
 
 Tokens issued before this deploy were granted under the old ten-scope set, and scope grants are
-immutable per refresh token. So **every character must log in once more after the deploy** (menu →
-Add character, or the "Log in with EVE Online" button, then `/auth/start`) to pick up the new
-scopes. Until a character does that, those two features degrade gracefully rather than failing:
+immutable per refresh token. So **every character must be authorised once more after the deploy** (sign in with Google,
+then menu → Add character, which goes through `/auth/start`) to pick up the new scopes. Until a character does that, those two features degrade gracefully rather than failing:
 structures show `Unknown structure (id)` and online status is blank, while everything else
 (skills, assets, fittings, clones, wallet, location) keeps syncing normally.
 
@@ -146,7 +177,7 @@ Fits live in our own `fits` / `fit_items` tables and are **never pushed to ESI**
 `esi-fittings.write_fittings.v1` scope is not requested. Export is EFT text.
 
 Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/*` and `/_next/*`.
+`/api/health`, `/auth/google/*` and `/_next/*`.
 
 ## Skill planner
 
@@ -170,7 +201,7 @@ so the two cannot disagree.
   as templates.
 
 Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/*` and `/_next/*`.
+`/api/health`, `/auth/google/*` and `/_next/*`.
 
 ## Combat (killmails & PvP stats)
 
@@ -212,7 +243,7 @@ fittings endpoints use: low 11–18, mid 19–26, high 27–34, rigs 92–94, su
 87, cargo 5, implants 89, fighter bay 158.
 
 Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/*` and `/_next/*`.
+`/api/health`, `/auth/google/*` and `/_next/*`.
 
 ## Logs and troubleshooting
 

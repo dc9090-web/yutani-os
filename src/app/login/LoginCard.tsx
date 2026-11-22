@@ -1,9 +1,10 @@
 const MESSAGES: Record<string, string> = {
-  "not-allowed": "That character is not on the allow-list for this site.",
-  state: "The login attempt expired or was tampered with. Please try again.",
-  token: "EVE SSO did not accept the login. Please try again.",
-  jwt: "EVE SSO returned a token we could not verify.",
-  unknown: "Login failed. Please try again.",
+  "not-allowed": "That Google account is not allowed on this site.",
+  cancelled: "Sign-in was cancelled.",
+  state: "The sign-in attempt expired or was tampered with. Please try again.",
+  token: "Google did not accept the sign-in. Please try again.",
+  jwt: "Google returned a sign-in we could not verify.",
+  unknown: "Sign-in failed. Please try again.",
 };
 export function LoginCard({ error }: { error: string | null }) {
   return (
@@ -17,11 +18,11 @@ export function LoginCard({ error }: { error: string | null }) {
       </div>
       <div className="login-card">
         <h1 className="login-h1">Sign in</h1>
-        <p className="login-sub">Authorise one of your characters with EVE Online SSO.</p>
+        <p className="login-sub">Sign in with the Google account this site is set up for.</p>
         {error ? <p className="login-msg" role="alert">{MESSAGES[error] ?? MESSAGES.unknown}</p> : null}
-        <a className="sso-btn" href="/auth/start">Log in with EVE Online</a>
+        <a className="sso-btn" href="/auth/google/start">Sign in with Google</a>
       </div>
-      <p className="login-copy">Private tool · only allow-listed characters can sign in.</p>
+      <p className="login-copy">Private tool · only the owner&apos;s Google account can sign in.</p>
     </div>
   );
 }
