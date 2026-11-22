@@ -1,91 +1,146 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { AssetsBrowser } from "../../src/app/assets/AssetsBrowser.js";
-import type { AssetViewLocation } from "../../src/lib/view/assets.js";
+import type { AssetViewLocation, AssetViewNode } from "../../src/lib/view/assets.js";
+
+const FLAGS: Record<string, string> = { Hangar: "Hangar", LoSlot0: "Low slot 1", LoSlot1: "Low slot 2", HiSlot0: "High slot 1", Cargo: "Cargo hold", DroneBay: "Drone bay" };
+const node = (itemId: number, typeId: number, typeName: string, rawFlag: string, extra: Partial<AssetViewNode> = {}): AssetViewNode => ({
+  itemId, typeId, typeName, name: null, quantity: 1, flag: FLAGS[rawFlag] ?? rawFlag, rawFlag, isCharge: false,
+  isBlueprintCopy: false, volume: 1, iconUrl: `https://images.evetech.net/types/${typeId}/icon?size=32`, children: [], ...extra,
+});
 
 const locations: AssetViewLocation[] = [
   {
-    locationId: 60003760, label: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", itemCount: 3, volume: 27294,
+    locationId: 60003760, label: "Jita IV - Moon 4 - Caldari Navy Assembly Plant", itemCount: 1323, volume: 27294,
     nodes: [
-      {
-        itemId: 1035000000001, typeId: 587, typeName: "Rifter", name: "Scarlet Dart", quantity: 1,
-        flag: "Hangar", isBlueprintCopy: false, volume: 27289, iconUrl: "https://images.evetech.net/types/587/icon?size=32",
+      node(1035000000001, 587, "Rifter", "Hangar", {
+        name: "Scarlet Dart",
         children: [
-          { itemId: 2001, typeId: 519, typeName: "Gyrostabilizer II", name: null, quantity: 1, flag: "Low slot 1", isBlueprintCopy: false, volume: 5, iconUrl: "https://images.evetech.net/types/519/icon?size=32", children: [] },
+          node(2001, 519, "Gyrostabilizer II", "LoSlot0"),
+          node(2003, 519, "Gyrostabilizer II", "LoSlot1"),
+          node(2004, 484, "125mm Gatling AutoCannon II", "HiSlot0"),
+          node(2005, 12608, "Hail S", "HiSlot0", { isCharge: true, quantity: 120 }),
+          node(2006, 2454, "Hobgoblin I", "DroneBay", { quantity: 2 }),
+          node(2007, 12608, "Hail S", "Cargo", { quantity: 500 }),
         ],
-      },
-      { itemId: 2002, typeId: 691, typeName: "Rifter Blueprint", name: null, quantity: 1, flag: "Hangar", isBlueprintCopy: true, volume: 0.01, iconUrl: "https://images.evetech.net/types/691/bpc?size=32", children: [] },
+      }),
+      node(2002, 691, "Rifter Blueprint", "Hangar", { isBlueprintCopy: true, iconUrl: "https://images.evetech.net/types/691/bpc?size=32" }),
     ],
   },
-  {
-    locationId: 60008494, label: "Amarr VIII - Emperor Family Academy", itemCount: 1, volume: 1.2,
-    nodes: [{ itemId: 3001, typeId: 34, typeName: "Tritanium", name: null, quantity: 120, flag: "Hangar", isBlueprintCopy: false, volume: 1.2, iconUrl: "https://images.evetech.net/types/34/icon?size=32", children: [] }],
-  },
+  { locationId: 60008494, label: "Amarr VIII - Emperor Family Academy", itemCount: 1, volume: 1.2, nodes: [node(3001, 34, "Tritanium", "Hangar", { quantity: 120 })] },
 ];
+const descriptions = { 519: "Raises projectile damage and rate of fire." };
+const ui = () => render(<AssetsBrowser locations={locations} descriptions={descriptions} />);
+const jita = () => screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ });
 
 describe("AssetsBrowser", () => {
   it("lists locations with their item count and volume, collapsed", () => {
-    render(<AssetsBrowser locations={locations} />);
-    expect(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ })).toBeInTheDocument();
-    expect(screen.getByText(/3 items · 27,294 m³/)).toBeInTheDocument();
-    expect(screen.getByText(/1 item · 1.2 m³/)).toBeInTheDocument();
+    ui();
+    expect(jita()).toHaveAttribute("aria-expanded", "false");
+    expect(jita()).toHaveTextContent("1,323 items27,294 m³");
+    expect(screen.getByRole("button", { name: /Emperor Family Academy/ })).toHaveTextContent("1 item1.2 m³");
     expect(screen.queryByText("Rifter")).toBeNull();
+    expect(screen.getByText("All 2 locations, most items first")).toBeInTheDocument();
   });
 
-  it("expands a location into its tree, nesting fitted modules under the ship", () => {
-    render(<AssetsBrowser locations={locations} />);
-    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
+  it("opens a location into its ships and containers, each with a header, summary and flag", () => {
+    ui();
+    fireEvent.click(jita());
+    expect(jita()).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText("Rifter")).toBeInTheDocument();
     expect(screen.getByText("Scarlet Dart")).toBeInTheDocument();
-    expect(screen.getByText("Gyrostabilizer II")).toBeInTheDocument();
-    expect(screen.getByText("Low slot 1")).toBeInTheDocument();
-    expect(screen.getByText("BPC")).toHaveClass("bpc");
-    expect(screen.queryByText("Tritanium")).toBeNull();
+    expect(screen.getByText("6 items inside: 3 fitted, 2 drones, 1 cargo stack")).toBeInTheDocument();
+    expect(screen.getByText("HANGAR")).toBeInTheDocument();
+    expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["Fitted", "Drone bay", "Cargo hold", "Hangar"]);
   });
 
-  it("explains each item on hover from its type description, and stays quiet for one without", () => {
-    render(<AssetsBrowser locations={locations} descriptions={{ 587: "The Rifter is a very powerful combat frigate.", 519: "Gives a bonus to projectile turrets." }} />);
-    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
-    expect(screen.getByText("Rifter").closest(".tree-item")).toHaveAttribute("data-desc", "The Rifter is a very powerful combat frigate.");
-    expect(screen.getByText("Gyrostabilizer II").closest(".tree-item")).toHaveAttribute("data-desc", "Gives a bonus to projectile turrets.");
-    expect(screen.getByText("Rifter Blueprint").closest(".tree-item")).not.toHaveAttribute("data-desc");
+  it("merges identical modules into one row with a quantity and slot range, and notes the loaded charge", () => {
+    ui();
+    fireEvent.click(jita());
+    const fitted = screen.getByRole("heading", { name: "Fitted" }).closest(".as-group") as HTMLElement;
+    expect(within(fitted).getByText("3 items")).toBeInTheDocument();
+    const rows = within(fitted).getAllByRole("listitem");
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent("125mm Gatling AutoCannon IIHail S loadedHigh 1");
+    expect(rows[1]).toHaveTextContent("2×Gyrostabilizer IILow 1–2");
   });
 
-  it("shows each item's type icon and hides one the image server cannot supply", () => {
-    const { container } = render(<AssetsBrowser locations={locations} />);
-    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
-    const icons = container.querySelectorAll<HTMLImageElement>("img.item-icon");
-    expect(icons).toHaveLength(3);
-    expect(icons[0].src).toBe("https://images.evetech.net/types/587/icon?size=32");
-    expect(icons[2].src).toBe("https://images.evetech.net/types/691/bpc?size=32");
-    fireEvent.error(icons[1]);
-    expect(icons[1]).toHaveClass("missing");
+  it("puts drones and cargo in their own columns, and loose hangar items after the ships", () => {
+    ui();
+    fireEvent.click(jita());
+    const drones = screen.getByRole("heading", { name: "Drone bay" }).closest(".as-group") as HTMLElement;
+    expect(drones).toHaveTextContent("2 drones");
+    expect(within(drones).getByRole("listitem")).toHaveTextContent("2×Hobgoblin I");
+    const cargo = screen.getByRole("heading", { name: "Cargo hold" }).closest(".as-group") as HTMLElement;
+    expect(within(cargo).getByRole("listitem")).toHaveTextContent("500×Hail S");
+    const hangar = screen.getByRole("heading", { name: "Hangar" }).closest(".as-group") as HTMLElement;
+    expect(within(hangar).getByRole("listitem")).toHaveTextContent("Rifter BlueprintBPC");
   });
 
-  it("collapses a container without losing the rest of the tree", () => {
-    render(<AssetsBrowser locations={locations} />);
-    fireEvent.click(screen.getByRole("button", { name: /Caldari Navy Assembly Plant/ }));
-    fireEvent.click(screen.getByRole("button", { name: /collapse Rifter/i }));
-    expect(screen.queryByText("Gyrostabilizer II")).toBeNull();
+  it("gives every item row an icon tile and keeps the tile when the image is missing", () => {
+    ui();
+    fireEvent.click(jita());
+    const icon = screen.getByText("Hobgoblin I").closest("li")!.querySelector("img.as-icon") as HTMLImageElement;
+    expect(icon.getAttribute("src")).toBe("https://images.evetech.net/types/2454/icon?size=32");
+    fireEvent.error(icon);
+    expect(icon).toHaveClass("yo-tile", "is-blank");
+    expect(screen.getByText("Rifter Blueprint").closest("li")!.querySelector("img")?.getAttribute("src")).toContain("/bpc");
+  });
+
+  it("explains an item on hover from its type description, and stays quiet for one without", () => {
+    ui();
+    fireEvent.click(jita());
+    expect(screen.getByText("Gyrostabilizer II")).toHaveAttribute("data-desc", "Raises projectile damage and rate of fire.");
+    expect(screen.getByText("Hobgoblin I")).not.toHaveAttribute("data-desc");
+  });
+
+  it("keeps several locations open at once", () => {
+    ui();
+    fireEvent.click(jita());
+    fireEvent.click(screen.getByRole("button", { name: /Emperor Family Academy/ }));
     expect(screen.getByText("Rifter")).toBeInTheDocument();
+    expect(screen.getByText("Tritanium")).toBeInTheDocument();
+    fireEvent.click(jita());
+    expect(screen.queryByText("Rifter")).toBeNull();
+    expect(screen.getByText("Tritanium")).toBeInTheDocument();
   });
 
-  it("filters by type name across every location and auto-expands the matches", () => {
-    render(<AssetsBrowser locations={locations} />);
-    fireEvent.change(screen.getByLabelText(/filter/i), { target: { value: "gyro" } });
+  it("filters by item name: matching locations open by themselves and show only the matches", () => {
+    ui();
+    fireEvent.change(screen.getByLabelText("Filter by name"), { target: { value: "gyro" } });
     expect(screen.getByText("Gyrostabilizer II")).toBeInTheDocument();
-    expect(screen.getByText("Rifter")).toBeInTheDocument();               // kept as the ancestor
+    expect(screen.queryByText("Hobgoblin I")).toBeNull();
     expect(screen.queryByRole("button", { name: /Emperor Family Academy/ })).toBeNull();
+    expect(screen.getByText("1 of 2 locations match")).toBeInTheDocument();
+  });
+
+  it("filters by location name, leaving the location closed with all its contents", () => {
+    ui();
+    fireEvent.change(screen.getByLabelText("Filter by name"), { target: { value: "amarr" } });
+    const amarr = screen.getByRole("button", { name: /Emperor Family Academy/ });
+    expect(amarr).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByRole("button", { name: /Caldari Navy Assembly Plant/ })).toBeNull();
+    fireEvent.click(amarr);
+    expect(screen.getByText("Tritanium")).toBeInTheDocument();
+  });
+
+  it("finds a ship by the pilot's name for it and shows its whole fit", () => {
+    ui();
+    fireEvent.change(screen.getByLabelText("Filter by name"), { target: { value: "scarlet" } });
+    expect(screen.getByText("Gyrostabilizer II")).toBeInTheDocument();
+    expect(screen.getByText("Hobgoblin I")).toBeInTheDocument();
+    expect(screen.queryByText("Rifter Blueprint")).toBeNull();
   });
 
   it("says so when the filter matches nothing", () => {
-    render(<AssetsBrowser locations={locations} />);
-    fireEvent.change(screen.getByLabelText(/filter/i), { target: { value: "zzz" } });
-    expect(screen.getByText(/nothing matches/i)).toBeInTheDocument();
+    ui();
+    fireEvent.change(screen.getByLabelText("Filter by name"), { target: { value: "zzz" } });
+    expect(screen.getByText("No locations or items match that filter.")).toBeInTheDocument();
+    expect(screen.getByText("0 of 2 locations match")).toBeInTheDocument();
   });
 
   it("shows the empty state before the first sync", () => {
     render(<AssetsBrowser locations={[]} />);
-    expect(screen.getByText(/not synced yet/i)).toBeInTheDocument();
+    expect(screen.getByText(/Not synced yet/)).toBeInTheDocument();
   });
 });

@@ -8,6 +8,8 @@ export interface StatCellView {
   unit?: ReactNode;
   /** Set when `unit` is a name or a phrase, not a unit: it is then set in the UI face, not mono. */
   unitIsText?: boolean;
+  /** Set when `value` is a name, not a figure: it is set in the UI face at body size, its unit in mono. */
+  valueIsText?: boolean;
   note?: ReactNode;
   tone?: "good" | "bad";
 }
@@ -23,9 +25,9 @@ export function StatStrip({ cells, label, min = 240, small = false }: { cells: S
       {cells.map((cell) => (
         <div key={cell.label} className="yo-stat-cell">
           <span className="yo-label">{cell.label}</span>
-          <span className={`yo-stat-figure${cell.tone === undefined ? "" : ` is-${cell.tone}`}`}>
+          <span className={`yo-stat-figure${cell.valueIsText ? " is-name" : ""}${cell.tone === undefined ? "" : ` is-${cell.tone}`}`}>
             {cell.value}
-            {cell.unit === undefined ? null : <span className={`yo-stat-unit${cell.unitIsText ? " is-text" : ""}`}> {cell.unit}</span>}
+            {cell.unit === undefined ? null : <span className={`yo-stat-unit${cell.unitIsText ? " is-text" : ""}${cell.valueIsText ? " is-mono" : ""}`}> {cell.unit}</span>}
           </span>
           {cell.note === undefined ? null : <span className="yo-stat-note">{cell.note}</span>}
         </div>

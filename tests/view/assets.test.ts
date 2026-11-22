@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { AssetRow } from "../../src/lib/db/character-assets.js";
 import {
-  buildAssetTree, toViewNodes, sumVolume, filterAssetTree, locationDisplayLabel,
+  buildAssetTree, toViewNodes, sumVolume, filterAssetTree, locationDisplayLabel, locationContents, filterContents, contentsEmpty,
   type AssetViewNode, type TypeInfo,
 } from "../../src/lib/view/assets.js";
 
@@ -154,5 +154,100 @@ describe("filterAssetTree", () => {
 
   it("returns nothing when nothing matches", () => {
     expect(filterAssetTree(view, "zzz")).toEqual([]);
+  });
+});
+
+describe("locationContents", () => {
+  const FLAG: Record<string, string> = { Hangar: "Hangar", Cargo: "Cargo hold", DroneBay: "Drone bay", SpecializedOreHold: "Ore hold" };
+  const n = (itemId: number, typeId: number, typeName: string, rawFlag: string, extra: Partial<AssetViewNode> = {}): AssetViewNode => ({
+    itemId, typeId, typeName, name: null, quantity: 1, flag: FLAG[rawFlag] ?? rawFlag, rawFlag, isCharge: false,
+    isBlueprintCopy: false, volume: 0, iconUrl: `https://images.evetech.net/types/${typeId}/icon?size=32`, children: [], ...extra,
+  });
+  const hurricane = n(1, 100, "Hurricane Fleet Issue", "Hangar", {
+    name: "Wraith",
+    children: [
+      ...[0, 1, 2, 3, 4, 5].map((i) => n(10 + i, 200, "220mm Vulcan AutoCannon II", `HiSlot${i}`)),
+      n(16, 201, "Heavy Assault Missile Launcher II", "HiSlot6"),
+      n(17, 201, "Heavy Assault Missile Launcher II", "HiSlot7"),
+      n(20, 300, "Sensor Booster II", "MedSlot0"), n(21, 301, "Scan Resolution Script", "MedSlot0", { isCharge: true }),
+      n(22, 300, "Sensor Booster II", "MedSlot2"), n(23, 301, "Scan Resolution Script", "MedSlot2", { isCharge: true }),
+      n(24, 300, "Sensor Booster II", "MedSlot3"),
+      n(30, 400, "Medium Trimark Armor Pump II", "RigSlot0"),
+      n(40, 500, "Hobgoblin II", "DroneBay", { quantity: 5 }), n(41, 500, "Hobgoblin II", "DroneBay", { quantity: 5 }),
+      n(50, 600, "Hail M", "Cargo", { quantity: 3000 }), n(51, 600, "Hail M", "Cargo", { quantity: 848 }),
+      n(52, 700, "Small Secure Container", "Cargo", { name: "Loot", children: [n(60, 34, "Tritanium", "Unlocked", { quantity: 9 })] }),
+      n(53, 800, "Veldspar", "SpecializedOreHold", { quantity: 10 }),
+    ],
+  });
+
+  it("turns an item that holds things into a holder with a summary and its flag in capitals", () => {
+    const { holders, loose } = locationContents([hurricane]);
+    expect(loose).toEqual([]);
+    expect(holders).toHaveLength(1);
+    expect(holders[0]).toMatchObject({
+      title: "Hurricane Fleet Issue", label: "Wraith", flag: "HANGAR",
+      summary: "21 items inside: 12 fitted, 10 drones, 3 cargo stacks",
+      iconUrl: "https://images.evetech.net/types/100/icon?size=64",
+    });
+  });
+  it("orders the columns Fitted, Drone bay, Cargo hold, then the rest, then nested containers", () => {
+    expect(locationContents([hurricane]).holders[0].groups.map((g) => [g.name, g.count])).toEqual([
+      ["Fitted", "12 items"], ["Drone bay", "10 drones"], ["Cargo hold", "2 stacks"], ["Ore hold", "1 stack"],
+      ["Small Secure Container “Loot” · Unlocked", "1 stack"],
+    ]);
+  });
+  it("merges identical modules by slot family and charge, with a slot range", () => {
+    const fitted = locationContents([hurricane]).holders[0].groups[0];
+    expect(fitted.items.map((i) => [i.quantity, i.typeName, i.note, i.where])).toEqual([
+      [6, "220mm Vulcan AutoCannon II", null, "High 1–6"],
+      [2, "Heavy Assault Missile Launcher II", null, "High 7–8"],
+      [2, "Sensor Booster II", "Scan Resolution Script loaded in each", "Mid 1, 3"],
+      [1, "Sensor Booster II", null, "Mid 4"],
+      [1, "Medium Trimark Armor Pump II", null, "Rig 1"],
+    ]);
+  });
+  it("sums identical stacks into one row", () => {
+    const [, drones, cargo] = locationContents([hurricane]).holders[0].groups;
+    expect(drones.items.map((i) => [i.quantity, i.typeName])).toEqual([[10, "Hobgoblin II"]]);
+    expect(cargo.items.map((i) => [i.quantity, i.typeName, i.name])).toEqual([[3848, "Hail M", null], [1, "Small Secure Container", "Loot"]]);
+  });
+  it("keeps loose items in columns by where they sit, originals apart from copies", () => {
+    const { holders, loose } = locationContents([
+      n(1, 34, "Tritanium", "Hangar", { quantity: 100 }), n(2, 34, "Tritanium", "Hangar", { quantity: 50 }),
+      n(3, 691, "Rifter Blueprint", "Hangar"), n(4, 691, "Rifter Blueprint", "Hangar", { isBlueprintCopy: true }),
+      n(5, 587, "Rifter", "Hangar"), n(6, 35, "Pyerite", "Deliveries"),
+    ]);
+    expect(holders).toEqual([]);
+    expect(loose.map((g) => [g.name, g.count])).toEqual([["Hangar", "4 stacks"], ["Deliveries", "1 stack"]]);
+    expect(loose[0].items.map((i) => [i.quantity, i.typeName, i.isBlueprintCopy])).toEqual([
+      [150, "Tritanium", false], [1, "Rifter Blueprint", false], [1, "Rifter Blueprint", true], [1, "Rifter", false],
+    ]);
+  });
+  it("still shows a slot that holds only a charge", () => {
+    const ship = n(1, 100, "Rifter", "Hangar", { children: [n(2, 301, "Hail S", "HiSlot0", { isCharge: true, quantity: 40 })] });
+    expect(locationContents([ship]).holders[0].groups[0].items.map((i) => [i.typeName, i.where])).toEqual([["Hail S", "High 1"]]);
+  });
+
+  describe("filterContents", () => {
+    const contents = locationContents([hurricane, n(90, 34, "Tritanium", "Hangar", { quantity: 5 })]);
+    it("keeps only matching rows, dropping empty columns and holders", () => {
+      const out = filterContents(contents, "hail");
+      expect(out.holders[0].groups.map((g) => g.name)).toEqual(["Cargo hold"]);
+      expect(out.loose).toEqual([]);
+      expect(contentsEmpty(filterContents(contents, "zzz"))).toBe(true);
+    });
+    it("matches the charge note and nested containers", () => {
+      expect(filterContents(contents, "scan resolution").holders[0].groups[0].items.map((i) => i.typeName)).toEqual(["Sensor Booster II"]);
+      const trit = filterContents(contents, "tritanium");
+      expect(trit.holders[0].groups.map((g) => g.name)).toEqual(["Small Secure Container “Loot” · Unlocked"]);
+      expect(trit.loose[0].items).toHaveLength(1);
+    });
+    it("keeps a holder whole when its own name or the pilot's name for it matches", () => {
+      expect(filterContents(contents, "wraith").holders[0].groups).toHaveLength(5);
+      expect(filterContents(contents, "hurricane").holders[0].groups).toHaveLength(5);
+    });
+    it("returns the input for a blank query", () => {
+      expect(filterContents(contents, "  ")).toBe(contents);
+    });
   });
 });
