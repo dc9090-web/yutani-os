@@ -60,6 +60,9 @@ compose.resources {
 // The contract fixtures live with the site (../api-fixtures); the app's tests decode the same files.
 // `-Pshots=<dir>` also renders every screen from them to PNGs, off screen.
 tasks.withType<Test>().configureEach {
+    // One JVM per test class: the off-screen scenes and the UI test each drive Compose's global
+    // snapshot and frame state, and sharing a JVM made the UI test miss its first frame now and then.
+    forkEvery = 1
     systemProperty("fixtures", rootProject.file("../api-fixtures/v1").absolutePath)
     systemProperty("shots", providers.gradleProperty("shots").getOrElse(""))
     // -PliveUrl=… -PliveToken=… runs LiveSyncTest against a real site (a local one, with a dev token).

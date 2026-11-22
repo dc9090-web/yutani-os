@@ -26,7 +26,7 @@ import com.yutanios.app.ui.whenMissing
  */
 @Composable
 fun ShipDetailScreen(path: String, onBack: () -> Unit, initialLaunched: Map<Long, Int>? = null) {
-    val state by resource(path, ShipDetail.serializer())
+    val state = resource(path, ShipDetail.serializer()).value
     val detail = (state as? Res.Ready)?.data
     val view = detail?.view
     val control = view?.droneControl

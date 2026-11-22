@@ -21,7 +21,13 @@ sealed interface Res<out T> {
     data class Ready<T>(val loaded: Loaded<T>) : Res<T> { val data: T get() = loaded.data }
 }
 
-/** The phone's copy of `path`, kept current as syncs rewrite it. Never touches the network. */
+/**
+ * The phone's copy of `path`, kept current as syncs rewrite it. Never touches the network.
+ *
+ * Read `.value` in the screen's own body (`val state = resource(…).value`), not inside the
+ * `Screen { … }` list builder: a read made only inside the lazy list's builder could miss the
+ * moment the copy arrived, leaving the screen blank until something else redrew it.
+ */
 @Composable
 fun <T> resource(path: String, serializer: KSerializer<T>): State<Res<T>> {
     val app = LocalApp.current

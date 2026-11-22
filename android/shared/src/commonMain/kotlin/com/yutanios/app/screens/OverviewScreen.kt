@@ -41,8 +41,8 @@ import com.yutanios.app.ui.whenMissing
 /** Every character on one screen: the summary strip, then a card each. */
 @Composable
 fun OverviewScreen() {
-    val state by resource(Paths.OVERVIEW, Overview.serializer())
-    val now by rememberNow()
+    val state = resource(Paths.OVERVIEW, Overview.serializer()).value
+    val now = rememberNow().value
     Screen("Overview", perCharacter = false) {
         if (whenMissing(state)) return@Screen
         val overview = (state as Res.Ready).data

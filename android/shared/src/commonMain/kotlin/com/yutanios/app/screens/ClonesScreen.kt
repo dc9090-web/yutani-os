@@ -44,7 +44,7 @@ private fun plural(count: Int, noun: String) = "$count $noun${if (count == 1) ""
 /** The active clone's panel, then the jump clones grouped by station, each a collapsible row. */
 @Composable
 fun ClonesScreen(characterId: Long) {
-    val state by resource(Paths.clones(characterId), Clones.serializer())
+    val state = resource(Paths.clones(characterId), Clones.serializer()).value
     // What the reader has opened stays open while a sync rewrites the copy, but not across characters.
     val toggled = remember(characterId) { mutableStateMapOf<Long, Boolean>() }
     val openInfo = remember(characterId) { mutableStateMapOf<String, Boolean>() }

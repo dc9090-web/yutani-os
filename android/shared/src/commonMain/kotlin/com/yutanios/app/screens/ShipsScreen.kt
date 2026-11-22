@@ -53,7 +53,7 @@ import com.yutanios.app.ui.whenMissing
  */
 @Composable
 fun ShipsScreen(characterId: Long, onOpenAsset: (Long) -> Unit, onOpenFit: (Long) -> Unit, initialTab: Int = 0, initialOpen: Set<String> = emptySet()) {
-    val state by resource(Paths.ships(characterId), Ships.serializer())
+    val state = resource(Paths.ships(characterId), Ships.serializer()).value
     // Saved, so coming back from a saved fit's sheet lands on the Saved fits tab again.
     var tab by rememberSaveable { mutableIntStateOf(initialTab) }
     var open by remember(characterId) { mutableStateOf(initialOpen) }

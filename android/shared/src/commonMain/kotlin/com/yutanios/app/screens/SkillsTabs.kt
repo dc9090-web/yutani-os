@@ -218,7 +218,7 @@ private fun QueueHead(count: Int, finishAt: Long?) {
 /** The one line on the screen that ticks every second: the time until the whole queue is trained. */
 @Composable
 private fun QueueCountdown(finishAt: Long?) {
-    val now by rememberNow(1000)
+    val now = rememberNow(1000).value
     Txt(if (finishAt == null) "—" else countdown(finishAt - now), type.mono, maxLines = 1)
 }
 

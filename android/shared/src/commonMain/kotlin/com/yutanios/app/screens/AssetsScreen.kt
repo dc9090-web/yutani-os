@@ -28,7 +28,7 @@ import com.yutanios.app.ui.whenMissing
  */
 @Composable
 fun AssetsScreen(characterId: Long, initialQuery: String = "", initiallyExpandAll: Boolean = false) {
-    val state by resource(Paths.assets(characterId), AssetsData.serializer())
+    val state = resource(Paths.assets(characterId), AssetsData.serializer()).value
     val data = (state as? Res.Ready)?.data
     var query by remember(characterId) { mutableStateOf(initialQuery) }
     // Null until a location is first tapped, so "all open" can follow the data when it arrives.

@@ -44,7 +44,7 @@ fun SkillsScreen(characterId: Long, initialTab: Int = SkillsTab.OVERVIEW) {
     // One description open at a time per list, as on the site.
     var open by remember(tab, characterId) { mutableStateOf<String?>(null) }
     val toggle = { key: String -> open = if (open == key) null else key }
-    val now by rememberNow()
+    val now = rememberNow().value
 
     val overview = if (tab == SkillsTab.OVERVIEW) resource(Paths.TRAINING_OVERVIEW, TrainingOverview.serializer()).value else null
     val sheet = if (tab == SkillsTab.SKILLS) resource(Paths.skills(characterId), SkillsData.serializer()).value else null
