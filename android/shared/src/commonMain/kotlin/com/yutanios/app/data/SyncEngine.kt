@@ -72,9 +72,11 @@ class SyncEngine(private val api: ApiClient, private val store: Store, private v
     private suspend fun fetch(resource: SyncResource) {
         when (val got = api.get(resource.path, store.etag(resource.path))) {
             is Fetched.Body -> {
-                // Stored under the tag the response carried; if the data moved on since the list was
-                // built, the next sync sees the difference and simply asks again.
-                store.put(resource.path, got.text, got.etag ?: resource.etag, now())
+                // Stored under the tag the list gave, not the response header: a proxy that compresses
+                // may rewrite the header to a weak tag (W/"…"), which would never equal the list's and
+                // would make every sync fetch everything. If the data moved on between the list and
+                // this GET, the next list shows a different tag and the resource is simply asked for again.
+                store.put(resource.path, got.text, resource.etag, now())
                 _changed.emit(resource.path)
             }
             Fetched.NotModified -> Unit
