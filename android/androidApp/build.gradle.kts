@@ -36,8 +36,8 @@ android {
         applicationId = "com.yutanios.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 4
-        versionName = "0.1.3"
+        versionCode = 5
+        versionName = "0.1.4"
         buildConfigField("String", "SITE_URL", "\"${local.getProperty("yutani.siteUrl", "")}\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${local.getProperty("yutani.googleWebClientId", "")}\"")
     }

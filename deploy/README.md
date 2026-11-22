@@ -12,7 +12,7 @@ the worker and Postgres from `deploy/docker-compose.yml`.
 
 - Installing: [1. Answer the questions](#1-answer-the-questions) · [Google sign-in set-up](#google-sign-in-set-up) · [2. Install](#2-install) · [Redeploying](#redeploying-app-changes)
 - Running it: [Where things live](#where-things-live-on-the-host) · [Logs and troubleshooting](#logs-and-troubleshooting) · [ESI scopes](#esi-application-scopes) · [ESI compatibility date](#esi-compatibility-date)
-- How each part behaves: [Static data](#static-data-sde) · [Market prices](#market-prices) · [The app API and phones](#the-app-api-and-phones) · [Skill planner](#skill-planner) · [Fitting designer](#fitting-designer) · [Combat](#combat-killmails-and-pvp-stats)
+- How each part behaves: [Static data](#static-data-sde) · [Market prices](#market-prices) · [Player count](#player-count) · [The app API and phones](#the-app-api-and-phones) · [Skill planner](#skill-planner) · [Fitting designer](#fitting-designer) · [Combat](#combat-killmails-and-pvp-stats)
 
 ## 1. Answer the questions
 
@@ -181,6 +181,15 @@ job retries after 10 minutes.
 
 Prices are empty until the first run, so `/ships` shows `0 ISK` and "n items unpriced" on a fresh
 deploy for up to an hour.
+
+## Player count
+
+The `server-status` job reads ESI's public `GET /status` every five minutes and stores how many
+pilots are logged in to Tranquility. The status strip shows it as `TQ 23,456 ONLINE`, and
+`GET /api/v1/server` sends it to the Android app with every sync.
+
+- During daily downtime, or whenever ESI is failing, the job's run fails and retries each minute.
+- A count more than twenty minutes old is not shown: the strip reads `TQ —` until a run succeeds.
 
 ## The app API and phones
 

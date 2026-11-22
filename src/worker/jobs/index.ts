@@ -3,6 +3,7 @@ import { sdeUpdateJob } from "./sde-update.js";
 import { marketPricesJob } from "./market-prices.js";
 import { killmailBackfillJob } from "./killmail-backfill.js";
 import { killmailValuesJob } from "./killmail-values.js";
+import { serverStatusJob } from "./server-status.js";
 import { characterInfoJob } from "./character-info.js";
 import { skillsJob } from "./skills.js";
 import { clonesJob } from "./clones.js";
@@ -13,12 +14,13 @@ import { locationJob } from "./location.js";
 import { killmailsJob } from "./killmails.js";
 
 /**
- * Registration order. The four global jobs come first so a fresh database imports the SDE, pulls
- * prices, starts the zKillboard backfill and begins valuing killmails on the very first tick; the
+ * Registration order. The five global jobs come first so a fresh database imports the SDE, pulls
+ * prices, starts the zKillboard backfill, begins valuing killmails and reads the player count on the
+ * very first tick; the
  * character jobs are staggered by the scheduler, so with 8 jobs x 4 characters the per-tick fan-out
  * stays small.
  */
 export const ALL_JOBS: SyncJob[] = [
-  sdeUpdateJob, marketPricesJob, killmailBackfillJob, killmailValuesJob,
+  sdeUpdateJob, marketPricesJob, killmailBackfillJob, killmailValuesJob, serverStatusJob,
   characterInfoJob, skillsJob, clonesJob, assetsJob, fittingsJob, walletJob, locationJob, killmailsJob,
 ];

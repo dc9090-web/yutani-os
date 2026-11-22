@@ -15,7 +15,7 @@ One Next.js app, one sync worker, one Postgres. Pages never call ESI: the worker
 [![Mantine](https://img.shields.io/badge/Mantine-9-339af0?logo=mantine&logoColor=white)](https://mantine.dev/)
 [![EVE SSO](https://img.shields.io/badge/EVE_SSO-PKCE-f5a623)](https://developers.eveonline.com/)
 [![ESI](https://img.shields.io/badge/ESI-2026--08--18-5fd3e8)](https://developers.eveonline.com/api-explorer)
-[![Tests](https://img.shields.io/badge/vitest-1%2C702_passing-43d9a0?logo=vitest&logoColor=white)](tests/)
+[![Tests](https://img.shields.io/badge/vitest-1%2C710_passing-43d9a0?logo=vitest&logoColor=white)](tests/)
 [![Docker](https://img.shields.io/badge/Docker-Compose_%2B_Traefik-2496ed?logo=docker&logoColor=white)](deploy/)
 [![Android](https://img.shields.io/badge/Android-Kotlin_Multiplatform-3ddc84?logo=android&logoColor=white)](android/)
 
@@ -185,7 +185,7 @@ A native app in [`android/`](android/) (Kotlin Multiplatform, Compose) with the 
 - 📥 **The phone holds everything.** After sign-in it downloads every screen for every character, including ones never opened. Screens open from that copy at once and work with no connection.
 - 🔄 **Only what changed.** A sync is one small request for the list of tags, then one request per resource whose tag differs. With nothing new that is a single round trip.
 - ⏱️ **Countdowns stay true.** Anything worked out against the clock is recomputed on the phone from raw times, so a day-old copy still counts down correctly.
-- 🕐 **When it syncs.** On opening, on pull-down, and about hourly in the background. A strip under the navigation says "Synced 5 m ago" or "Offline · as of 2 h ago".
+- 🕐 **When it syncs.** On opening, on pull-down, and about hourly in the background. A strip under the navigation says "Synced 5 m ago" or "Offline · as of 2 h ago", with the number of pilots in game beside it, as of that same sync.
 - 👆 **Swipe between sections**, tap the strip to jump, long-press an item for its description.
 - 🧮 **No game maths on the phone.** Fit stats come from the site as finished values; the one exception is the drone selector's sum.
 - 🔑 **Google sign-in**, the token encrypted with a key in the Android Keystore, revocable from Settings on the site.
@@ -209,7 +209,7 @@ Building, signing, the one-off Android client in Google Cloud and installing are
 | --- | --- |
 | `POST /api/v1/auth/google`, `DELETE /api/v1/auth/session` | Sign a phone in with `{ idToken, deviceName }`; sign it out. |
 | `GET /api/v1/sync` | Every resource a phone should hold, with its current ETag. |
-| `GET /api/v1/me`, `/characters`, `/overview`, `/training-overview` | The account, the character switcher, the Overview, Skills › Overview. |
+| `GET /api/v1/me`, `/server`, `/characters`, `/overview`, `/training-overview` | The account, Tranquility's player count, the character switcher, the Overview, Skills › Overview. |
 | `GET /api/v1/characters/{id}/skills`, `/training`, `/clones`, `/assets`, `/ships` | One character's screens. |
 | `GET /api/v1/characters/{id}/wallet` | The balance; with `?kind=journal\|transactions&offset=&limit=` (at most 500) a slice of that list. |
 | `GET /api/v1/characters/{id}/ships/asset/{itemId}`, `/ships/fit/{fittingId}` | A fit sheet, with the per-drone numbers the drone selector sums. |
@@ -311,14 +311,15 @@ The full guide, including the Google Cloud steps and the notes on each backgroun
 | ⚛️ | **Next.js 16, React 19** | Server-rendered pages and the JSON routes. One image serves both the web app and the worker. |
 | 🟦 | **TypeScript, strict** | The ESI client is typed from CCP's OpenAPI document, pinned to a compatibility date, and regenerated with one command. |
 | 🐘 | **PostgreSQL 17** | One schema file, safe to re-apply. CCP's static data lives in `sde_*` tables, so every page is a local query. |
-| 🔁 | **The sync worker** | Twelve jobs: four global and eight per character, staggered, with every run recorded and shown on Settings. |
+| 🔁 | **The sync worker** | Thirteen jobs: five global and eight per character, staggered, with every run recorded and shown on Settings. |
 | 📡 | **The ESI client** | Caches by ETag in Postgres, respects each route's rate-limit bucket, slows down when the error budget runs low, and stops calling for a minute after a 502, 503 or 504. |
 | 🧮 | **The dogma engine** | A pure library modelled on Pyfa that works out a fit's DPS, EHP, capacitor, speed and targeting from the static data, with stacking penalties. |
 | 🐳 | **Docker Compose, Traefik, Ansible** | One playbook provisions a fresh host. |
 
 - **Pages read Postgres, never ESI.** The worker makes every outbound call. A page that cannot reach the database still draws its frame and says so.
-- **The twelve jobs.** Global: `sde-update` (6 h), `market-prices` (1 h), `killmail-backfill` (15 min), `killmail-values` (1 h). Per character: `character-info`, `clones` and `fittings` (6 h); `skills`, `assets`, `wallet` and `killmails` (1 h); `location` (15 min). A failed run retries after ten minutes.
+- **The thirteen jobs.** Global: `sde-update` (6 h), `market-prices` (1 h), `killmail-backfill` (15 min), `killmail-values` (1 h), `server-status` (5 min). Per character: `character-info`, `clones` and `fittings` (6 h); `skills`, `assets`, `wallet` and `killmails` (1 h); `location` (15 min). A failed run retries after ten minutes.
 - **Prices** come from CCP's reference prices for every type, and from Fuzzwork's Jita aggregates for the types that matter to you: what you own, what is in a fit and what you traded recently. If Fuzzwork is down, the reference prices are used and Settings shows a warning.
+- **The status strip** under the navigation shows the state of the sync, ESI, the static-data build, your character count and how many pilots are logged in to Tranquility (`TQ 23,456 ONLINE`). The count comes from ESI every five minutes and shows a dash when there is no current one, for example during daily downtime.
 - **One loader per page.** Each page's data is built by a function in `src/lib/pages`, which the page and the matching `/api/v1` route both call, so the site and the app cannot drift apart.
 - **Two older pages are still in the code but no longer in the navigation:** the fitting designer (linked from Ships › Saved fits) and the Combat killboard at `/combat`, which the killmail jobs feed. Their notes are in [deploy/README.md](deploy/README.md).
 - **Design notes** for every phase are in [`docs/superpowers/specs/`](docs/superpowers/specs/), the plans that built them in [`docs/superpowers/plans/`](docs/superpowers/plans/), and the research on the SDE, ESI, the dogma engine and the skill planner in [`docs/research/`](docs/research/).
@@ -342,8 +343,8 @@ The full specification, with every page drawn for desktop and phone, is in [`doc
 ## 🧪 Tests
 
 ```bash
-npm test                                   # the site: 1,702 tests in 183 files
-cd android && ./gradlew :shared:jvmTest    # the app: 87 tests
+npm test                                   # the site: 1,710 tests in 185 files
+cd android && ./gradlew :shared:jvmTest    # the app: 91 tests
 ```
 
 - **The site's suite** covers both sign-in flows, the app API and its contract fixtures, the ESI client's rate limiting, the SDE importer, the dogma engine against real fits, the skill timeline and remap optimiser, and the React components. The database tests need a Postgres on port 5432; `compose.dev.yml` provides one.

@@ -73,6 +73,7 @@ private suspend fun drawEverything(app: AppContainer) {
 private fun serializerFor(path: String): KSerializer<out Any> = when {
     path == Paths.ME -> Me.serializer()
     path == Paths.CHARACTERS -> CharacterList.serializer()
+    path == Paths.SERVER -> Server.serializer()
     path == Paths.OVERVIEW -> Overview.serializer()
     path == Paths.TRAINING_OVERVIEW -> TrainingOverview.serializer()
     path.endsWith("/skills") -> SkillsData.serializer()

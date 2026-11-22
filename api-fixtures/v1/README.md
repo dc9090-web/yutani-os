@@ -24,7 +24,7 @@ The ids are below the range EVE gives real players.
 
 **On this page:** [rules for every route](#rules-for-every-route), including the
 [clock-derived fields](#clock-derived-fields) a client must recompute, then one section per route in
-the order a phone fetches them: sync, sign-in, me, characters, overview, training overview, then
+the order a phone fetches them: sync, sign-in, me, server, characters, overview, training overview, then
 each character's skills, training, clones, assets, wallet, ships and ship detail.
 
 ## Rules for every route
@@ -124,6 +124,24 @@ DELETE /api/v1/auth/session   (bearer)  →  204; the token no longer works
 ```ts
 interface Me { email: string; ownerInitials: string | null; apiVersion: 1 }
 ```
+
+## `GET /api/v1/server` — `server.json`
+
+How many pilots are logged in to Tranquility, read by the site from ESI every five minutes.
+
+```ts
+interface Server {
+  status: {
+    players: number;   // 23456
+    label: string;     // "23,456": show this
+    at: string;        // ISO-8601 UTC: when the site read it from ESI
+  } | null;            // null until the site has a count
+}
+```
+
+The site sends the count it has stored, however old. A client should show it only if `at` is within
+twenty minutes of its own last successful sync: an older one means the site's job was failing, or
+Tranquility was down.
 
 ## `GET /api/v1/characters` — `characters.json`
 

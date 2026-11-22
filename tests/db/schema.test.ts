@@ -30,6 +30,7 @@ describe("schema", () => {
       "sde_market_groups", "sde_masteries", "sde_meta", "sde_meta_groups", "sde_races", "sde_regions", "sde_skill_plans",
       "sde_solar_systems", "sde_stations", "sde_type_attributes", "sde_type_bonuses",
       "sde_type_effects", "sde_types",
+      "server_status",
       "skill_plan_entries", "skill_plans",
       "structures", "sync_runs", "universe_names",
     ]);

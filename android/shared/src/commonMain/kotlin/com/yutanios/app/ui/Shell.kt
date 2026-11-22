@@ -45,6 +45,8 @@ import com.yutanios.app.model.CharacterList
 import com.yutanios.app.model.CharacterOption
 import com.yutanios.app.model.Me
 import com.yutanios.app.model.Paths
+import com.yutanios.app.model.Server
+import com.yutanios.app.model.playersLabel
 import com.yutanios.app.resources.Res as R
 import com.yutanios.app.resources.wordmark
 import com.yutanios.app.time.relativeTime
@@ -130,6 +132,8 @@ fun SyncStrip(modifier: Modifier = Modifier) {
     val index by app.store.index.collectAsState()
     val progress by app.sync.progress.collectAsState()
     val now by rememberNow()
+    val server = resource(Paths.SERVER, Server.serializer()).value
+    val players = playersLabel((server as? Res.Ready)?.data, index.lastSuccessAt)
     val (dot, text) = when {
         progress.running && progress.total > 0 -> Yo.accent to "UPDATING ${progress.done}/${progress.total}"
         progress.running -> Yo.accent to "CHECKING FOR UPDATES"
@@ -144,7 +148,9 @@ fun SyncStrip(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(6.dp).background(dot, CircleShape))
-        Txt(text, type.tag, Modifier.padding(start = 8.dp), maxLines = 1)
+        Txt(text, type.tag, Modifier.padding(start = 8.dp).weight(1f), maxLines = 1)
+        // Pilots in game, as of the same moment as everything else on the phone.
+        if (players != null) Txt("TQ $players ONLINE", type.tag, Modifier.padding(start = 12.dp), maxLines = 1)
     }
 }
 

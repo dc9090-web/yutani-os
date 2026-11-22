@@ -1,3 +1,5 @@
+import { getServerStatus } from "../../db/server-status.js";
+import { grouped } from "../../view/format.js";
 import { getConfig } from "../../config.js";
 import { listCharacters } from "../../db/characters.js";
 import type { FitData } from "../../ships/load.js";
@@ -19,6 +21,18 @@ import { API_VERSION, type Resource } from "./respond.js";
 export const meResource = (who: { email: string }): Resource => ({
   path: "/api/v1/me", clock: false,
   build: async () => ({ email: who.email, ownerInitials: getConfig().ownerInitials, apiVersion: API_VERSION }),
+});
+
+/**
+ * How many pilots are in game. `status` is null when the site has no current count. The count is
+ * shown as stored, so the phone pairs it with the age of its own copy rather than a clock of ours.
+ */
+export const serverResource = (): Resource => ({
+  path: "/api/v1/server", clock: false,
+  build: async () => {
+    const status = await getServerStatus();
+    return { status: status === null ? null : { players: status.players, label: grouped(status.players), at: status.fetchedAt.toISOString() } };
+  },
 });
 
 export const charactersResource = (): Resource => ({

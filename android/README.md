@@ -103,7 +103,8 @@ a Revoke button; a revoked phone is signed out the next time it reaches the site
 - When the app is opened, and when you pull down on any screen.
 - About once an hour in the background while the phone has a network.
 - The strip under the navigation shows the state: "Synced 5 m ago", "Updating 12/40", or
-  "Offline · as of 2 h ago".
+  "Offline · as of 2 h ago". At its right is the number of pilots in game (`TQ 23,456 ONLINE`), as
+  of that same sync.
 
 The phone keeps everything except wallet rows older than the newest 500 of each list, which are
 fetched on demand, and icons it has never shown.

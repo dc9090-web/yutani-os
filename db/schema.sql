@@ -421,3 +421,13 @@ CREATE TABLE IF NOT EXISTS app_sessions (
   last_used_at  timestamptz,
   revoked_at    timestamptz
 );
+
+-- How many pilots are logged in to Tranquility, from ESI's public GET /status. One row, rewritten by
+-- the worker's server-status job; the status strip and the phone app show it.
+CREATE TABLE IF NOT EXISTS server_status (
+  id              int PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  players         int NOT NULL,
+  server_version  text,
+  start_time      timestamptz,
+  fetched_at      timestamptz NOT NULL DEFAULT now()
+);

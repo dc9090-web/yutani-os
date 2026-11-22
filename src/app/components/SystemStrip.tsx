@@ -9,23 +9,27 @@ export interface SystemStripProps {
   esi: SystemReadout;
   sdeBuild: number | null;
   characters: number;
+  /** Pilots logged in to Tranquility, already grouped ("23,456"); null when there is no current count. */
+  players: string | null;
   /** ISO timestamp of the server render; the clock ticks on from it client-side. */
   now: string;
 }
 
 /**
  * The status strip directly under the header (redesign hand-off, DESIGN_SYSTEM.md "Shell"): a state
- * dot + SYS, ESI, SDE build, character count, and the UTC clock right-aligned. Fed from the same
+ * dot + SYS, ESI, SDE build, character count, how many pilots are in game, and the UTC clock
+ * right-aligned. Fed from the same
  * data the settings page shows. The dot's colour is never the only signal — the word beside it says
  * the same thing.
  */
-export function SystemStrip({ sync, esi, sdeBuild, characters, now }: SystemStripProps) {
+export function SystemStrip({ sync, esi, sdeBuild, characters, players, now }: SystemStripProps) {
   return (
     <div className="sys-strip">
       <span className="sys-item sys-lead"><span className={`sys-dot ${sync}`} aria-hidden="true" />SYS {SYS_LABEL[sync]}</span>
       <span className="sys-item">ESI {ESI_LABEL[esi]}</span>
       <span className="sys-item">SDE {sdeBuild ?? "—"}</span>
       <span className="sys-item">{characters} CHARACTER{characters === 1 ? "" : "S"}</span>
+      <span className="sys-item" title="Pilots logged in to Tranquility">TQ {players === null ? "—" : `${players} ONLINE`}</span>
       <span className="sys-item sys-right"><SysClock initial={now} /></span>
     </div>
   );

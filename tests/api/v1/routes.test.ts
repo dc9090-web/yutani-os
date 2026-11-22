@@ -20,6 +20,7 @@ const R = "../../../src/app/api/v1";
 const ROUTES = ([
   [/^\/api\/v1\/me$/, await import(`${R}/me/route.js`)],
   [/^\/api\/v1\/sync$/, await import(`${R}/sync/route.js`)],
+  [/^\/api\/v1\/server$/, await import(`${R}/server/route.js`)],
   [/^\/api\/v1\/characters$/, await import(`${R}/characters/route.js`)],
   [/^\/api\/v1\/overview$/, await import(`${R}/overview/route.js`)],
   [/^\/api\/v1\/training-overview$/, await import(`${R}/training-overview/route.js`)],
@@ -195,7 +196,7 @@ describe("GET /api/v1/sync", () => {
   it("lists everything a phone should hold, by the exact path to GET", async () => {
     const paths = (await syncList()).map((r) => r.path);
     expect(paths).toEqual([
-      "/api/v1/me", "/api/v1/characters", "/api/v1/overview", "/api/v1/training-overview",
+      "/api/v1/me", "/api/v1/server", "/api/v1/characters", "/api/v1/overview", "/api/v1/training-overview",
       ...[MAIN, ALT, 9000003].flatMap((id) => [
         `/api/v1/characters/${id}/skills`, `/api/v1/characters/${id}/training`, `/api/v1/characters/${id}/clones`,
         `/api/v1/characters/${id}/assets`, `/api/v1/characters/${id}/wallet`,

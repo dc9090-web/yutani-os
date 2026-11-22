@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 object Paths {
     const val ME = "/api/v1/me"
     const val CHARACTERS = "/api/v1/characters"
+    const val SERVER = "/api/v1/server"
     const val OVERVIEW = "/api/v1/overview"
     const val TRAINING_OVERVIEW = "/api/v1/training-overview"
     fun skills(id: Long) = "/api/v1/characters/$id/skills"

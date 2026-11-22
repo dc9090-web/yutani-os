@@ -3,7 +3,7 @@ import { listCharacters } from "../../db/characters.js";
 import { loadFitData, type FitData } from "../../ships/load.js";
 import type { ShipsData } from "../../pages/ships.js";
 import {
-  assetsResource, charactersResource, clonesResource, meResource, overviewResource, shipDetailResource, shipsResource,
+  assetsResource, charactersResource, clonesResource, meResource, overviewResource, serverResource, shipDetailResource, shipsResource,
   skillsResource, trainingOverviewResource, trainingResource, walletRowsResource, walletSummaryResource, type ShipDetailKind,
 } from "./resources.js";
 import { API_VERSION, ETAG_NOW, etagOf, type Resource } from "./respond.js";
@@ -106,8 +106,9 @@ let running: Promise<SyncEntry[]> | undefined;
 export async function loadSync(who: { email: string }): Promise<SyncData> {
   running ??= build().finally(() => { running = undefined; });
   const shared = await running;
-  const me = meResource(who);
-  return { resources: [{ path: me.path, etag: etagOf(await me.build(ETAG_NOW)) }, ...shared] };
+  // Two one-row resources, tagged on the spot: cheaper to build than to stamp.
+  const small = await Promise.all([meResource(who), serverResource()].map(async (r) => ({ path: r.path, etag: etagOf(await r.build(ETAG_NOW)) })));
+  return { resources: [...small, ...shared] };
 }
 
 export const syncResource = (who: { email: string }): Resource<SyncData> => ({

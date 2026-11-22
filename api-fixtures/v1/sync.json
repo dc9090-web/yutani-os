@@ -6,6 +6,10 @@
         "etag": "\"mZMPVnTiNtoowz9WSKkvo-yv9BrUaYjf\""
       },
       {
+        "path": "/api/v1/server",
+        "etag": "\"ClQjYEtso9D9XQCDZAS3FhSsOeOahYmW\""
+      },
+      {
         "path": "/api/v1/characters",
         "etag": "\"41Nhh-eXGRw6kEpG473cibutBNsacATO\""
       },

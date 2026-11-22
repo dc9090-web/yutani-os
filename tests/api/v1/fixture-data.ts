@@ -3,7 +3,7 @@ import { resetDb, resetSde } from "../../db/helpers.js";
 import { resetDogmaCache } from "../../../src/lib/dogma/sde-loader.js";
 import { loadSync, resetSyncCache } from "../../../src/lib/api/v1/sync.js";
 import {
-  assetsResource, charactersResource, clonesResource, meResource, overviewResource, shipDetailResource, shipsResource,
+  assetsResource, charactersResource, clonesResource, meResource, serverResource, overviewResource, shipDetailResource, shipsResource,
   skillsResource, trainingOverviewResource, trainingResource, walletRowsResource, walletSummaryResource, type ShipDetailKind,
 } from "../../../src/lib/api/v1/resources.js";
 import type { Resource } from "../../../src/lib/api/v1/respond.js";
@@ -186,6 +186,10 @@ export async function seedApiFixtureDb(): Promise<Pool> {
 
   await seedMain(pool);
 
+  // The player count, read a few minutes before the fixture clock.
+  await pool.query(
+    "INSERT INTO server_status (id, players, server_version, start_time, fetched_at) VALUES (1, 23456, '3113402', '2026-03-14T11:02:00Z', '2026-03-14T11:57:00Z')");
+
   // The alt: paused queue (ESI sends no dates), in space in Perimeter, online, no wallet row yet.
   await pool.query("INSERT INTO character_skill_summary (character_id, total_sp) VALUES ($1, 1250000)", [ALT]);
   await pool.query(
@@ -210,7 +214,7 @@ export function fixtureFile(path: string): string {
 
 function resourceFor(path: string): Resource {
   const who = { email: FIXTURE_EMAIL };
-  const globals = [meResource(who), charactersResource(), overviewResource(), trainingOverviewResource()];
+  const globals = [meResource(who), serverResource(), charactersResource(), overviewResource(), trainingOverviewResource()];
   const found = globals.find((r) => r.path === path);
   if (found !== undefined) return found;
   const match = /^\/api\/v1\/characters\/(\d+)\/(.+)$/.exec(path);
