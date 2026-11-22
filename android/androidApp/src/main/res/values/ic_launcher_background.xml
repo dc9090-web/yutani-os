@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Ground behind the black circle. Set to #000000 for a full-bleed black icon. -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+</resources>

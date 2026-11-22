@@ -21,10 +21,10 @@ object Shots {
     private val out = System.getProperty("shots").orEmpty()
     val wanted: Boolean get() = out.isNotEmpty()
 
-    fun shot(name: String, section: Section, heightDp: Int = 4000, screen: @Composable () -> Unit) {
+    fun shot(name: String, section: Section, heightDp: Int = 4000, live: AppContainer? = null, screen: @Composable () -> Unit) {
         File(out).mkdirs()
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        val app = Fixtures.app(scope)
+        val app = live ?: Fixtures.app(scope)
         try {
             ImageComposeScene(width = 390 * 2, height = heightDp * 2, density = Density(2f)) {
                 AppFrame(app) { SectionFrame(section, {}) { screen() } }

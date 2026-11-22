@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Yutani OS themed-icon layer (Android 13+): Y only, tinted by the system. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M150,151L206,151L282,272L282,361L230,361L230,278Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M306,151L362,151L292,262.3L264,217.8Z" />
+</vector>
