@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
@@ -48,7 +49,7 @@ class SyncEngine(private val api: ApiClient, private val store: Store, private v
                 stale.map { resource ->
                     async {
                         gate.withPermit { fetch(resource) }
-                        _progress.value = _progress.value.let { it.copy(done = it.done + 1) }
+                        _progress.update { it.copy(done = it.done + 1) }
                     }
                 }.awaitAll()
             }

@@ -32,12 +32,13 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.client.encoding)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
             implementation(libs.okio)
         }
+        androidMain.dependencies { implementation(libs.ktor.client.okhttp) }
+        jvmMain.dependencies { implementation(libs.ktor.client.okhttp) }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)

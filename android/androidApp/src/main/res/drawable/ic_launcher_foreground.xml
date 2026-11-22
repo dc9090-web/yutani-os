@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The site's mark (src/app/icon.svg), scaled into the adaptive icon's safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="32" android:viewportHeight="32">
+    <group android:scaleX="0.5" android:scaleY="0.5" android:pivotX="16" android:pivotY="16">
+        <path android:fillColor="#F5A524" android:pathData="M5.5,7 H10.8 L16,13.3 L21.2,7 H26.5 V8.6 L18.6,18.2 V20.9 L13.4,22.6 V18.2 L5.5,8.6 Z" />
+        <path android:fillColor="#F5A524" android:pathData="M13.4,24.2 L18.6,22.5 V25.1 L16.8,26.9 H13.4 Z" />
+    </group>
+</vector>

@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.kotlinx.coroutines.swing)
+    implementation(libs.kotlinx.coroutines.core)
 }
 
 // A development window only; it is never packaged or shipped.
