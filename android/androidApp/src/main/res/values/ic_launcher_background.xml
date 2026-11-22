@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Ground behind the black circle. Set to #000000 for a full-bleed black icon. -->
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <!-- Black, not the artwork's white. The launcher cuts the icon to a circle of 36dp radius and
+         the black circle in the foreground is 35.9dp, so a white ground showed through as a
+         hairline on part of the rim. With a black ground there is nothing lighter to show. -->
+    <color name="ic_launcher_background">#000000</color>
 </resources>
