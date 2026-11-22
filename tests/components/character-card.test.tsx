@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { CharacterCard, type OverviewCard } from "../../src/app/components/CharacterCard.js";
 
 const full: OverviewCard = {
@@ -8,122 +8,91 @@ const full: OverviewCard = {
   corp: "Caldari Navy · Northern Coalition",
   race: "Caldari",
   needsReauth: false,
-  balance: "1,234,568 ISK",
+  balance: "1,234,568",
   system: { name: "Jita", sec: "0.9", secClass: "sec-high" },
   dockedAt: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
   ship: { typeName: "Rifter", groupName: "Frigate" },
-  online: true,
+  online: null,
   training: { active: true, skill: "Caldari Frigate V", time: "3h 12m", percent: 64 },
   totalSp: "47.4M",
-  account: "Main",
+  accountTag: "MAIN",
   tags: ["Miner", "Scanner"],
 };
 
+const cell = (label: string) => screen.getByText(label).parentElement!;
+
 describe("CharacterCard", () => {
-  it("shows the balance, location, ship, training and SP", () => {
-    const { container } = render(<CharacterCard card={full} />);
-    expect(screen.getByRole("heading", { name: /TrilliumONE/ })).toBeInTheDocument();
-    expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
-    expect(screen.getByText("Caldari")).toHaveClass("ov-race");
-    expect(screen.getByText("1,234,568 ISK")).toBeInTheDocument();
+  it("shows identity, SP, wallet, ship, location and training", () => {
+    render(<CharacterCard card={full} />);
+    expect(screen.getByRole("heading", { level: 2, name: "TrilliumONE" })).toBeInTheDocument();
+    expect(screen.getByText("Caldari Navy · Northern Coalition · Caldari")).toBeInTheDocument();
+    expect(cell("Total SP")).toHaveTextContent("47.4M");
+    expect(cell("Wallet")).toHaveTextContent("Wallet1,234,568ISK");
+    expect(cell("Ship")).toHaveTextContent("ShipRifterFrigate");
     expect(screen.getByText("0.9")).toHaveClass("sec-high");
-
-    const locationRow = container.querySelectorAll(".ov-row")[1];
-    expect(locationRow.textContent).toContain("Jita");
-    expect(locationRow.textContent).toContain("Caldari Navy Assembly Plant");
-
-    const shipRow = container.querySelectorAll(".ov-row")[2];
-    expect(shipRow.querySelector(".ship-type-pills.ov-ship-pills")).not.toBeNull();
-    expect(shipRow.textContent).toContain("Rifter");
-    expect(shipRow.textContent).not.toContain("Scarlet Dart");   // the pilot's ship name is not shown here
-    expect(screen.getByText("Frigate")).toHaveClass("pill");
-    expect(screen.getByText("Rifter")).toHaveClass("pill");
-
+    expect(cell("Location")).toHaveTextContent("0.9 Jita");
+    const station = screen.getByText("Jita IV - Moon 4 - Caldari Navy Assembly Plant");
+    expect(station).toHaveAttribute("title", "Jita IV - Moon 4 - Caldari Navy Assembly Plant");
     expect(screen.getByText("Caldari Frigate V")).toBeInTheDocument();
-    expect(screen.getByText("3h 12m")).toHaveClass("dur");
-    expect(screen.getByText("47.4M")).toBeInTheDocument();
-    expect(screen.getByText("Total SP")).toBeInTheDocument();
+    expect(screen.getByText("3h 12m")).toHaveClass("ov-eta");
+    expect(screen.getByRole("img", { name: "Training progress 64%" })).toBeInTheDocument();
+    expect(screen.getByText("64%")).toBeInTheDocument();
   });
 
-  it("omits the race line until the character-info job has stored one", () => {
-    const { container } = render(<CharacterCard card={{ ...full, race: null }} />);
-    expect(container.querySelector(".ov-race")).toBeNull();
+  it("gives MAIN the filled badge and any other account the outlined one", () => {
+    const { rerender } = render(<CharacterCard card={full} />);
+    expect(screen.getByText("MAIN").className).toBe("yo-tag is-main");
+    rerender(<CharacterCard card={{ ...full, accountTag: "ALT" }} />);
+    expect(screen.getByText("ALT").className).toBe("yo-tag");
+    rerender(<CharacterCard card={{ ...full, accountTag: null }} />);
+    expect(screen.queryByText("MAIN")).toBeNull();
+    expect(screen.queryByText("ALT")).toBeNull();
   });
 
-  it("shows a mini progress bar sized to the training percent", () => {
-    render(<CharacterCard card={full} />);
-    const bar = screen.getByRole("progressbar");
-    expect(bar).toHaveAttribute("aria-valuenow", "64");
-    expect(bar.querySelector(".progress-fill")).toHaveStyle({ width: "64%" });
+  it("shows the owner's role tags as chips, and keeps the row when there are none", () => {
+    const { container, rerender } = render(<CharacterCard card={full} />);
+    expect(screen.getByText("Miner")).toHaveClass("yo-chip");
+    expect(screen.getByText("Scanner")).toHaveClass("yo-chip");
+    rerender(<CharacterCard card={{ ...full, tags: [] }} />);
+    expect(container.querySelector(".ov-roles")).not.toBeNull();
+    expect(container.querySelectorAll(".yo-chip")).toHaveLength(0);
   });
 
-  it("shows the online dot only while the character is online", () => {
-    const { rerender, container } = render(<CharacterCard card={full} />);
-    expect(container.querySelector(".online-dot.on")).not.toBeNull();
+  it("omits the race until the character-info job has stored one", () => {
+    render(<CharacterCard card={{ ...full, race: null }} />);
+    expect(screen.getByText("Caldari Navy · Northern Coalition")).toBeInTheDocument();
+  });
+
+  it("says Online in words only for a character who is online", () => {
+    const { rerender } = render(<CharacterCard card={{ ...full, online: true }} />);
+    expect(screen.getByText("Online")).toHaveClass("yo-tag", "is-good");
     rerender(<CharacterCard card={{ ...full, online: false }} />);
-    expect(container.querySelector(".online-dot")).toBeNull();   // offline: no grey dot
+    expect(screen.queryByText("Online")).toBeNull();
     rerender(<CharacterCard card={{ ...full, online: null }} />);
-    expect(container.querySelector(".online-dot")).toBeNull();
+    expect(screen.queryByText("Online")).toBeNull();
   });
 
-  it("shows the re-authorise badge, top-right of the head, for a broken token", () => {
+  it("flags a character whose token needs re-authorising", () => {
     render(<CharacterCard card={{ ...full, needsReauth: true }} />);
-    const badge = screen.getByText("re-authorise");
-    expect(badge).toHaveClass("needs_reauth");
-    expect(badge).toHaveClass("ov-status");
+    expect(screen.getByText("Re-authorise")).toHaveClass("yo-tag", "is-bad");
   });
 
-  it("degrades to placeholders before the first sync", () => {
-    render(<CharacterCard card={{
-      ...full, balance: null, system: null, dockedAt: null, ship: null, online: null,
-      training: { active: false, label: "Not synced" }, totalSp: null,
-    }} />);
-    expect(screen.getAllByText("Not synced yet")).toHaveLength(3);   // wallet, location and ship
-    expect(screen.getAllByText("—")).toHaveLength(1);                // total SP
+  it("says In space for an undocked character", () => {
+    render(<CharacterCard card={{ ...full, dockedAt: null }} />);
+    expect(cell("Location")).toHaveTextContent("0.9 JitaIn space");
+  });
+
+  it("marks what has not synced yet instead of inventing values", () => {
+    render(<CharacterCard card={{ ...full, balance: null, system: null, dockedAt: null, ship: null, totalSp: null, training: { active: false, label: "Not synced" } }} />);
+    expect(screen.getAllByText("Not synced yet")).toHaveLength(3);
+    expect(cell("Total SP")).toHaveTextContent("—");
     expect(screen.getByText("Not synced")).toBeInTheDocument();
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /Training progress/ })).toBeNull();
   });
 
-  it("shows 'Queue empty' with no progress bar when the queue is empty", () => {
+  it("shows a message and no bar when the queue is empty", () => {
     render(<CharacterCard card={{ ...full, training: { active: false, label: "Queue empty" } }} />);
-    expect(screen.getByText("Queue empty")).toHaveClass("faint");
-    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-  });
-
-  it("shows an account pill when the character is assigned to an account", () => {
-    render(<CharacterCard card={full} />);
-    expect(screen.getByText("Main")).toHaveClass("pill main");
-    expect(screen.getByText("Main").closest(".ov-head-right")).not.toBeNull();   // top-right of the card, not in the tag row
-  });
-
-  it("shows a plain pill for an account name that isn't Main or Alt", () => {
-    render(<CharacterCard card={{ ...full, account: "Trial" }} />);
-    const pill = screen.getByText("Trial");
-    expect(pill).toHaveClass("pill");
-    expect(pill).not.toHaveClass("main");
-    expect(pill).not.toHaveClass("alt");
-  });
-
-  it("shows no account pill when unassigned", () => {
-    render(<CharacterCard card={{ ...full, account: null }} />);
-    expect(screen.queryByText("Main")).not.toBeInTheDocument();
-  });
-
-  it("shows one green tag pill per tag, and no pills row when there are none", () => {
-    render(<CharacterCard card={full} />);
-    const pillsRow = screen.getByText("Miner").closest<HTMLElement>(".ov-pills");
-    expect(pillsRow).not.toBeNull();
-    expect(within(pillsRow!).getByText("Miner")).toHaveClass("pill tag");
-    expect(within(pillsRow!).getByText("Scanner")).toHaveClass("pill tag");
-
-    const { container } = render(<CharacterCard card={{ ...full, account: null, tags: [] }} />);
-    expect(container.querySelector(".ov-pills")).toBeNull();
-  });
-
-  it("gives an unknown tag name the same green tag pill", () => {
-    render(<CharacterCard card={{ ...full, tags: ["Hauler"] }} />);
-    const pill = screen.getByText("Hauler");
-    expect(pill).toHaveClass("pill tag");
-    expect(pill.className.trim()).toBe("pill tag");
+    expect(screen.getByText("Queue empty")).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /Training progress/ })).toBeNull();
   });
 });

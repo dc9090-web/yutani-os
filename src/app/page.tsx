@@ -6,19 +6,21 @@ import { getSkillSummary, listSkillQueue } from "../lib/db/character-skills.js";
 import { getGroups, getRaces, getSolarSystems, getTypes } from "../lib/sde/repo.js";
 import { locationLabels } from "../lib/names/index.js";
 import { tagsByCharacter } from "../lib/db/tags.js";
-import { iskWhole, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
+import { grouped, overviewTraining, secClass, secText, sp } from "../lib/view/format.js";
 import { liveQueue } from "../lib/view/skills.js";
 import { getConfig } from "../lib/config.js";
-import { overviewCharacters } from "../lib/view/characters.js";
+import { accountTag, overviewCharacters } from "../lib/view/characters.js";
+import { overviewSummary } from "../lib/view/overview.js";
 import { CharacterCard, type OverviewCard } from "./components/CharacterCard.js";
 import { NoCharacter } from "./components/NoCharacter.js";
+import { PageHead } from "./components/PageHead.js";
+import { StatStrip } from "./components/StatStrip.js";
 
 export default async function Overview() {
   const [allCharacters, accounts, tagsByChar] = await Promise.all([listCharacters(), listAccounts(), tagsByCharacter()]);
   const characters = overviewCharacters(allCharacters, getConfig().overviewCharacterIds);
   if (characters.length === 0) return <NoCharacter title="Overview" />;
   const now = new Date();
-  const accountNames = new Map(accounts.map((a) => [a.id, a.name]));
 
   // Four repo reads per character, all in flight at once; the id -> name lookups below are then
   // batched across every character so the page never queries inside a row loop.
@@ -70,7 +72,7 @@ export default async function Overview() {
       corp: `${character.corporationName ?? "—"}${character.allianceName ? ` · ${character.allianceName}` : ""}`,
       race: character.raceId === null ? null : races.get(character.raceId) ?? null,
       needsReauth: character.tokenStatus === "needs_reauth",
-      balance: wallet === null ? null : iskWhole(wallet.balance),
+      balance: wallet === null ? null : grouped(Math.round(wallet.balance)),
       system: location?.solarSystemId == null ? null : {
         name: system?.name ?? `Unknown system (${location.solarSystemId})`,
         sec: secText(system?.securityStatus ?? null),
@@ -87,16 +89,30 @@ export default async function Overview() {
         : overviewTraining(head === null || headName === null ? null
           : { ...head, skillName: headName }, now),
       totalSp: summary === null ? null : sp(summary.totalSp, false),
-      account: character.accountId == null ? null : accountNames.get(character.accountId) ?? null,
+      accountTag: accountTag(character.accountId, accounts),
       tags: tagsByChar.get(character.id) ?? [],
     };
   });
 
+  const summary = overviewSummary(rows.map(({ character, wallet, summary: skills, head }) => ({
+    name: character.name,
+    balance: wallet?.balance ?? null,
+    totalSp: skills?.totalSp ?? null,
+    headFinish: head?.finishDate ?? null,
+  })), now);
+
   return (<>
-    <h1 className="page-title">Overview</h1>
-    <p className="page-sub">{cards.length} character{cards.length === 1 ? "" : "s"} authorised</p>
-    <div className="card-grid overview">
+    <PageHead title="Overview" sub={`${cards.length} character${cards.length === 1 ? "" : "s"} authorised`} />
+    <StatStrip label="Account summary" cells={[
+      { label: "Combined wallet", value: summary.wallet ?? "—", unit: summary.wallet === null ? undefined : "ISK" },
+      { label: "Total skill points", value: summary.totalSp ?? "—", unit: summary.totalSp === null ? undefined : "SP" },
+      { label: "Training queues", value: summary.queuesActive, unit: `of ${summary.queuesTotal} active` },
+      summary.next === null
+        ? { label: "Next skill completes", value: "—" }
+        : { label: "Next skill completes", value: summary.next.time, unit: summary.next.name, unitIsText: true },
+    ]} />
+    <section className="ov-grid" aria-label="Characters">
       {cards.map((card) => <CharacterCard key={card.id} card={card} />)}
-    </div>
+    </section>
   </>);
 }

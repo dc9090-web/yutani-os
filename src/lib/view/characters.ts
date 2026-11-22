@@ -1,3 +1,5 @@
+import { sp } from "./format.js";
+
 export interface CharacterView { id: number; name: string; accountId: number | null; corporationName: string | null; allianceName: string | null; tokenStatus: "ok" | "needs_reauth" }
 export interface CharacterGroup { label: string; characters: CharacterView[] }
 
@@ -11,6 +13,33 @@ export function groupByAccount(characters: CharacterView[], accounts: { id: numb
   const rest = characters.filter((c) => c.accountId === null || !known.has(c.accountId));
   if (rest.length) groups.push({ label: "Unassigned", characters: rest });
   return groups;
+}
+
+/**
+ * "MAIN" / "ALT" — the account's name in capitals, as the badge beside a character's name. Accounts
+ * are named by the owner in Settings (ESI does not expose them), so any other name shows as typed.
+ */
+export function accountTag(accountId: number | null, accounts: readonly { id: number; name: string }[]): string | null {
+  const account = accountId === null ? undefined : accounts.find((a) => a.id === accountId);
+  return account === undefined ? null : account.name.toUpperCase();
+}
+
+export interface CharacterOptionView { id: number; name: string; tag: string | null; sp: string | null; needsReauth: boolean }
+
+/** The rows of the character dropdown, in the order the characters are listed everywhere else. */
+export function characterOptions(
+  characters: readonly { id: number; name: string; accountId: number | null; tokenStatus: "ok" | "needs_reauth" }[],
+  accounts: readonly { id: number; name: string }[],
+  totalSp: ReadonlyMap<number, number | null>,
+): CharacterOptionView[] {
+  return characters.map((c) => {
+    const points = totalSp.get(c.id) ?? null;
+    return {
+      id: c.id, name: c.name, tag: accountTag(c.accountId, accounts),
+      sp: points === null ? null : sp(points, false),
+      needsReauth: c.tokenStatus === "needs_reauth",
+    };
+  });
 }
 
 export function portraitUrl(id: number, size: 64 | 128 | 256 = 64): string {
