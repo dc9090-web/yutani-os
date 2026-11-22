@@ -5,7 +5,6 @@ export interface AppConfig {
   googleCallbackUrl: string;
   /** Google accounts allowed to sign in, trimmed and lower-cased. Never empty: an empty list stops the app. */
   allowedGoogleEmails: Set<string>;
-  allowedCharacterIds: Set<number>;
   /** Characters the Overview page and the Skills training overview show; empty = every authorised character. */
   overviewCharacterIds: Set<number>;
   /** Up to three letters for the header's account button (OWNER_INITIALS); null shows a person icon. */
@@ -16,10 +15,11 @@ export interface AppConfig {
   siteOrigin: string;
 }
 
-const REQUIRED = ["EVE_CLIENT_ID", "EVE_CLIENT_SECRET", "EVE_CALLBACK_URL", "ALLOWED_CHARACTER_IDS",
+const REQUIRED = ["EVE_CLIENT_ID", "EVE_CLIENT_SECRET", "EVE_CALLBACK_URL",
   "ESI_COMPATIBILITY_DATE", "ESI_USER_AGENT", "SESSION_SECRET", "DATABASE_URL",
   "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "ALLOWED_GOOGLE_EMAILS"] as const;
 
+/** Comma-separated positive character ids (used for OVERVIEW_CHARACTER_IDS); junk is dropped. */
 export function parseAllowedCharacterIds(raw: string | undefined): Set<number> {
   const out = new Set<number>();
   for (const part of (raw ?? "").split(",")) {
@@ -57,7 +57,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     googleClientId: env.GOOGLE_CLIENT_ID!, googleClientSecret: env.GOOGLE_CLIENT_SECRET!,
     googleCallbackUrl: `${siteOrigin}/auth/google/callback`,
     allowedGoogleEmails,
-    allowedCharacterIds: parseAllowedCharacterIds(env.ALLOWED_CHARACTER_IDS),
     overviewCharacterIds: parseAllowedCharacterIds(env.OVERVIEW_CHARACTER_IDS),
     ownerInitials: parseOwnerInitials(env.OWNER_INITIALS),
     esiBaseUrl: env.ESI_BASE_URL ?? "https://esi.evetech.net",

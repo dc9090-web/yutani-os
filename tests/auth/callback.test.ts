@@ -1,11 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
-import type { SessionPayload } from "../../src/lib/auth/session.js";
 
 process.env.EVE_CLIENT_ID = "cid";
 process.env.EVE_CLIENT_SECRET = "sec";
 process.env.EVE_CALLBACK_URL = "https://eve.example.com/auth/callback";
-process.env.ALLOWED_CHARACTER_IDS = "1,2";
 process.env.ESI_COMPATIBILITY_DATE = "2026-08-28";
 process.env.ESI_USER_AGENT = "ua";
 process.env.SESSION_SECRET = "s".repeat(32);
@@ -29,43 +27,60 @@ vi.mock("../../src/lib/auth/session.js", async (importOriginal) => {
 
 // These regular imports run after the mocks above because vitest hoists vi.mock() calls to the top of the file.
 import { GET } from "../../src/app/auth/callback/route.js";
-import { completeLogin } from "../../src/lib/auth/flow.js";
-import { readSession, verifyPayload, SESSION_COOKIE, SESSION_MAX_AGE } from "../../src/lib/auth/session.js";
+import { completeLogin, AuthError } from "../../src/lib/auth/flow.js";
+import { readSession, verifySession, SESSION_COOKIE, OAUTH_COOKIE } from "../../src/lib/auth/session.js";
 
 // Behind Traefik the route handler sees the container's own origin, not the public one —
 // redirects must be built from the configured site origin, never from req.nextUrl.
 function req(): NextRequest {
-  return new NextRequest("http://localhost:3000/auth/callback?code=c0de&state=st");
+  const r = new NextRequest("http://localhost:3000/auth/callback?code=c0de&state=st");
+  r.cookies.set(OAUTH_COOKIE, "oc");
+  return r;
 }
 
-describe("auth callback", () => {
+describe("auth callback (adding a character)", () => {
   beforeEach(() => {
+    vi.mocked(completeLogin).mockReset();
     vi.mocked(completeLogin).mockResolvedValue({ characterId: 2, name: "x" });
     vi.mocked(readSession).mockResolvedValue({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) });
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
-  it("redirects to /settings and keeps the existing active character when a session exists", async () => {
+  it("redirects to /settings and keeps the Google account and the existing active character", async () => {
     const res = await GET(req());
     expect(res.headers.get("location")).toBe("https://eve.example.com/settings");
-    const cookie = res.cookies.get(SESSION_COOKIE)?.value;
-    const payload = verifyPayload<SessionPayload>(cookie, process.env.SESSION_SECRET!, SESSION_MAX_AGE);
-    expect(payload).toMatchObject({ activeCharacterId: 1 });
+    expect(completeLogin).toHaveBeenCalledWith({ code: "c0de", state: "st", oauthCookie: "oc" }, expect.anything());
+    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!);
+    expect(payload).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1 });
+    expect(res.cookies.get(OAUTH_COOKIE)?.value ?? "").toBe("");
   });
 
-  it("redirects to / and uses the newly logged-in character when there is no existing session", async () => {
+  it("makes the new character active when the session has none yet", async () => {
+    vi.mocked(readSession).mockResolvedValue({ sub: "g-1", email: "owner@example.com", activeCharacterId: null, iat: Math.floor(Date.now() / 1000) });
+    const res = await GET(req());
+    expect(res.headers.get("location")).toBe("https://eve.example.com/settings");
+    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!);
+    expect(payload).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: 2 });
+  });
+
+  it("does nothing for a visitor who is not signed in", async () => {
     vi.mocked(readSession).mockResolvedValue(null);
     const res = await GET(req());
-    expect(res.headers.get("location")).toBe("https://eve.example.com/");
-    const cookie = res.cookies.get(SESSION_COOKIE)?.value;
-    const payload = verifyPayload<SessionPayload>(cookie, process.env.SESSION_SECRET!, SESSION_MAX_AGE);
-    expect(payload).toMatchObject({ activeCharacterId: 2 });
+    expect(res.headers.get("location")).toBe("https://eve.example.com/login");
+    expect(completeLogin).not.toHaveBeenCalled();
   });
-});
 
-describe("auth callback failure path", () => {
-  it("redirects to the public /login with the error code, not the container origin", async () => {
-    vi.mocked(completeLogin).mockRejectedValueOnce(Object.assign(new Error("bad"), { name: "AuthError", code: "jwt" }));
+  it("reports a failed character authorisation on Settings and keeps the session", async () => {
+    vi.mocked(completeLogin).mockRejectedValue(new AuthError("jwt" as never, "x"));
     const res = await GET(req());
-    expect(res.headers.get("location")).toMatch(/^https:\/\/eve\.example\.com\/login\?error=/);
+    expect(res.headers.get("location")).toBe("https://eve.example.com/settings?error=jwt");
+    expect(res.cookies.get(SESSION_COOKIE)).toBeUndefined();
+  });
+
+  it("reports an unexpected failure on Settings as unknown", async () => {
+    vi.mocked(completeLogin).mockRejectedValue(new Error("boom"));
+    const res = await GET(req());
+    expect(res.headers.get("location")).toBe("https://eve.example.com/settings?error=unknown");
+    expect(res.cookies.get(SESSION_COOKIE)).toBeUndefined();
   });
 });

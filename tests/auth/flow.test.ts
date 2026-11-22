@@ -8,7 +8,7 @@ import type { SsoMetadata } from "../../src/lib/auth/sso.js";
 const config = loadConfig({
   NODE_ENV: "test",
   EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.example.com/auth/callback",
-  ALLOWED_CHARACTER_IDS: "669539978", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
+  ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",
   GOOGLE_CLIENT_ID: "gid", GOOGLE_CLIENT_SECRET: "gsec", ALLOWED_GOOGLE_EMAILS: "owner@example.com",
 });
@@ -51,10 +51,10 @@ describe("completeLogin", () => {
     await expect(completeLogin({ code: "c", state: "other", oauthCookie: cookie }, config, deps())).rejects.toMatchObject({ code: "state" });
     await expect(completeLogin({ code: "c", state: "st", oauthCookie: undefined }, config, deps())).rejects.toMatchObject({ code: "state" });
   });
-  it("rejects a character that is not allow-listed and does not persist it", async () => {
+  it("stores any character the signed-in owner authorises", async () => {
     const d = deps({ verify: vi.fn(async () => ({ characterId: 42, name: "Stranger", scopes: [], owner: "o" })) });
-    await expect(completeLogin({ code: "c", state: "st", oauthCookie: cookie }, config, d)).rejects.toMatchObject({ code: "not-allowed" });
-    expect(d.upsert).not.toHaveBeenCalled();
+    await expect(completeLogin({ code: "c", state: "st", oauthCookie: cookie }, config, d)).resolves.toEqual({ characterId: 42, name: "Stranger" });
+    expect(d.upsert).toHaveBeenCalledWith(expect.objectContaining({ id: 42 }));
   });
   it("maps token and jwt failures", async () => {
     const d1 = deps({ exchange: vi.fn(async () => { throw new Error("http 500"); }) });

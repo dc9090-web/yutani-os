@@ -10,11 +10,13 @@ import { StaticDataPanel } from "./StaticDataPanel.js";
 import { SyncStatus } from "./SyncStatus.js";
 import { TagsPanel } from "./TagsPanel.js";
 import { PageHead } from "../components/PageHead.js";
+import { AuthoriseError } from "./AuthoriseError.js";
 
-export default async function SettingsPage() {
-  const [accounts, characters, runs, sdeMeta, tags, tagsByChar] = await Promise.all([
-    listAccounts(), listCharacters(), latestRuns(), getSdeMeta(), listTags(), tagsByCharacter(),
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ error?: string | string[] }> }) {
+  const [accounts, characters, runs, sdeMeta, tags, tagsByChar, query] = await Promise.all([
+    listAccounts(), listCharacters(), latestRuns(), getSdeMeta(), listTags(), tagsByCharacter(), searchParams,
   ]);
+  const error = typeof query.error === "string" && query.error !== "" ? query.error : null;
   const names = Object.fromEntries(characters.map((c) => [c.id, c.name]));
   // tagsByChar maps id -> sorted names; characters' tag chips need ids, so translate through the
   // (unique) name -> id lookup rather than adding a second tags repo query.
@@ -26,6 +28,7 @@ export default async function SettingsPage() {
   }
   return (<>
     <PageHead title="Settings" sub="Accounts, characters, static data and sync status." />
+    <AuthoriseError error={error} />
     <div className="card-grid settings-grid">
       <AccountsPanel accounts={accounts} />
       <CharactersPanel characters={characters.map(toCharacterView)} accounts={accounts} tags={tags} characterTags={characterTagIds} />
