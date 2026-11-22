@@ -25,6 +25,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -103,7 +104,14 @@ fun Header(modifier: Modifier = Modifier) {
 /** The 44dp second row: the six sections, scrolling sideways, the current one underlined in amber. */
 @Composable
 fun NavStrip(current: Section?, onSelect: (Section) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier.fillMaxWidth().height(44.dp).horizontalScroll(rememberScrollState()).padding(horizontal = 6.dp)) {
+    val scroll = rememberScrollState()
+    // On a narrow phone the last sections sit off the edge of the strip; keep the current one in view
+    // as swipes move through them.
+    LaunchedEffect(current, scroll.maxValue) {
+        val index = current?.ordinal ?: return@LaunchedEffect
+        scroll.animateScrollTo(scroll.maxValue * index / (Section.entries.size - 1))
+    }
+    Row(modifier.fillMaxWidth().height(44.dp).horizontalScroll(scroll).padding(horizontal = 6.dp)) {
         Section.entries.forEach { section ->
             val on = section == current
             Box(

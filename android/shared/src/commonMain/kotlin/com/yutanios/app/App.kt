@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -120,27 +122,35 @@ private fun Shell() {
     val app = LocalApp.current
     val nav = rememberNavController()
     val entry by nav.currentBackStackEntryAsState()
-    val route = entry?.destination?.route
-    val section = Section.entries.firstOrNull { it.route == route } ?: if (route?.startsWith("ship/") == true) Section.Ships else null
+    val onShip = entry?.destination?.route?.startsWith("ship/") == true
+    // The six sections sit side by side in a pager, so a swipe left or right flips between them
+    // and the strip above follows. A ship's detail opens over the pager and is left with Back.
+    val pager = rememberPagerState { Section.entries.size }
+    val scope = rememberCoroutineScope()
     // Opening the app is the moment to check for changes; the copy is on screen meanwhile.
     LaunchedEffect(Unit) { app.refresh() }
-    SectionFrame(section, onSelect = { target ->
-        nav.navigate(target.route) { popUpTo(Section.Overview.route) { saveState = true }; launchSingleTop = true; restoreState = true }
+    SectionFrame(if (onShip) Section.Ships else Section.entries[pager.currentPage], onSelect = { target ->
+        if (onShip) nav.popBackStack(HOME, inclusive = false)
+        scope.launch { pager.animateScrollToPage(target.ordinal) }
     }) {
         val active = LocalCharacters.current.active
-        NavHost(nav, startDestination = Section.Overview.route, modifier = Modifier.fillMaxSize()) {
-            composable(Section.Overview.route) { OverviewScreen() }
-            composable(Section.Skills.route) { PerCharacter("Skills", active?.id) { SkillsScreen(it) } }
-            composable(Section.Clones.route) { PerCharacter("Clones", active?.id) { ClonesScreen(it) } }
-            composable(Section.Assets.route) { PerCharacter("Assets", active?.id) { AssetsScreen(it) } }
-            composable(Section.Wallet.route) { PerCharacter("Wallet", active?.id) { WalletScreen(it) } }
-            composable(Section.Ships.route) {
-                PerCharacter("Ships", active?.id) { id ->
-                    ShipsScreen(
-                        id,
-                        onOpenAsset = { itemId -> nav.navigate("ship/asset/$id/$itemId") },
-                        onOpenFit = { fittingId -> nav.navigate("ship/fit/$id/$fittingId") },
-                    )
+        NavHost(nav, startDestination = HOME, modifier = Modifier.fillMaxSize()) {
+            composable(HOME) {
+                HorizontalPager(pager, Modifier.fillMaxSize(), key = { Section.entries[it].route }) { page ->
+                    when (Section.entries[page]) {
+                        Section.Overview -> OverviewScreen()
+                        Section.Skills -> PerCharacter("Skills", active?.id) { SkillsScreen(it) }
+                        Section.Clones -> PerCharacter("Clones", active?.id) { ClonesScreen(it) }
+                        Section.Assets -> PerCharacter("Assets", active?.id) { AssetsScreen(it) }
+                        Section.Wallet -> PerCharacter("Wallet", active?.id) { WalletScreen(it) }
+                        Section.Ships -> PerCharacter("Ships", active?.id) { id ->
+                            ShipsScreen(
+                                id,
+                                onOpenAsset = { itemId -> nav.navigate("ship/asset/$id/$itemId") },
+                                onOpenFit = { fittingId -> nav.navigate("ship/fit/$id/$fittingId") },
+                            )
+                        }
+                    }
                 }
             }
             val ids = listOf(navArgument("character") { type = NavType.LongType }, navArgument("id") { type = NavType.LongType })
@@ -155,6 +165,8 @@ private fun Shell() {
         }
     }
 }
+
+private const val HOME = "home"
 
 /** A per-character screen needs a character; before the first sync there is none to show. */
 @Composable
