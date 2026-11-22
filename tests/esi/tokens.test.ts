@@ -5,7 +5,7 @@ import { SsoError, type refreshAccessToken } from "../../src/lib/auth/sso.js";
 import { loadConfig } from "../../src/lib/config.js";
 import type { updateRefreshToken as updateRefreshTokenFn } from "../../src/lib/db/characters.js";
 
-const config = loadConfig({ NODE_ENV: "test", EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://x/cb", ALLOWED_CHARACTER_IDS: "1", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua", SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x" });
+const config = loadConfig({ NODE_ENV: "test", EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://x/cb", ALLOWED_CHARACTER_IDS: "1", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua", SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x", GOOGLE_CLIENT_ID: "gid", GOOGLE_CLIENT_SECRET: "gsec", ALLOWED_GOOGLE_EMAILS: "owner@example.com" });
 const metadata = { issuer: "i", authorization_endpoint: "a", token_endpoint: "t", jwks_uri: "j" };
 const character = { id: 1, name: "n", accountId: null, corporationId: null, corporationName: null, allianceId: null, allianceName: null, raceId: null, refreshTokenEnc: encryptSecret("rt-plain", config.sessionSecret), scopes: [], tokenStatus: "ok" as const, lastLoginAt: null };
 

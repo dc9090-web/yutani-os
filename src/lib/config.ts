@@ -1,5 +1,10 @@
 export interface AppConfig {
   eveClientId: string; eveClientSecret: string; eveCallbackUrl: string;
+  googleClientId: string; googleClientSecret: string;
+  /** `${siteOrigin}/auth/google/callback`. */
+  googleCallbackUrl: string;
+  /** Google accounts allowed to sign in, trimmed and lower-cased. Never empty: an empty list stops the app. */
+  allowedGoogleEmails: Set<string>;
   allowedCharacterIds: Set<number>;
   /** Characters the Overview page and the Skills training overview show; empty = every authorised character. */
   overviewCharacterIds: Set<number>;
@@ -12,13 +17,24 @@ export interface AppConfig {
 }
 
 const REQUIRED = ["EVE_CLIENT_ID", "EVE_CLIENT_SECRET", "EVE_CALLBACK_URL", "ALLOWED_CHARACTER_IDS",
-  "ESI_COMPATIBILITY_DATE", "ESI_USER_AGENT", "SESSION_SECRET", "DATABASE_URL"] as const;
+  "ESI_COMPATIBILITY_DATE", "ESI_USER_AGENT", "SESSION_SECRET", "DATABASE_URL",
+  "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "ALLOWED_GOOGLE_EMAILS"] as const;
 
 export function parseAllowedCharacterIds(raw: string | undefined): Set<number> {
   const out = new Set<number>();
   for (const part of (raw ?? "").split(",")) {
     const n = Number(part.trim());
     if (Number.isInteger(n) && n > 0) out.add(n);
+  }
+  return out;
+}
+
+/** Comma-separated emails, trimmed and lower-cased; an entry without "@" is dropped. */
+export function parseAllowedEmails(raw: string | undefined): Set<string> {
+  const out = new Set<string>();
+  for (const part of (raw ?? "").split(",")) {
+    const email = part.trim().toLowerCase();
+    if (email.includes("@")) out.add(email);
   }
   return out;
 }
@@ -32,15 +48,22 @@ export function parseOwnerInitials(raw: string | undefined): string | null {
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   const missing = REQUIRED.filter((k) => !env[k]);
   if (missing.length) throw new Error(`Missing env: ${missing.join(", ")}`);
+  // An empty allow-list must never mean "allow everyone".
+  const allowedGoogleEmails = parseAllowedEmails(env.ALLOWED_GOOGLE_EMAILS);
+  if (allowedGoogleEmails.size === 0) throw new Error("Missing env: ALLOWED_GOOGLE_EMAILS");
+  const siteOrigin = new URL(env.EVE_CALLBACK_URL!).origin;
   return {
     eveClientId: env.EVE_CLIENT_ID!, eveClientSecret: env.EVE_CLIENT_SECRET!, eveCallbackUrl: env.EVE_CALLBACK_URL!,
+    googleClientId: env.GOOGLE_CLIENT_ID!, googleClientSecret: env.GOOGLE_CLIENT_SECRET!,
+    googleCallbackUrl: `${siteOrigin}/auth/google/callback`,
+    allowedGoogleEmails,
     allowedCharacterIds: parseAllowedCharacterIds(env.ALLOWED_CHARACTER_IDS),
     overviewCharacterIds: parseAllowedCharacterIds(env.OVERVIEW_CHARACTER_IDS),
     ownerInitials: parseOwnerInitials(env.OWNER_INITIALS),
     esiBaseUrl: env.ESI_BASE_URL ?? "https://esi.evetech.net",
     esiCompatibilityDate: env.ESI_COMPATIBILITY_DATE!, esiUserAgent: env.ESI_USER_AGENT!,
     sessionSecret: env.SESSION_SECRET!, databaseUrl: env.DATABASE_URL!,
-    siteOrigin: new URL(env.EVE_CALLBACK_URL!).origin,
+    siteOrigin,
   };
 }
 

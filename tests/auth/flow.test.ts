@@ -10,6 +10,7 @@ const config = loadConfig({
   EVE_CLIENT_ID: "cid", EVE_CLIENT_SECRET: "sec", EVE_CALLBACK_URL: "https://eve.example.com/auth/callback",
   ALLOWED_CHARACTER_IDS: "669539978", ESI_COMPATIBILITY_DATE: "2026-08-28", ESI_USER_AGENT: "ua",
   SESSION_SECRET: "s".repeat(32), DATABASE_URL: "postgres://x",
+  GOOGLE_CLIENT_ID: "gid", GOOGLE_CLIENT_SECRET: "gsec", ALLOWED_GOOGLE_EMAILS: "owner@example.com",
 });
 const metadata: SsoMetadata = { issuer: "https://login.eveonline.com/", authorization_endpoint: "https://login.eveonline.com/v2/oauth/authorize", token_endpoint: "https://login.eveonline.com/v2/oauth/token", jwks_uri: "https://login.eveonline.com/oauth/jwks" };
 

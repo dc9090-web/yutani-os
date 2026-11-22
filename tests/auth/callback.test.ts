@@ -10,6 +10,9 @@ process.env.ESI_COMPATIBILITY_DATE = "2026-08-28";
 process.env.ESI_USER_AGENT = "ua";
 process.env.SESSION_SECRET = "s".repeat(32);
 process.env.DATABASE_URL = "postgres://x";
+process.env.GOOGLE_CLIENT_ID = "gid";
+process.env.GOOGLE_CLIENT_SECRET = "gsec";
+process.env.ALLOWED_GOOGLE_EMAILS = "owner@example.com";
 
 vi.mock("../../src/lib/auth/flow.js", () => ({
   completeLogin: vi.fn(async () => ({ characterId: 2, name: "x" })),
