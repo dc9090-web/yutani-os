@@ -1,0 +1,262 @@
+{
+  "data": {
+    "skillsSynced": true,
+    "ships": [
+      {
+        "key": "asset:1040000000001",
+        "href": "/ships/asset/1040000000001",
+        "name": "Paper Kite",
+        "typeId": 593,
+        "typeName": "Tristan",
+        "groupName": "Frigate",
+        "raceName": "Gallente",
+        "location": "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "stats": {
+          "dps": "176.2",
+          "ehp": "3,242",
+          "velocity": "988 m/s",
+          "cap": "Lasts 56s",
+          "capOk": false,
+          "propKind": "AB"
+        },
+        "cpu": {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 174,
+          "output": 167.38,
+          "text": "174.00 / 167.38 tf",
+          "percent": 100,
+          "over": true
+        },
+        "power": {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 40.22,
+          "output": 43.75,
+          "text": "40.22 / 43.75 MW",
+          "percent": 91.9,
+          "over": false
+        },
+        "missingSkills": 1,
+        "weapons": [
+          {
+            "key": "3178:12612",
+            "typeId": 3178,
+            "name": "Light Neutron Blaster II",
+            "count": 2,
+            "charge": "Void S",
+            "range": "optimal 1.6 km · falloff 1.4 km"
+          },
+          {
+            "key": "448:",
+            "typeId": 448,
+            "name": "Warp Scrambler II",
+            "count": 1,
+            "charge": null,
+            "range": "range 9.0 km"
+          },
+          {
+            "key": "527:",
+            "typeId": 527,
+            "name": "Stasis Webifier II",
+            "count": 1,
+            "charge": null,
+            "range": "range 10.0 km"
+          }
+        ],
+        "value": "27.2M ISK",
+        "valueRaw": 27193721,
+        "unpriced": "1 item unpriced",
+        "error": null,
+        "mastery": 1
+      },
+      {
+        "key": "asset:1040000000050",
+        "href": "/ships/asset/1040000000050",
+        "name": "Scarlet Dart",
+        "typeId": 587,
+        "typeName": "Rifter",
+        "groupName": "Frigate",
+        "raceName": "Minmatar",
+        "location": "Perimeter - Example Trade Tower",
+        "system": {
+          "name": "Perimeter",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "stats": {
+          "dps": "38.7",
+          "ehp": "2,107",
+          "velocity": "456 m/s",
+          "cap": "Stable 100%",
+          "capOk": true,
+          "propKind": null
+        },
+        "cpu": {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 36.75,
+          "output": 167.38,
+          "text": "36.75 / 167.38 tf",
+          "percent": 22,
+          "over": false
+        },
+        "power": {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 4.76,
+          "output": 51.25,
+          "text": "4.76 / 51.25 MW",
+          "percent": 9.3,
+          "over": false
+        },
+        "missingSkills": 2,
+        "weapons": [
+          {
+            "key": "2889:21898",
+            "typeId": 2889,
+            "name": "200mm AutoCannon II",
+            "count": 1,
+            "charge": "Republic Fleet EMP S",
+            "range": "optimal 720 m · falloff 8.3 km"
+          }
+        ],
+        "value": "5.0M ISK",
+        "valueRaw": 5035355,
+        "unpriced": null,
+        "error": null,
+        "mastery": 1
+      }
+    ],
+    "fits": [
+      {
+        "key": "fit:7001",
+        "href": "/ships/fit/7001",
+        "name": "Tristan - drone brawler",
+        "typeId": 593,
+        "typeName": "Tristan",
+        "groupName": "Frigate",
+        "raceName": "Gallente",
+        "location": "Saved fit",
+        "system": null,
+        "stats": {
+          "dps": "166.7",
+          "ehp": "3,242",
+          "velocity": "988 m/s",
+          "cap": "Lasts 57s",
+          "capOk": false,
+          "propKind": "AB"
+        },
+        "cpu": {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 174,
+          "output": 167.38,
+          "text": "174.00 / 167.38 tf",
+          "percent": 100,
+          "over": true
+        },
+        "power": {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 38.52,
+          "output": 43.75,
+          "text": "38.52 / 43.75 MW",
+          "percent": 88,
+          "over": false
+        },
+        "missingSkills": 1,
+        "weapons": [
+          {
+            "key": "3178:12612",
+            "typeId": 3178,
+            "name": "Light Neutron Blaster II",
+            "count": 2,
+            "charge": "Void S",
+            "range": "optimal 1.6 km · falloff 1.4 km"
+          },
+          {
+            "key": "448:",
+            "typeId": 448,
+            "name": "Warp Scrambler II",
+            "count": 1,
+            "charge": null,
+            "range": "range 9.0 km"
+          },
+          {
+            "key": "527:",
+            "typeId": 527,
+            "name": "Stasis Webifier II",
+            "count": 1,
+            "charge": null,
+            "range": "range 10.0 km"
+          }
+        ],
+        "value": "26.1M ISK",
+        "valueRaw": 26080821,
+        "unpriced": null,
+        "error": null,
+        "mastery": 1
+      },
+      {
+        "key": "fit:7002",
+        "href": "/ships/fit/7002",
+        "name": "Rifter - autocannons",
+        "typeId": 587,
+        "typeName": "Rifter",
+        "groupName": "Frigate",
+        "raceName": "Minmatar",
+        "location": "Saved fit",
+        "system": null,
+        "stats": {
+          "dps": "116.2",
+          "ehp": "2,778",
+          "velocity": "456 m/s",
+          "cap": "Stable 100%",
+          "capOk": true,
+          "propKind": null
+        },
+        "cpu": {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 80.25,
+          "output": 167.38,
+          "text": "80.25 / 167.38 tf",
+          "percent": 47.9,
+          "over": false
+        },
+        "power": {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 13.28,
+          "output": 51.25,
+          "text": "13.28 / 51.25 MW",
+          "percent": 25.9,
+          "over": false
+        },
+        "missingSkills": 2,
+        "weapons": [
+          {
+            "key": "2889:21898",
+            "typeId": 2889,
+            "name": "200mm AutoCannon II",
+            "count": 3,
+            "charge": "Republic Fleet EMP S",
+            "range": "optimal 720 m · falloff 8.3 km"
+          }
+        ],
+        "value": "12.8M ISK",
+        "valueRaw": 12824165,
+        "unpriced": null,
+        "error": null,
+        "mastery": 1
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

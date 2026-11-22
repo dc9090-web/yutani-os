@@ -1,0 +1,37 @@
+{
+  "data": {
+    "entries": [
+      {
+        "position": 1,
+        "skillId": 3329,
+        "skill": "Minmatar Frigate",
+        "desc": "Skill at operating Minmatar frigates.",
+        "targetLevel": 4,
+        "remaining": "—",
+        "progress": null,
+        "startAt": null,
+        "finishAt": null,
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 21000
+      },
+      {
+        "position": 2,
+        "skillId": 3302,
+        "skill": "Small Projectile Turret",
+        "desc": "Operation of small projectile turrets. 5% Bonus to small projectile turret damage per level.",
+        "targetLevel": 4,
+        "remaining": "—",
+        "progress": null,
+        "startAt": null,
+        "finishAt": null,
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 8000
+      }
+    ],
+    "finishAt": null,
+    "eta": "—"
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

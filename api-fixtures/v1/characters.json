@@ -1,0 +1,28 @@
+{
+  "data": {
+    "characters": [
+      {
+        "id": 9000001,
+        "name": "Example Pilot One",
+        "tag": "MAIN",
+        "sp": "3.9M",
+        "needsReauth": false
+      },
+      {
+        "id": 9000002,
+        "name": "Example Pilot Two",
+        "tag": "ALT",
+        "sp": "1.3M",
+        "needsReauth": true
+      },
+      {
+        "id": 9000003,
+        "name": "Example Pilot Three",
+        "tag": null,
+        "sp": null,
+        "needsReauth": false
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

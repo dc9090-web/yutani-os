@@ -1,0 +1,90 @@
+{
+  "data": {
+    "kind": "transactions",
+    "offset": 0,
+    "limit": 500,
+    "rows": [
+      {
+        "day": "2026-03-14",
+        "time": "10:42",
+        "typeId": 2456,
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "unitText": "920,000.00",
+        "signedTotal": "+18,400,000.00",
+        "transactionId": 6001,
+        "date": "2026-03-14 10:42",
+        "side": "Sell",
+        "typeName": "Hobgoblin II",
+        "quantity": "20",
+        "unitPrice": "920,000.00 ISK",
+        "total": "18,400,000.00 ISK",
+        "location": "Jita IV - Moon 4 - Caldari Navy Assembly Plant"
+      },
+      {
+        "day": "2026-03-13",
+        "time": "19:30",
+        "typeId": 12612,
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "unitText": "410.50",
+        "signedTotal": "−2,052,500.00",
+        "transactionId": 6002,
+        "date": "2026-03-13 19:30",
+        "side": "Buy",
+        "typeName": "Void S",
+        "quantity": "5,000",
+        "unitPrice": "410.50 ISK",
+        "total": "2,052,500.00 ISK",
+        "location": "Jita IV - Moon 4 - Caldari Navy Assembly Plant"
+      },
+      {
+        "day": "2026-03-12",
+        "time": "12:00",
+        "typeId": 593,
+        "system": {
+          "name": "Perimeter",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "unitText": "1,150,000.00",
+        "signedTotal": "−1,150,000.00",
+        "transactionId": 6003,
+        "date": "2026-03-12 12:00",
+        "side": "Buy",
+        "typeName": "Tristan",
+        "quantity": "1",
+        "unitPrice": "1,150,000.00 ISK",
+        "total": "1,150,000.00 ISK",
+        "location": "Perimeter - Example Trade Tower"
+      },
+      {
+        "day": "2026-03-09",
+        "time": "07:45",
+        "typeId": 34,
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "unitText": "4.18",
+        "signedTotal": "+1,045,000.00",
+        "transactionId": 6004,
+        "date": "2026-03-09 07:45",
+        "side": "Sell",
+        "typeName": "Tritanium",
+        "quantity": "250,000",
+        "unitPrice": "4.18 ISK",
+        "total": "1,045,000.00 ISK",
+        "location": "Jita IV - Moon 4 - Caldari Navy Assembly Plant"
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

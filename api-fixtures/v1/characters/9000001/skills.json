@@ -1,0 +1,566 @@
+{
+  "data": {
+    "groups": [
+      {
+        "groupId": 1210,
+        "name": "Armor",
+        "groupSp": "557k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3394,
+            "name": "Hull Upgrades",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at maintaining your ship's armor and installing hull upgrades like expanded cargoholds and inertial stabilizers. Grants a 5% bonus to armor hit points per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3392,
+            "name": "Mechanics",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at maintaining the mechanical components and structural integrity of a spaceship. 5% bonus to structure hit points per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3393,
+            "name": "Repair Systems",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Operation of armor/hull repair modules. 5% reduction in repair systems duration per skill level.\n\nNote: Has no effect on capital sized modules.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          }
+        ]
+      },
+      {
+        "groupId": 273,
+        "name": "Drones",
+        "groupSp": "709k",
+        "queued": 3,
+        "skills": [
+          {
+            "skillId": 3437,
+            "name": "Drone Avionics",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at control range for all drones.\n\nBonus: Drone control range increased by 5000 meters per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 23618,
+            "name": "Drone Durability",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Increases drone and fighter hit points.\n\n5% bonus to drone shield, armor and hull hit points per level.\n5% bonus to fighter hit points per level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3442,
+            "name": "Drone Interfacing",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 1,
+            "training": true,
+            "desc": "Improves damage and mining yield for drones and fighters under your control.\n\n10% bonus to drone damage and drone mining yield per level.\n10% bonus to fighter damage per level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 12305,
+            "name": "Drone Navigation",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at controlling drones at high speeds.\n\n5% increase in drone max velocity per level.\n5% increase in fighter max velocity per level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 23606,
+            "name": "Drone Sharpshooting",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Increases the weapon range of drones and fighters.\n\n5% bonus to drone optimal range per level.\n5% bonus to fighter optimal range per level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3436,
+            "name": "Drones",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at remote controlling drones. Can operate 1 drone per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 12486,
+            "name": "Gallente Drone Specialization",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 2,
+            "training": false,
+            "desc": "Specialization in the operation of advanced Gallente drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Gallente Drone Specialization.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 24241,
+            "name": "Light Drone Operation",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at controlling light combat drones. 5% bonus to damage of light drones per level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          }
+        ]
+      },
+      {
+        "groupId": 272,
+        "name": "Electronic Systems",
+        "groupSp": "53k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3427,
+            "name": "Electronic Warfare",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Operation of ECM jamming systems. 5% less capacitor need for ECM and ECM Burst systems per skill level.\n\nNote: Does not affect capital class modules.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3435,
+            "name": "Propulsion Jamming",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at using propulsion/warpdrive jammers. 5% Reduction to Warp Scrambler, Warp Disruptor, and Stasis Web capacitor need per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          }
+        ]
+      },
+      {
+        "groupId": 1216,
+        "name": "Engineering",
+        "groupSp": "866k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 11207,
+            "name": "Advanced Weapon Upgrades",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Reduces the powergrid needs of weapon turrets and launchers by 2% per skill level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3418,
+            "name": "Capacitor Management",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at regulating your ship's overall energy capacity. 5% bonus to capacitor capacity per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3417,
+            "name": "Capacitor Systems Operation",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at operating your ship's capacitor, including the use of capacitor boosters and other basic energy modules. 5% reduction in capacitor recharge time per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3426,
+            "name": "CPU Management",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Basic understanding of spaceship sensory and computer systems. 5% Bonus to ship CPU output per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3413,
+            "name": "Power Grid Management",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Basic understanding of spaceship energy grid systems. 5% Bonus to ship's powergrid output per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3318,
+            "name": "Weapon Upgrades",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Knowledge of gunnery computer systems, including the use of weapon upgrade modules. 5% reduction per skill level in the CPU needs of weapon turrets, launchers and smartbombs.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          }
+        ]
+      },
+      {
+        "groupId": 255,
+        "name": "Gunnery",
+        "groupSp": "762k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3316,
+            "name": "Controlled Bursts",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Allows better control over the capacitor use of weapon turrets. 5% reduction in capacitor need of weapon turrets per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3300,
+            "name": "Gunnery",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Basic turret operation skill. 2% Bonus to weapon turrets' rate of fire per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3312,
+            "name": "Motion Prediction",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Improved ability at hitting moving targets. 5% bonus per skill level to weapon turret tracking speeds.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3310,
+            "name": "Rapid Firing",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at the rapid discharge of weapon turrets. 4% bonus per skill level to weapon turret rate of fire.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3311,
+            "name": "Sharpshooter",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at long-range weapon turret firing. 5% bonus to weapon optimal range per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 12210,
+            "name": "Small Blaster Specialization",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Specialist training in the operation of advanced small blasters. 2% bonus per skill level to the damage of small turrets requiring Small Blaster Specialization.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3301,
+            "name": "Small Hybrid Turret",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Operation of small hybrid turrets. 5% Bonus to small hybrid turret damage per level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3302,
+            "name": "Small Projectile Turret",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Operation of small projectile turrets. 5% Bonus to small projectile turret damage per level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3315,
+            "name": "Surgical Strike",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Knowledge of spaceships' structural weaknesses. 3% bonus per skill level to the damage of all weapon turrets.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3317,
+            "name": "Trajectory Analysis",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Advanced understanding of zero-G physics. 5% bonus per skill level to weapon turret accuracy falloff.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          }
+        ]
+      },
+      {
+        "groupId": 275,
+        "name": "Navigation",
+        "groupSp": "317k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3452,
+            "name": "Acceleration Control",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at efficiently using Afterburners and MicroWarpdrives. 5% Bonus to Afterburner and MicroWarpdrive speed boost per skill level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3450,
+            "name": "Afterburner",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at using afterburners. 5% reduction to Afterburner duration and 10% reduction in Afterburner capacitor use per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3453,
+            "name": "Evasive Maneuvering",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Improved skill at efficiently turning and accelerating a spaceship. 5% improved ship agility for all ships per skill level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3449,
+            "name": "Navigation",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at regulating the power output of ship thrusters. 5% bonus to sub-warp ship velocity per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          }
+        ]
+      },
+      {
+        "groupId": 270,
+        "name": "Science",
+        "groupSp": "45k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3402,
+            "name": "Science",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Basic understanding of scientific principles. 5% Bonus to blueprint copying speed per level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          }
+        ]
+      },
+      {
+        "groupId": 257,
+        "name": "Spaceship Command",
+        "groupSp": "557k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3328,
+            "name": "Gallente Frigate",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at operating Gallente frigates.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          },
+          {
+            "skillId": 3329,
+            "name": "Minmatar Frigate",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at operating Minmatar frigates.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          },
+          {
+            "skillId": 3327,
+            "name": "Spaceship Command",
+            "level": 5,
+            "activeLevel": 5,
+            "queued": 0,
+            "training": false,
+            "desc": "The basic operation of spaceships. 2% improved ship agility for all ships per skill level.",
+            "trainedLevel": 5,
+            "trainedActiveLevel": 5
+          }
+        ]
+      },
+      {
+        "groupId": 1213,
+        "name": "Targeting",
+        "groupSp": "24k",
+        "queued": 0,
+        "skills": [
+          {
+            "skillId": 3428,
+            "name": "Long Range Targeting",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at long range targeting. 5% Bonus to targeting range per skill level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3431,
+            "name": "Signature Analysis",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at operating Targeting systems. 5% improved targeting speed per skill level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3429,
+            "name": "Target Management",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Skill at targeting multiple targets. +1 extra target per skill level, up to the ship's maximum allowed number of targets locked.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          }
+        ]
+      }
+    ],
+    "queueLength": 3,
+    "queue": [
+      {
+        "skillId": 3315,
+        "skill": "Surgical Strike",
+        "level": 4,
+        "label": "Surgical Strike IV",
+        "startAt": "2026-03-12T08:00:00.000Z",
+        "finishAt": "2026-03-14T06:30:00.000Z",
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 8000
+      },
+      {
+        "skillId": 3442,
+        "skill": "Drone Interfacing",
+        "level": 5,
+        "label": "Drone Interfacing V",
+        "startAt": "2026-03-14T06:30:00.000Z",
+        "finishAt": "2026-03-19T18:45:00.000Z",
+        "levelStartSp": 45255,
+        "levelEndSp": 256000,
+        "trainingStartSp": 61200
+      },
+      {
+        "skillId": 12486,
+        "skill": "Gallente Drone Specialization",
+        "level": 4,
+        "label": "Gallente Drone Specialization IV",
+        "startAt": "2026-03-19T18:45:00.000Z",
+        "finishAt": "2026-03-22T03:10:00.000Z",
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 8000
+      },
+      {
+        "skillId": 12486,
+        "skill": "Gallente Drone Specialization",
+        "level": 5,
+        "label": "Gallente Drone Specialization V",
+        "startAt": "2026-03-22T03:10:00.000Z",
+        "finishAt": "2026-04-05T21:00:00.000Z",
+        "levelStartSp": 45255,
+        "levelEndSp": 256000,
+        "trainingStartSp": 45255
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

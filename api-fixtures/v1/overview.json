@@ -1,0 +1,179 @@
+{
+  "data": {
+    "summary": {
+      "wallet": "1.28B",
+      "totalSp": "5.1M",
+      "queuesActive": 1,
+      "queuesTotal": 3,
+      "next": {
+        "time": "5d 6h 45m",
+        "name": "Example Pilot One"
+      }
+    },
+    "cards": [
+      {
+        "id": 9000001,
+        "name": "Example Pilot One",
+        "corp": "Example Corporation · Example Alliance",
+        "race": "Gallente",
+        "needsReauth": false,
+        "balance": "1,284,503,217",
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "dockedAt": "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+        "ship": {
+          "typeId": 593,
+          "typeName": "Tristan",
+          "groupName": "Frigate"
+        },
+        "online": false,
+        "training": {
+          "active": true,
+          "skill": "Drone Interfacing V",
+          "time": "5d 6h 45m",
+          "percent": 11
+        },
+        "trainingRaw": {
+          "synced": true,
+          "queue": [
+            {
+              "skillId": 3315,
+              "skill": "Surgical Strike",
+              "level": 4,
+              "label": "Surgical Strike IV",
+              "startAt": "2026-03-12T08:00:00.000Z",
+              "finishAt": "2026-03-14T06:30:00.000Z",
+              "levelStartSp": 8000,
+              "levelEndSp": 45255,
+              "trainingStartSp": 8000
+            },
+            {
+              "skillId": 3442,
+              "skill": "Drone Interfacing",
+              "level": 5,
+              "label": "Drone Interfacing V",
+              "startAt": "2026-03-14T06:30:00.000Z",
+              "finishAt": "2026-03-19T18:45:00.000Z",
+              "levelStartSp": 45255,
+              "levelEndSp": 256000,
+              "trainingStartSp": 61200
+            },
+            {
+              "skillId": 12486,
+              "skill": "Gallente Drone Specialization",
+              "level": 4,
+              "label": "Gallente Drone Specialization IV",
+              "startAt": "2026-03-19T18:45:00.000Z",
+              "finishAt": "2026-03-22T03:10:00.000Z",
+              "levelStartSp": 8000,
+              "levelEndSp": 45255,
+              "trainingStartSp": 8000
+            },
+            {
+              "skillId": 12486,
+              "skill": "Gallente Drone Specialization",
+              "level": 5,
+              "label": "Gallente Drone Specialization V",
+              "startAt": "2026-03-22T03:10:00.000Z",
+              "finishAt": "2026-04-05T21:00:00.000Z",
+              "levelStartSp": 45255,
+              "levelEndSp": 256000,
+              "trainingStartSp": 45255
+            }
+          ]
+        },
+        "totalSp": "3.9M",
+        "accountTag": "MAIN",
+        "tags": [
+          "Scout"
+        ]
+      },
+      {
+        "id": 9000002,
+        "name": "Example Pilot Two",
+        "corp": "Example Corporation",
+        "race": "Minmatar",
+        "needsReauth": true,
+        "balance": null,
+        "system": {
+          "name": "Perimeter",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "dockedAt": null,
+        "ship": {
+          "typeId": 587,
+          "typeName": "Rifter",
+          "groupName": "Frigate"
+        },
+        "online": true,
+        "training": {
+          "active": true,
+          "skill": "Minmatar Frigate IV",
+          "time": "paused",
+          "percent": 0
+        },
+        "trainingRaw": {
+          "synced": true,
+          "queue": [
+            {
+              "skillId": 3329,
+              "skill": "Minmatar Frigate",
+              "level": 4,
+              "label": "Minmatar Frigate IV",
+              "startAt": null,
+              "finishAt": null,
+              "levelStartSp": 8000,
+              "levelEndSp": 45255,
+              "trainingStartSp": 21000
+            },
+            {
+              "skillId": 3302,
+              "skill": "Small Projectile Turret",
+              "level": 4,
+              "label": "Small Projectile Turret IV",
+              "startAt": null,
+              "finishAt": null,
+              "levelStartSp": 8000,
+              "levelEndSp": 45255,
+              "trainingStartSp": 8000
+            }
+          ]
+        },
+        "totalSp": "1.3M",
+        "accountTag": "ALT",
+        "tags": [
+          "Hauler",
+          "Scout"
+        ]
+      },
+      {
+        "id": 9000003,
+        "name": "Example Pilot Three",
+        "corp": "—",
+        "race": null,
+        "needsReauth": false,
+        "balance": null,
+        "system": null,
+        "dockedAt": null,
+        "ship": null,
+        "online": null,
+        "training": {
+          "active": false,
+          "label": "Not synced"
+        },
+        "trainingRaw": {
+          "synced": false,
+          "queue": []
+        },
+        "totalSp": null,
+        "accountTag": null,
+        "tags": []
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

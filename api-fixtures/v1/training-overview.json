@@ -1,0 +1,174 @@
+{
+  "data": {
+    "characters": [
+      {
+        "id": 9000001,
+        "name": "Example Pilot One",
+        "online": false,
+        "status": {
+          "kind": "eta",
+          "text": "22d 9h"
+        },
+        "progress": 0.11410151249812696,
+        "count": 3,
+        "rows": [
+          {
+            "position": 1,
+            "skill": "Drone Interfacing",
+            "trainedLevel": 4,
+            "targetLevel": 5,
+            "training": true,
+            "remaining": "5d 6h 45m"
+          },
+          {
+            "position": 2,
+            "skill": "Gallente Drone Specialization",
+            "trainedLevel": 3,
+            "targetLevel": 4,
+            "training": false,
+            "remaining": "2d 8h 25m"
+          },
+          {
+            "position": 3,
+            "skill": "Gallente Drone Specialization",
+            "trainedLevel": 4,
+            "targetLevel": 5,
+            "training": false,
+            "remaining": "14d 17h 50m"
+          }
+        ],
+        "truncated": false,
+        "synced": true,
+        "queue": [
+          {
+            "skillId": 3315,
+            "skill": "Surgical Strike",
+            "level": 4,
+            "label": "Surgical Strike IV",
+            "startAt": "2026-03-12T08:00:00.000Z",
+            "finishAt": "2026-03-14T06:30:00.000Z",
+            "levelStartSp": 8000,
+            "levelEndSp": 45255,
+            "trainingStartSp": 8000
+          },
+          {
+            "skillId": 3442,
+            "skill": "Drone Interfacing",
+            "level": 5,
+            "label": "Drone Interfacing V",
+            "startAt": "2026-03-14T06:30:00.000Z",
+            "finishAt": "2026-03-19T18:45:00.000Z",
+            "levelStartSp": 45255,
+            "levelEndSp": 256000,
+            "trainingStartSp": 61200
+          },
+          {
+            "skillId": 12486,
+            "skill": "Gallente Drone Specialization",
+            "level": 4,
+            "label": "Gallente Drone Specialization IV",
+            "startAt": "2026-03-19T18:45:00.000Z",
+            "finishAt": "2026-03-22T03:10:00.000Z",
+            "levelStartSp": 8000,
+            "levelEndSp": 45255,
+            "trainingStartSp": 8000
+          },
+          {
+            "skillId": 12486,
+            "skill": "Gallente Drone Specialization",
+            "level": 5,
+            "label": "Gallente Drone Specialization V",
+            "startAt": "2026-03-22T03:10:00.000Z",
+            "finishAt": "2026-04-05T21:00:00.000Z",
+            "levelStartSp": 45255,
+            "levelEndSp": 256000,
+            "trainingStartSp": 45255
+          }
+        ]
+      },
+      {
+        "id": 9000002,
+        "name": "Example Pilot Two",
+        "online": true,
+        "status": {
+          "kind": "paused"
+        },
+        "progress": null,
+        "count": 2,
+        "rows": [
+          {
+            "position": 1,
+            "skill": "Minmatar Frigate",
+            "trainedLevel": 3,
+            "targetLevel": 4,
+            "training": false,
+            "remaining": "—"
+          },
+          {
+            "position": 2,
+            "skill": "Small Projectile Turret",
+            "trainedLevel": 3,
+            "targetLevel": 4,
+            "training": false,
+            "remaining": "—"
+          }
+        ],
+        "truncated": false,
+        "synced": true,
+        "queue": [
+          {
+            "skillId": 3329,
+            "skill": "Minmatar Frigate",
+            "level": 4,
+            "label": "Minmatar Frigate IV",
+            "startAt": null,
+            "finishAt": null,
+            "levelStartSp": 8000,
+            "levelEndSp": 45255,
+            "trainingStartSp": 21000
+          },
+          {
+            "skillId": 3302,
+            "skill": "Small Projectile Turret",
+            "level": 4,
+            "label": "Small Projectile Turret IV",
+            "startAt": null,
+            "finishAt": null,
+            "levelStartSp": 8000,
+            "levelEndSp": 45255,
+            "trainingStartSp": 8000
+          }
+        ]
+      },
+      {
+        "id": 9000003,
+        "name": "Example Pilot Three",
+        "online": null,
+        "status": {
+          "kind": "notSynced"
+        },
+        "progress": null,
+        "count": 0,
+        "rows": [],
+        "truncated": false,
+        "synced": false,
+        "queue": []
+      }
+    ],
+    "all": [
+      {
+        "id": 9000001,
+        "name": "Example Pilot One"
+      },
+      {
+        "id": 9000002,
+        "name": "Example Pilot Two"
+      },
+      {
+        "id": 9000003,
+        "name": "Example Pilot Three"
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

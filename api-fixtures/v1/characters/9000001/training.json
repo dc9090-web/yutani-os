@@ -1,0 +1,51 @@
+{
+  "data": {
+    "entries": [
+      {
+        "position": 1,
+        "skillId": 3442,
+        "skill": "Drone Interfacing",
+        "desc": "Improves damage and mining yield for drones and fighters under your control.\n\n10% bonus to drone damage and drone mining yield per level.\n10% bonus to fighter damage per level.",
+        "targetLevel": 5,
+        "remaining": "5d 6h 45m",
+        "progress": 0.11410151249812696,
+        "startAt": "2026-03-14T06:30:00.000Z",
+        "finishAt": "2026-03-19T18:45:00.000Z",
+        "levelStartSp": 45255,
+        "levelEndSp": 256000,
+        "trainingStartSp": 61200
+      },
+      {
+        "position": 2,
+        "skillId": 12486,
+        "skill": "Gallente Drone Specialization",
+        "desc": "Specialization in the operation of advanced Gallente drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Gallente Drone Specialization.",
+        "targetLevel": 4,
+        "remaining": "2d 8h 25m",
+        "progress": null,
+        "startAt": "2026-03-19T18:45:00.000Z",
+        "finishAt": "2026-03-22T03:10:00.000Z",
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 8000
+      },
+      {
+        "position": 3,
+        "skillId": 12486,
+        "skill": "Gallente Drone Specialization",
+        "desc": "Specialization in the operation of advanced Gallente drones. 2% bonus per skill level to the damage of light, medium, heavy and sentry drones requiring Gallente Drone Specialization.",
+        "targetLevel": 5,
+        "remaining": "14d 17h 50m",
+        "progress": null,
+        "startAt": "2026-03-22T03:10:00.000Z",
+        "finishAt": "2026-04-05T21:00:00.000Z",
+        "levelStartSp": 45255,
+        "levelEndSp": 256000,
+        "trainingStartSp": 45255
+      }
+    ],
+    "finishAt": "2026-04-05T21:00:00.000Z",
+    "eta": "22d 9h 0m 0s"
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

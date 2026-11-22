@@ -1,0 +1,647 @@
+{
+  "data": {
+    "kind": "ok",
+    "view": {
+      "title": "Scarlet Dart",
+      "typeId": 587,
+      "typeName": "Rifter",
+      "ship": {
+        "typeName": "Rifter",
+        "groupName": "Frigate",
+        "raceName": "Minmatar"
+      },
+      "location": {
+        "system": {
+          "name": "Perimeter",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "place": "Perimeter - Example Trade Tower",
+        "note": null
+      },
+      "renderUrl": "https://images.evetech.net/types/587/render?size=128",
+      "skillsSynced": true,
+      "stats": {
+        "capacitor": {
+          "title": "Capacitor",
+          "headline": "Stable 100%",
+          "ok": true,
+          "rows": [
+            {
+              "label": "Capacity",
+              "value": "300 GJ / 1m 40s"
+            },
+            {
+              "label": "Recharge",
+              "value": "7.5 GJ/s peak"
+            },
+            {
+              "label": "Δ",
+              "value": "+7.5 GJ/s (100.0%)"
+            }
+          ]
+        },
+        "offense": {
+          "title": "Offense",
+          "headline": "38.7 dps",
+          "note": null,
+          "rows": [
+            {
+              "label": "Weapons",
+              "value": "38.7 dps"
+            },
+            {
+              "label": "Drones",
+              "value": "—"
+            },
+            {
+              "label": "Volley",
+              "value": "69 HP"
+            }
+          ]
+        },
+        "defense": {
+          "title": "Defense",
+          "headline": "2,107 ehp",
+          "recharge": "1.8 hp/s",
+          "layers": [
+            {
+              "layer": "Shield",
+              "hp": "450 hp",
+              "note": "625 s",
+              "resists": [
+                0,
+                20,
+                40,
+                50
+              ],
+              "ehp": "621"
+            },
+            {
+              "layer": "Armor",
+              "hp": "563 hp",
+              "note": null,
+              "resists": [
+                60,
+                35,
+                25,
+                10
+              ],
+              "ehp": "833"
+            },
+            {
+              "layer": "Hull",
+              "hp": "438 hp",
+              "note": null,
+              "resists": [
+                33,
+                33,
+                33,
+                33
+              ],
+              "ehp": "653"
+            }
+          ],
+          "rows": []
+        },
+        "targeting": {
+          "title": "Targeting",
+          "headline": "25.9 km",
+          "rows": [
+            {
+              "label": "Sensor strength",
+              "value": "8.0 points (Ladar)"
+            },
+            {
+              "label": "Scan resolution",
+              "value": "759 mm"
+            },
+            {
+              "label": "Signature radius",
+              "value": "35 m"
+            },
+            {
+              "label": "Max targets",
+              "value": "3×"
+            }
+          ]
+        },
+        "navigation": {
+          "title": "Navigation",
+          "headline": "456.3 m/s",
+          "rows": [
+            {
+              "label": "Mass",
+              "value": "1,067.0 t"
+            },
+            {
+              "label": "Inertia",
+              "value": "2.4480×"
+            },
+            {
+              "label": "Warp speed",
+              "value": "5.00 AU/s"
+            },
+            {
+              "label": "Align time",
+              "value": "3.62 s"
+            }
+          ]
+        },
+        "drones": {
+          "title": "Drones",
+          "headline": "—",
+          "rows": [
+            {
+              "label": "Bandwidth",
+              "value": "0 / 0 Mbit/s"
+            },
+            {
+              "label": "Control range",
+              "value": "40.0 km"
+            },
+            {
+              "label": "In bay",
+              "value": "0 drones"
+            }
+          ]
+        },
+        "bays": [
+          {
+            "label": "Cargo hold",
+            "value": "2 / 140 m³"
+          },
+          {
+            "label": "Drone bay",
+            "value": "0 m³"
+          }
+        ]
+      },
+      "bonuses": [
+        {
+          "skill": "Minmatar Frigate",
+          "level": 4,
+          "text": "7.5% bonus to Small Projectile Turret rate of fire"
+        },
+        {
+          "skill": "Minmatar Frigate",
+          "level": 4,
+          "text": "10% bonus to Small Projectile Turret falloff"
+        }
+      ],
+      "gauges": [
+        {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 36.75,
+          "output": 167.38,
+          "text": "36.75 / 167.38 tf",
+          "percent": 22,
+          "over": false
+        },
+        {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 4.76,
+          "output": 51.25,
+          "text": "4.76 / 51.25 MW",
+          "percent": 9.3,
+          "over": false
+        },
+        {
+          "label": "Calibration",
+          "unit": "",
+          "used": 0,
+          "output": 400,
+          "text": "0 / 400",
+          "percent": 0,
+          "over": false
+        }
+      ],
+      "slots": [
+        {
+          "slot": "high",
+          "title": "High",
+          "used": 1,
+          "total": 3,
+          "rows": [
+            {
+              "quantity": 1,
+              "key": "high:0",
+              "name": "200mm AutoCannon II",
+              "typeId": 2889,
+              "charge": "Republic Fleet EMP S",
+              "chargeTypeId": 21898,
+              "desc": "The 200mm is a powerful autocannon that can smash apart most lightly armored frigates with ease.\n\nMust be loaded with any of the following regular and advanced projectile ammo types: Carbonized Lead, Depleted Uranium, EMP, Fusion, Nuclear, Phased Plasma, Proton, Titanium Sabot, Barrage, Hail.",
+              "chargeDesc": "Small Projectile Ammo. A new technology, this highly advanced ammunition emits a focused EM pulse. Very potent against shields.\n\n50% reduced optimal range.",
+              "chargeAssumed": false,
+              "range": {
+                "optimal": "720 m",
+                "falloff": "8.3 km"
+              },
+              "state": "Active"
+            }
+          ]
+        },
+        {
+          "slot": "mid",
+          "title": "Mid",
+          "used": 0,
+          "total": 3,
+          "rows": []
+        },
+        {
+          "slot": "low",
+          "title": "Low",
+          "used": 1,
+          "total": 4,
+          "rows": [
+            {
+              "quantity": 1,
+              "key": "low:0",
+              "name": "Gyrostabilizer II",
+              "typeId": 519,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "Gives a bonus to the speed and damage of projectile turrets.\n\nPenalty: Using more than one type of this module or similar modules that affect the same attribute on the ship will be penalized.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Online"
+            }
+          ]
+        },
+        {
+          "slot": "rig",
+          "title": "Rigs",
+          "used": 0,
+          "total": 3,
+          "rows": []
+        },
+        {
+          "slot": "subsystem",
+          "title": "Subsystems",
+          "used": 0,
+          "total": 0,
+          "rows": []
+        }
+      ],
+      "counters": [
+        {
+          "label": "High",
+          "used": 1,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Mid",
+          "used": 0,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Low",
+          "used": 1,
+          "total": 4,
+          "over": false
+        },
+        {
+          "label": "Rigs",
+          "used": 0,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Subsystems",
+          "used": 0,
+          "total": 0,
+          "over": false
+        },
+        {
+          "label": "Turrets",
+          "used": 1,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Launchers",
+          "used": 0,
+          "total": 2,
+          "over": false
+        }
+      ],
+      "problems": [
+        {
+          "kind": "skill",
+          "label": "Skill",
+          "text": "Small Projectile Turret level 5 required (trained 4)"
+        },
+        {
+          "kind": "skill",
+          "label": "Skill",
+          "text": "Small Autocannon Specialization level 1 required (trained 0)"
+        }
+      ],
+      "missing": [
+        {
+          "skillTypeId": 11084,
+          "name": "Small Autocannon Specialization",
+          "have": 0,
+          "need": 1
+        },
+        {
+          "skillTypeId": 3302,
+          "name": "Small Projectile Turret",
+          "have": 4,
+          "need": 5
+        }
+      ],
+      "ammo": [
+        {
+          "key": "ammo:12608",
+          "typeId": 12608,
+          "name": "Hail S",
+          "desc": "Hail is an attempt to combine the penetration of titanium sabot with the versatility of a depleted uranium shell. It has tremendous damage potential, but should not be used at long ranges. Any pilot using this ammunition should be prepared to trade optimal range, falloff range, and tracking speed for a devastating amount of damage.\n\n25% reduced falloff.\n50% reduced optimal range.\n25% reduced tracking speed.\n\nNote: This ammunition can only be used by small tech level II and faction Autocannons.",
+          "loadedIn": 0,
+          "dps": "49.7",
+          "dpsDesc": "49.7 dps from 1 × 200mm AutoCannon II loaded with it",
+          "range": {
+            "optimal": "720 m",
+            "falloff": "6.2 km"
+          },
+          "band": {
+            "label": "Short",
+            "level": 1,
+            "beyond": false,
+            "desc": "Reaches 7.0 km of this ship's 25.9 km lock range"
+          },
+          "damage": {
+            "types": [
+              {
+                "kind": "explosive",
+                "label": "Explosive",
+                "share": 0.7853107344632769
+              },
+              {
+                "kind": "kinetic",
+                "label": "Kinetic",
+                "share": 0.21468926553672316
+              }
+            ],
+            "desc": "Explosive 79% · Kinetic 21% of 17.7 base damage per shot"
+          },
+          "order": 6950.7
+        },
+        {
+          "key": "ammo:21898",
+          "typeId": 21898,
+          "name": "Republic Fleet EMP S",
+          "desc": "Small Projectile Ammo. A new technology, this highly advanced ammunition emits a focused EM pulse. Very potent against shields.\n\n50% reduced optimal range.",
+          "loadedIn": 1,
+          "dps": "38.7",
+          "dpsDesc": "38.7 dps from 1 × 200mm AutoCannon II loaded with it",
+          "range": {
+            "optimal": "720 m",
+            "falloff": "8.3 km"
+          },
+          "band": {
+            "label": "Medium",
+            "level": 2,
+            "beyond": false,
+            "desc": "Reaches 9.0 km of this ship's 25.9 km lock range"
+          },
+          "damage": {
+            "types": [
+              {
+                "kind": "em",
+                "label": "EM",
+                "share": 0.7499999999999999
+              },
+              {
+                "kind": "explosive",
+                "label": "Explosive",
+                "share": 0.16666666666666666
+              },
+              {
+                "kind": "kinetic",
+                "label": "Kinetic",
+                "share": 0.08333333333333333
+              }
+            ],
+            "desc": "EM 75% · Explosive 17% · Kinetic 8% of 13.8 base damage per shot"
+          },
+          "order": 9027.599999999999
+        }
+      ],
+      "consumables": [],
+      "cargo": [
+        {
+          "key": "Cargo:12608:0",
+          "typeId": 12608,
+          "name": "Hail S",
+          "nickname": null,
+          "quantity": 800,
+          "desc": "Hail is an attempt to combine the penetration of titanium sabot with the versatility of a depleted uranium shell. It has tremendous damage potential, but should not be used at long ranges. Any pilot using this ammunition should be prepared to trade optimal range, falloff range, and tracking speed for a devastating amount of damage.\n\n25% reduced falloff.\n50% reduced optimal range.\n25% reduced tracking speed.\n\nNote: This ammunition can only be used by small tech level II and faction Autocannons.",
+          "value": "344,800.00 ISK"
+        }
+      ],
+      "drones": [],
+      "unfittable": [],
+      "unknown": [],
+      "value": {
+        "total": "5,035,355.00 ISK",
+        "totalShort": "5.0M ISK",
+        "lines": [
+          {
+            "label": "Hull",
+            "value": "650,000.00 ISK"
+          },
+          {
+            "label": "Modules & rigs",
+            "value": "4,040,000.00 ISK"
+          },
+          {
+            "label": "Charges",
+            "value": "555.00 ISK"
+          },
+          {
+            "label": "Cargo",
+            "value": "344,800.00 ISK"
+          }
+        ],
+        "unpriced": null
+      },
+      "mastery": 1,
+      "key": {
+        "ehp": {
+          "value": "2,107",
+          "unit": null,
+          "tone": null,
+          "note": "Shield recharge 1.8 hp/s"
+        },
+        "speed": {
+          "value": "456",
+          "unit": "m/s",
+          "tone": null,
+          "note": null
+        },
+        "capacitor": {
+          "value": "Stable 100%",
+          "unit": null,
+          "tone": "good",
+          "note": "+7.5 GJ/s"
+        },
+        "lock": {
+          "value": "25.9",
+          "unit": "km",
+          "tone": null,
+          "note": "3 targets · 759 mm scan res"
+        },
+        "align": {
+          "value": "3.62",
+          "unit": "s",
+          "tone": null,
+          "note": null
+        }
+      },
+      "repairs": [
+        {
+          "label": "Passive shield",
+          "value": "1.8",
+          "idle": false
+        },
+        {
+          "label": "Shield boost",
+          "value": "0",
+          "idle": true
+        },
+        {
+          "label": "Armor repair",
+          "value": "0",
+          "idle": true
+        },
+        {
+          "label": "Hull repair",
+          "value": "0",
+          "idle": true
+        }
+      ],
+      "droneControl": null,
+      "weapons": {
+        "dps": 38.7354509177973,
+        "volley": 68.79909960000002
+      },
+      "skillGaps": [
+        {
+          "name": "Ship and bonuses",
+          "skills": [
+            {
+              "skillTypeId": 3418,
+              "name": "Capacitor Management",
+              "level": 4,
+              "effect": "5% bonus to capacitor capacity per skill level.",
+              "affects": "Rifter hull"
+            },
+            {
+              "skillTypeId": 3417,
+              "name": "Capacitor Systems Operation",
+              "level": 4,
+              "effect": "5% reduction in capacitor recharge time per skill level.",
+              "affects": "Rifter hull"
+            },
+            {
+              "skillTypeId": 3453,
+              "name": "Evasive Maneuvering",
+              "level": 3,
+              "effect": "5% improved ship agility for all ships per skill level.",
+              "affects": "Rifter hull"
+            },
+            {
+              "skillTypeId": 3428,
+              "name": "Long Range Targeting",
+              "level": 3,
+              "effect": "5% Bonus to targeting range per skill level.",
+              "affects": "Rifter hull"
+            },
+            {
+              "skillTypeId": 3329,
+              "name": "Minmatar Frigate",
+              "level": 4,
+              "effect": "7.5% bonus to Small Projectile Turret rate of fire; 10% bonus to Small Projectile Turret falloff, per level",
+              "affects": "Rifter hull"
+            },
+            {
+              "skillTypeId": 3431,
+              "name": "Signature Analysis",
+              "level": 3,
+              "effect": "5% improved targeting speed per skill level.",
+              "affects": "Rifter hull"
+            }
+          ]
+        },
+        {
+          "name": "Modules",
+          "skills": [
+            {
+              "skillTypeId": 11207,
+              "name": "Advanced Weapon Upgrades",
+              "level": 3,
+              "effect": "Reduces the powergrid needs of weapon turrets and launchers by 2% per skill level.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3316,
+              "name": "Controlled Bursts",
+              "level": 4,
+              "effect": "5% reduction in capacitor need of weapon turrets per skill level.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3312,
+              "name": "Motion Prediction",
+              "level": 4,
+              "effect": "5% bonus per skill level to weapon turret tracking speeds.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3310,
+              "name": "Rapid Firing",
+              "level": 4,
+              "effect": "4% bonus per skill level to weapon turret rate of fire.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3311,
+              "name": "Sharpshooter",
+              "level": 4,
+              "effect": "5% bonus to weapon optimal range per skill level.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3302,
+              "name": "Small Projectile Turret",
+              "level": 4,
+              "effect": "5% Bonus to small projectile turret damage per level.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3315,
+              "name": "Surgical Strike",
+              "level": 3,
+              "effect": "3% bonus per skill level to the damage of all weapon turrets.",
+              "affects": "200mm AutoCannon II"
+            },
+            {
+              "skillTypeId": 3317,
+              "name": "Trajectory Analysis",
+              "level": 3,
+              "effect": "5% bonus per skill level to weapon turret accuracy falloff.",
+              "affects": "200mm AutoCannon II"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

@@ -1,0 +1,918 @@
+{
+  "data": {
+    "kind": "ok",
+    "view": {
+      "title": "Paper Kite",
+      "typeId": 593,
+      "typeName": "Tristan",
+      "ship": {
+        "typeName": "Tristan",
+        "groupName": "Frigate",
+        "raceName": "Gallente"
+      },
+      "location": {
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "place": "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+        "note": null
+      },
+      "renderUrl": "https://images.evetech.net/types/593/render?size=128",
+      "skillsSynced": true,
+      "stats": {
+        "capacitor": {
+          "title": "Capacitor",
+          "headline": "Lasts 56s",
+          "ok": false,
+          "rows": [
+            {
+              "label": "Capacity",
+              "value": "420 GJ / 2m 20s"
+            },
+            {
+              "label": "Recharge",
+              "value": "7.5 GJ/s peak"
+            },
+            {
+              "label": "Δ",
+              "value": "−5.6 GJ/s (74.6%)"
+            }
+          ]
+        },
+        "offense": {
+          "title": "Offense",
+          "headline": "176.2 dps",
+          "note": null,
+          "rows": [
+            {
+              "label": "Weapons",
+              "value": "95.2 dps"
+            },
+            {
+              "label": "Drones",
+              "value": "81.0 dps"
+            },
+            {
+              "label": "Volley",
+              "value": "551 HP"
+            }
+          ]
+        },
+        "defense": {
+          "title": "Defense",
+          "headline": "3,242 ehp",
+          "recharge": "1.4 hp/s",
+          "layers": [
+            {
+              "layer": "Shield",
+              "hp": "350 hp",
+              "note": "625 s",
+              "resists": [
+                13,
+                30,
+                48,
+                56
+              ],
+              "ehp": "552"
+            },
+            {
+              "layer": "Armor",
+              "hp": "563 hp",
+              "note": null,
+              "resists": [
+                57,
+                45,
+                45,
+                24
+              ],
+              "ehp": "980"
+            },
+            {
+              "layer": "Hull",
+              "hp": "688 hp",
+              "note": null,
+              "resists": [
+                60,
+                60,
+                60,
+                60
+              ],
+              "ehp": "1,710"
+            }
+          ],
+          "rows": []
+        },
+        "targeting": {
+          "title": "Targeting",
+          "headline": "46.0 km",
+          "rows": [
+            {
+              "label": "Sensor strength",
+              "value": "9.0 points (Magnetometric)"
+            },
+            {
+              "label": "Scan resolution",
+              "value": "690 mm"
+            },
+            {
+              "label": "Signature radius",
+              "value": "41 m"
+            },
+            {
+              "label": "Max targets",
+              "value": "3×"
+            }
+          ]
+        },
+        "navigation": {
+          "title": "Navigation",
+          "headline": "393.8 m/s",
+          "rows": [
+            {
+              "label": "With afterburner",
+              "value": "987.6 m/s"
+            },
+            {
+              "label": "Mass",
+              "value": "1,044.0 t"
+            },
+            {
+              "label": "Inertia",
+              "value": "2.6316×"
+            },
+            {
+              "label": "Warp speed",
+              "value": "5.00 AU/s"
+            },
+            {
+              "label": "Align time",
+              "value": "3.81 s"
+            },
+            {
+              "label": "Align, AB on",
+              "value": "5.63 s"
+            }
+          ]
+        },
+        "drones": {
+          "title": "Drones",
+          "headline": "81.0 dps",
+          "rows": [
+            {
+              "label": "Bandwidth",
+              "value": "40 / 25 Mbit/s"
+            },
+            {
+              "label": "Control range",
+              "value": "40.0 km"
+            },
+            {
+              "label": "In bay",
+              "value": "8 drones"
+            }
+          ]
+        },
+        "bays": [
+          {
+            "label": "Cargo hold",
+            "value": "11.7 / 140 m³"
+          },
+          {
+            "label": "Drone bay",
+            "value": "40 / 40 m³"
+          }
+        ]
+      },
+      "bonuses": [
+        {
+          "skill": "Gallente Frigate",
+          "level": 5,
+          "text": "7.5% bonus to Small Hybrid Turret tracking speed"
+        },
+        {
+          "skill": "Gallente Frigate",
+          "level": 5,
+          "text": "10% bonus to Drone hitpoints and tracking speed"
+        }
+      ],
+      "gauges": [
+        {
+          "label": "CPU",
+          "unit": "tf",
+          "used": 174,
+          "output": 167.38,
+          "text": "174.00 / 167.38 tf",
+          "percent": 100,
+          "over": true
+        },
+        {
+          "label": "Powergrid",
+          "unit": "MW",
+          "used": 40.22,
+          "output": 43.75,
+          "text": "40.22 / 43.75 MW",
+          "percent": 91.9,
+          "over": false
+        },
+        {
+          "label": "Calibration",
+          "unit": "",
+          "used": 300,
+          "output": 400,
+          "text": "300 / 400",
+          "percent": 75,
+          "over": false
+        }
+      ],
+      "slots": [
+        {
+          "slot": "high",
+          "title": "High",
+          "used": 2,
+          "total": 3,
+          "rows": [
+            {
+              "quantity": 2,
+              "key": "high:0",
+              "name": "Light Neutron Blaster II",
+              "typeId": 3178,
+              "charge": "Void S",
+              "chargeTypeId": 12612,
+              "desc": "Particle blasters operate on a similar principle as the railgun except they fire a magnetically contained ball of subatomic particles. No other turret class can match the sheer destructive power of particle blasters, but due to the rapid dispersion of the containment field, it also has the worst range of all turrets.\n\nRequires either regular or advanced hybrid charge types: Antimatter, Iridium, Iron, Lead, Plutonium, Thorium, Tungsten, Uranium, Null, Void.",
+              "chargeDesc": "The Void Xenon charge is a high-powered blaster charge that delivers an extremely powerful blast of kinetic energy. However, it has several serious drawbacks, most notably the fact that it requires considerably more capacitor energy than any other blaster charge. It also needs to maintain a clean aim for a slightly longer time than normal.\n\n25% reduced optimal range.\n25% reduced tracking speed.\n50% reduced falloff range.\n\nNote: This ammunition can only be used by small tech level II and faction Blasters.",
+              "chargeAssumed": false,
+              "range": {
+                "optimal": "1.6 km",
+                "falloff": "1.4 km"
+              },
+              "state": "Active"
+            }
+          ]
+        },
+        {
+          "slot": "mid",
+          "title": "Mid",
+          "used": 3,
+          "total": 3,
+          "rows": [
+            {
+              "quantity": 1,
+              "key": "mid:0",
+              "name": "1MN Afterburner II",
+              "typeId": 438,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "Gives a boost to the maximum velocity of the ship when activated. The thrust that boosts the ship, and the corresponding maximum velocity bonus, are limited by the mass of the ship that uses this module.\n\nNote: Usually fit on Frigates and Destroyers.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Active"
+            },
+            {
+              "quantity": 1,
+              "key": "mid:1",
+              "name": "Warp Scrambler II",
+              "typeId": 448,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "Disrupts the target ship's navigation computer, disabling warping, jumping, microwarpdrives and micro jump drives.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": {
+                "optimal": "9.0 km",
+                "falloff": null
+              },
+              "state": "Active"
+            },
+            {
+              "quantity": 1,
+              "key": "mid:2",
+              "name": "Stasis Webifier II",
+              "typeId": 527,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "Reduces the maximum speed of a ship by employing micro energy streams which effectively entangle the target temporarily, thereby slowing it down.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": {
+                "optimal": "10.0 km",
+                "falloff": null
+              },
+              "state": "Active"
+            }
+          ]
+        },
+        {
+          "slot": "low",
+          "title": "Low",
+          "used": 3,
+          "total": 3,
+          "rows": [
+            {
+              "quantity": 1,
+              "key": "low:0",
+              "name": "Damage Control II",
+              "typeId": 2048,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "Utilizes a combination of containment field emitters and redundancy systems to mitigate the impact of critical system damage.\n\nGrants a bonus to resistance for shield, armor and hull.\n\nOnly one Damage Control can be fit at a given time.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Online"
+            },
+            {
+              "quantity": 1,
+              "key": "low:1",
+              "name": "Drone Damage Amplifier II",
+              "typeId": 4405,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "The Drone Damage Amplifier projects a multi-node quantum entanglement onto the ship's drone or fighter communications net, creating a bridged processor link that allows for better real-time trajectory projections.\n\nPenalty: Using more than one type of this module or similar modules that affect the same attribute on the ship will be penalized.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Online"
+            },
+            {
+              "quantity": 1,
+              "key": "low:2",
+              "name": "Small Armor Repairer II",
+              "typeId": 1183,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "This module uses nano-assemblers to repair damage done to the armor of the ship.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Active"
+            }
+          ]
+        },
+        {
+          "slot": "rig",
+          "title": "Rigs",
+          "used": 2,
+          "total": 3,
+          "rows": [
+            {
+              "quantity": 1,
+              "key": "rig:0",
+              "name": "Small Auxiliary Nano Pump I",
+              "typeId": 31045,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "This ship modification is designed to increase a ship's armor repairer repair amount at the expense of increased power grid need for them.\n\nPenalty: Using more than one type of this module or similar modules that affect the same attribute on the ship will be penalized.\n\nThe drawbacks of fitting this rig may be reduced by training the Armor Rigging skill.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Online"
+            },
+            {
+              "quantity": 1,
+              "key": "rig:1",
+              "name": "Small Hybrid Burst Aerator I",
+              "typeId": 31526,
+              "charge": null,
+              "chargeTypeId": null,
+              "desc": "This ship modification is designed to increase a ship's hybrid turret rate of fire at the expense of increased power grid need for hybrid weapons.\n\nPenalty: Using more than one type of this module or similar modules that affect the same attribute on the ship will be penalized.\n\nThe drawbacks of fitting this rig may be reduced by training the Hybrid Weapon Rigging skill.",
+              "chargeDesc": null,
+              "chargeAssumed": false,
+              "range": null,
+              "state": "Online"
+            }
+          ]
+        },
+        {
+          "slot": "subsystem",
+          "title": "Subsystems",
+          "used": 0,
+          "total": 0,
+          "rows": []
+        }
+      ],
+      "counters": [
+        {
+          "label": "High",
+          "used": 2,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Mid",
+          "used": 3,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Low",
+          "used": 3,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Rigs",
+          "used": 2,
+          "total": 3,
+          "over": false
+        },
+        {
+          "label": "Subsystems",
+          "used": 0,
+          "total": 0,
+          "over": false
+        },
+        {
+          "label": "Turrets",
+          "used": 2,
+          "total": 2,
+          "over": false
+        },
+        {
+          "label": "Launchers",
+          "used": 0,
+          "total": 0,
+          "over": false
+        }
+      ],
+      "problems": [
+        {
+          "kind": "cpu",
+          "label": "CPU",
+          "text": "CPU: 174 tf used of 167.38 tf"
+        },
+        {
+          "kind": "skill",
+          "label": "Skill",
+          "text": "Minmatar Drone Specialization level 1 required (trained 0)"
+        }
+      ],
+      "missing": [
+        {
+          "skillTypeId": 12485,
+          "name": "Minmatar Drone Specialization",
+          "have": 0,
+          "need": 1
+        }
+      ],
+      "ammo": [
+        {
+          "key": "ammo:12612",
+          "typeId": 12612,
+          "name": "Void S",
+          "desc": "The Void Xenon charge is a high-powered blaster charge that delivers an extremely powerful blast of kinetic energy. However, it has several serious drawbacks, most notably the fact that it requires considerably more capacitor energy than any other blaster charge. It also needs to maintain a clean aim for a slightly longer time than normal.\n\n25% reduced optimal range.\n25% reduced tracking speed.\n50% reduced falloff range.\n\nNote: This ammunition can only be used by small tech level II and faction Blasters.",
+          "loadedIn": 2,
+          "dps": "95.2",
+          "dpsDesc": "95.2 dps from 2 × Light Neutron Blaster II loaded with it",
+          "range": {
+            "optimal": "1.6 km",
+            "falloff": "1.4 km"
+          },
+          "band": {
+            "label": "Short",
+            "level": 1,
+            "beyond": false,
+            "desc": "Reaches 3.1 km of this ship's 46.0 km lock range"
+          },
+          "damage": {
+            "types": [
+              {
+                "kind": "thermal",
+                "label": "Thermal",
+                "share": 0.5
+              },
+              {
+                "kind": "kinetic",
+                "label": "Kinetic",
+                "share": 0.5
+              }
+            ],
+            "desc": "Thermal 50% · Kinetic 50% of 17.8 base damage per shot"
+          },
+          "order": 3057.5
+        },
+        {
+          "key": "ammo:222",
+          "typeId": 222,
+          "name": "Antimatter Charge S",
+          "desc": "Consists of two components: a shell of titanium and a core of antimatter atoms suspended in plasma state. Railguns launch the shell directly, while particle blasters pump the plasma into a cyclotron and process the plasma into a bolt that is then fired.\n\n50% reduced optimal range.",
+          "loadedIn": 0,
+          "dps": "64.2",
+          "dpsDesc": "64.2 dps from 2 × Light Neutron Blaster II loaded with it",
+          "range": {
+            "optimal": "1.1 km",
+            "falloff": "2.9 km"
+          },
+          "band": {
+            "label": "Short",
+            "level": 1,
+            "beyond": false,
+            "desc": "Reaches 4.0 km of this ship's 46.0 km lock range"
+          },
+          "damage": {
+            "types": [
+              {
+                "kind": "kinetic",
+                "label": "Kinetic",
+                "share": 0.5833333333333334
+              },
+              {
+                "kind": "thermal",
+                "label": "Thermal",
+                "share": 0.4166666666666667
+              }
+            ],
+            "desc": "Kinetic 58% · Thermal 42% of 12.0 base damage per shot"
+          },
+          "order": 3955
+        },
+        {
+          "key": "ammo:12614",
+          "typeId": 12614,
+          "name": "Null S",
+          "desc": "The Null is an improved version of the standard Thorium charge that possesses greatly improved molecular cohesion, resulting in superior range and reduced particle dissipation.\n\n40% increased optimal range.\n25% reduced tracking speed.\n40% increased falloff range.\n\nNote: This ammunition can only be used by small tech level II and faction Blasters.",
+          "loadedIn": 0,
+          "dps": "58.8",
+          "dpsDesc": "58.8 dps from 2 × Light Neutron Blaster II loaded with it",
+          "range": {
+            "optimal": "3.0 km",
+            "falloff": "4.0 km"
+          },
+          "band": {
+            "label": "Short",
+            "level": 1,
+            "beyond": false,
+            "desc": "Reaches 7.0 km of this ship's 46.0 km lock range"
+          },
+          "damage": {
+            "types": [
+              {
+                "kind": "thermal",
+                "label": "Thermal",
+                "share": 0.5454545454545454
+              },
+              {
+                "kind": "kinetic",
+                "label": "Kinetic",
+                "share": 0.45454545454545453
+              }
+            ],
+            "desc": "Thermal 55% · Kinetic 45% of 11.0 base damage per shot"
+          },
+          "order": 7049
+        }
+      ],
+      "consumables": [
+        {
+          "key": "consumable:28668",
+          "typeId": 28668,
+          "name": "Nanite Repair Paste",
+          "desc": "A thick, heavy liquid, typically stored in tanks or container systems intended for liquids. It is composed of billions of nanites that can be programmed to repair damaged ship modules on the fly. The paste is simply applied to the damaged area, and the nanites meld into an exact copy of the damaged area, thus effecting repairs upon the module. This is a one-time process, as the nanites use themselves up along with the trace elements mixed into their carrier fluid.\n\nThe Repair Paste is generally only used for emergency on-site repairs. It is then recommended to have the damaged components…",
+          "kind": "paste",
+          "effect": "Overheat repair",
+          "use": null
+        }
+      ],
+      "cargo": [
+        {
+          "key": "Cargo:12612:0",
+          "typeId": 12612,
+          "name": "Void S",
+          "nickname": null,
+          "quantity": 2000,
+          "desc": "The Void Xenon charge is a high-powered blaster charge that delivers an extremely powerful blast of kinetic energy. However, it has several serious drawbacks, most notably the fact that it requires considerably more capacitor energy than any other blaster charge. It also needs to maintain a clean aim for a slightly longer time than normal.\n\n25% reduced optimal range.\n25% reduced tracking speed.\n50% reduced falloff range.\n\nNote: This ammunition can only be used by small tech level II and faction Blasters.",
+          "value": "821,000.00 ISK"
+        },
+        {
+          "key": "Cargo:12614:1",
+          "typeId": 12614,
+          "name": "Null S",
+          "nickname": null,
+          "quantity": 1500,
+          "desc": "The Null is an improved version of the standard Thorium charge that possesses greatly improved molecular cohesion, resulting in superior range and reduced particle dissipation.\n\n40% increased optimal range.\n25% reduced tracking speed.\n40% increased falloff range.\n\nNote: This ammunition can only be used by small tech level II and faction Blasters.",
+          "value": "598,500.00 ISK"
+        },
+        {
+          "key": "Cargo:222:2",
+          "typeId": 222,
+          "name": "Antimatter Charge S",
+          "nickname": null,
+          "quantity": 1000,
+          "desc": "Consists of two components: a shell of titanium and a core of antimatter atoms suspended in plasma state. Railguns launch the shell directly, while particle blasters pump the plasma into a cyclotron and process the plasma into a bolt that is then fired.\n\n50% reduced optimal range.",
+          "value": "13,400.00 ISK"
+        },
+        {
+          "key": "Cargo:28668:3",
+          "typeId": 28668,
+          "name": "Nanite Repair Paste",
+          "nickname": null,
+          "quantity": 40,
+          "desc": "A thick, heavy liquid, typically stored in tanks or container systems intended for liquids. It is composed of billions of nanites that can be programmed to repair damaged ship modules on the fly. The paste is simply applied to the damaged area, and the nanites meld into an exact copy of the damaged area, thus effecting repairs upon the module. This is a one-time process, as the nanites use themselves up along with the trace elements mixed into their carrier fluid.\n\nThe Repair Paste is generally only used for emergency on-site repairs. It is then recommended to have the damaged components…",
+          "value": "900,000.00 ISK"
+        }
+      ],
+      "drones": [
+        {
+          "key": "DroneBay:2456:0",
+          "typeId": 2456,
+          "name": "Hobgoblin II",
+          "nickname": null,
+          "quantity": 5,
+          "desc": "Light Scout Drone",
+          "value": "4,600,000.00 ISK"
+        },
+        {
+          "key": "DroneBay:2488:1",
+          "typeId": 2488,
+          "name": "Warrior II",
+          "nickname": null,
+          "quantity": 3,
+          "desc": "Light Scout Drone",
+          "value": "2,670,000.00 ISK"
+        }
+      ],
+      "unfittable": [],
+      "unknown": [],
+      "value": {
+        "total": "27,193,721.00 ISK",
+        "totalShort": "27.2M ISK",
+        "lines": [
+          {
+            "label": "Hull",
+            "value": "1,180,000.00 ISK"
+          },
+          {
+            "label": "Modules & rigs",
+            "value": "16,410,000.00 ISK"
+          },
+          {
+            "label": "Charges",
+            "value": "821.00 ISK"
+          },
+          {
+            "label": "Drones",
+            "value": "7,270,000.00 ISK"
+          },
+          {
+            "label": "Cargo",
+            "value": "2,332,900.00 ISK"
+          }
+        ],
+        "unpriced": "1 item unpriced"
+      },
+      "mastery": 1,
+      "key": {
+        "ehp": {
+          "value": "3,242",
+          "unit": null,
+          "tone": null,
+          "note": "Shield recharge 1.4 hp/s"
+        },
+        "speed": {
+          "value": "988",
+          "unit": "m/s",
+          "tone": null,
+          "note": "With afterburner · 393.8 m/s without"
+        },
+        "capacitor": {
+          "value": "Lasts 56s",
+          "unit": null,
+          "tone": "bad",
+          "note": "−5.6 GJ/s"
+        },
+        "lock": {
+          "value": "46.0",
+          "unit": "km",
+          "tone": null,
+          "note": "3 targets · 690 mm scan res"
+        },
+        "align": {
+          "value": "3.81",
+          "unit": "s",
+          "tone": null,
+          "note": "5.63 s with AB on"
+        }
+      },
+      "repairs": [
+        {
+          "label": "Passive shield",
+          "value": "1.4",
+          "idle": false
+        },
+        {
+          "label": "Shield boost",
+          "value": "0",
+          "idle": true
+        },
+        {
+          "label": "Armor repair",
+          "value": "22.0",
+          "idle": false
+        },
+        {
+          "label": "Hull repair",
+          "value": "0",
+          "idle": true
+        }
+      ],
+      "droneControl": {
+        "types": [
+          {
+            "typeId": 2456,
+            "name": "Hobgoblin II",
+            "inBay": 5,
+            "bandwidth": 5,
+            "dpsEach": 16.1952,
+            "volleyEach": 64.7808
+          },
+          {
+            "typeId": 2488,
+            "name": "Warrior II",
+            "inBay": 3,
+            "bandwidth": 5,
+            "dpsEach": 13.158599999999998,
+            "volleyEach": 52.63439999999999
+          }
+        ],
+        "bandwidth": 25,
+        "maxActive": 5,
+        "launched": {
+          "2456": 5
+        },
+        "controlRange": "40.0 km",
+        "bay": "40 / 40 m³"
+      },
+      "weapons": {
+        "dps": 95.21351851851853,
+        "volley": 226.74147300000004
+      },
+      "skillGaps": [
+        {
+          "name": "Ship and bonuses",
+          "skills": [
+            {
+              "skillTypeId": 3418,
+              "name": "Capacitor Management",
+              "level": 4,
+              "effect": "5% bonus to capacitor capacity per skill level.",
+              "affects": "Tristan hull"
+            },
+            {
+              "skillTypeId": 3417,
+              "name": "Capacitor Systems Operation",
+              "level": 4,
+              "effect": "5% reduction in capacitor recharge time per skill level.",
+              "affects": "Tristan hull"
+            },
+            {
+              "skillTypeId": 3453,
+              "name": "Evasive Maneuvering",
+              "level": 3,
+              "effect": "5% improved ship agility for all ships per skill level.",
+              "affects": "Tristan hull"
+            },
+            {
+              "skillTypeId": 3428,
+              "name": "Long Range Targeting",
+              "level": 3,
+              "effect": "5% Bonus to targeting range per skill level.",
+              "affects": "Tristan hull"
+            },
+            {
+              "skillTypeId": 3431,
+              "name": "Signature Analysis",
+              "level": 3,
+              "effect": "5% improved targeting speed per skill level.",
+              "affects": "Tristan hull"
+            }
+          ]
+        },
+        {
+          "name": "Modules",
+          "skills": [
+            {
+              "skillTypeId": 3452,
+              "name": "Acceleration Control",
+              "level": 3,
+              "effect": "5% Bonus to Afterburner and MicroWarpdrive speed boost per skill level.",
+              "affects": "1MN Afterburner II"
+            },
+            {
+              "skillTypeId": 11207,
+              "name": "Advanced Weapon Upgrades",
+              "level": 3,
+              "effect": "Reduces the powergrid needs of weapon turrets and launchers by 2% per skill level.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3450,
+              "name": "Afterburner",
+              "level": 4,
+              "effect": "5% reduction to Afterburner duration and 10% reduction in Afterburner capacitor use per skill level.",
+              "affects": "1MN Afterburner II"
+            },
+            {
+              "skillTypeId": 3316,
+              "name": "Controlled Bursts",
+              "level": 4,
+              "effect": "5% reduction in capacitor need of weapon turrets per skill level.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3312,
+              "name": "Motion Prediction",
+              "level": 4,
+              "effect": "5% bonus per skill level to weapon turret tracking speeds.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3435,
+              "name": "Propulsion Jamming",
+              "level": 4,
+              "effect": "5% Reduction to Warp Scrambler, Warp Disruptor, and Stasis Web capacitor need per skill level.",
+              "affects": "Stasis Webifier II, Warp Scrambler II"
+            },
+            {
+              "skillTypeId": 3310,
+              "name": "Rapid Firing",
+              "level": 4,
+              "effect": "4% bonus per skill level to weapon turret rate of fire.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3393,
+              "name": "Repair Systems",
+              "level": 4,
+              "effect": "5% reduction in repair systems duration per skill level.",
+              "affects": "Small Armor Repairer II"
+            },
+            {
+              "skillTypeId": 3311,
+              "name": "Sharpshooter",
+              "level": 4,
+              "effect": "5% bonus to weapon optimal range per skill level.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 12210,
+              "name": "Small Blaster Specialization",
+              "level": 3,
+              "effect": "2% bonus per skill level to the damage of small turrets requiring Small Blaster Specialization.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3315,
+              "name": "Surgical Strike",
+              "level": 3,
+              "effect": "3% bonus per skill level to the damage of all weapon turrets.",
+              "affects": "2× Light Neutron Blaster II"
+            },
+            {
+              "skillTypeId": 3317,
+              "name": "Trajectory Analysis",
+              "level": 3,
+              "effect": "5% bonus per skill level to weapon turret accuracy falloff.",
+              "affects": "2× Light Neutron Blaster II"
+            }
+          ]
+        },
+        {
+          "name": "Drones",
+          "skills": [
+            {
+              "skillTypeId": 23618,
+              "name": "Drone Durability",
+              "level": 3,
+              "effect": "Increases drone and fighter hit points. 5% bonus to drone shield, armor and hull hit points per level. 5% bonus to fighter hit points per level.",
+              "affects": "Hobgoblin II, Warrior II"
+            },
+            {
+              "skillTypeId": 3442,
+              "name": "Drone Interfacing",
+              "level": 4,
+              "effect": "10% bonus to drone damage and drone mining yield per level. 10% bonus to fighter damage per level.",
+              "affects": "Hobgoblin II, Warrior II"
+            },
+            {
+              "skillTypeId": 12305,
+              "name": "Drone Navigation",
+              "level": 4,
+              "effect": "5% increase in drone max velocity per level. 5% increase in fighter max velocity per level.",
+              "affects": "Hobgoblin II, Warrior II"
+            },
+            {
+              "skillTypeId": 23606,
+              "name": "Drone Sharpshooting",
+              "level": 4,
+              "effect": "Increases the weapon range of drones and fighters. 5% bonus to drone optimal range per level. 5% bonus to fighter optimal range per level.",
+              "affects": "Hobgoblin II, Warrior II"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

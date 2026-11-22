@@ -1,0 +1,92 @@
+{
+  "data": {
+    "groups": [
+      {
+        "groupId": 255,
+        "name": "Gunnery",
+        "groupSp": "53k",
+        "queued": 1,
+        "skills": [
+          {
+            "skillId": 3300,
+            "name": "Gunnery",
+            "level": 4,
+            "activeLevel": 3,
+            "queued": 0,
+            "training": false,
+            "desc": "Basic turret operation skill. 2% Bonus to weapon turrets' rate of fire per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3302,
+            "name": "Small Projectile Turret",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 1,
+            "training": false,
+            "desc": "Operation of small projectile turrets. 5% Bonus to small projectile turret damage per level.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          }
+        ]
+      },
+      {
+        "groupId": 257,
+        "name": "Spaceship Command",
+        "groupSp": "53k",
+        "queued": 1,
+        "skills": [
+          {
+            "skillId": 3329,
+            "name": "Minmatar Frigate",
+            "level": 3,
+            "activeLevel": 3,
+            "queued": 1,
+            "training": false,
+            "desc": "Skill at operating Minmatar frigates.",
+            "trainedLevel": 3,
+            "trainedActiveLevel": 3
+          },
+          {
+            "skillId": 3327,
+            "name": "Spaceship Command",
+            "level": 4,
+            "activeLevel": 4,
+            "queued": 0,
+            "training": false,
+            "desc": "The basic operation of spaceships. 2% improved ship agility for all ships per skill level.",
+            "trainedLevel": 4,
+            "trainedActiveLevel": 4
+          }
+        ]
+      }
+    ],
+    "queueLength": 2,
+    "queue": [
+      {
+        "skillId": 3329,
+        "skill": "Minmatar Frigate",
+        "level": 4,
+        "label": "Minmatar Frigate IV",
+        "startAt": null,
+        "finishAt": null,
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 21000
+      },
+      {
+        "skillId": 3302,
+        "skill": "Small Projectile Turret",
+        "level": 4,
+        "label": "Small Projectile Turret IV",
+        "startAt": null,
+        "finishAt": null,
+        "levelStartSp": 8000,
+        "levelEndSp": 45255,
+        "trainingStartSp": 8000
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

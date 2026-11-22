@@ -1,0 +1,135 @@
+{
+  "data": {
+    "resources": [
+      {
+        "path": "/api/v1/me",
+        "etag": "\"mZMPVnTiNtoowz9WSKkvo-yv9BrUaYjf\""
+      },
+      {
+        "path": "/api/v1/characters",
+        "etag": "\"41Nhh-eXGRw6kEpG473cibutBNsacATO\""
+      },
+      {
+        "path": "/api/v1/overview",
+        "etag": "\"pxg8N1uLLIctiNWdxrcGQXJ0x3YhKHcw\""
+      },
+      {
+        "path": "/api/v1/training-overview",
+        "etag": "\"idLyfDewmNlLsJW8K5rcfU_MdeGgDQ4S\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/skills",
+        "etag": "\"i1OK19eX-5ik2Lln7iTqUlCgfa4ueUXx\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/training",
+        "etag": "\"645EOF0YwabZES-lvSGE4bQlNP1B1QBt\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/clones",
+        "etag": "\"n0UHmq6YlBjtuRxV_h6fHTHhfhsJfO5z\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/assets",
+        "etag": "\"gG4FHKwvvwi24V5B6wENKwAvWR-LLVrV\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/wallet",
+        "etag": "\"8IRORg81U49yprRmLqCTAdwLpnLoK2pA\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/wallet?kind=journal&offset=0&limit=500",
+        "etag": "\"Qkl5Lk7EPM8Fwvw4mYGE0sdFszwPlYE5\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/wallet?kind=transactions&offset=0&limit=500",
+        "etag": "\"8UM4wT1EuDxM5rdQfkDJtn2PYMbcs8-g\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/ships",
+        "etag": "\"iv_R-voV20gFIW5r-WBjJjNHVI8fQ-y1\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/ships/asset/1040000000001",
+        "etag": "\"xpWeVBkHihF4PivGrFVQgQQZnOaePFW4\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/ships/asset/1040000000050",
+        "etag": "\"K4KgN57flv-BZ-70YNeIJjHkTUTLK0lN\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/ships/fit/7001",
+        "etag": "\"ppLLJjJ8NkRdrOLNp4WPed7G8Nob3f_z\""
+      },
+      {
+        "path": "/api/v1/characters/9000001/ships/fit/7002",
+        "etag": "\"jy6DfvuSX4DUzCwbiZip2oqcklBM5J6u\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/skills",
+        "etag": "\"gNLfxWu3H1l2AeXN9FMEYWBIxOJHLddy\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/training",
+        "etag": "\"upukOTeimvpYEKtyqVSSx53eIvdDOsKt\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/clones",
+        "etag": "\"fFQKxPOwNK3GR2__4LPJ_ItYKyTX5U2A\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/assets",
+        "etag": "\"FDorJvXi7EBAJmAk5sHcwb0IKp1LDIdN\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/wallet",
+        "etag": "\"eFmT237M-MocgyIDJaWG4dfpsLGKKsTC\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/wallet?kind=journal&offset=0&limit=500",
+        "etag": "\"5Znq3mOEyfDdQ0lqn2_sMGHjn-BglPd_\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/wallet?kind=transactions&offset=0&limit=500",
+        "etag": "\"U1gHU0dmejNvZqNxYOVeDa7RE5tiz8Bq\""
+      },
+      {
+        "path": "/api/v1/characters/9000002/ships",
+        "etag": "\"FAKLtWcxSaylozooK62fO4Wu_H2Gv4jv\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/skills",
+        "etag": "\"rDegho0ZoKVAWTv-IJzW54u3jLxPwkbv\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/training",
+        "etag": "\"oorbfX5i7x_b6N4txp0vmYQZjqJBiGsY\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/clones",
+        "etag": "\"fFQKxPOwNK3GR2__4LPJ_ItYKyTX5U2A\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/assets",
+        "etag": "\"FDorJvXi7EBAJmAk5sHcwb0IKp1LDIdN\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/wallet",
+        "etag": "\"eFmT237M-MocgyIDJaWG4dfpsLGKKsTC\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/wallet?kind=journal&offset=0&limit=500",
+        "etag": "\"5Znq3mOEyfDdQ0lqn2_sMGHjn-BglPd_\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/wallet?kind=transactions&offset=0&limit=500",
+        "etag": "\"U1gHU0dmejNvZqNxYOVeDa7RE5tiz8Bq\""
+      },
+      {
+        "path": "/api/v1/characters/9000003/ships",
+        "etag": "\"fxhkbvAWBaTMTZNS4GBnIffNSYwdvDij\""
+      }
+    ]
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}

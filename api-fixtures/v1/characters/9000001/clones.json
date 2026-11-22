@@ -1,0 +1,181 @@
+{
+  "data": {
+    "synced": true,
+    "home": {
+      "name": "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+      "kind": "station",
+      "system": {
+        "name": "Jita",
+        "sec": "0.9",
+        "secClass": "sec-high"
+      }
+    },
+    "active": {
+      "implants": [
+        {
+          "typeId": 10216,
+          "name": "Ocular Filter - Standard",
+          "slot": 1,
+          "bonus": "+4 Perception",
+          "desc": "This image processor implanted in the occipital lobe grants a bonus to a character's Perception.\n\n+4 Bonus to Perception"
+        },
+        {
+          "typeId": 10208,
+          "name": "Memory Augmentation - Standard",
+          "slot": 2,
+          "bonus": "+4 Memory",
+          "desc": "This image processor implanted in the temporal lobe grants a bonus to a character's memory.\n\n+4 Bonus to Memory"
+        },
+        {
+          "typeId": 10212,
+          "name": "Neural Boost - Standard",
+          "slot": 3,
+          "bonus": "+4 Willpower",
+          "desc": "A Data processing unit implanted in the Parietal lobe. Grants a bonus to Willpower.\n\n+4 Bonus to Willpower"
+        },
+        {
+          "typeId": 10221,
+          "name": "Cybernetic Subprocessor - Standard",
+          "slot": 4,
+          "bonus": "+4 Intelligence",
+          "desc": "This grafted subprocessor implanted in the frontal lobe grants a bonus to a character's Intelligence.\n\n+4 Bonus to Intelligence"
+        },
+        {
+          "typeId": 10225,
+          "name": "Social Adaptation Chip - Standard",
+          "slot": 5,
+          "bonus": "+4 Charisma",
+          "desc": "This image processor implanted in the parietal lobe grants a bonus to a character's Charisma.\n\n+4 Bonus to Charisma"
+        },
+        {
+          "typeId": 13216,
+          "name": "Zainou 'Gypsy' CPU Management EE-603",
+          "slot": 6,
+          "bonus": null,
+          "desc": "A neural interface upgrade that boosts the pilot's skill at electronics.\n\n3% bonus to CPU output."
+        }
+      ],
+      "slots": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "used": 6
+    },
+    "locations": [
+      {
+        "key": "1035000000001",
+        "title": "Perimeter",
+        "station": "Perimeter - Example Trade Tower",
+        "system": {
+          "name": "Perimeter",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "clones": [
+          {
+            "implants": [],
+            "slots": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "used": 0,
+            "jumpCloneId": 8002,
+            "code": "JC 02",
+            "name": null
+          },
+          {
+            "implants": [
+              {
+                "typeId": 13216,
+                "name": "Zainou 'Gypsy' CPU Management EE-603",
+                "slot": 6,
+                "bonus": null,
+                "desc": "A neural interface upgrade that boosts the pilot's skill at electronics.\n\n3% bonus to CPU output."
+              }
+            ],
+            "slots": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              true,
+              false,
+              false,
+              false,
+              false
+            ],
+            "used": 1,
+            "jumpCloneId": 8003,
+            "code": "JC 03",
+            "name": "Empty spare"
+          }
+        ]
+      },
+      {
+        "key": "60003760",
+        "title": "Jita",
+        "station": "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+        "system": {
+          "name": "Jita",
+          "sec": "0.9",
+          "secClass": "sec-high"
+        },
+        "clones": [
+          {
+            "implants": [
+              {
+                "typeId": 10216,
+                "name": "Ocular Filter - Standard",
+                "slot": 1,
+                "bonus": "+4 Perception",
+                "desc": "This image processor implanted in the occipital lobe grants a bonus to a character's Perception.\n\n+4 Bonus to Perception"
+              },
+              {
+                "typeId": 10212,
+                "name": "Neural Boost - Standard",
+                "slot": 3,
+                "bonus": "+4 Willpower",
+                "desc": "A Data processing unit implanted in the Parietal lobe. Grants a bonus to Willpower.\n\n+4 Bonus to Willpower"
+              }
+            ],
+            "slots": [
+              true,
+              false,
+              true,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "used": 2,
+            "jumpCloneId": 8001,
+            "code": "JC 01",
+            "name": "Trade clone"
+          }
+        ]
+      }
+    ],
+    "lastCloneJumpAt": "2026-03-13T17:20:00.000Z"
+  },
+  "generatedAt": "2026-03-14T12:00:00.000Z"
+}
