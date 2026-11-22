@@ -17,8 +17,9 @@ of the data kept on the phone. Design: `docs/superpowers/specs/2026-11-22-androi
 
 ```
 export JAVA_HOME=~/tools/jdk-21 ANDROID_HOME=~/Android/Sdk
-./gradlew :shared:jvmTest                      # all tests
+./gradlew :shared:jvmTest                      # all tests (one JVM per test class)
 ./gradlew :shared:jvmTest -Pshots=/some/dir    # also draw every screen to PNG tiles from the fixtures
+./gradlew :shared:jvmTest -PliveUrl=… -PliveToken=…   # also sync from a real site and decode everything it sends
 ./gradlew :androidApp:assembleDebug            # debug APK
 ./gradlew :androidApp:assembleRelease          # signed APK (needs keystore.properties)
 ./gradlew :desktopApp:run                      # the window (needs a display; set YUTANI_SITE_URL and YUTANI_TOKEN)
@@ -30,6 +31,11 @@ export JAVA_HOME=~/tools/jdk-21 ANDROID_HOME=~/Android/Sdk
 - No Android-only API in `commonMain`.
 - Screens never touch the network. They read the phone's copy with `resource(path, serializer)`;
   only a sync writes to it.
+- Read a resource in the screen's own body (`val state = resource(…).value`), never only inside the
+  `Screen { … }` list builder: a read made there could miss the moment the copy arrived and leave the
+  screen blank.
+- The six sections sit in a `HorizontalPager` (`App.kt`), so a swipe flips between them. Anything that
+  scrolls sideways inside a screen competes with that gesture; avoid it.
 - The app computes nothing the site computes. It shows the strings the API sends. The exceptions:
   anything that depends on the current time (recomputed from the raw times beside it, see
   `time/Format.kt` and `model/Training.kt`) and the drone selector's sum.

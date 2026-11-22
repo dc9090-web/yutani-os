@@ -1,24 +1,38 @@
 # `/api/v1` — responses and their shapes
 
-Every file here is a full response body for an **invented** account (three characters named
-"Example Pilot …", ids below the range EVE gives players, `pilot@example.com`). They are written by
-`npm run api:fixtures` and checked by `tests/api/v1/contract.test.ts`, so they are what the site
-returns today. A client can decode these files and run on them with no server.
+Every file in this folder is a complete response body from the site's read API, for an **invented**
+account. The Android app's models are written against these files and this page.
 
-File for a path: drop `/api/v1/`, turn `wallet?kind=X&…` into `wallet-X`, add `.json`.
-`/api/v1/characters/9000001/wallet?kind=journal&offset=0&limit=500` → `characters/9000001/wallet-journal.json`.
+- **Where they come from.** `npm run api:fixtures` writes them, and `tests/api/v1/contract.test.ts`
+  fails when the site's output drifts from them. They are what the site returns today.
+- **What they are for.** A client can decode them, and run on them, with no server.
+- **Which file is which.** Take the request path, drop `/api/v1/`, turn `wallet?kind=X&…` into
+  `wallet-X`, and add `.json`. So
+  `/api/v1/characters/9000001/wallet?kind=journal&offset=0&limit=500` is
+  `characters/9000001/wallet-journal.json`.
+- **The clock.** Every fixture was generated at `2026-03-14T12:00:00.000Z` (its `generatedAt`).
 
-The three characters cover the cases: **9000001** has everything synced and is training (its stored
-queue still holds one entry that finished before the fixture's clock); **9000002** has a paused
-queue, no wallet yet and a token that needs re-authorising; **9000003** has nothing synced at all.
-The fixture clock (`generatedAt`) is `2026-03-14T12:00:00.000Z`.
+The account is `pilot@example.com`, with three characters chosen to cover the cases:
+
+| Character | State |
+| --- | --- |
+| **9000001** Example Pilot One | Everything synced, and training. Its stored queue still holds one entry that finished before the fixture's clock. |
+| **9000002** Example Pilot Two | A paused queue, no wallet yet, and a token that needs re-authorising. |
+| **9000003** Example Pilot Three | Just added: nothing synced at all. |
+
+The ids are below the range EVE gives real players.
+
+**On this page:** [rules for every route](#rules-for-every-route), including the
+[clock-derived fields](#clock-derived-fields) a client must recompute, then one section per route in
+the order a phone fetches them: sync, sign-in, me, characters, overview, training overview, then
+each character's skills, training, clones, assets, wallet, ships and ship detail.
 
 ## Rules for every route
 
 - **Auth.** `Authorization: Bearer <token>`. Without a valid one: `401 { "error": "unauthorised" }`.
   A 401 means sign in again (the token was revoked, or the account left the allow-list).
 - **Envelope.** `200 { "data": …, "generatedAt": "<ISO-8601 UTC>" }`. Errors are `{ "error": "<code>" }`:
-  `400 bad-id` (an id that is not a positive integer), `400 bad-request` (a bad query value),
+  `400 bad-id` (an id that is not a positive integer written in plain digits), `400 bad-request` (a bad query value),
   `404 not-found` (a character the site does not hold, or a ship that character does not have).
 - **ETag.** Every GET sends a strong `ETag`. Send it back as `If-None-Match` and an unchanged
   resource answers `304` with no body. The tag covers `data` only, and does **not** change because
@@ -97,9 +111,10 @@ Listed: `me`, `characters`, `overview`, `training-overview`, and per character `
 ```
 POST /api/v1/auth/google      { "idToken": "<Google ID token for the WEB client ID>", "deviceName": "Pixel 9" }
   200 { "token": "<bearer token, shown once>", "email": "pilot@example.com" }
-  400 { "error": "bad-request" }    idToken missing, or deviceName not 1–80 characters
+  400 { "error": "bad-request" }    idToken missing, deviceName not 1–80 characters, or a body over 8 KB
   401 { "error": "invalid-token" }  the ID token did not verify
   403 { "error": "not-allowed" }    the Google account is not on the site's allow-list
+  503 { "error": "unavailable" }    the site could not fetch Google's keys; the token was not judged, try again
 
 DELETE /api/v1/auth/session   (bearer)  →  204; the token no longer works
 ```

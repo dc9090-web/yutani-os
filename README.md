@@ -4,9 +4,9 @@
 
 <br>
 
-**A self-hosted command centre for your EVE Online characters: skills, clones, ships, fitting, assets, wallet and combat, behind Google sign-in, in an amber-phosphor console. With a native Android app that keeps a full copy on the phone and works offline.**
+**A self-hosted command centre for your EVE Online characters: skills, clones, ships, assets and wallet on one site, behind Google sign-in. A native Android app keeps a full copy on your phone and works offline.**
 
-One Next.js app, one sync worker, one Postgres. The pages never call ESI. The worker keeps the database fresh and the pages read from it, so every screen is instant and nothing you click can hit a rate limit.
+One Next.js app, one sync worker, one Postgres. Pages never call ESI: the worker keeps the database fresh and the pages read from it, so every screen is instant and nothing you click can hit a rate limit.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev/)
@@ -21,57 +21,49 @@ One Next.js app, one sync worker, one Postgres. The pages never call ESI. The wo
 
 <img src="docs/screenshots/overview.png" alt="The Overview page: a summary strip, then character cards two-up, each with wallet, current ship, sec-coloured location, the skill in training and total SP" width="900">
 
-*The Overview. Every authorised character on one screen: who is online, where they are, what they fly, what is training and for how long.*
+*The Overview. Every character on one screen: who is online, where they are, what they fly, and what is training for how long.*
 
 </div>
 
 ---
 
-## ✨ What it does
+## Contents
 
-Yutani OS adds your characters with EVE SSO, syncs them in the background and gives you nine screens:
-
-| | | |
-| --- | --- | --- |
-| 🏠 | **Overview** | Every character, two-up: online dot, corp and alliance, race, main/alt, tags, wallet, sec-coloured location, hull, the skill in training with real SP progress, total SP. |
-| 🎓 | **Skills** | Summary and attributes, a four-character **training overview**, the queue with a live countdown, every trained skill in framed groups, and your **skill plans**. |
-| 🧬 | **Clones** | Home station, active implants with their bonuses, jump clones. |
-| 🚀 | **Ships** | Every fitted ship you own and every saved fit, as cards with DPS, EHP, speed, capacitor, CPU and powergrid gauges, missing skills and Jita value. |
-| 🛠️ | **Fitting** | A full **fitting designer** with a Pyfa-style dogma engine running in the browser. EFT import and export. |
-| 📦 | **Assets** | Every location as a tree: ships with their fitted modules by slot, containers, blueprints, stacks, volumes. |
-| 💰 | **Wallet** | Balance, journal and transactions, colour-coded. |
-| ⚔️ | **Combat** | A private killboard: stats tiles, a twelve-month activity strip, top ships and systems, and every killmail back to the start of your history via zKillboard. |
-| ⚙️ | **Settings** | Accounts, characters, tags, the static-data build, and a sync-status table that tells you exactly what ran, when, and why it failed. |
-
-There is also a native **[Android app](#-the-android-app)** showing the read-only screens from a copy kept on the phone.
-
-Everything sits behind one session cookie. You sign in with Google, and only the Google accounts on the allow-list get in; EVE SSO is then used from Settings to add each character.
+- [What it does](#-what-it-does)
+- The screens: [Overview](#-overview) · [Skills](#-skills-and-skill-plans) · [Ships](#-ships-and-fit-sheets) · [Assets, wallet and clones](#-assets--wallet-and--clones) · [Settings](#️-settings)
+- [Who gets in](#-who-gets-in)
+- [The Android app](#-the-android-app) and [the API it uses](#-the-app-api)
+- [Install](#-install) · [Scripts](#️-scripts) · [Deploying](#-deploying)
+- [How it works](#️-how-it-works) · [Design](#-the-design) · [Tests](#-tests)
 
 ---
 
-## 🚀 Built on the current stack
+## ✨ What it does
 
-| | Technology | Why it matters |
+You sign in with Google, add your characters with EVE SSO, and the worker syncs them in the background. The site then gives you seven screens:
+
+| | | |
 | --- | --- | --- |
-| ⚛️ | **Next.js 16, React 19** | App router, server components for every page, API routes for the editors. One image serves the web app and the worker. |
-| 🟦 | **TypeScript, strict, end to end** | The ESI client is typed from CCP's OpenAPI document, pinned to a compatibility date, and regenerated with one command. |
-| 🐘 | **PostgreSQL 17** | One schema file, idempotent migrations. The SDE lives in our own `sde_*` tables, so every page is a local query. |
-| 🔐 | **EVE SSO with PKCE** | OAuth2 authorization code + PKCE, JWTs verified against CCP's JWKS, refresh tokens encrypted at rest, and twelve read-only ESI scopes. |
-| 📡 | **A careful ESI client** | ETag caching in Postgres, per-route rate-limit buckets, an error-limit floor, and a circuit breaker that stops calling during a Tranquility outage instead of getting the app 420'd. |
-| 🧮 | **A pure dogma engine** | Modelled on Pyfa: fit tree, SDE effects with modifier info, stacking penalties, cap stability, DPS, volley, EHP, mobility and targeting. The same code runs on the server and in the browser. |
-| 🗂️ | **CCP's Static Data Export** | The worker streams the ~95 MB JSON Lines archive to disk, imports it, and re-checks the published build every six hours. |
-| 🔁 | **A twelve-job sync worker** | Four global jobs and eight per-character jobs, staggered, every run recorded in `sync_runs` and shown on Settings. |
-| 🎨 | **Mantine 9 + one hand-written stylesheet** | Tokens only, dark only, no utility framework. Michroma, Chakra Petch and JetBrains Mono. |
-| 🐳 | **Docker Compose, Traefik, Ansible** | Postgres, app and worker behind Traefik with Cloudflare DNS-challenge TLS. One playbook provisions a fresh VM. |
+| 🏠 | **Overview** | Every character: online status, corporation, main or alt, your tags, wallet, ship, location with its security status, and the skill in training. |
+| 🎓 | **Skills** | Every character's training queue side by side, one character's trained skills, the live queue, and **skill plans**. |
+| 🧬 | **Clones** | Home station, active implants with their bonuses, and jump clones. |
+| 🚀 | **Ships** | Every fitted ship you own and every saved fit, with DPS, EHP, speed, capacitor, CPU and powergrid, missing skills and Jita value. |
+| 📦 | **Assets** | Every location as a tree: ships with their fitted modules, containers, blueprints and stacks. |
+| 💰 | **Wallet** | Balance, journal and transactions. |
+| ⚙️ | **Settings** | Accounts, characters, tags, signed-in phones, the static-data build, and what each sync job last did. |
+
+The **[Android app](#-the-android-app)** shows the same screens, minus Settings, from a copy kept on the phone.
+
+Only Google accounts on your allow-list can sign in. EVE SSO is used afterwards, from Settings, to add each character.
 
 ---
 
 ## 🏠 Overview
 
-- 👥 **Every character, grouped by account.** Main and alt pills, tags you define, a re-authorise badge the moment a token stops working.
-- 🟢 **Live where it matters.** Online dot, current system with its security status, the station or structure, the hull and its class.
-- 📈 **Training progress by SP, not by the clock.** The bar measures how far through the level the character is, so it is right even after a queue was paused.
-- 📱 **Works on a phone.** At phone width the navigation becomes a strip under the logo and the cards go single-column.
+- 👥 **Every character on one screen.** Main and alt badges, tags you define, and a re-authorise badge the moment a token stops working.
+- 🟢 **Where they are now.** Online status, the current system with its security status in colour, the station or structure, and the hull.
+- 📈 **Training progress by skill points, not by the clock.** The bar shows how far through the level the character is, so it stays right after a queue was paused or edited.
+- 📱 **Works on a phone.** At phone width the navigation becomes a strip under the logo and the cards stack in one column.
 
 <div align="center">
 <img src="docs/screenshots/overview-phone.png" alt="The Overview on a phone: the navigation strip under the logo, the summary cells two-up and single-column cards" width="320">
@@ -79,102 +71,83 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 
 ---
 
-## 🎓 Skills and the planner
+## 🎓 Skills and skill plans
 
 <div align="center">
-<img src="docs/screenshots/skills.png" alt="The Skills page: summary with attributes and remap info, then a four-column Training overview card with each character's queue" width="900">
+<img src="docs/screenshots/skills.png" alt="The Skills page on its Overview tab: one card per character with the number of skills in queue, a progress bar for the current skill and the queue with time left per entry" width="900">
 
-*Summary, attributes and remaps, then the Training overview: every character's queue side by side, with a countdown to the end of each.*
+*The Overview tab: every character's queue side by side. The Skills and Training tabs cover one character at a time.*
 </div>
 
-- 📊 **Summary and attributes.** Total and unallocated SP, the five attributes with implant bonuses, bonus remaps and when the next one is available.
-- 🧭 **Training overview.** One column per character, up to twenty queue entries each, the head skill's progress bar and a "done in" countdown. Paused and unsynced characters say so.
-- ⏱️ **The queue, live.** Time remaining per entry, a ticking countdown above the table, and it advances past entries ESI still lists after they finished.
-- 🗂️ **Trained skills in framed groups**, with level boxes (trained, active, training) and the SDE description on hover.
+The page has three tabs:
 
-- 📝 **EVEMon-style plans.** Up to 500 entries, prerequisites expanded automatically, Alpha-trainable levels badged, and a warning when another character on the account is already training.
-- 🧠 **Optimal remap.** Brute-forces all 2,885 legal attribute distributions and tells you the fastest one and how much it saves.
-- 📥 **Import and export.** Paste a plan from EVEMon, or start from one of CCP's forty certified career plans. Export as EVEMon text or in the in-game skill-plan format.
-- 🔁 **Same maths everywhere.** The training timeline is a pure, isomorphic library. The server computes it for the page, the editor recomputes it on every keystroke, and the two cannot disagree.
+- 🧭 **Overview.** One card per character: how many skills are queued, when the queue ends, a progress bar for the current skill and the next entries. Paused and unsynced characters say so. **Edit** chooses which characters appear.
+- 🗂️ **Skills.** One character's trained skills by group, with level blocks that mark trained, training and queued levels. The skill's description opens under the row.
+- ⏱️ **Training.** The queue with time left per entry and a ticking countdown to its end. Entries that have finished drop out, even while ESI still lists them.
+
+**Skill plans** live at `/skills/plans`, linked from the page:
+
+- 📝 **EVEMon-style plans.** Up to 500 entries, with prerequisites added for you and Alpha-trainable levels marked.
+- 🧠 **Optimal remap.** Tries all 2,885 legal attribute distributions and tells you the fastest one and how much time it saves.
+- 📥 **Import and export.** Paste a plan from EVEMon or start from one of CCP's forty career plans. Export as EVEMon text or in the in-game skill-plan format.
 
 ---
 
 ## 🚀 Ships and fit sheets
 
 <div align="center">
-<img src="docs/screenshots/ships.png" alt="The Ships page: cards for every fitted ship with render, hull pills, DPS, EHP, speed and capacitor tiles, CPU and powergrid gauges" width="900">
+<img src="docs/screenshots/ships.png" alt="The Ships page: a card per fitted ship with hull render, location, DPS, EHP, speed and capacitor cells, CPU and powergrid bars, value, missing skills and mastery" width="900">
 
-*Fitted ships, straight from your assets. Each card is computed against the character's actual skills.*
+*Fitted ships, straight from your assets. Each card is worked out against the character's actual skills.*
 </div>
 
-- 🛰️ **Fitted ships and saved fits** are both cards: render, hull, race and class pills, location, DPS, EHP, speed and capacitor, CPU and powergrid gauges, missing skills and estimated value.
-- 🎯 **Honest numbers.** Until a character's skills are synced the page says so and treats every skill as level 0, so the worst case is what you see.
+- 🛰️ **Fitted ships and saved fits** are both shown as cards: render, hull class, location, DPS, EHP, speed, capacitor, CPU and powergrid, missing skills and estimated value.
+- 🎯 **Honest numbers.** Until a character's skills have synced, the page says so and treats every skill as level 0, so you see the worst case.
 
 <div align="center">
-<img src="docs/screenshots/fit-sheet.png" alt="A fit sheet: modules by slot with state pills and an affected-by popover, the Ship stats card with capacitor, offense, the resist table, targeting, navigation and drones" width="900">
+<img src="docs/screenshots/fit-sheet.png" alt="A fit sheet: the hull, its location and value, key figures for DPS, EHP, speed and capacitor, then problems, missing skills and the modules by slot" width="900">
 
-*A fit sheet. The Ship stats card mirrors the in-game fitting window. Hover a value to see which skills and modules changed it, and which were stacking-penalised.*
+*A fit sheet: one ship in full.*
 </div>
 
-- 🔍 **Affected by.** Every module and stat can show the modifiers that produced it, with the stacking penalty called out.
-- 🧾 **Problems and missing skills** in their own cards: slot overflow, powergrid over, a skill one level short, a drone bay too small.
-- 💎 **Value broken down** into hull, modules and rigs, charges, drones and cargo, priced from Jita, with the unpriced items counted.
-
----
-
-## 🛠️ The fitting designer
-
-- ⚡ **The dogma engine runs in the browser.** One cached request fetches the attribute and effect tables once a day, types are fetched on demand, and every change recomputes instantly.
-- 🧰 **Real module states.** Active, overloaded, online, offline and passive, with charges loaded and ammo assumed from cargo for the DPS number.
-- 🔎 **An item browser that knows your hull.** Tick "fits this hull" and the market tree only shows what will fit, with Tech II, Faction and Officer badges.
-- 📋 **EFT in, EFT out.** Import a fit from text, export one, clone it, or build one from an asset, a saved fitting or a killmail.
-- 💰 **Priced as you browse.** Prices come from Jita aggregates. A module nobody has priced yet is priced synchronously the first time you see it.
-- 🔒 **Yours.** Fits live in this database and are never written back to ESI. The write-fittings scope is not even requested.
-
----
-
-## ⚔️ Combat
-
-- 📅 **30 days, 90 days, a year or everything**, for one character or all of them.
-- 🧮 **Kills, losses, efficiency, ISK destroyed, ISK lost, solo kills**, a twelve-month strip, and the ships and systems you fight in most.
-- 🕰️ **Your whole history.** ESI only keeps 90 days of killmails, so a backfill job walks zKillboard, politely, one request every two seconds, up to 20,000 kills and 20,000 losses per character.
-- 💸 **Every killmail is valued** from the same market table the Ships pages use, with zKillboard's total shown when it has one.
+- 🧾 **Problems and missing skills** in their own cards: too many modules for the slots, powergrid over, a skill one level short, a drone bay too small.
+- 🔍 **Affected by.** Modules and stats can show the skills and modules that changed them.
+- 🔫 **Ammunition and drones.** DPS and range for every round in the hold, and a drone selector that updates the figures as you choose what to launch.
+- 💎 **Value broken down** into hull, modules, charges, drones and cargo, priced from Jita.
 
 ---
 
 ## 📦 Assets, 💰 wallet and 🧬 clones
 
 <div align="center">
-<img src="docs/screenshots/assets.png" alt="The Assets page: locations with item counts and volume, an expandable tree of ships, fitted modules by slot, containers, blueprints and mineral stacks" width="900">
+<img src="docs/screenshots/assets.png" alt="The Assets page: a name filter, totals, and a list of locations with their security status, item counts and volume" width="900">
 
-*Assets as a tree. A ship opens into its fitted modules by slot; a container opens into what is inside it.*
+*Assets as a tree. A location opens into its ships and containers, and each of those into what is inside.*
 </div>
 
-- 🌳 **Locations, then ships and containers, then items.** Counts and cubic metres per location, type icons on every row, blueprint originals and copies badged, a name filter.
-- 🏗️ **Player structures named.** Citadels the character can dock at are resolved through the structures scope.
+- 🌳 **Locations, then ships and containers, then items.** Item counts and volume per location, an icon on every row, blueprint copies marked, and a name filter.
+- 🏗️ **Player structures are named.** Citadels the character can dock at are looked up through the structures scope.
 
 <div align="center">
-<img src="docs/screenshots/wallet.png" alt="The Wallet page: balance, then the journal with date, type, from, to, amount and running balance" width="900">
+<img src="docs/screenshots/wallet.png" alt="The Wallet page: the balance, then the journal grouped by day with type, counterparty, amount and running balance" width="900">
 </div>
 
-- 💰 **Wallet.** Balance, the journal with running balance, and transactions, with income green and spend red.
-- 🧬 **Clones.** Home station, active implants and the attribute bonuses they give, every jump clone and where it is.
+- 💰 **Wallet.** The balance, the journal with a running balance, and market transactions. Money in is teal with a plus sign; money out is coral with a minus.
+- 🧬 **Clones.** The active clone with its implants and the attribute bonuses they give, the home station, and every jump clone by location.
 
 ---
 
-## ⚙️ Settings and the sync table
+## ⚙️ Settings
 
 <div align="center">
-<img src="docs/screenshots/settings.png" alt="The Settings page: accounts, characters with main/alt and re-authorise, tags, the static data build with table counts, the signed-in phones with a Revoke button each, and the sync status" width="900">
-
-*Accounts, characters, tags, the SDE build, the phones signed in to the Android app, and a sync table that names the job, the character, the row count and the error.*
+<img src="docs/screenshots/settings.png" alt="The Settings page: accounts, characters with main or alt and re-authorise, tags, the static data build with table counts, the signed-in phones with a Revoke button each, and the sync status" width="900">
 </div>
 
-- 👤 **Accounts and characters.** Group characters under accounts, mark main and alt, re-authorise one when its token is rejected, remove one cleanly.
-- 🏷️ **Tags** you define, shown as pills on the Overview.
-- 🗄️ **Static data.** The imported SDE build, when CCP released it, when it was imported, and the table counts.
-- 📱 **Signed-in phones.** Every phone running the Android app, when it signed in and when it last synced, with a Revoke button that signs it out on its next request.
-- 🩺 **Sync status.** Every job's latest run per character with status, rows and the message. Partial imports show as amber warnings, not silent gaps.
+- 👤 **Accounts and characters.** Group characters under accounts, mark main and alt, add a character, re-authorise one whose token was rejected, or remove one.
+- 🏷️ **Tags** you define, shown on the Overview.
+- 🗄️ **Static data.** Which build of CCP's Static Data Export is imported, and when.
+- 📱 **Signed-in phones.** Every phone running the Android app, when it signed in and when it last synced, with a Revoke button.
+- 🩺 **Sync status.** Each job's latest run per character: status, rows and any message. A partial import shows as an amber warning.
 
 ---
 
@@ -184,32 +157,16 @@ Everything sits behind one session cookie. You sign in with Google, and only the
 <img src="docs/screenshots/login.png" alt="The login page: the Yutani OS lockup and a sign-in card with the Sign in with Google button" width="700">
 </div>
 
-- 🪪 **Google sign-in.** Authorization code with PKCE, state and a nonce; the ID token verified against Google's JWKS, issuer, audience and nonce checked, and the email must be verified.
-- 📜 **An account allow-list.** Only the Google accounts in `ALLOWED_GOOGLE_EMAILS` get a session; an empty list stops the app from starting.
-- 🛰️ **EVE SSO adds characters.** Once signed in, Settings › Add character runs EVE SSO with PKCE, the token's JWT verified against CCP's JWKS.
-- 🔐 **Refresh tokens are encrypted at rest** with the session secret. Access tokens are refreshed by the worker as needed.
-- 🚪 **One guard for every path.** The proxy lets through the login page, the health check, the Google sign-in routes and the brand images. Everything else needs the session cookie.
-- 📱 **Phones sign in with the same Google account.** The Android app posts a Google ID token to `/api/v1/auth/google` and gets a bearer token; only its SHA-256 is stored. Settings › Signed-in phones lists each device and revokes it. A token whose account leaves the allow-list stops working.
+- 🪪 **Google sign-in is the only way in.** Only the accounts listed in `ALLOWED_GOOGLE_EMAILS` get a session. With an empty list the app refuses to start.
+- 🛰️ **EVE SSO only adds characters.** Once signed in, Settings › Add character runs EVE SSO for one character at a time.
+- 📱 **Phones use the same Google account.** The Android app trades a Google ID token for its own token, which Settings › Signed-in phones can revoke. Removing an account from the allow-list stops its phones too.
+- 🚪 **Everything else is closed.** Without a session, only the login page, the health check, the sign-in routes and the brand images can be reached.
 
----
+The details, for the curious:
 
-## 📱 The app API
-
-`/api/v1` serves the same view objects the pages draw, as JSON, for the Android app. It reads only; nothing here talks to ESI.
-
-| Route | What it returns |
-| --- | --- |
-| `POST /api/v1/auth/google`, `DELETE /api/v1/auth/session` | Sign a phone in with `{ idToken, deviceName }`; sign it out. |
-| `GET /api/v1/sync` | Every resource a phone should hold, with its current ETag. |
-| `GET /api/v1/me`, `/characters`, `/overview`, `/training-overview` | The account, the character switcher, the Overview, Skills › Overview. |
-| `GET /api/v1/characters/{id}/skills`, `/training`, `/clones`, `/assets`, `/ships` | One character's screens. |
-| `GET /api/v1/characters/{id}/wallet` | The balance; with `?kind=journal\|transactions&offset=&limit=` (at most 500) a slice of that list. |
-| `GET /api/v1/characters/{id}/ships/asset/{itemId}`, `/ships/fit/{fittingId}` | A fit sheet, with the per-drone numbers the drone selector sums. |
-
-- 🔑 **Bearer token or the site's cookie.** Without either: `401 { "error": "unauthorised" }`, never a redirect.
-- 📦 **`{ data, generatedAt }`**, errors as `{ error }` with 400, 401 or 404. The character is always in the path.
-- 🏷️ **ETags that ignore the clock.** Every GET answers `If-None-Match` with `304`. A tag moves when the stored data does, not because a countdown ticked, so anything worked out against the clock also carries its raw timestamps and SP bounds for the app to recompute.
-- 🧾 **A contract in the repo.** [`api-fixtures/v1/`](api-fixtures/v1/) holds every response for an invented account and a [README](api-fixtures/v1/README.md) of the shapes. A test fails when a loader drifts from them.
+- Both sign-ins use the authorization-code flow with PKCE, and both tokens are verified against the issuer's published keys.
+- EVE refresh tokens are encrypted at rest with the session secret.
+- Only a SHA-256 hash of a phone's token is stored.
 
 ---
 
@@ -244,15 +201,23 @@ Building, signing, the one-off Android client in Google Cloud and installing are
 
 ---
 
-## 🛠️ Under the hood
+## 📱 The app API
 
-- **Pages read Postgres, never ESI.** The worker owns every outbound call. A page that cannot reach the database still renders its shell and says so.
-- **Twelve jobs.** Global: `sde-update` (6 h), `market-prices` (1 h), `killmail-backfill` (15 min), `killmail-values` (1 h). Per character: `character-info` and `clones` and `fittings` (6 h), `skills`, `assets`, `wallet` and `killmails` (1 h), `location` (15 min). Character jobs are staggered so a tick never fans out all at once. A failed run retries after ten minutes.
-- **The ESI client** remembers which rate-limit bucket each route template belongs to, caches by ETag in Postgres, backs off when the error-limit header gets low, and opens a one-minute breaker after any 502, 503 or 504.
-- **Market prices** come from two sources: CCP's reference prices for every type, and Fuzzwork's Jita aggregates for the types of interest, which is everything you own, everything in a fit, everything traded in the last 30 days and everything on a recent killmail. Fuzzwork has no SLA, so a failure degrades to the reference prices and shows as a warning.
-- **The dogma engine** is a pure library under `src/lib/dogma`. Fit tree, SDE effects with modifier info, stacking penalties, validation, performance. The server loads it from Postgres; the browser gets the same tables as cached JSON.
-- **Killmails are immutable.** A `(killmail_id, killmail_hash)` pair is stored once and never re-fetched; only its value columns are ever updated.
-- **Design notes for every phase** live in [`docs/superpowers/specs/`](docs/superpowers/specs/) and the plans that built them in [`docs/superpowers/plans/`](docs/superpowers/plans/). The research behind the SDE format, the ESI endpoints, the dogma engine and the skill planner is in [`docs/research/`](docs/research/).
+`/api/v1` serves the same view objects the pages draw, as JSON, for the Android app. It reads only; nothing here talks to ESI.
+
+| Route | What it returns |
+| --- | --- |
+| `POST /api/v1/auth/google`, `DELETE /api/v1/auth/session` | Sign a phone in with `{ idToken, deviceName }`; sign it out. |
+| `GET /api/v1/sync` | Every resource a phone should hold, with its current ETag. |
+| `GET /api/v1/me`, `/characters`, `/overview`, `/training-overview` | The account, the character switcher, the Overview, Skills › Overview. |
+| `GET /api/v1/characters/{id}/skills`, `/training`, `/clones`, `/assets`, `/ships` | One character's screens. |
+| `GET /api/v1/characters/{id}/wallet` | The balance; with `?kind=journal\|transactions&offset=&limit=` (at most 500) a slice of that list. |
+| `GET /api/v1/characters/{id}/ships/asset/{itemId}`, `/ships/fit/{fittingId}` | A fit sheet, with the per-drone numbers the drone selector sums. |
+
+- 🔑 **Bearer token or the site's cookie.** Without either: `401 { "error": "unauthorised" }`, never a redirect.
+- 📦 **`{ data, generatedAt }`**, errors as `{ error }` with 400, 401 or 404. The character is always in the path.
+- 🏷️ **ETags that ignore the clock.** Every GET answers `If-None-Match` with `304`. A tag moves when the stored data does, not because a countdown ticked, so anything worked out against the clock also carries its raw timestamps and SP bounds for the app to recompute.
+- 🧾 **A contract in the repo.** [`api-fixtures/v1/`](api-fixtures/v1/) holds every response for an invented account and a [README](api-fixtures/v1/README.md) of the shapes. A test fails when a loader drifts from them.
 
 ---
 
@@ -317,42 +282,72 @@ The first worker tick downloads and imports the SDE, which takes a few minutes. 
 
 ## 🤖 Deploying
 
-One script asks the questions, one playbook does the install, on the machine you run it from or on a host over SSH. You pick the subdomain; the host's address, its LAN range and the secrets are detected or generated.
+One script asks the questions and one playbook does the install, on the machine you run it from or on another host over SSH.
 
 ```bash
-./deploy/setup.sh                                   # subdomain, email, characters, EVE SSO app, Cloudflare token
+./deploy/setup.sh                                   # subdomain, email, Google account and client, EVE SSO app, Cloudflare token
 cd deploy/ansible
 ansible-galaxy collection install -r requirements.yml
 ansible-playbook -K site.yml                        # first install; later: --tags eve to redeploy the app
 ```
 
-What you need: a Debian or Ubuntu host, a subdomain whose DNS zone is on Cloudflare with an A record pointing at the host, a Cloudflare DNS token, and an EVE developer application with `https://<your domain>/auth/callback` as its callback. The stack is three containers, Postgres, the app and the worker, behind Traefik with a Let's Encrypt certificate obtained through a DNS challenge, so it works on a LAN-only host. Only the host's own LAN, Tailscale and the networks you add can reach it.
+You need:
 
-See [deploy/README.md](deploy/README.md) for the SDE, market, fitting, planner and combat operational notes.
+- a Debian or Ubuntu host;
+- a subdomain whose DNS zone is on Cloudflare, with an A record pointing at the host, and a Cloudflare DNS token;
+- an EVE developer application with `https://<your domain>/auth/callback` as its callback;
+- a Google OAuth client with `https://<your domain>/auth/google/callback` as its redirect URI.
+
+The stack is three containers (Postgres, the app and the worker) behind Traefik. The certificate comes from Let's Encrypt through a DNS challenge, so it works on a host that is only reachable on your LAN. Only the host's own LAN, Tailscale and the networks you add can reach the site.
+
+The full guide, including the Google Cloud steps and the notes on each background job, is [deploy/README.md](deploy/README.md).
 
 ---
 
-## 🎨 The Yutani OS design
+## 🛠️ How it works
 
-Yutani OS is the sister project of [Yutani](https://github.com/dc9090-web/yutani), the EVE multiboxing tool for COSMIC, and wears the same house style: a MU/TH/UR console in amber phosphor on warm black.
+| | Part | What it does |
+| --- | --- | --- |
+| ⚛️ | **Next.js 16, React 19** | Server-rendered pages and the JSON routes. One image serves both the web app and the worker. |
+| 🟦 | **TypeScript, strict** | The ESI client is typed from CCP's OpenAPI document, pinned to a compatibility date, and regenerated with one command. |
+| 🐘 | **PostgreSQL 17** | One schema file, safe to re-apply. CCP's static data lives in `sde_*` tables, so every page is a local query. |
+| 🔁 | **The sync worker** | Twelve jobs: four global and eight per character, staggered, with every run recorded and shown on Settings. |
+| 📡 | **The ESI client** | Caches by ETag in Postgres, respects each route's rate-limit bucket, slows down when the error budget runs low, and stops calling for a minute after a 502, 503 or 504. |
+| 🧮 | **The dogma engine** | A pure library modelled on Pyfa that works out a fit's DPS, EHP, capacitor, speed and targeting from the static data, with stacking penalties. |
+| 🐳 | **Docker Compose, Traefik, Ansible** | One playbook provisions a fresh host. |
 
-- 🎛️ **Tokens only, dark only.** Every colour is a custom property on `:root`. Status colours never change meaning: green is ok, kill and high-sec; red is error, loss and null-sec; amber is active and warning; cyan is charges, meta and links.
-- 🔤 **Three families.** Michroma for labels, nav and buttons. Chakra Petch for titles, names and values. JetBrains Mono for body copy and every table.
-- 🪟 **Glass panels with corner brackets**, tick rulers on card feet, a grid field behind the page, and a system strip under the header with sync state, ESI, SDE build, character count and the UTC clock.
-- 📐 **One hand-written stylesheet.** No preprocessor, no CSS modules, no utility framework. Mantine draws only the character menu and the Settings forms.
-- 🔁 **Designed in the open.** [`docs/design-package/`](docs/design-package/) holds every screen as self-contained HTML transcribed from the real JSX, with the real stylesheet inlined, so the whole UI can be restyled in a design tool and diffed back. [`CHANGES.md`](docs/design-package/CHANGES.md) records the Yutani OS iteration.
+- **Pages read Postgres, never ESI.** The worker makes every outbound call. A page that cannot reach the database still draws its frame and says so.
+- **The twelve jobs.** Global: `sde-update` (6 h), `market-prices` (1 h), `killmail-backfill` (15 min), `killmail-values` (1 h). Per character: `character-info`, `clones` and `fittings` (6 h); `skills`, `assets`, `wallet` and `killmails` (1 h); `location` (15 min). A failed run retries after ten minutes.
+- **Prices** come from CCP's reference prices for every type, and from Fuzzwork's Jita aggregates for the types that matter to you: what you own, what is in a fit and what you traded recently. If Fuzzwork is down, the reference prices are used and Settings shows a warning.
+- **One loader per page.** Each page's data is built by a function in `src/lib/pages`, which the page and the matching `/api/v1` route both call, so the site and the app cannot drift apart.
+- **Two older pages are still in the code but no longer in the navigation:** the fitting designer (linked from Ships › Saved fits) and the Combat killboard at `/combat`, which the killmail jobs feed. Their notes are in [deploy/README.md](deploy/README.md).
+- **Design notes** for every phase are in [`docs/superpowers/specs/`](docs/superpowers/specs/), the plans that built them in [`docs/superpowers/plans/`](docs/superpowers/plans/), and the research on the SDE, ESI, the dogma engine and the skill planner in [`docs/research/`](docs/research/).
+
+---
+
+## 🎨 The design
+
+Yutani OS is the sister project of [Yutani](https://github.com/dc9090-web/yutani), the EVE multiboxing tool for COSMIC. The look is clean, dark and easy to read, with a restrained "ship's computer" feel.
+
+- 🟧 **One accent.** Amber marks what is live or selected: the current page, the MAIN badge, the skill in training.
+- 🟢 **Two status colours.** Teal for good and coral for bad, always with a word or a sign beside them, never colour alone.
+- 🔤 **Three typefaces.** Space Grotesk for headings, Inter for names and text, JetBrains Mono for every number.
+- 🧱 **Depth from surfaces, not borders.** The page, cards, sunken cells and open rows each have their own shade.
+- 🎛️ **Tokens only, dark only.** Every colour, radius and spacing value is a `--yo-` custom property in one stylesheet.
+
+The full specification, with every page drawn for desktop and phone, is in [`docs/design-handoff/`](docs/design-handoff/). The previous amber-console design is kept in [`docs/design-package/`](docs/design-package/).
 
 ---
 
 ## 🧪 Tests
 
 ```bash
-npm test
+npm test                                   # the site: 1,702 tests in 183 files
+cd android && ./gradlew :shared:jvmTest    # the app: 87 tests
 ```
 
-1,702 vitest tests across 183 files cover the SSO flow, the app API and its contract fixtures, the ESI client's rate limiting and breaker, the SDE importer, the dogma engine against real fits, EFT parsing, the skill timeline and remap optimiser, the killmail pipeline and the React components. The `tests/db` suite needs a Postgres on port 5432; `compose.dev.yml` provides one.
-
-The Android app has its own suite (`cd android && ./gradlew :shared:jvmTest`, 87 tests): it decodes the same contract fixtures, tests the sync engine against a pretend site, and swipes through the real app shell.
+- **The site's suite** covers both sign-in flows, the app API and its contract fixtures, the ESI client's rate limiting, the SDE importer, the dogma engine against real fits, the skill timeline and remap optimiser, and the React components. The database tests need a Postgres on port 5432; `compose.dev.yml` provides one.
+- **The app's suite** decodes the same contract fixtures, runs the sync engine against a pretend site, and swipes through the real app shell.
 
 ---
 

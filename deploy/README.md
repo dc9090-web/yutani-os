@@ -1,9 +1,18 @@
 # Deploying Yutani OS
 
-One Ansible playbook installs everything on a Debian or Ubuntu host: Docker, Traefik (TLS through a
-Cloudflare DNS-01 challenge, so a LAN-only host gets a real certificate), then the app, the worker and
-Postgres from `deploy/docker-compose.yml`. It installs on the machine you run it from, or on a host over
-SSH; the host's own LAN, Tailscale and loopback are the only networks allowed in unless you add more.
+One Ansible playbook installs everything on a Debian or Ubuntu host: Docker, Traefik, then the app,
+the worker and Postgres from `deploy/docker-compose.yml`.
+
+- It installs on the machine you run it from, or on another host over SSH.
+- The certificate comes from Let's Encrypt through a Cloudflare DNS challenge, so a host that is only
+  on your LAN still gets a real one.
+- Only the host's own LAN, Tailscale and loopback can reach the site, unless you add more networks.
+
+**Contents**
+
+- Installing: [1. Answer the questions](#1-answer-the-questions) · [Google sign-in set-up](#google-sign-in-set-up) · [2. Install](#2-install) · [Redeploying](#redeploying-app-changes)
+- Running it: [Where things live](#where-things-live-on-the-host) · [Logs and troubleshooting](#logs-and-troubleshooting) · [ESI scopes](#esi-application-scopes) · [ESI compatibility date](#esi-compatibility-date)
+- How each part behaves: [Static data](#static-data-sde) · [Market prices](#market-prices) · [The app API and phones](#the-app-api-and-phones) · [Skill planner](#skill-planner) · [Fitting designer](#fitting-designer) · [Combat](#combat-killmails-and-pvp-stats)
 
 ## 1. Answer the questions
 
@@ -11,11 +20,24 @@ SSH; the host's own LAN, Tailscale and loopback are the only networks allowed in
 ./deploy/setup.sh
 ```
 
-It asks for the subdomain, a contact email, the Google account(s) that may sign in, your Google sign-in
-client, your EVE SSO application and a Cloudflare DNS token, generates the session secret and the Postgres password, and writes three git-ignored
-files: `ansible/inventory.ini` (where), `ansible/vars/site.yml` (what) and `ansible/vars/secrets.yml`
-(0600). Re-running keeps your answers as defaults and never regenerates a secret. Every prompt can be
-pre-seeded from an environment variable of the same name (`DOMAIN=eve.example.com ./deploy/setup.sh`).
+The script asks for:
+
+- the subdomain and a contact email;
+- the Google account or accounts that may sign in, and your Google sign-in client;
+- your EVE SSO application;
+- a Cloudflare DNS token.
+
+It generates the session secret and the Postgres password, and writes three git-ignored files:
+
+| File | Holds |
+| --- | --- |
+| `ansible/inventory.ini` | Where to install. |
+| `ansible/vars/site.yml` | The settings that are not secret. |
+| `ansible/vars/secrets.yml` | The secrets (mode 0600). |
+
+Running it again keeps your answers as the defaults and never regenerates a secret. Any question can
+be answered in advance with an environment variable of the same name
+(`DOMAIN=eve.example.com ./deploy/setup.sh`).
 
 You need, before you start:
 
@@ -29,7 +51,7 @@ You need, before you start:
 
 ## Google sign-in set-up
 
-The site is signed in to with Google; EVE SSO is only used afterwards, from Settings, to add and
+You sign in to the site with Google. EVE SSO is only used afterwards, from Settings, to add and
 re-authorise characters. Only the addresses in `allowed_google_emails` get in, and an empty list stops
 the app from starting. The Google side is a one-off in the Google Cloud console:
 
@@ -56,7 +78,9 @@ the app from starting. The Google side is a one-off in the Google Cloud console:
    logged as `[auth] google account not allowed: <address>` in `docker logs eve-app`, which shows the
    address to add.
 
-The Android app adds an Android OAuth client to this same project (package name and the signing key's SHA-1); nothing here changes. The steps are in [android/README.md](../android/README.md).
+The Android app needs one more client in this same project, of type Android, with the app's package
+name and the SHA-1 of its signing key. Nothing above changes. The steps are in
+[android/README.md](../android/README.md).
 
 ## 2. Install
 
@@ -77,8 +101,12 @@ packages, swap), `docker` (engine + compose plugin), `traefik` (reverse proxy an
 ansible-playbook -K site.yml --tags eve
 ```
 
-Only re-syncs the repository, rebuilds the image, restarts the stack and re-applies the schema; skips the
-idempotent but slower `common`/`docker`/`traefik` roles. Changed a setting in `vars/site.yml`? Same command.
+This copies the repository to the host again, rebuilds the image, restarts the stack and re-applies
+the schema. It skips the slower `common`, `docker` and `traefik` roles. Use the same command after
+changing a setting in `vars/site.yml`.
+
+The `android/` folder is not copied to the host and is not part of the image; the app is built
+separately (see [android/README.md](../android/README.md)).
 
 ## Running Ansible from a non-interactive shell
 
@@ -88,20 +116,17 @@ A shell without a pseudo-tty breaks Ansible's progress output. Wrap the command 
 script -qc "ansible-playbook site.yml --tags eve" /dev/null
 ```
 
-## ESI application scopes (manual, one-off)
+## ESI application scopes
 
-The app now requests twelve scopes (`SCOPES` in `src/lib/auth/sso.ts`). The developer-portal
-application at <https://developers.eveonline.com> already has all twelve enabled — no portal
-change is needed. Two of them were added in phase 3:
+The app requests twelve read-only scopes (`SCOPES` in `src/lib/auth/sso.ts`). Your application at
+<https://developers.eveonline.com> must have all twelve enabled.
 
-- `esi-universe.read_structures.v1` — names of player structures (citadels) the character can dock at
-- `esi-location.read_online.v1` — whether the character is currently online
-
-Tokens issued before this deploy were granted under the old ten-scope set, and scope grants are
-immutable per refresh token. So **every character must be authorised once more after the deploy** (sign in with Google,
-then menu → Add character, which goes through `/auth/start`) to pick up the new scopes. Until a character does that, those two features degrade gracefully rather than failing:
-structures show `Unknown structure (id)` and online status is blank, while everything else
-(skills, assets, fittings, clones, wallet, location) keeps syncing normally.
+A refresh token only ever carries the scopes it was granted when the character was authorised. If a
+scope is added to the app later, **each character must be authorised once more** to pick it up:
+sign in, then Settings › Re-authorise. Until then the features behind the new scope degrade rather
+than fail, and everything else keeps syncing. For example, without
+`esi-universe.read_structures.v1` a player structure shows as `Unknown structure (id)`, and without
+`esi-location.read_online.v1` the online status is blank.
 
 ## ESI compatibility date
 
@@ -110,7 +135,7 @@ structures show `Unknown structure (id)` and online status is blank, while every
 `2026-08-18` in `deploy/ansible/group_vars/eve.yml`, `.env`, `.env.example`, `deploy/.env.example`
 and `scripts/esi-types.ts`. Bump all five together and re-run `npm run esi:types`, never one alone.
 
-## Where things live on the VM
+## Where things live on the host
 
 - `/opt/eve/traefik` — Traefik config, dynamic routes, ACME certificate storage.
 - `/opt/eve/src` — the synced repository (`base_dir` in `group_vars/eve.yml`); `/opt/eve/src/deploy` is the Compose project directory
@@ -138,8 +163,6 @@ The worker polls CCP's Static Data Export on a schedule; there is nothing to pro
   downloads when the published build number differs from `sde_meta.build_number`, so tables added by
   a migration stay empty until `npm run sde:import` is run by hand (the command above). Phase 6's
   `sde_alpha_skills` and `sde_skill_plans` were filled that way.
-```
-```markdown
 
 ## Market prices
 
@@ -159,25 +182,23 @@ job retries after 10 minutes.
 Prices are empty until the first run, so `/ships` shows `0 ISK` and "n items unpriced" on a fresh
 deploy for up to an hour.
 
-## Fitting designer
+## The app API and phones
 
-`/fitting` runs the dogma engine **in the browser**. Three routes feed it:
+`/api/v1` serves the Android app. It only reads, and nothing in it talks to ESI. The routes are listed
+in the main [README](../README.md#-the-app-api) and described field by field in
+[api-fixtures/v1/README.md](../api-fixtures/v1/README.md).
 
-- `GET /api/dogma/meta` — the attribute/effect/group half of `DogmaData`, ~1.25 MB of JSON, with
-  `Cache-Control: public, max-age=86400` and `ETag: "sde-<build>"`. A browser revalidates once a
-  day and gets a 304 unless the SDE was re-imported.
-- `GET /api/dogma/types?ids=` — up to 200 type ids plus their `requiredSkillN` closure, memoised
-  per id in the tab.
-- `GET /api/market/prices?ids=` — serves `market_prices` and, for ids with no row or a row older
-  than 24 h, fetches Jita aggregates from Fuzzwork **synchronously** (one chunk of ≤ 500) before
-  answering, so a freshly browsed module is priced immediately instead of waiting for the hourly
-  job. A Fuzzwork failure is logged and the stored (ESI) prices are served.
-
-Fits live in our own `fits` / `fit_items` tables and are **never pushed to ESI** — the
-`esi-fittings.write_fittings.v1` scope is not requested. Export is EFT text.
-
-Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/google/*` and `/_next/*`.
+- **Signing in.** A phone posts a Google ID token to `POST /api/v1/auth/google` and gets a bearer
+  token back. Only the token's SHA-256 hash is stored, in `app_sessions`.
+- **Revoking.** Settings › Signed-in phones lists every phone with a Revoke button. A phone whose
+  Google account is taken off `allowed_google_emails` is refused on its next request.
+- **What a sync costs.** `GET /api/v1/sync` lists every resource with a tag. The site remembers each
+  tag until the stored data behind it changes, so a sync with nothing new is one cheap request. The
+  first sync after new data arrives rebuilds the affected resources, fit sheets included, which
+  takes a second or two.
+- **A token for development.** `docker compose exec -T app npm run -s app:token -- <email> "<name>"`
+  (from `/opt/eve/src/deploy`) creates a session and prints its token once. Revoke it from Settings
+  when you are done.
 
 ## Skill planner
 
@@ -200,12 +221,27 @@ so the two cannot disagree.
   Alpha-trainable levels, and `sde_skill_plans` (40 rows) is CCP's certified career plans, offered
   as templates.
 
-Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/google/*` and `/_next/*`.
+## Fitting designer
 
-## Combat (killmails & PvP stats)
+`/fitting` is no longer in the navigation; it is linked from Ships › Saved fits. It runs the dogma
+engine **in the browser**. Three routes feed it:
 
-`/combat` is the killboard: stats tiles, a twelve-month activity strip, top ships and systems, and
+- `GET /api/dogma/meta` — the attribute/effect/group half of `DogmaData`, ~1.25 MB of JSON, with
+  `Cache-Control: public, max-age=86400` and `ETag: "sde-<build>"`. A browser revalidates once a
+  day and gets a 304 unless the SDE was re-imported.
+- `GET /api/dogma/types?ids=` — up to 200 type ids plus their `requiredSkillN` closure, memoised
+  per id in the tab.
+- `GET /api/market/prices?ids=` — serves `market_prices` and, for ids with no row or a row older
+  than 24 h, fetches Jita aggregates from Fuzzwork **synchronously** (one chunk of ≤ 500) before
+  answering, so a freshly browsed module is priced immediately instead of waiting for the hourly
+  job. A Fuzzwork failure is logged and the stored (ESI) prices are served.
+
+Fits live in our own `fits` / `fit_items` tables and are **never pushed to ESI** — the
+`esi-fittings.write_fittings.v1` scope is not requested. Export is EFT text.
+
+## Combat (killmails and PvP stats)
+
+`/combat` is no longer in the navigation but still works, and its jobs still run. It is the killboard: stats tiles, a twelve-month activity strip, top ships and systems, and
 the killmail table. `/combat/<id>` is one killmail — victim, fit, attackers — and "Open in fitting
 designer" turns the victim's fit into a local fit.
 
@@ -234,16 +270,19 @@ only the `zkb_*` and `computed_value` columns are ever updated.
 **A character must have logged in since the killmail scope was added.** The portal grants
 `esi-killmails.read_killmails.v1`, but a refresh token minted before that grant cannot use it: the
 `killmails` job records `warn: killmail scope not on this token yet — log the character in again`
-on `/settings` and returns no rows. Fix it with **Add character** in the top-right menu — the SSO
-round trip mints a new token with the full scope set. The zKillboard backfill needs no scope, so
+on `/settings` and returns no rows. Fix it with **Re-authorise** on Settings: the SSO round trip
+mints a new token with the full scope set. The zKillboard backfill needs no scope, so
 history appears either way.
 
 Item slots on a killmail come from the raw numeric `invFlags` id, not the string enum the assets and
 fittings endpoints use: low 11–18, mid 19–26, high 27–34, rigs 92–94, subsystems 125–132, drone bay
 87, cargo 5, implants 89, fighter bay 158.
 
-Everything is behind the session cookie: `src/proxy.ts` guards every path except `/login`,
-`/api/health`, `/auth/google/*` and `/_next/*`.
+## Who can reach what
+
+Everything is behind the session: `src/proxy.ts` lets through only `/login`, `/api/health`,
+`/auth/google/*`, `/api/v1/auth/google` and the static files. Requests under `/api/v1/` may carry a
+phone's bearer token in place of the cookie, and get `401` as JSON when they have neither.
 
 ## Logs and troubleshooting
 
