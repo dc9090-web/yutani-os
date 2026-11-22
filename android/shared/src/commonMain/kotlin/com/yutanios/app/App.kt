@@ -62,12 +62,31 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun App(app: AppContainer) {
+    AppFrame(app) {
+        val signedIn by app.signedIn.collectAsState()
+        if (signedIn) Shell() else SignIn()
+    }
+}
+
+/** Theme, the container and the page ground. Everything the app draws sits inside this. */
+@Composable
+fun AppFrame(app: AppContainer, content: @Composable () -> Unit) {
     YutaniTheme {
         CompositionLocalProvider(LocalApp provides app) {
-            Box(Modifier.fillMaxSize().background(Yo.bg).windowInsetsPadding(WindowInsets.safeDrawing)) {
-                val signedIn by app.signedIn.collectAsState()
-                if (signedIn) Shell() else SignIn()
-            }
+            Box(Modifier.fillMaxSize().background(Yo.bg).windowInsetsPadding(WindowInsets.safeDrawing)) { content() }
+        }
+    }
+}
+
+/** The signed-in frame: header, navigation strip, status strip, then the current screen. */
+@Composable
+fun SectionFrame(section: Section?, onSelect: (Section) -> Unit, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalCharacters provides rememberCharacters()) {
+        Column(Modifier.fillMaxSize()) {
+            Header()
+            NavStrip(section, onSelect)
+            SyncStrip()
+            Box(Modifier.fillMaxWidth().weight(1f)) { content() }
         }
     }
 }
@@ -105,38 +124,33 @@ private fun Shell() {
     val section = Section.entries.firstOrNull { it.route == route } ?: if (route?.startsWith("ship/") == true) Section.Ships else null
     // Opening the app is the moment to check for changes; the copy is on screen meanwhile.
     LaunchedEffect(Unit) { app.refresh() }
-    CompositionLocalProvider(LocalCharacters provides rememberCharacters()) {
+    SectionFrame(section, onSelect = { target ->
+        nav.navigate(target.route) { popUpTo(Section.Overview.route) { saveState = true }; launchSingleTop = true; restoreState = true }
+    }) {
         val active = LocalCharacters.current.active
-        Column(Modifier.fillMaxSize()) {
-            Header()
-            NavStrip(section, onSelect = { target ->
-                nav.navigate(target.route) { popUpTo(Section.Overview.route) { saveState = true }; launchSingleTop = true; restoreState = true }
-            })
-            SyncStrip()
-            NavHost(nav, startDestination = Section.Overview.route, modifier = Modifier.fillMaxWidth().weight(1f)) {
-                composable(Section.Overview.route) { OverviewScreen() }
-                composable(Section.Skills.route) { PerCharacter("Skills", active?.id) { SkillsScreen(it) } }
-                composable(Section.Clones.route) { PerCharacter("Clones", active?.id) { ClonesScreen(it) } }
-                composable(Section.Assets.route) { PerCharacter("Assets", active?.id) { AssetsScreen(it) } }
-                composable(Section.Wallet.route) { PerCharacter("Wallet", active?.id) { WalletScreen(it) } }
-                composable(Section.Ships.route) {
-                    PerCharacter("Ships", active?.id) { id ->
-                        ShipsScreen(
-                            id,
-                            onOpenAsset = { itemId -> nav.navigate("ship/asset/$id/$itemId") },
-                            onOpenFit = { fittingId -> nav.navigate("ship/fit/$id/$fittingId") },
-                        )
-                    }
+        NavHost(nav, startDestination = Section.Overview.route, modifier = Modifier.fillMaxSize()) {
+            composable(Section.Overview.route) { OverviewScreen() }
+            composable(Section.Skills.route) { PerCharacter("Skills", active?.id) { SkillsScreen(it) } }
+            composable(Section.Clones.route) { PerCharacter("Clones", active?.id) { ClonesScreen(it) } }
+            composable(Section.Assets.route) { PerCharacter("Assets", active?.id) { AssetsScreen(it) } }
+            composable(Section.Wallet.route) { PerCharacter("Wallet", active?.id) { WalletScreen(it) } }
+            composable(Section.Ships.route) {
+                PerCharacter("Ships", active?.id) { id ->
+                    ShipsScreen(
+                        id,
+                        onOpenAsset = { itemId -> nav.navigate("ship/asset/$id/$itemId") },
+                        onOpenFit = { fittingId -> nav.navigate("ship/fit/$id/$fittingId") },
+                    )
                 }
-                val ids = listOf(navArgument("character") { type = NavType.LongType }, navArgument("id") { type = NavType.LongType })
-                composable("ship/asset/{character}/{id}", ids) { e ->
-                    val (character, id) = e.arguments!!.read { getLong("character") to getLong("id") }
-                    ShipDetailScreen(Paths.shipAsset(character, id), onBack = { nav.popBackStack() })
-                }
-                composable("ship/fit/{character}/{id}", ids) { e ->
-                    val (character, id) = e.arguments!!.read { getLong("character") to getLong("id") }
-                    ShipDetailScreen(Paths.shipFit(character, id), onBack = { nav.popBackStack() })
-                }
+            }
+            val ids = listOf(navArgument("character") { type = NavType.LongType }, navArgument("id") { type = NavType.LongType })
+            composable("ship/asset/{character}/{id}", ids) { e ->
+                val (character, id) = e.arguments!!.read { getLong("character") to getLong("id") }
+                ShipDetailScreen(Paths.shipAsset(character, id), onBack = { nav.popBackStack() })
+            }
+            composable("ship/fit/{character}/{id}", ids) { e ->
+                val (character, id) = e.arguments!!.read { getLong("character") to getLong("id") }
+                ShipDetailScreen(Paths.shipFit(character, id), onBack = { nav.popBackStack() })
             }
         }
     }

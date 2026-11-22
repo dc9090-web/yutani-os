@@ -56,3 +56,11 @@ compose.resources {
     publicResClass = true
     packageOfResClass = "com.yutanios.app.resources"
 }
+
+// The contract fixtures live with the site (../api-fixtures); the app's tests decode the same files.
+// `-Pshots=<dir>` also renders every screen from them to PNGs, off screen.
+tasks.withType<Test>().configureEach {
+    systemProperty("fixtures", rootProject.file("../api-fixtures/v1").absolutePath)
+    systemProperty("shots", providers.gradleProperty("shots").getOrElse(""))
+    inputs.dir(rootProject.file("../api-fixtures/v1")).optional()
+}

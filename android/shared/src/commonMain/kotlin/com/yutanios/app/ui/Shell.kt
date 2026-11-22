@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.yutanios.app.model.CharacterList
 import com.yutanios.app.model.CharacterOption
 import com.yutanios.app.model.Me
 import com.yutanios.app.model.Paths
@@ -47,7 +48,6 @@ import com.yutanios.app.resources.Res as R
 import com.yutanios.app.resources.wordmark
 import com.yutanios.app.time.relativeTime
 import kotlinx.coroutines.launch
-import kotlinx.serialization.builtins.ListSerializer
 import org.jetbrains.compose.resources.painterResource
 
 enum class Section(val route: String, val title: String) {
@@ -65,10 +65,10 @@ val LocalCharacters = staticCompositionLocalOf { Characters(emptyList(), null) {
 @Composable
 fun rememberCharacters(): Characters {
     val app = LocalApp.current
-    val list by resource(Paths.CHARACTERS, ListSerializer(CharacterOption.serializer()))
+    val list by resource(Paths.CHARACTERS, CharacterList.serializer())
     val index by app.store.index.collectAsState()
     val scope = rememberCoroutineScope()
-    val all = (list as? Res.Ready)?.data ?: emptyList()
+    val all = (list as? Res.Ready)?.data?.characters ?: emptyList()
     return Characters(all, index.activeCharacterId) { id -> scope.launch { app.store.setActiveCharacter(id) } }
 }
 

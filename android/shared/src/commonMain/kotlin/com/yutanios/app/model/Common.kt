@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
 /** One row of the character dropdown: `CharacterOptionView` on the site. */
 @Serializable data class CharacterOption(val id: Long, val name: String, val tag: String? = null, val sp: String? = null, val needsReauth: Boolean = false)
 
+/** `GET /api/v1/characters`. */
+@Serializable data class CharacterList(val characters: List<CharacterOption> = emptyList())
+
 object Paths {
     const val ME = "/api/v1/me"
     const val CHARACTERS = "/api/v1/characters"
