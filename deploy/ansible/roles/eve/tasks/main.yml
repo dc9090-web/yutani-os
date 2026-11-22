@@ -23,6 +23,10 @@
       - "--exclude=deploy/ansible/vars/site.yml"
       - "--exclude=deploy/ansible/inventory.ini"
       - "--exclude=.superpowers"
+      # The Android app is built elsewhere; its folder holds build output and git-ignored private settings.
+      - "--exclude=android"
+      - "--exclude=.claude"
+      - "--exclude=.preview"
   become: false
 
 - name: Template the stack .env

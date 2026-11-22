@@ -9,3 +9,7 @@ compose.dev.yml
 .env
 .env.*
 tsconfig.tsbuildinfo
+android
+api-fixtures
+.claude
+.preview
