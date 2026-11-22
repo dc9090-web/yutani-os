@@ -30,15 +30,21 @@ export function verifyPayload<T>(token: string | undefined, secret: string, maxA
 
 const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.length > 0;
 
-/** A session is a signed cookie that names a Google account. A cookie from before Google sign-in (no `sub`) is signed out. */
-export function verifySession(token: string | undefined, secret: string, now = Math.floor(Date.now() / 1000)): SessionPayload | null {
+/**
+ * A session is a signed cookie that names a Google account still on the allow-list (`allowedEmails`, already
+ * trimmed and lower-cased). A cookie from before Google sign-in (no `sub`) is signed out, and so is one whose
+ * account has since been taken off the list.
+ */
+export function verifySession(token: string | undefined, secret: string, allowedEmails: ReadonlySet<string>, now = Math.floor(Date.now() / 1000)): SessionPayload | null {
   const payload = verifyPayload<Partial<SessionPayload>>(token, secret, SESSION_MAX_AGE, now);
   if (!payload || !nonEmpty(payload.sub) || !nonEmpty(payload.email)) return null;
+  if (!allowedEmails.has(payload.email.trim().toLowerCase())) return null;
   return payload as SessionPayload;
 }
 
-export function withActiveCharacter(session: SessionPayload, activeCharacterId: number | null, now = Math.floor(Date.now() / 1000)): SessionPayload {
-  return { sub: session.sub, email: session.email, activeCharacterId, iat: now };
+/** `iat` stays the Google sign-in time, so switching character never extends the session past SESSION_MAX_AGE. */
+export function withActiveCharacter(session: SessionPayload, activeCharacterId: number | null): SessionPayload {
+  return { sub: session.sub, email: session.email, activeCharacterId, iat: session.iat };
 }
 
 export function cookieOptions(maxAge: number) {
@@ -49,5 +55,6 @@ export async function readSession(): Promise<SessionPayload | null> {
   const { cookies } = await import("next/headers");
   const { getConfig } = await import("../config.js");
   const jar = await cookies();
-  return verifySession(jar.get(SESSION_COOKIE)?.value, getConfig().sessionSecret);
+  const config = getConfig();
+  return verifySession(jar.get(SESSION_COOKIE)?.value, config.sessionSecret, config.allowedGoogleEmails);
 }

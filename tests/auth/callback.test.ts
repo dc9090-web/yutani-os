@@ -50,7 +50,7 @@ describe("auth callback (adding a character)", () => {
     const res = await GET(req());
     expect(res.headers.get("location")).toBe("https://eve.example.com/settings");
     expect(completeLogin).toHaveBeenCalledWith({ code: "c0de", state: "st", oauthCookie: "oc" }, expect.anything());
-    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!);
+    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!, new Set(["owner@example.com"]));
     expect(payload).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1 });
     expect(res.cookies.get(OAUTH_COOKIE)?.value ?? "").toBe("");
   });
@@ -59,7 +59,7 @@ describe("auth callback (adding a character)", () => {
     vi.mocked(readSession).mockResolvedValue({ sub: "g-1", email: "owner@example.com", activeCharacterId: null, iat: Math.floor(Date.now() / 1000) });
     const res = await GET(req());
     expect(res.headers.get("location")).toBe("https://eve.example.com/settings");
-    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!);
+    const payload = verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!, new Set(["owner@example.com"]));
     expect(payload).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: 2 });
   });
 

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "./lib/auth/session.js";
+import { parseAllowedEmails } from "./lib/config.js";
 
 const PUBLIC_EXACT = new Set(["/login", "/api/health"]);
 // /yutani/ holds the brand images the bare login page shows before there is a session.
@@ -15,7 +16,8 @@ export function isPublicPath(pathname: string): boolean {
 export function proxy(req: NextRequest) {
   if (isPublicPath(req.nextUrl.pathname)) return NextResponse.next();
   const secret = process.env.SESSION_SECRET;
-  const ok = secret ? verifySession(req.cookies.get(SESSION_COOKIE)?.value, secret) : null;
+  // An account taken off ALLOWED_GOOGLE_EMAILS is signed out on its next request; an unset list lets no one in.
+  const ok = secret ? verifySession(req.cookies.get(SESSION_COOKIE)?.value, secret, parseAllowedEmails(process.env.ALLOWED_GOOGLE_EMAILS)) : null;
   if (ok) return NextResponse.next();
   const login = new URL("/login", req.nextUrl.origin);
   return NextResponse.redirect(login);

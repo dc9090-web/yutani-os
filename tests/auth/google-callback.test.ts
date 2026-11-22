@@ -23,7 +23,7 @@ import { GET } from "../../src/app/auth/google/callback/route.js";
 import { GET as START } from "../../src/app/auth/google/start/route.js";
 import { completeGoogleLogin } from "../../src/lib/auth/google-flow.js";
 import { AuthError } from "../../src/lib/auth/flow.js";
-import { verifySession, SESSION_COOKIE, GOOGLE_OAUTH_COOKIE } from "../../src/lib/auth/session.js";
+import { signPayload, verifySession, SESSION_COOKIE, GOOGLE_OAUTH_COOKIE } from "../../src/lib/auth/session.js";
 
 // Behind Traefik the route handler sees the container's own origin; redirects must use the configured site origin.
 function req(query: string): NextRequest {
@@ -42,7 +42,7 @@ describe("google callback", () => {
   it("signs the owner in and lands on the overview", async () => {
     const res = await GET(req("?code=c&state=st"));
     expect(res.headers.get("location")).toBe("https://eve.example.com/");
-    expect(verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!)).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: null });
+    expect(verifySession(res.cookies.get(SESSION_COOKIE)?.value, process.env.SESSION_SECRET!, new Set(["owner@example.com"]))).toMatchObject({ sub: "g-1", email: "owner@example.com", activeCharacterId: null });
     expect(res.cookies.get(GOOGLE_OAUTH_COOKIE)?.value ?? "").toBe("");
     expect(completeGoogleLogin).toHaveBeenCalledWith({ code: "c", state: "st", error: null, oauthCookie: "oc" }, expect.anything());
   });
@@ -54,12 +54,32 @@ describe("google callback", () => {
     expect(res.headers.get("location")).toBe("https://eve.example.com/login?error=cancelled");
   });
 
-  it.each(["not-allowed", "cancelled", "state", "token", "jwt"])("sends a %s failure to the login page with no session", async (code) => {
+  it.each(["not-allowed", "cancelled", "token", "jwt"])("sends a %s failure to the login page with no session and clears the attempt", async (code) => {
     vi.mocked(completeGoogleLogin).mockRejectedValue(new AuthError(code as never, "x"));
     const res = await GET(req("?code=c&state=st"));
     expect(res.headers.get("location")).toBe(`https://eve.example.com/login?error=${code}`);
     expect(res.cookies.get(SESSION_COOKIE)?.value ?? "").toBe("");
     expect(res.cookies.get(GOOGLE_OAUTH_COOKIE)?.value ?? "").toBe("");
+  });
+
+  // Two tabs: the second /auth/google/start overwrote the cookie, so the first tab's callback fails on state.
+  // It must leave the cookie alone so the second tab can still finish.
+  it("sends a state failure to the login page but keeps the other tab's attempt", async () => {
+    vi.mocked(completeGoogleLogin).mockRejectedValue(new AuthError("state", "x"));
+    const res = await GET(req("?code=c&state=stale"));
+    expect(res.headers.get("location")).toBe("https://eve.example.com/login?error=state");
+    expect(res.cookies.get(SESSION_COOKIE)?.value ?? "").toBe("");
+    expect(res.cookies.get(GOOGLE_OAUTH_COOKIE)).toBeUndefined();
+  });
+
+  // Back button, reload or session restore replays a callback that already succeeded.
+  it("sends an owner who is already signed in to the overview on a replayed callback", async () => {
+    vi.mocked(completeGoogleLogin).mockRejectedValue(new AuthError("state", "x"));
+    const r = req("?code=c&state=st");
+    r.cookies.set(SESSION_COOKIE, signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 7, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET!));
+    const res = await GET(r);
+    expect(res.headers.get("location")).toBe("https://eve.example.com/");
+    expect(res.cookies.get(SESSION_COOKIE)).toBeUndefined();
   });
 
   it("reports an unexpected failure as unknown", async () => {

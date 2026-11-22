@@ -19,16 +19,23 @@ describe("session tokens", () => {
 
 describe("Google account sessions", () => {
   const s = "s".repeat(32);
+  const allowed = new Set(["owner@example.com"]);
   it("accepts a session that names a Google account", () => {
     const t = signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 5, iat: 1000 }, s);
-    expect(verifySession(t, s, 2000)).toEqual({ sub: "g-1", email: "owner@example.com", activeCharacterId: 5, iat: 1000 });
+    expect(verifySession(t, s, allowed, 2000)).toEqual({ sub: "g-1", email: "owner@example.com", activeCharacterId: 5, iat: 1000 });
   });
   it("treats a pre-Google cookie as signed out", () => {
-    expect(verifySession(signPayload({ activeCharacterId: 5, iat: 1000 }, s), s, 2000)).toBeNull();
-    expect(verifySession(signPayload({ sub: "", email: "owner@example.com", activeCharacterId: 5, iat: 1000 }, s), s, 2000)).toBeNull();
+    expect(verifySession(signPayload({ activeCharacterId: 5, iat: 1000 }, s), s, allowed, 2000)).toBeNull();
+    expect(verifySession(signPayload({ sub: "", email: "owner@example.com", activeCharacterId: 5, iat: 1000 }, s), s, allowed, 2000)).toBeNull();
   });
-  it("keeps the account when the active character changes", () => {
-    expect(withActiveCharacter({ sub: "g-1", email: "owner@example.com", activeCharacterId: 5, iat: 1000 }, 9, 3000))
-      .toEqual({ sub: "g-1", email: "owner@example.com", activeCharacterId: 9, iat: 3000 });
+  it("signs out an account that has been taken off the allow-list", () => {
+    const t = signPayload({ sub: "g-2", email: "second@example.com", activeCharacterId: 5, iat: 1000 }, s);
+    expect(verifySession(t, s, new Set(["owner@example.com", "second@example.com"]), 2000)).not.toBeNull();
+    expect(verifySession(t, s, allowed, 2000)).toBeNull();
+    expect(verifySession(t, s, new Set(), 2000)).toBeNull();
+  });
+  it("keeps the account and the sign-in time when the active character changes", () => {
+    expect(withActiveCharacter({ sub: "g-1", email: "owner@example.com", activeCharacterId: 5, iat: 1000 }, 9))
+      .toEqual({ sub: "g-1", email: "owner@example.com", activeCharacterId: 9, iat: 1000 });
   });
 });

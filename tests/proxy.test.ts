@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { isPublicPath, proxy } from "../src/proxy.js";
 import { SESSION_COOKIE, signPayload } from "../src/lib/auth/session.js";
@@ -18,8 +18,11 @@ describe("isPublicPath", () => {
 
 describe("proxy", () => {
   const original = process.env.SESSION_SECRET;
+  const originalEmails = process.env.ALLOWED_GOOGLE_EMAILS;
+  beforeEach(() => { process.env.ALLOWED_GOOGLE_EMAILS = "Owner@Example.com"; });
   afterEach(() => {
     if (original === undefined) delete process.env.SESSION_SECRET; else process.env.SESSION_SECRET = original;
+    if (originalEmails === undefined) delete process.env.ALLOWED_GOOGLE_EMAILS; else process.env.ALLOWED_GOOGLE_EMAILS = originalEmails;
   });
 
   it("redirects to /login when SESSION_SECRET is unset", () => {
@@ -44,6 +47,21 @@ describe("proxy", () => {
     process.env.SESSION_SECRET = "s".repeat(32);
     const req = new NextRequest("https://eve.example.com/settings");
     req.cookies.set(SESSION_COOKIE, signPayload({ activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET));
+    expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
+  });
+
+  it("sends a session for an account no longer on the allow-list to /login", () => {
+    process.env.SESSION_SECRET = "s".repeat(32);
+    const req = new NextRequest("https://eve.example.com/settings");
+    req.cookies.set(SESSION_COOKIE, signPayload({ sub: "g-2", email: "second@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET));
+    expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
+  });
+
+  it("sends every session to /login when ALLOWED_GOOGLE_EMAILS is unset", () => {
+    process.env.SESSION_SECRET = "s".repeat(32);
+    delete process.env.ALLOWED_GOOGLE_EMAILS;
+    const req = new NextRequest("https://eve.example.com/settings");
+    req.cookies.set(SESSION_COOKIE, signPayload({ sub: "g-1", email: "owner@example.com", activeCharacterId: 1, iat: Math.floor(Date.now() / 1000) }, process.env.SESSION_SECRET));
     expect(proxy(req).headers.get("location")).toBe("https://eve.example.com/login");
   });
 });
